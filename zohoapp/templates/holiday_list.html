@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load mathfilters %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+
+
+<style>
+    .modal{
+        z-index: 9999;
+
+    }
+    .modal {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    width: 50%;
+    height: 30%;
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Black semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99;
+  }
+
+  /* Style for the modal content */
+  .modal-content {
+    background-color: black;
+    /* White background for the modal */
+    color: black;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 10px 8px rgba(0, 0, 0, 0.9);
+    max-width: 500px;
+    /* You can adjust the width as needed */
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Style for the close button (you can customize this) */
+  .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+  }
+
+  .modal-title {
+    color: white;
+    size: 20px;
+  }
+
+  .dropdown-item:hover {
+    color: white;
+  }
+</style>
+
+<div class="container-fluid">
+    <div>
+        <center>
+            
+            <h2 class="mt-4" id="headline">ALL HOLIDAYS</h2>
+            <div class="display">
+                
+            </div>
+
+        </center>
+    </div>
+   
+
+    <div class="row container-fluid mb-3">
+        <div class="col-md-3">
+            <input type="text" id="search" class="form-control bg-light text-dark" name="search"
+            placeholder="Search Here..."   onkeyup="searchFunction()">        </div>
+        <div class="col-md-2">
+          <div class="dropdown">
+            <a class="btn text-center px-4 pt-2 btn-outline-warning" id="sortbutton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" >
+              <i  class="fas fa-sort m-1"></i>
+            </a>
+            <div class="dropdown-menu m-1">
+              <a class="dropdown-item text-light" href="{% url 'holiday_list' %}">All</a>
+              <a class="dropdown-item text-light" onclick="sortTableByMonthAsc()">Month</a>
+              <a class="dropdown-item text-light" onclick="sortTableByYearAsc()">Year</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-1">
+            
+        </div>
+        <div class="col-md-6">
+          <div class="dropdown d-flex">
+           
+            <a style="height: 5vh; margin-left: 2vh;" class="btn btn-outline-warning text-right" role="button" style="margin-left: 5px;" onclick="toggleModal()" >
+                <i class="fa fa-arrow-down" style="font-size: large;"></i><span style="font-size: 3vh;">Import</span>
+              </a>
+            <a style="height: 5vh; margin-left: 2vh;" class="btn btn-outline-warning text-right " role="button" style="margin-left: 5px;" onclick="ExportToExcel('xlsx')" >
+                <i class="fa fa-arrow-up" style="font-size: large;"></i><span style="font-size: 3vh;">Export</span>
+              </a>
+              
+            <a style="height: 5vh; margin-left: 2vh;" class="btn btn-outline-warning text-right px-3 py-2" role="button" style="margin-left: 5px;"  href="{% url 'holiday_add' %}">
+                <i class="fa fa-plus" style="font-size: large;"></i><span style="font-size: 3vh;">New</span>
+              </a>
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title" id="myModalLabel">Add Comment</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeModal()">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="commentForm" method="post" action="{% url 'xl_to_django' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                        <input type="file" name="import">
+                        <input type="submit" value="upload">
+                </div>
+
+                
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+    <script>
+
+function toggleModal() {
+      const modal = document.getElementById("myModal");
+      if (modal.style.display === "none") {
+        modal.style.display = "block";
+        // You can add an AJAX call here to load comments dynamically, if needed
+      } else {
+        modal.style.display = "none";
+      }
+    }
+    function closeModal() {
+      const modal = document.getElementById("myModal");
+      modal.style.display = "none";
+    }
+            function ExportToExcel(type, fn, dl) {
+        var elt = document.getElementById('myTable');
+        var wb = XLSX.utils.table_to_book(elt, { sheet: "sheet1" });
+        return dl ?
+            XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }) :
+            XLSX.writeFile(wb, fn || ('holidays.' +  (type || 'xlsx')));
+    }
+
+
+       function searchFunction() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("search");
+        filter = input.value.toLowerCase();
+        table = document.getElementById("myTable");
+        tr = table.getElementsByTagName("tr");
+        // input.style.borderColor = "green";
+        for (i = 1; i < tr.length; i++) {
+            let rowVisible = false;
+            td = tr[i].getElementsByTagName("td");
+            for (j = 0; j < td.length; j++) {
+                if (td[j]) {
+                    txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                        rowVisible = true;
+                        break;
+                    }
+                }
+            }
+
+            // Show/hide the row based on the search results
+            tr[i].style.display = rowVisible ? "" : "none";
+        }
+    }
+    </script>
+    <table class="table mt-3" style="background-color: rgba(0, 0, 0, 0.568);" id="myTable">
+        <thead>
+            <th class="text-center">Sl no.</th>
+            <th class="text-center">Month</th>
+            <th class="text-center">Year</th>
+            <th class="text-center">Holidays</th>
+            <th class="text-center">Working days</th>
+        </thead>
+        {% for key, value in event_counts_json.items %}
+        <tr class="text-light mt-2 pt-1 clickable-row" data-href="{% url 'holidays' key %}">
+            <td class="text-center">{{forloop.counter }}</td>
+            <td class="text-center">{{ value.month }}</td>
+            <td class="text-center">{{ value.year }}</td>
+            <td class="text-center">{{ value.count }}</td>
+            <td class="text-center">{{ value.total_days|sub:value.count }}</td>
+            
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<!-- Add this line to include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+<script>
+    function sortTableByMonthAsc() {
+    var rows = $('tr.clickable-row').get();
+    console.log(rows)
+    console.log('suuupi')
+    rows.sort(function (a, b) {
+        var monthA = $(a).find('td:eq(1)').text(); // Assuming month is in the second column
+        var monthB = $(b).find('td:eq(1)').text();
+
+        var yearA = $(a).find('td:eq(2)').text(); // Assuming year is in the third column
+        var yearB = $(b).find('td:eq(2)').text();
+
+        var monthOrder = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        var monthAIndex = monthOrder.indexOf(monthA);
+        var monthBIndex = monthOrder.indexOf(monthB);
+
+        if (yearA === yearB) {
+            return monthAIndex - monthBIndex;
+        } else {
+            return yearA - yearB;
+        }
+    });
+    $.each(rows, function (index, row) {
+        $('#myTable').append(row);
+    });
+}
+
+
+</script>
+
+<script>
+    function sortTableByYearAsc() {
+        var rows = $('tr.clickable-row').get();
+        console.log(rows)
+        console.log('suuupi')
+        rows.sort(function (a, b) {
+            var yearA = $(a).find('td:eq(2)').text(); // Assuming year is in the third column
+            var yearB = $(b).find('td:eq(2)').text();
+
+            if (yearA === yearB) {
+                // If years are the same, then compare months
+                var monthA = $(a).find('td:eq(1)').text(); // Assuming month is in the second column
+                var monthB = $(b).find('td:eq(1)').text();
+
+                var monthOrder = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                var monthAIndex = monthOrder.indexOf(monthA);
+                var monthBIndex = monthOrder.indexOf(monthB);
+
+                return monthAIndex - monthBIndex;
+            } else {
+                // If years are different, sort based on years
+                return yearA - yearB;
+            }
+        });
+
+        $.each(rows, function (index, row) {
+            $('#myTable').append(row);
+        });
+    }
+</script>
+
+<script>
+    jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});
+   
+   
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,547 @@
+
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<!-- <link href='https://unpkg.com/css.gg@2.0.0/icons/css/trash.css' rel='stylesheet'>
+<script src="https://cdn.jsdelivr.net/bootstrap.datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
+<script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script> -->
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+
+<style>
+    .card{
+        background: none;
+    }
+    tbody tr td{
+        border: none;
+        border-top: none;
+        border-style: none;
+        color:azure;
+        justify-content: center;
+    }
+    tr:hover{
+        cursor: pointer;
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+   
+    ul.image-bullets {
+        list-style-type: none;
+        padding-left: 30px;
+    }
+
+    ul.image-bullets li:before {
+        content: "";
+        background-image: url('static/images/bullet.png');
+        background-size: 15px 15px;
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        margin-right: 5px; 
+        margin-left: 26%;
+    }
+    .recurpoints ul li{
+        margin-bottom: 10px;
+    }
+
+    .flowchart {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 20px;
+}
+
+    .flowchart-item {
+        text-align: center;
+        padding: 10px;
+        background-color: lightblue;
+        border: 3px solid rgb(25, 91, 145);
+        border-radius: 5px;
+        width: 150px;
+        color: black;
+        font-size: 12px;
+    }
+    .flowchart-item i{
+        font-size: 15px;
+    }
+
+    .flowchart-connector {
+        flex-grow: 1;
+        height: 2px;
+        background-color: #ccc;
+        margin-top: 0%;
+
+    }
+
+    .modal{
+      z-index: 9999;
+      overflow: scroll;
+    }
+    
+    @media (max-width: 768px) {
+        .flowchart {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .flowchart-item {
+            width: 120px;
+        }
+        .flowchart-connector {
+            height: 50px;
+            width: 2px; 
+            margin-left: 0%; 
+            transform: translateX(-50%);
+        }
+    }
+    /* .btn{
+        color: rgb(218, 164, 48);
+        outline-color: azure;
+        border: 2px solid rgb(25, 91, 145);
+    }
+    .btn:hover{
+        color: darkslategray;
+        background-color: lightblue;
+        outline: none;
+        
+    } */
+    /* a{
+        list-style: none;
+        color: azure;
+    }
+     a:hover{
+        color: rgb(218, 164, 48);
+     } */
+     ::-webkit-scrollbar {
+        width: 5px; 
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1; 
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888; 
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555; 
+    }
+
+    .table-container {
+    max-height: 400px; /* Adjust the max-height as needed */
+    overflow: auto;
+}
+
+@media (max-width: 768px) {
+    .table th:nth-child(3), .table td:nth-child(3) {
+        display: none;
+    }
+    /* Add more rules for other columns as needed */
+}
+ 
+</style>
+
+
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+  
+  <!-- <script>
+  document.getElementById("export").addEventListener("click", function () {
+  const Table = document.getElementById("table");
+  const ws = XLSX.utils.table_to_sheet(Table);
+  ws['!cols'] = [{ wch: 15 },{ wch: 15 },{ wch: 15 },{ wch: 15 },{ wch: 15 },{ wch: 15 }];
+  ws['!rows'] = [{ hpt: 30 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+  XLSX.writeFile(wb, "expense_list.xlsx"); 
+});
+
+</script> -->
+
+<script>
+    function export_excel()
+    {
+        const Table = document.getElementById("table");
+  const ws = XLSX.utils.table_to_sheet(Table);
+  ws['!cols'] = [{ wch: 15 },{ wch: 15 },{ wch: 15 },{ wch: 15 },{ wch: 15 },{ wch: 15 }];
+  ws['!rows'] = [{ hpt: 30 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+  XLSX.writeFile(wb, "expense_list.xlsx"); 
+    }
+</script>
+
+
+
+<div>
+    <div class="row pb-5">
+        <div class="col-md-10">
+            <h2 class="mb-0 text-uppercase text-right">Expense</h2>
+        </div>
+    </div>
+           
+    <div >
+        <div >
+            <div class="row">
+                <div class="col-md-3">
+                    <input type="text" id="search" placeholder="Search..." class="form-control text-dark bg-light px-3 py-2" autocomplete="off">
+                </div>
+                <div class="col-md-3">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-warning px-3 py-2 text-warning" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-sort"></i>
+                        </button>
+                        <div class="dropdown-menu" id="sort-options">
+                            <a class="dropdown-item" href="{% url 'expensepage' %}" data-sort="all">All</a>
+                            <a class="dropdown-item" href="{% url 'exp_sort_by_amount' %}" data-sort="name">Amount</a>
+                            <a class="dropdown-item" href="{% url 'exp_sort_by_expen_acc' %}" data-sort="amount">Expense Account</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2"></div>
+                <div class="col-md-1">
+                    <a class="btn btn-outline-warning text-center px-3 py-2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                        <i class="fa fa-filter mx-3"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{% url 'expensepage' %}">All</a>
+                        <a class="dropdown-item" href="{% url 'filter_by_draft_exp' %}">Draft</a>
+                        <a class="dropdown-item" href="{% url 'filter_by_save_exp' %}">Save</a>
+                    </div>
+  
+                </div>
+                <div class="col-md-3">
+                    <button  id="export" class="btn btn-outline-warning  px-3 py-2" onclick="export_excel()">Export</button>
+                    <a  style="color: white; height:35px;" id="importBtn" data-toggle="modal" data-target="#import_modal" class="btn btn-outline-warning text-warning mr-1 pt-2" >Import</a>
+
+
+                    <a href="{% url 'save_expense' %}" class="btn btn-outline-warning  text-right px-3 py-2" role="button">
+                      <b>+</b> New
+                    </a>
+                </div>
+
+            </div>
+          
+    <hr>
+    <div class="row">
+        <div class="col-md-12">
+            {% for message in messages %}
+            <b style="color: rgb(189, 124, 3);">{{message}}</b>
+            {% endfor %}
+        </div>
+    </div>
+    <div >
+        <div>
+            <table id="table" class="table mt-4" >
+            <thead>
+                <tr>
+                            <th>DATE</th>
+                            <th>EXPENSE NUMBER</th>
+                            <th>EXPENSE ACCOUNT</th>
+                            <th>EXPENSE TYPE</th>
+                            <th>PAYMENT METHOD</th>
+                            <th>AMOUNT</th>
+                            <th>STATUS</th>
+                </tr>
+            </thead>
+            <tbody id="tbl">
+                {% for expense in expenses %}
+                <tr style="cursor: pointer;">
+                    <td><a href="{% url 'expense_details' expense.id %}" style="color: white;">{{ expense.date }}</a></td>
+                    <td><a href="{% url 'expense_details' expense.id %}" style="color: white;">{{ expense.expense_number }}</a></td>
+                    <td><a href="{% url 'expense_details' expense.id %}" style="color: white;">{{ expense.expense_account }}</a></td>
+                    <td><a href="{% url 'expense_details' expense.id %}" style="color: white;">{{ expense.expense_type }}</a></td>
+                    <td><a href="{% url 'expense_details' expense.id %}" style="color: white;">{{ expense.paid }}</a></td>
+                    <td><a href="{% url 'expense_details' expense.id %}" style="color: white;">{{ expense.amount }}</a></td> 
+                    <td><a href="{% url 'expense_details' expense.id %}" style="color: white;">{{ expense.status }}</a></td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    
+
+<!-- ................................... import modal ................. -->
+
+<div class="modal fade" id="import_modal">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+        <div class="modal-header " style="background: rgb(32, 35, 37);">
+          <h1 class="text-light">Import Expense</h1>
+        </div>
+        <div class="modal-body" style="background: rgb(32, 35, 37);">
+          <div class="card p-3 m-3">        
+            <div class="row">
+              <div class="col-md-12 col-lg-12 col-sm-12">
+                <h5 class="text-danger">IMPORTANT:</h5>
+                <p class="text-light">File should have  sheet named 'Sheet1' and column name & order should be in the given format(Uppercase)</p><br>
+                <p class="text-light">Place of supply should be in the following format ,eg: for kerala  Type [KL]-Kerala  </p><br>
+                <div class="row">
+                    <div class="col-md-4">
+                        [AN]-Andaman and Nicobar Islads<br>
+      [AD]-Andhra Predhesh <br>
+      [AR]-Arunachal Predesh <br>
+      [AS]-Assam<br>
+      [BR]-Bihar<br>
+      [CH]-Chandigarh<br>
+      [CG]-Chhattisgarh<br>
+      [DNH]-Dadra and Nagar Haveli<br>
+      [DD]-Damn anad Diu<br>
+      [DL]-Delhi<br>
+      [GA]-Goa<br>
+      [GJ]-Gujarat<br>
+      [HR]-Haryana<br>
+
+                    </div>
+                    <div class="col-md-4">
+                        [HP]-Himachal Predesh<br>
+      [JK]-Jammu and Kashmir<br>
+      [JH]-Jharkhand<br>
+      [KA]-Karnataka<br>
+      [KL]-Kerala<br>
+      [LA]-Ladakh<br>
+      [LD]-Lakshadweep<br>
+      [MP]-Madhya Predesh<br>
+      [MH]-Maharashtra<br>
+      [MN]-Manipur<br>
+      [ML]-Meghalaya<br>
+      [MZ]-Mizoram<br>
+                        
+                    </div>
+                    <div class="col-md-4">
+                        [NL]-Nagaland<br>
+      [OD]-Odisha<br>
+      [PY]-Puducherry<br>
+      [PB]-Punjab<br>
+      [RJ]-Rajasthan<br>
+      [SK]-Sikkim<br>
+      [TN]-Tamil Nadu<br>
+      [TS]-Telangana<br>
+      [TR]-Tripura<br>
+      [UP]-Uttar Predesh<br>
+      [UK]-Uttarakhand<br>
+      [WB]-West Bengal<br>
+      [OT]-Other Territory<br>
+                    </div>
+                </div><br><br>
+                <p class="text-light">Vendor and customer name should be given with salutaion  and the name and salutaion should be in uppercase<br>
+                    eg :MR. ADITHYA CHOPRA
+                </p><br>
+                <p class="text-light">Status should be given in one of the following format <br>
+                    draft  <br>
+                    save
+                </p><br>
+                <p class="text-light">If you have IGST Tax ,then fill CGST and SGST filled with 0  <br>
+                    If you have CGST and SGST Tax ,then fill IGST filled with 0
+                    
+                </p>
+
+
+              </div>
+            </div>
+          </div>
+          <a href="{% url 'downloadExpenseSampleImportFile' %}" class="text-primary" style="font-size:medium;">Download Sample File here</a> <br>
+  
+          <form action="{% url 'import_expense' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <h6 class="text-light">File</h6>
+            <input type="file" name="excel_file" class="form-control text-dark" style="width: 50%;"><br>
+            <button class="btn btn-outline-warning mt-3">IMPORT</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ..........................................import modal end  ........................... -->
+
+
+
+
+</div>
+</div>       
+<hr>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <div class="card radius-15 mt-5">
+            <div class="card-body">
+                <div class="card-title">
+                    <h3 class="mb-0 text-center">Life cycle of Expense</h3>
+                    <br>
+                    <div class="flowchart">
+                        <div class="flowchart-item text-uppercase" style="width: 200px;">
+                            <i class="fa-sharp fa-solid fa-bag-shopping" style="color: #daa430;"></i> Expense Incurred
+                        </div>
+                        <div class="flowchart-connector"></div>
+                        <div class="flowchart-item text-uppercase" style="width: 210px;">
+                            <i class="fa-sharp fa-solid fa-file" style="color: #daa430;"></i> Record Expense
+                        </div>
+                        <div class="flowchart-connector"></div>
+                        <div class="flowchart-item text-uppercase" >
+                            <i class="fa-sharp fa-solid fa-receipt" style="color: #daa430;"></i> Billable
+                        </div>
+                        <div class="flowchart-connector">  </div>
+                        <div class="flowchart-item text-uppercase">
+                            <i class="fa-sharp fa-solid fa-money-check-dollar" style="color: #3ec61c;"></i>Convert to invoice
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="card radius-15">
+            <div class="card-body">
+                <div class="card-title recurpoints">
+                    <h3 class="mb-0 text-center">In the Expense Section,you can:</h3>
+                    <br>
+                    <div >
+                    <ul class='image-bullets'>
+                        <li>Record a single expense or record expenses in bulk.</li>
+                        <li> Set mileage rates and record expenses based on the distance travelled.</li>
+                        <li>Convert an expense into an invoice to get it reimbursed.</li>
+                    </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+</div>
+</div>
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script>
+  $(document).ready(function() {
+    var $rows = $('#table tbody tr');
+    $('#search').keyup(function() {
+      var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+      $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+      }).hide();
+    });
+  });
+
+
+$('.dropdown-toggle').dropdown();
+
+
+</script>
+{% endblock %}
+<script>
+    $(document).ready(function() {
+      var $rows = $('#table tbody tr');
+      $('#search').keyup(function() {
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+        $rows.show().filter(function() {
+          var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+          return !~text.indexOf(val);
+        }).hide();
+      });
+    });
+  
+    function searchTable() {
+      let input, filter, table, tr, td, i, j, txtValue;
+      input = document.getElementById("searchInput");
+      filter = input.value.toLowerCase();
+      table = document.getElementById("tableBody");
+      tr = table.getElementsByTagName("tr");
+  
+      console.log("Filter Value:", filter);
+  
+      // Loop through all table rows (excluding the first row, which contains the column headers)
+      for (i = 0; i < tr.length; i++) {
+          let rowVisible = false;
+          td = tr[i].getElementsByTagName("td");
+  
+          // Loop through all table cells (columns) in each row
+          for (j = 0; j < td.length; j++) {
+              if (td[j]) {
+                  txtValue = td[j].textContent || td[j].innerText;
+                  console.log("Text Value:", txtValue);
+                  if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                      rowVisible = true;
+                      break;
+                  }
+              }
+          }
+  
+          // Show/hide the row based on the search results
+          tr[i].style.display = rowVisible ? "" : "none";
+      }
+  }
+  
+  
+//sort
+$(document).ready(function() {
+    function sortTable(criteria) {
+        const rows = $("#tbl tr").get();
+        rows.sort(function(rowA, rowB) {
+            const cellA = $(rowA).find("td").eq(criteria === "name" ? 2 : criteria === "amount" ? 6 : 0).text().toLowerCase();
+            const cellB = $(rowB).find("td").eq(criteria === "name" ? 2 : criteria === "amount" ? 6 : 0).text().toLowerCase();
+            return cellA.localeCompare(cellB);
+        });
+        $("#tbl").empty().append(rows);
+    }
+
+    // Handle click event on dropdown items
+    $(".dropdown-menu a").click(function() {
+        const sortingCriteria = $(this).data("sort");
+        if (sortingCriteria) {
+            sortTable(sortingCriteria);
+        }
+    });
+});
+  
+  </script>
+
+
+
+
+
+  <!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<!-- Bootstrap JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+

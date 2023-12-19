@@ -1,0 +1,545 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+  
+  #over:hover{
+        background-color: rgba(110, 110, 110, 0.616);
+        
+    }
+    .description-icon {
+    cursor: pointer;
+  }
+  
+  .description-icon::before {
+    content: attr(title);
+    display: none;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 5px;
+    border-radius: 4px;
+    z-index: 1;
+    white-space: nowrap;
+  }
+  
+  .description-icon:hover::before {
+    display: block;
+  }
+  @media (max-width: 768px) {
+        .flowchart {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .flowchart-item {
+            width: 120px;
+        }
+        .flowchart-connector {
+            height: 50px;
+            width: 2px; 
+            margin-left: 0%; 
+            transform: translateX(-50%);
+        }
+    }
+    .btn{
+        color: rgb(218, 164, 48);
+        outline-color: azure;
+        border: 2px solid rgb(25, 91, 145);
+    }
+    .btn:hover{
+        color: darkslategray;
+        background-color: lightblue;
+        outline: none;
+        
+    }
+    a{
+        list-style: none;
+        color: azure;
+    }
+     a:hover{
+        color: rgb(218, 164, 48);
+     }
+     .modal{
+      z-index: 1;
+     }
+     .modal-content{
+      z-index: 1;
+     }
+     .modal-backdrop{
+      z-index: 1;
+     }
+    *:not(#table_over)::-webkit-scrollbar { display: none; }
+</style>
+
+{% if messages %}
+  {% for i in messages %}
+    {% if i.tags == 'warning' %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert" style="z-index: 1;">
+      <strong>WARNING:</strong> {{ i }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% elif i.tags == 'info' %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert"  style="z-index: 1;">
+      <strong>INFO:</strong> {{ i }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% elif i.tags == 'success' %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="z-index: 1;">
+      <strong>SUCCESS:</strong> {{ i }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% elif i.tags == 'error' %}
+    <div class="alert bg-danger alert-dismissible fade show" role="alert" style="z-index: 1;">
+      <strong>ERROR:</strong> {{ i }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+<div class="container-fluid" >
+    <div style="height: 600px;">
+      <div class="row">
+        <div class="col-md-3">
+          <a class="text-white" style="font-size: 2rem;">E-way Bills</a>
+        </div>
+      </div>
+      <div class="row mt-5">
+        <div class="col-md-3 col-sm-12">
+          <input type="text" id="vendorSearchInput" class="form-control bg-light text-dark" placeholder="Search e-way bills...">
+        </div>
+        
+        <div class="col-md-9 col-sm-12 form-inline d-flex justify-content-end">
+          <a class="btn text-center px-3" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa fa-file-excel-o mx-1" style="padding-inline-end: 5px;"> </i>Import</a>
+          <a class="btn text-center px-3 ms-2" type="button" onclick="exportToExcel()"><i class="fa fa-file-excel-o mx-1" style="padding-inline-end: 5px;"> </i>Export</a>
+          <a class="btn text-center px-3 ms-2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button"><i class="fa fa-filter mx-3"></i></a>
+          <div class="dropdown-menu">
+              <a class="dropdown-item" href="" style="color:rgb(218, 164, 48) ;">All</a>
+              <a class="dropdown-item" href="#" style="color:rgb(218, 164, 48) ;" id="sortCustomer" data-sort="customer">Name</a>
+              <a class="dropdown-item" href="#" style="color:rgb(218, 164, 48) ;" id="sortEway">E-way Bill Number</a>
+          </div>
+          <a style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;" class="btn text-center mr-2 ms-2" href="{% url 'ewaycreate' %}">
+              New
+          </a>
+        </div>
+      </div>
+      
+    
+        <div class="row mt-3">
+            <div class="col-sm-12 col-md-12" style="overflow: auto;">
+              <table class="table text-white" id="vendorTable">
+                <thead>
+                  <tr>
+                    <th>DATE</th>
+                    <th>TRANSACTIONS</th>
+                    <th>CUSTOMER NAME</th>
+                    <th id="eway_bill">E-WAY BILL NO.</th>
+                    <th>CUSTOMER E-MAIL</th>
+                    <th>CUSTOMER GSTIN</th>
+                    <th>AMOUNT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for v in proj %}
+                  <tr id="over">
+                    <!--<td onclick="location.href ='{% url 'detail' v.id %}' " > {{v.name}}</td> -->
+                    <td><a href="{% url 'ewayoverview' v.id %}"> {{v.date}} </a></td>  
+                    <td><a href="{% url 'ewayoverview' v.id %}">{{v.trans}}</a></td>
+                    <td><a href="{% url 'ewayoverview' v.id %}"> {{v.cust.customerName}}</a> </td>
+                    <td><a href="{% url 'ewayoverview' v.id %}">{{v.invoiceno}}</a></td>
+                    <td><a href="{% url 'ewayoverview' v.id %}">{{v.cust.customerEmail}}</a></td>
+                    <td>
+                      {% if v.cgstin_inp %}
+                        <a href="{% url 'ewayoverview' v.id %}">{{ v.cgstin_inp }}</a>
+                      {% else %}
+                      <a href="{% url 'ewayoverview' v.id %}">{{ v.cgst_trt_inp}}</a>
+                      {% endif %}
+                    </td>
+                   
+                    <td><a href="{% url 'ewayoverview' v.id %}">{{v.grand_total}}</a></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              
+            </div>
+            <div class="col-sm-12 col-md-1 col-lg-1"></div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="0" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index: 10;margin-top: 3.2rem;">
+  <div class="modal-dialog">
+    <div style="background-color: rgb(63, 63, 63);width: 40rem;" class="modal-content">
+      <!-- <div class="modal-header">
+        
+      </div> -->
+      <div class="modal-body">
+        <div class="d-flex justify-content-between">
+          <h1 class="modal-title fs-5 " id="exampleModalLabel">Import From Excel</h1>
+          <button type="button" class="btn-close text-light" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <hr class="mb-3">
+        <label class="text-danger fw-bold pb-2" for="">Fields needed to be filled are</label>
+        <div id="table_over" style="overflow-x: auto;">
+          <table class="table table-bordered border-secondary me-1">
+            <thead>
+              <th class="text-light">Sl NO</th>
+              <th class="text-light">Document Type</th>
+              <th class="text-light">Transaction Sub Type</th>
+              <th class="text-light">Customer Name</th>
+              <th class="text-light">Customer Email ID</th>
+              <th class="text-light">Address</th>
+              <th class="text-light">Billing Address</th>
+              <th class="text-light">Place of Supply</th>
+              <th class="text-light">Invoice</th>
+              <!-- <th class="text-light">Reference Number</th> -->
+              <th class="text-light">Date</th>
+              <th class="text-light">Transaction Type</th>
+              <!-- <th class="text-light">HSN Number</th>
+              <th class="text-light">SAC Number</th> -->
+              <th class="text-light">Transportation</th>
+              <th class="text-light">Kilometre</th>
+              <th class="text-light">Vehicle Number</th>
+              <th class="text-light">Sub Total</th>
+              <th class="text-light">GST</th>
+              <th class="text-light">IGST</th>
+              <th class="text-light">Tax Amount</th>
+              <th class="text-light">Shipping Charge</th>
+              <th class="text-light">Adjustment</th>
+              <th class="text-light">Total</th>
+              <th class="text-light">Customer Note</th>
+              <th class="text-light">Terms & Conditions</th>
+              <th class="text-light">File</th>
+            </thead>
+          </table>
+          <p></p>
+        </div>
+
+        <a class="pt-2 pb-2" type="button" onclick="more_det()">more +</a>
+        <div id="more_detail" class="p-2 fs-6 mb-3" style="overflow-y: scroll;max-height: 15rem;border: 1px solid rgb(255, 255, 255);border-radius: 0.5rem;">
+          <h6 class="fw-bold">Eway Table</h6>
+          <div class="row">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Document Type*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Values must be equal to Sl No. off Eway Table.</small>
+            </div>
+          </div>
+
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Transaction Sub Type*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Values must be Supply,Export,SKD/CKD.</small>
+            </div>
+          </div>
+
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Customer Name*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Type the Customer Name.</small>
+            </div>
+          </div>
+
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Customer Email ID*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Type the Customer Email ID.</small>
+            </div>
+          </div>
+
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Place of Supply*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Type the state code , Enter [OT] if out side the state.</small>
+            </div>
+          </div>
+
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Date*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Date of Transaction.</small>
+            </div>
+          </div>
+         
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Transaction Type*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Values must be either Goods or Services.</small>
+            </div>
+          </div>
+
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">HSN Number*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Provide HSN Number if you slected Goods.</small>
+            </div>
+          </div>
+
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">SAC Number*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Provide SAC Number if selected SAC Number.</small>
+            </div>
+          </div>
+
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Transportation	*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Enter the Transportation Vehicle Example (Car,Train,Bus..).</small>
+            </div>
+          </div>
+
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">File-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Any Attatchment you needed to be included.</small>
+            </div>
+          </div>
+
+        </div>
+
+        <div id="table_over" style="overflow-x: auto;">
+          <table class="table table-bordered border-secondary me-1">
+            <thead>
+              <th class="text-light">Eway Bill no.</th>
+              <th class="text-light">Item</th>
+              <th class="text-light">Quantity</th>
+              <!-- <th class="text-light">Rate</th> -->
+              <th class="text-light">Discount</th>
+              <th class="text-light">Tax</th>
+              <th class="text-light">Amount</th>
+            </thead>
+          </table>
+          <p></p>
+        </div>
+        <a class="pt-2 pb-2" type="button" onclick="more_det2()">more +</a>
+        <div id="more_detail2" class="p-2 fs-6" style="overflow-y: scroll;max-height: 15rem;border: 1px solid rgb(255, 255, 255);border-radius: 0.5rem;">
+          <h6 class="fw-bold">ITEM Table</h6>
+          <div class="row">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Eway Bill no.*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Values must be Invoices,Credit Notes,Delivery Challans.</small>
+            </div>
+          </div>
+
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Item*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Name of the item.</small>
+            </div>
+          </div>
+
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Quantity*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Quantity of the item.</small>
+            </div>
+          </div>
+
+          <!-- <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Rate*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Rate of the item.</small>
+            </div>
+          </div> -->
+
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Discount*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Type the Discount price.</small>
+            </div>
+          </div>
+
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Tax*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Date of Transaction.</small>
+            </div>
+          </div>
+         
+          <div class="row mt-1">
+            <div class="col-sm-12 col-lg-4">
+              <small class="text-warning" for="">Amount*-</small>
+            </div>
+            <div class="col-sm-12 col-lg-8">
+              <small class="text-warning" for="">Total Amount.</small>
+            </div>
+          </div>
+
+
+        </div>
+
+        
+        <hr class="mt-1">
+        <form action="{% url 'import_eway_bill' %}" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <label style="color: rgb(152, 152, 255);" class=" fw-bolder" for="">Download Sample Excel File</label>
+              <a class="btn btn-outline-warning ms-5" href="{% url 'download_ebay_sampleImportFile' %}">Download</a>
+             <hr>
+              <input class="form-control bg-dark" type="file" name="excel_file">
+              <hr>
+              <div class="d-flex justify-content-end">
+                <button type="button" class="btn bt-lg btn-secondary me-2 text-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn bt-lg btn-primary text-dark">Import</button>
+              </div>
+          </div>
+          <br>
+      </form>
+      <!-- <div class="modal-footer">
+        
+      </div> -->
+    </div>
+  </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // Function to filter items based on the search query
+    function filterItems(query) {
+      query = query.toLowerCase();
+      $("#vendorTable tbody tr").each(function() {
+        const rowText = $(this).text().toLowerCase();
+        if (rowText.includes(query)) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
+      });
+    }
+  
+    // Handle keyup event on the search input
+    $("#vendorSearchInput").keyup(function() {
+      const searchQuery = $(this).val();
+      filterItems(searchQuery);
+    });
+  });
+  </script>
+<script>
+  $(document).ready(function() {
+    // Function to filter items based on the search query
+    function filterItems(query) {
+      query = query.toLowerCase();
+      $("#vendorTable tbody tr").each(function() {
+        const rowText = $(this).text().toLowerCase();
+        if (rowText.includes(query)) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
+      });
+    }
+  
+    // Function to sort the table based on the selected criteria
+    function sortTable(criteria) {
+      const rows = $("#vendorTable tbody tr").get();
+      rows.sort(function(rowA, rowB) {
+        const cellA = $(rowA).find("td").eq(criteria === "customer" ? 2 : 1).text().toLowerCase();
+        const cellB = $(rowB).find("td").eq(criteria === "customer" ? 2 : 1).text().toLowerCase();
+        return cellA.localeCompare(cellB);
+      });
+      $("#vendorTable tbody").empty().append(rows);
+    }
+  
+    // Handle keyup event on the search input
+    $("#vendorSearchInput").keyup(function() {
+      const searchQuery = $(this).val();
+      filterItems(searchQuery);
+    });
+  
+    // Handle click event on dropdown items
+    $(".form-inline a").click(function() {
+      const sortingCriteria = $(this).data("sort");
+      if (sortingCriteria) {
+        sortTable(sortingCriteria);
+      }
+    });
+  });
+
+  $('#sortEway').click(function(){
+      var table = $('#vendorTable').eq(0)
+      var eway = $('#eway_bill')
+      var rows = table.find('tr:gt(0)').toArray().sort(comparer(eway.index()))
+      eway.asc = !eway.asc
+      // if (!this.asc)
+      // {
+      //   rows = rows.reverse()
+      // }
+      for (var i = 0; i < rows.length; i++)
+      {
+        table.append(rows[i])
+      }
+  })
+  function comparer(index) {
+      return function(a, b) {
+          var valA = getCellValue(a, index), valB = getCellValue(b, index)
+          return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
+      }
+  }
+  function getCellValue(row, index){ return $(row).children('td').eq(index).text() }
+
+  function exportToExcel() {
+        // $('.export_hide').remove()
+        alert('asdasd')
+        var table = document.querySelector('table');
+        var ws = XLSX.utils.table_to_sheet(table);
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        XLSX.writeFile(wb, 'report.xlsx');
+        window.location.href=""
+    }
+    $(document).ready(function()
+    {
+      $('#more_detail').hide()
+      $('#more_detail2').hide()
+    })
+    function more_det()
+    {
+      $('#more_detail').toggle()
+    }
+    function more_det2()
+    {
+      $('#more_detail2').toggle()
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,659 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.0/html2canvas.min.js"></script>
+<style>
+    .tr{
+        cursor: pointer;
+    }
+
+    @media print{
+    body{
+        visibility: hidden;
+    }
+
+    #printtable{
+        visibility: visible;
+        width: auto;
+        height: auto;
+        margin-top: -600px;
+        margin-left: -100px;
+    }
+}
+h2{
+    font-size: x-large;
+    font-family: 'Segoe UI', Tahoma,;
+    color:#dfe4e9;
+  }
+  .card{
+        background: none;
+    }
+    tbody tr td{
+        border: none;
+        border-top: none;
+        border-style: none;
+        color:azure;
+        justify-content: center;
+    }
+ 
+
+tr:hover {
+  background-color : rgb(94, 94, 101);
+  color: aliceblue;
+cursor: pointer
+}
+    .btn {
+  background-color: white;
+  border: none;
+  color: green;
+  padding: 12px 16px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: white;
+}
+
+</style>
+<style>
+    .bar {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .bar .left {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .bar .left input {
+        height: 5vh;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    @media print {
+        .print-contents table tbody {
+            color: black;
+        }
+
+        #pdf-card {
+            background-color: white;
+        }
+    }
+</style>
+<div class="page-content">
+   
+        <div class="card-body">
+            <div class="card-title" id="div2">
+                <center>
+                    
+                    <center><h2 class="mb-0" style="font-size: 35px;color: rgb(218, 164, 48);">{{ company.company_name  }}</h2></center><br>
+                <center><label  id="headline" style="font-size: 40px;color: rgb(218, 164, 48);">PRODUCT SALE REPORT </label></center>
+                <center><p id="hdate" style="font-size: 20px;color: rgb(218, 164, 48);"></p></center>
+                    <div class="display">
+                        <div id="d1" style="display: inline-block;"></div>
+                        <div id="d2" style="display: inline-block;"></div>
+                    </div>
+
+                </center>
+                <hr>
+            </div>
+
+            <div class="bar">
+                <div class=" left">
+                    <div class="px-2">
+                        <label style="text-align:left ">From</label>
+                        <input name="FromDate" class="inputdate" type="date" id="in1" style="width: 70%; border-radius: 8px;padding: 5px; border: 3px solid rgb(200, 166, 104);">
+                    </div>
+
+                    <div class="px-2">
+                        <label style="text-align:left ">To</label>
+                        <input name="ToDate" type="date" class="inputdate" id="in2" style="width: 70%; border-radius: 8px;padding: 5px; border: 3px solid rgb(200, 166, 104);">
+                    </div>   
+              
+                </div>
+                <div class="right">
+                    <a href="{% url 'product_graphview' %}" class="btn btn-outline-info"  style="background: white; color: rgb(218, 164, 48);outline-color:rgb(218, 164, 48) ;"><i class="fa fa-line-chart" ></i></a>
+                    <button class="btn btn_pdf btn-outline-info" style="background: white; color: rgb(218, 164, 48);outline-color:rgb(218, 164, 48) ;"><i class="fa fa-file-pdf"></i> </button>
+                    <button class="btn btn_print btn-outline-info" id="printButton" onclick="display()"  style="background: white; color: rgb(218, 164, 48);"><i class="fa fa-print"></i></button>
+                    <button class=" btn btn-outline-info" id="export-button" onclick="exportAsExcel()"  style="background: white; color: rgb(218, 164, 48);"> <i class="fa fa-file-excel"></i> </button>
+                    <button class=" btn btn-outline-info"  style="background: white; color: rgb(218, 164, 48);"> <a  href="{% url 'report_inventory_view' %}" class="fa fa-close" style="color:rgb(218, 164, 48);"></a> </button>
+                </div>
+            </div><br>
+            <div class="px-2 dropdown">
+                    
+               
+                <input name="party" list="party"class="form-control" id="searchInput" placeholder="Search Items..." style="color: rgb(255, 255, 255);background: transparent;width: 20vw;">
+                        <datalist id="party" >
+                          {% for i in item %}
+                           <option value="{{i.Name}}" >
+                              {% endfor %}
+                           
+                      </datalist>
+              
+</form>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div  id="pdf-card">
+        <div class="card-body">
+            <div class="container-fluid">
+
+                <table class="table table-responsive-md mt-4 table-bordered"
+                    id="myTable">
+                    <thead>
+                        <tr>
+                            <th style=" color: rgb(218, 164, 48);display: none;" >DATE</th>
+                            <th style=" color: rgb(218, 164, 48);">ITEM NAME</th>
+                            <th style=" color: rgb(218, 164, 48);display: none;">TYPE</th>
+                            <th style=" color: rgb(218, 164, 48);">QUANTITY</th>
+                            <th style=" color: rgb(218, 164, 48);">SALES</th>
+                            <th style=" color: rgb(218, 164, 48);">SALES WITH TAX</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                     
+                        {% for product, data in product_data.items %}
+                                        <tr class="tr">
+                                          
+                                            <td style="display: none;">{{ data.date | date:'d-m-Y'}}</td> 
+                                          
+                                            <td >{{ product }}</td>
+                                            <td style="display: none;">invoice</td> 
+                                            <td >{{ data.quantity }}</td> 
+                                            
+                                                  
+                                            <td >{{ data.subtotal }}</td>   
+                                            <td >{{data.grandtotal}}</td>     
+                                        </tr></a>
+                                    {% endfor %} 
+                                  
+                                    
+
+                    </tbody>
+                </table>
+
+
+
+            </div>
+            <div class="row p-4">
+                <div class="col-10">
+                    
+                    <div class="row mb-2">
+                        <div class="col-4 "style="display: none;">Invoice Sale: <p id="sales" style="font-size: 19px;">₹<span
+                                    id="totalInvoice"></span></p>
+                        </div>
+                        <div class="col-4"style="display: none;">Reccuring Invoice Sale: <p id="purchase" style="font-size: 19px;">₹<span
+                                    id="totalReccuringinvoice"></span>
+                            </p>
+                        </div>
+                        <div class="col-4"style="display: none;">Credit Note: <p id="expense" style="font-size: 19px;">₹<span
+                                    id="totalCreditnote"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 "style="display: none;">Total Sale: <p id="sales" style="font-size: 19px;">₹<span
+                                    id="totalSale"></span></p>
+                        </div>
+                        <div class="col-4"style="color: rgb(218, 164, 48);">Total Sales Without Tax:<p id="expense" style="font-size: 19px;">
+                                ₹<span id="totalSalewithoutCreditnotes">  </span></p>
+                        </div>
+                        <div class="col-4"style="color: rgb(218, 164, 48);">Total Sales With Tax :<p id="purchase" style="font-size: 19px;">₹<span
+                             id="grantTotal">    
+                                     </span>
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+               
+                <div class="col-2 text-center">
+                    <h5 style="padding-top: 100px;color: rgb(218, 164, 48);">Grand Total</h5>
+                    <h4 id="totvalue"style=" color: rgb(218, 164, 48);"><span id="superTotal"></span></h4>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var $tableRows = $("#myTable tbody tr");
+        var originalRows = Array.from($tableRows);
+
+        var filteredRows = originalRows.slice();
+        var totalgrantTotal = 0;
+        var totalCreditnotegranttotal = 0;
+        var totalInvoiceSubtotal = 0;
+        var totalRecinvoiceSubtotal = 0;
+        var totalCreditnoteSubtotal = 0;
+
+        document.getElementById("in1").addEventListener("change", filterByDate);
+        document.getElementById("in2").addEventListener("change", filterByDate);
+
+        function filterByDate() {
+            var startDate = moment(document.getElementById("in1").value, "YYYY-MM-DD");
+            var startDatevalue = document.getElementById("in1").value;
+            var endDateInput = document.getElementById("in2");
+
+            endDateInput.min = startDatevalue;
+            var endDate = moment(endDateInput.value, "YYYY-MM-DD");
+
+            if (!moment(document.getElementById("in1").value).isValid()) {
+                $tableRows.show();
+                filteredRows = originalRows.slice();
+                document.getElementById("d1").textContent = "";
+                document.getElementById("d2").textContent = "";
+                return;
+            }
+
+            if (!moment(endDateInput.value, "YYYY-MM-DD").isValid()) {
+                $tableRows.show();
+                filteredRows = originalRows.slice();
+                document.getElementById("d1").textContent = "";
+                document.getElementById("d2").textContent = "";
+                return;
+            }
+
+            document.getElementById("d1").textContent = "Start Date: " + startDate.format("YYYY-MM-DD");
+            document.getElementById("d2").textContent = "End Date: " + endDate.format("YYYY-MM-DD");
+
+
+
+            var head = document.getElementById('headline');
+            head.textContent = "PRODUCT SALE REPORT";
+
+            filteredRows = originalRows.filter(function (row) {
+                var dateCell = row.querySelector("td:first-child");
+                var rowDateString = dateCell.textContent;
+                var rowDate = moment(rowDateString, "DD/MM/YYYY");
+
+                return rowDate.isSameOrAfter(startDate) && rowDate.isSameOrBefore(endDate);
+            });
+
+            $tableRows.hide();
+            $(filteredRows).show();
+            calculateTotals(filteredRows);
+            calculateGranttotal(filteredRows);
+
+            calculateGrantTotalByMonth(filteredRows);
+            return filteredRows; // Return filtered rows
+        }
+      
+
+ 
+
+        // Code for filtering rows based on search input
+      
+        $rows = $('.dropdown-menu #d-item');
+        function searchTable() {
+      let input, filter, table, tr, td, i, j, txtValue;
+      input = document.getElementById("searchInput");
+      filter = input.value.toLowerCase();
+      table = document.getElementById("myTable");
+      tr = table.getElementsByTagName("tr");
+
+      // Loop through all table rows (excluding the first row, which contains the column headers)
+      for (i = 1; i < tr.length; i++) {
+        let rowVisible = false;
+        td = tr[i].getElementsByTagName("td");
+
+        // Loop through all table cells (columns) in each row
+        for (j = 0; j < td.length; j++) {
+          if (td[j]) {
+            txtValue = td[j].textContent || td[j].innerText;
+            if (txtValue.toLowerCase().indexOf(filter) > -1) {
+              rowVisible = true;
+              break;
+            }
+          }
+        }
+  
+        // Show/hide the row based on the search results
+        tr[i].style.display = rowVisible ? "" : "none";
+      }
+      
+    }
+  
+    // Attach the search function to the input field's "input" event
+    document.getElementById("searchInput").addEventListener("input", searchTable);
+    const inputElement = $('input[name="party"]');
+
+
+// Event handler for input change
+inputElement.on('input', function () {
+    const inputValue = $(this).val();
+
+    let total = 0;
+    let totalMoneyin = 0;
+    let totalMoneyout = 0;
+    let totalexpense = 0;
+    let totalsales = 0;
+    let salesreturn = 0;
+    let sales = 0;
+    let totalpurchase = 0;
+    let purchasereturn = 0;
+    let purchase = 0;
+
+
+
+
+    // Iterate through the table rows
+    $('#myTable tbody tr').each(function () {
+        const type = $(this).find('td:eq(2)').text().trim();
+        const name = $(this).find('td:eq(1)').text().trim();
+        const amount = parseFloat($(this).find('td:eq(5)').text());
+        const amount2 = parseFloat($(this).find('td:eq(4)').text());
+        
+        // Check if the 'type' is 'invoice' and matches the input value
+       
+        if ((type === 'invoice' || type === 'reccuring invoice' ) && name === inputValue) {
+            // Add the 'amount' to the total sum
+            totalsales += amount;
+            console.log(totalsales);
+        }
+        if ((type === 'invoice' || type === 'reccuring invoice' ) && name === inputValue) {
+            // Add the 'amount' to the total sum
+            totalMoneyout += amount2;
+            console.log("total="+totalMoneyout);
+        }
+        
+        if (type === 'credit note' && name === inputValue) {
+            // Add the 'amount' to the total sum
+            salesreturn += amount;
+            console.log(salesreturn);
+        }
+      
+        if (name === inputValue) {
+            total += amount;
+            console.log('amount is' + amount);
+        }
+        
+
+        sales = totalsales - salesreturn
+        sales= sales.toFixed(2)
+        purchase = totalpurchase - purchasereturn
+        purchase= purchase.toFixed(2)
+       
+        if (sales < 0) {
+            sales = Math.abs(sales); // Convert to positive value
+        }
+        if (purchase < 0) {
+            purchase = Math.abs(purchase); // Convert to positive value
+        }
+        document.getElementById("totalSalewithoutCreditnotes").textContent=totalMoneyout;
+        document.getElementById("grantTotal").textContent=totalsales;
+    });
+
+    if (inputValue != '') {
+
+        // Display the total sum
+        $('#moneyin').text('₹' + totalMoneyin);
+        $('#moneyout').text('₹' + totalMoneyout);
+        $('#expense').text('₹' + totalexpense);
+        $('#sales').text('₹' + sales);
+        $('#purchase').text('₹' + purchase);
+        $("#totvalue").text('₹' + total.toFixed(2));
+        $("#tot").text('₹' + total.toFixed(2));
+        $("#balance").text('₹' + total.toFixed(2));
+    } else if (inputValue == '' || inputValue.length == 1) {
+        location.reload();
+    }
+    if (inputValue === '' || inputValue.length == 1) {
+        head = 'PRODUCT SALE REPORT'
+    }
+    else {
+        console.log(inputValue);
+        head = inputValue + ' SALE REPORT';
+        head = head.toUpperCase();
+    }
+    $('#headline').text(head);
+
+
+
+});
+        // Click event handler for dropdown menu items
+        $rows.click(function () {
+           
+            var name  = $(this).text().trim();
+            var head = document.getElementById('headline');
+            head.textContent = name  +"SALE REPORT ";
+
+            var dRows = $(filteredRows).show().filter(function () {
+                return $(this).text().indexOf(name) === -1;
+            }).hide();
+
+            var remainingRows = $(filteredRows).not(dRows);
+            calculateTotals(remainingRows);
+            calculateGranttotal(remainingRows);
+            calculateGrantTotalByMonth(remainingRows);
+        });
+
+        localStorage.setItem('filteredRows', JSON.stringify(originalRows));
+
+        function calculateGranttotal(rows) {
+            totalgrantTotal = 0;
+            totalCreditnotegranttotal = 0;
+
+            for (let row of rows) {
+                let grantTotalCell = row.children[5];
+                let grantTotal = parseFloat(grantTotalCell.textContent);
+                totalgrantTotal += grantTotal;
+
+                let typeCell = row.children[2];
+
+                if (typeCell.textContent.trim() === "Credit Notes") {
+                    let creditgranttotalCell = row.children[5];
+                    let creditgranttotal = parseFloat(creditgranttotalCell.textContent);
+                    totalCreditnotegranttotal += creditgranttotal;
+                }
+            }
+
+            var superTotal = document.getElementById('superTotal');
+            var roundedNumber = totalgrantTotal - totalCreditnotegranttotal;
+            superTotal.textContent = roundedNumber.toFixed(2);
+
+            var gtTag = document.getElementById('grantTotal');
+            gtTag.textContent = totalgrantTotal.toFixed(2);
+        }
+        calculateGranttotal(originalRows);
+
+        function calculateTotals(rows) {
+            totalInvoiceSubtotal = 0;
+            totalRecinvoiceSubtotal = 0;
+            totalCreditnoteSubtotal = 0;
+
+            for (let row of rows) {
+                let typeCell = row.children[2];
+
+                if (typeCell.textContent.trim() === "invoice") {
+                    let subtotalCell = row.children[4];
+                    let subtotal = parseFloat(subtotalCell.textContent);
+                    totalInvoiceSubtotal += subtotal;
+                }
+
+                if (typeCell.textContent.trim() === "reccuring invoice") {
+                    let subtotalCell = row.children[4];
+                    let subtotal = parseFloat(subtotalCell.textContent);
+                    totalRecinvoiceSubtotal += subtotal;
+                }
+
+                if (typeCell.textContent.trim() === "Credit Notes") {
+                    let subtotalCell = row.children[4];
+                    let subtotal = parseFloat(subtotalCell.textContent);
+                    totalCreditnoteSubtotal += subtotal;
+                }
+            }
+
+            var TITag = document.getElementById('totalInvoice');
+            TITag.textContent = totalInvoiceSubtotal;
+
+            var RITag = document.getElementById('totalReccuringinvoice');
+            RITag.textContent = totalRecinvoiceSubtotal;
+
+            var cnTag = document.getElementById('totalCreditnote');
+            cnTag.textContent = totalCreditnoteSubtotal;
+
+            var tsTag = document.getElementById('totalSale');
+            tsTag.textContent = totalInvoiceSubtotal + totalRecinvoiceSubtotal + totalCreditnoteSubtotal;
+
+            var tswcnTag = document.getElementById('totalSalewithoutCreditnotes');
+            tswcnTag.textContent = totalInvoiceSubtotal + totalRecinvoiceSubtotal;
+        }
+
+        // Call calculateTotals initially to calculate totals for all rows
+        calculateTotals(originalRows);
+
+        function calculateGrantTotalByMonth(rows) {
+            var grandTotalsByMonth = {};
+
+            // Initialize grandTotalsByMonth with all months
+            for (let month = 0; month < 12; month++) {
+                grandTotalsByMonth[month] = 0;
+            }
+
+            for (let row of rows) {
+                let typeCell = row.children[2];
+                if (typeCell.textContent.trim() === "reccuring invoice" || typeCell.textContent.trim() === "invoice") {
+                    let dateCell = row.children[0];
+                    let dateString = dateCell.textContent;
+                    let date = moment(dateString, 'YYYY-MM-DD');
+                    let month = date.month(); // Subtract 1 from the month value
+
+
+                    if (!grandTotalsByMonth.hasOwnProperty(month)) {
+                        grandTotalsByMonth[month] = 0;
+                    }
+
+                    let grantTotalCell = row.children[5];
+                    let grantTotal = parseFloat(grantTotalCell.textContent);
+
+                    grandTotalsByMonth[month] += grantTotal;
+                }
+            }
+
+            localStorage.setItem('grandtotalBymonth', JSON.stringify(grandTotalsByMonth));
+        }
+
+        calculateGrantTotalByMonth(originalRows);
+function calculateGranttotal(rows) {
+            totalgrantTotal = 0;
+            totalCreditnotegranttotal = 0;
+
+            for (let row of rows) {
+                let grantTotalCell = row.children[5];
+                let grantTotal = parseFloat(grantTotalCell.textContent);
+                totalgrantTotal += grantTotal;
+
+                let typeCell = row.children[2];
+
+                if (typeCell.textContent.trim() === "Credit Notes") {
+                    let creditgranttotalCell = row.children[5];
+                    let creditgranttotal = parseFloat(creditgranttotalCell.textContent);
+                    totalCreditnotegranttotal += creditgranttotal;
+                }
+            }
+
+            var superTotal = document.getElementById('superTotal');
+            var roundedNumber = totalgrantTotal - totalCreditnotegranttotal;
+            superTotal.textContent = roundedNumber.toFixed(2);
+
+            var gtTag = document.getElementById('grantTotal');
+            gtTag.textContent = totalgrantTotal.toFixed(2);
+        }
+        calculateGranttotal(originalRows);
+
+    });
+
+</script>
+
+
+<script type="text/javascript">
+    function exportAsExcel() {
+        const table = document.getElementById('myTable'); // Replace 'myTable' with your table's ID
+        const wb = XLSX.utils.table_to_book(table);
+
+        XLSX.writeFile(wb, 'product sale report.xlsx');
+    }
+</script>
+<script>
+    function display() {
+        var printContents = document.getElementById("pdf-card").innerHTML;
+        var div2Contents = document.getElementById('div2').innerHTML;
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = div2Contents + printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload();
+
+    }
+
+
+    $(document).ready(function ($) {
+        $(document).on('click', '.btn_pdf', function (event) {
+            console.log('print1');
+            event.preventDefault();
+            var name = document.getElementById("headline").innerHTML;
+            var div2 = document.getElementById("div2");
+            var element = document.createElement('div');
+            element.appendChild(div2.cloneNode(true));
+            element.appendChild(document.getElementById('pdf-card').cloneNode(true));
+            element.style.color = 'white';
+            element.style.backgroundColor = '#243e54';
+            var opt = {
+                margin: 1,
+                filename: name + '.pdf',
+                image: { type: 'png', quality: 1.0 },
+                html2canvas: { scale: 3, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait', backgroundColor: '#243e54' }
+            };
+            html2pdf().set(opt).from(element).save();
+        });
+    });
+
+
+
+</script>
+<script>
+    var $rows = $('table tbody tr');
+    $('#party').keyup(function() {
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+        $rows.hide().filter(function() {
+            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return ~text.indexOf(val);
+        }).show();
+        calculateTotalBillAmount();
+    });
+    function calculateTotalBillAmount() {
+      const visibleRows = Array.from(dataTable.getElementsByTagName('tbody')[1].getElementsByTagName('tr'))
+          .filter(row => row.style.display !== 'none');
+    
+      let totalBillAmount = 0;
+    
+      visibleRows.forEach(row => {
+          const billAmountCell = row.querySelector('td:nth-child(4)');
+          const billAmount = parseFloat(billAmountCell.textContent);
+          if (!isNaN(billAmount)) {
+              totalBillAmount += billAmount;
+          }
+      });
+    
+      const totalBillAmountElement = document.getElementById('total-bill-amount');
+      totalBillAmountElement.textContent = `Total Bill Amount: ${totalBillAmount.toFixed(2)}`;
+    }
+</script>
+
+
+{% endblock %}

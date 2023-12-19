@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+    .table-container {
+        height: 600px;
+        padding-bottom: 100%;
+          }
+    .button-container {
+       width: 100px;
+        margin-left: 540px;
+        background-color: rgb(230, 171, 45);
+    }
+    .form-control{
+      background-color: black transparent;
+    }
+    .button-container a{
+        color: #FFFEEE;
+    }
+    td a{
+        color: rgb(247, 246, 244);
+    }
+    #over:hover{
+        background-color: rgba(110, 110, 110, 0.616);
+        
+    }
+    td {
+    white-space: nowrap; /* Prevent content from wrapping */
+    /* Add any additional styles or width as needed */
+    color: #FFFEEE;
+  }
+  tr{
+    color: #fff;
+  }
+  
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link href='https://unpkg.com/css.gg@2.0.0/icons/css/trash.css' rel='stylesheet'>
+
+
+
+
+
+
+<div class="table-container bg-dark" style="border-radius: 10px; width: 100%;padding-left: 20px;padding-right: 20px;padding-top: 20px;">
+  <div class="heading" >
+    <h1 style="margin-top: 20px;">All Payment Mades</h1>
+  </div>
+  <div class="row mt-5" style="margin-top: 5rem; margin-left: 1rem;">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <!-- Left end of the row -->
+            <div class="d-flex align-items-center">
+                <input type="search" id="searchInput" class="form-control bg-dark" oninput="searchTable()"
+                    placeholder="Search Payment Made..." style=" margin-right: 10px; width: 250px; border: 2px solid rgb(214, 141, 5);">
+                <div class="dropdown" role="group" style=" display: inline-flex; height: 2.3rem;">
+                    <a class="btn text-center px-4 pt-2 btn-outline-warning" id="sortbutton" data-bs-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false" role="button" title="sort">
+                        <i class="fas fa-sort m-1"></i>
+                    </a>
+                    <div class="dropdown-menu m-1">
+                        <a class="dropdown-item" href="{% url 'paymentmethod' %}">All</a>
+                        <a class="dropdown-item" href="{% url 'view_vendor_name' %}">Vendor Name</a>
+                        <a class="dropdown-item" href="{% url 'view_paidthrough' %}">Paid Through</a>
+                    </div>
+                </div>
+            </div>
+
+<!-- Right end of the row -->
+<div class="d-flex align-items-center">
+  <div class="input-group" style="margin-right: 10px;">
+      <div class="d-flex">
+          <!-- Excel button -->
+          <div class="dropdown d-flex me-2" role="group">
+              <a class="btn btn-outline-warning text-right px-3 py-2" role="button" href="#"
+                  onclick="exportToExcel()">
+                  <i class="fa-solid fa-file-excel" style="font-size: medium;"></i><span style="font-size: 2vh;">Excel</span>
+              </a>
+              <a style="color: #ccc;" href="#3"> </a>
+          </div>
+<!-- Additional button -->
+          <div class="form-inline me-2">
+            <a class="btn btn-outline-warning text-right px-3 py-2" role="button" href="#">
+              <i class="fa-solid fa-file-import" style="font-size: medium;"></i><span style="font-size: 2vh;">Import Excel</span>
+            </a>
+            <a style="color: #ccc;" href="#3"> </a>
+        </div>
+          <!-- Filter button -->
+          <div class="dropdown d-flex me-2" role="group">
+              <a class="btn text-center px-4 pt-2 btn-outline-warning" id="btnGroupDrop1"
+                  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                  <i class="fa fa-filter mt-1"></i>
+              </a>
+              <div class="dropdown-menu m-1">
+                  <a class="dropdown-item" href="" id="filterAllButton">All</a>
+                  <a class="dropdown-item" href="" id="filterSaveButton">Save</a>
+                  <a class="dropdown-item" href="" id="filterDraftButton">Draft</a>
+              </div>
+          </div>
+
+          
+          <!-- New button -->
+          <div class="form-inline me-2">
+              <a class="btn btn-outline-warning text-right px-3 py-2" role="button"
+                  href="{% url 'paymentadd_method' %}">
+                  <i class="fa fa-plus" style="font-size: medium;"></i><span style="font-size: 2vh;">New</span>
+              </a>
+              <a style="color: #ccc;" href="#3"> </a>
+          </div>
+          
+          
+      </div>
+  </div>
+</div>
+
+
+
+
+        </div>
+    </div>
+</div>
+
+
+  
+    <div class="table-responsive">
+    <table id="vendorTable" class="table" style="width:100%; margin-top: 40px; ">
+        <thead>
+            <tr>
+              <th class="text-white">Payment Date</th>
+              <th class="text-white">Payment Number</th>
+                <th class="text-white">Vendor</th>
+                <th class="text-white">Email Id</th>
+                <th class="text-white">Amount Paid</th>
+                <th class="text-white">Status</th>
+                <th class="text-white">Current Balance</th>
+                
+                
+
+
+
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in paymnt %}
+                                <tr id="over">
+                                    <td><a href="{% url 'payment_details_view' p.id %}">{{ p.date }}</a></td>
+                                    <td><a href="{% url 'payment_details_view' p.id %}">{{ p.payment }}</a></td>
+                                    <td><a href="{% url 'payment_details_view' p.id %}">{{ p.vendor.first_name}}&nbsp;{{ p.vendor.last_name}}</a></td>
+                                    <td><a href="{% url 'payment_details_view' p.id %}"> {{ p.vendor.vendor_email }}</a></td>
+                                    <td><a href="{% url 'payment_details_view' p.id %}">₹{{ p.balance }}</a></td>
+                                    <td><a href="{% url 'payment_details_view' p.id %}">{{ p.status }}</a></td> 
+                                    <td><a href="{% url 'payment_details_view' p.id %}">₹{{ p.total_opening_balance }}</a></td>
+                                    
+                                    
+                                    </tr>
+                                    {% endfor %}
+
+            </tbody>
+            </table>
+        </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> 
+      
+<script>
+// $(document).ready(function() {
+//   var originalTable = $('#vendorTable').clone(); // Clone the original table on page load
+//  // Function to sort items by name
+//  function sortByName() {
+//         var rows = $('#vendorTable tbody tr').get();
+//         rows.sort(function(a, b) {
+//           var keyA = $(a).children('td').eq(0).text().toUpperCase();
+//           var keyB = $(b).children('td').eq(0).text().toUpperCase();
+//           if (keyA < keyB) return -1;
+//           if (keyA > keyB) return 1;
+//           return 0;
+//         });
+//         $.each(rows, function(index, row) {
+//           $('#vendorTable').children('tbody').append(row);
+//         });
+//       }
+// // Function to sort items by HSN/SAC
+// function sortByHSN() {
+//         var rows = $('#vendorTable tbody tr').get();
+//         rows.sort(function(a, b) {
+//           var keyA = $(a).children('td').eq(4).text();
+//           var keyB = $(b).children('td').eq(4).text();
+//           return keyA.localeCompare(keyB);
+//         });
+//         $.each(rows, function(index, row) {
+//           $('#vendorTable').children('tbody').append(row);
+//         });
+//       }
+
+
+//       function restoreOriginalTable() {
+//         $('#vendorTable').replaceWith(originalTable.clone()); // Replace the current table with the original table clone
+//       }
+
+//       $('[data-sort]').on('click', function() {
+//         var sortType = $(this).data('sort');
+//         if (sortType === 'name') {
+//           sortByName();
+//         } else if (sortType === 'HSN') {
+//           sortByHSN();
+//         } 
+//       });
+//     });
+
+
+const vendorTable = document.getElementById("vendorTable").getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+document.getElementById('filterAllButton').addEventListener('click', function (event) {
+  event.preventDefault();
+  showRows('all');
+});
+
+document.getElementById('filterSaveButton').addEventListener('click', function (event) {
+  event.preventDefault();
+  showRows('save');
+});
+
+document.getElementById('filterDraftButton').addEventListener('click', function (event) {
+  event.preventDefault();
+  showRows('draft');
+});
+
+function showRows(status) {
+  for (let i = 0; i < vendorTable.length; i++) {
+    const row = vendorTable[i];
+    const rowStatus = row.getElementsByTagName('td')[5].innerText.toLowerCase(); // Assuming status is in the 9th column (index 8)
+
+    if (status === 'all') {
+      row.style.display = '';
+    } else if (status === rowStatus) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  }
+}
+
+
+
+function searchTable() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("vendorTable");
+    tr = table.getElementsByTagName("tr");
+
+    for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td");
+        var rowVisible = false;
+
+        for (var j = 0; j < td.length; j++) {
+            var cell = td[j];
+            if (cell) {
+                txtValue = cell.textContent || cell.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    rowVisible = true;
+                    break;
+                }
+            }
+        }
+
+        if (rowVisible) {
+            tr[i].style.display = "";
+        } else {
+            tr[i].style.display = "none";
+        }
+    }
+}
+
+// Function to save Excel using XLSX
+function exportToExcel() {
+        var table = document.querySelector('table');
+        var ws = XLSX.utils.table_to_sheet(table);
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        XLSX.writeFile(wb, 'report.xlsx');
+    }
+
+    // Function to handle export based on dropdown selection
+    document.getElementById('exportDropdown').addEventListener('change', function () {
+        var selectedValue = this.value;
+        if (selectedValue === 'pdf') {
+            exportToPDF();
+        } else if (selectedValue === 'xls') {
+            exportToExcel();
+        }
+    });
+    const pdfExportLink = document.getElementById('pdf'); // This should be the link for PDF export
+pdfExportLink.addEventListener('click', function (event) {
+    event.preventDefault(); // Prevent the link from navigating
+    exportToPDF();
+});
+
+
+    </script>
+    {% endblock %}
+
+  
+

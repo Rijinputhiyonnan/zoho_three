@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% load static %}
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zoho</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.5.0/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.5.0/js/bootstrap.min.js"></script>
+
+    <style>
+      .statement_table table {
+        border-collapse: collapse;
+        width: 100%; 
+      }
+      .statement_table td, .statement_table th {
+        border: 1px solid #000000; 
+        padding: 10px 4px; 
+        text-align: left;
+      }
+      .statement_table td{
+        background-color: azure;
+      }
+      .statement_table th {
+        font-weight: 500;
+        background-color: #d5d5d5;
+      }
+    </style>
+  </head>
+
+  <body>
+    <section id="statementTemplate" class="p-2 mt-3">
+      <header class="py-3 d-flex justify-content-center">
+          <!-- <div class="acc_status col-md-4 d-flex align-items-center">
+              <span class="px-3 py-2 ms-2 text-dark">Status: {{account.status}}</span>
+          </div> -->
+          <center>
+            <div class="company-info text-center col-md-4">
+                <!-- <img class="ms-2 img-fluid" style="border-radius: 50%; width: 3rem;" src="{{company.profile_pic.url}}" alt="Company Logo"> -->
+                <h4 class="text-white mb-0" style="font-size: 2rem;">{{company.company_name}}</h4>
+                <p class="text-white mb-0"> {{company.address}} - {{company.city}}</p>
+                <p class="text-white mb-0">{{company.company_email}}</p>
+                <p class="text-white mb-0">{{company.contact_number}}</p>
+            </div>
+          </center>
+          <div class="col-md-4"></div>
+      </header>
+      <div class="statement-container pt-3 px-1">
+          <h1 class="text-dark" style="font-size: 2rem;">Statement</h1>
+          <div class="statement-header pt-3">
+              <!-- <div class="statement-details text-dark" style="width: 60% !important;">
+                  <table>
+                      <tr>
+                          <td class="table-cell text-black" style="border: none;width: 5rem;">Name</td>
+                          <td class="table-cell text-black" style="border: none; font-weight: 500;">:{{account.acc_name}}</td>
+                      </tr>
+                      <tr>
+                          <td class="table-cell text-black" style="border: none;width: 5rem;">Account #</td>
+                          <td class="table-cell text-black" style="border: none; font-weight: 500;">:{{account.acc_number}}</td>
+                      </tr>
+                      <tr>
+                          <td class="table-cell text-black" style="border: none;width: 5rem;">Balance</td>
+                          <td class="table-cell text-black" style="border: none; font-weight: 500;">:{{account.balance}}</td>
+                      </tr>
+                  </table>
+              </div> -->
+              <div style="padding: 0rem 1rem;">
+                <div style="color: black; padding: 1rem; display: grid; grid-template-columns: 1fr 1fr;">
+                  <p>Name: <b>{{account.acc_name}}</b></p>
+                  <p>Lender Bank: <b>{{account.lender_bank}}</b></p>
+                </div>
+                <div style="color: black; padding: 1rem; display: grid; grid-template-columns: 1fr 1fr;">
+                  <p>Account # <span>{{account.acc_number}}</span></p>
+                  <p>Balance: <span>{{account.balance}}</span></p>
+                </div>
+              </div>
+          </div>
+          <div class="statement_table my-2">
+              <table class="text-dark" id="statementTable" style="width: 100%;">
+                  <thead class="bg-light">
+                      <tr>
+                          <th class="text-dark">Date</th>
+                          <th class="text-dark">Type</th>
+                          <th class="text-dark">Name</th>
+                          <th class="text-dark">Principal</th>
+                          <th class="text-dark">Interest</th>
+                          <th class="text-dark">Total Amount</th>
+                          <th class="text-dark">Balance</th>
+                      </tr>
+                  </thead>
+                  <tbody class="bg-transparent">
+                      {% for item in transactions %}
+                      <tr style="border-color: lightgray;">
+                          <td>{{item.date}}</td>
+                          <td>{{item.type}}</td>
+                          <td>{{item.loan_account.acc_name}}</td>
+                          <td>{{item.principal}}</td>
+                          <td>{{item.interest}}</td>
+                          <td>{{item.total}}</td>
+                          <td>{{item.balance}}</td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+          </div>
+          
+      </div>
+
+      <footer class="my-5">
+          <p class="text-dark text-center">&copy; Zoho Books 2023 | Info park kakkanad kochi, Ernamkulam, kerala India 12345 | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+      </footer>
+  </section>
+    <!-- <div class="page" style="margin: 1rem 0rem;">
+      <div style="padding: 0rem 1rem;">
+        <div style="color: black; padding: 1rem; display: grid; grid-template-columns: 1fr 1fr;">
+          <p>Name: <b>{{account.acc_name}}</b></p>
+          <p>Lender Bank: <b>{{account.lender_bank}}</b></p>
+        </div>
+        <div style="color: black; padding: 1rem; display: grid; grid-template-columns: 1fr 1fr;">
+          <p>Account # <span>{{account.acc_number}}</span></p>
+          <p>Balance: <span>{{account.balance}}</span></p>
+        </div>
+      </div>
+      <div>
+          <h2 style="margin-top: 1.3rem; color: #000;">Statement</h2>
+      </div>
+      <div style="margin-top: 1.3rem;">
+          <table class="table" id="statementTable">
+              <thead style="border: 1px solid black;">
+                  <tr >
+                      <th>Date</th>
+                      <th>Type</th>
+                      <th>Name</th>
+                      <th>Principal</th>
+                      <th>Interest</th>
+                      <th>Total Amount</th>
+                      <th>Balance</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for item in transactions %}
+                  <tr>
+                      <td>{{item.date}}</td>
+                      <td>{{item.type}}</td>
+                      <td>{{item.loan_account.acc_name}}</td>
+                      <td>{{item.principal}}</td>
+                      <td>{{item.interest}}</td>
+                      <td>{{item.total}}</td>
+                      <td>{{item.balance}}</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+  </div> -->
+</body>
+</html>

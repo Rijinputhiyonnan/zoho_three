@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+  .custom-height {
+    height: 40px;
+  }
+
+  a {
+    text-decoration: none;
+    color: white;
+  }
+
+  .custom-item:hover {
+    color: white;
+  }
+
+  .search-bar-container {
+    display: flex;
+    align-items: center;
+    width: 90%;
+  }
+
+  .btn-group {
+    margin-left: auto;
+    margin-right: 10px;
+  }
+
+  .btn-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  td {
+    color: white;
+  }
+
+  section {
+    background-color: #202325;
+    padding: 15px;
+  }
+</style>
+<div class="row">
+  <div class="col-sm-12 ">
+    <h1 style="margin-left: 20px;">
+      Manual Journal
+    </h1>
+
+  </div>
+</div>
+<div class="row container-fluid mb-3">
+  <div class="col-md-3">
+    <form action="{% url 'manual_journal_home' %}" method="GET">
+      <input type="text"  placeholder="Search..." class="form-control custom-height bg-light text-dark" id="myyInput" onkeyup="myyFunction()" autocomplete="off">
+    </form>
+  </div>
+  <script>
+    function myyFunction() {
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("myyInput");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("myTable");
+      tr = table.getElementsByTagName("tr");
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[0];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          }
+          else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
+  </script>
+
+  <div class="col-md-2">
+    <div class="dropdown">
+      <a class="btn text-center px-4 pt-2 btn-outline-warning" id="sortbutton" data-bs-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false" role="button">
+        <i class="fas fa-sort m-1"></i>
+      </a>
+      <div class="dropdown-menu m-1">
+        <a class="dropdown-item" href="#" onclick="showAll()">All</a>
+        <a class="dropdown-item" href="#" onclick="sortTable('contactName')">Contact Name</a>
+        <a class="dropdown-item" href="#" onclick="sortTable('journalNumber')">Journal Number</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    function sortTable(attribute) {
+      var table, rows, switching, i, x, y, shouldSwitch;
+      table = document.getElementById("myTable");
+      switching = true;
+      while (switching) {
+        switching = false;
+        rows = table.rows;
+        for (i = 1; i < rows.length - 1; i++) {
+          shouldSwitch = false;
+          x = rows[i].getElementsByTagName("td")[attribute === 'contactName' ? 0 : 4];
+          y = rows[i + 1].getElementsByTagName("td")[attribute === 'contactName' ? 0 : 4];
+          if (attribute === 'contactName' ? (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) : (parseInt(x.innerHTML) > parseInt(y.innerHTML))) {
+            shouldSwitch = true;
+            break;
+          }
+        }
+        if (shouldSwitch) {
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+        }
+      }
+    }
+  
+    function showAll() {
+      // Code to show all data
+      console.log("Show all data");
+    }
+  
+    // Event listener for dropdown items
+    document.addEventListener('DOMContentLoaded', function () {
+      var dropdownItems = document.querySelectorAll('.dropdown-item');
+  
+      dropdownItems.forEach(function (item) {
+        item.addEventListener('click', function () {
+          var text = item.innerText.trim();
+  
+          // Perform different actions based on the selected dropdown item
+          switch (text) {
+            case 'All':
+              showAll();
+              break;
+            case 'Contact Name':
+              sortTable('contactName');
+              break;
+            case 'Journal Number':
+              sortTable('journalNumber');
+              break;
+            default:
+              console.log("Unknown option");
+          }
+        });
+      });
+    });
+  </script>
+  <div class="col-md-4"></div>
+  <div class="col-md-3">
+    <div class="dropdown d-flex">
+      <a class="btn text-center px-4 pt-2 btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true"
+        aria-expanded="false" role="button">
+        <i class="fa fa-filter mt-1"></i>
+      </a>
+      <div class="dropdown-menu m-1">
+        <a class="dropdown-item" href="{% url 'manual_journal_home' %}">All</a>
+        <a class="dropdown-item" href="{% url 'manual_journal_home' %}?filter=draft">Draft</a>
+        <a class="dropdown-item" href="{% url 'manual_journal_home' %}?filter=save">Save</a>
+      </div>
+      <a style="height: 5vh; margin-left: 2vh;" class="btn btn-outline-warning text-right px-3 py-2" role="button"
+        style="margin-left: 5px;" href="{% url 'add_journal' %}">
+        <i class="fa fa-plus" style="font-size: large;"></i><span style="font-size: 3vh;">New</span>
+      </a>
+    </div>
+  </div>
+
+
+
+
+  <section>
+    <!--<div>
+        <h3 class="text-white" style="font-size: 2rem;">Manual Journal</h3>
+        <br>
+        <div class="search-bar-container">
+            <form action="{% url 'manual_journal_home' %}" method="GET">
+                <div class="input-group" style="width: 300px;">
+                    <input type="text" name="query" placeholder="Search..." class="form-control custom-height bg-light text-dark">
+                </div>
+            </form>
+            
+            <div class="dropdown btn-group ml-auto">
+                <button class="btn btn-dark border-primary custom-height" style="width: 90px;color: #F86F03;" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-filter"></i>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                    <li><a class="dropdown-item custom-item" href="{% url 'manual_journal_home' %}">All</a></li>
+                    <li><a class="dropdown-item custom-item" href="{% url 'manual_journal_home' %}?filter=draft">Draft</a></li>
+                    <li><a class="dropdown-item custom-item" href="{% url 'manual_journal_home' %}?filter=published">Published</a></li>
+                </ul>
+            </div>
+            <div class="">
+                <a href="{% url 'add_journal' %}" class="btn btn-dark border-primary custom-height btn-center" style="width: 90px;color: #F86F03;">+ NEW</a>
+            </div>
+        </div>
+    </div>-->
+
+    <hr>
+    <div class="container-fluid mt-1">
+      <table class="table"  id="myTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Journal No</th>
+            <th>Contact Name</th>
+            <th>Notes</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in journal %}
+          <tr class="journal-row" data-journal-id="{{ entry.journal.id }}">
+            <td><a href="{% url 'journal_list' %}">{{ entry.journal.date }}</a></td>
+            <td>{{ entry.journal.journal_no }}</td>
+            <td>{{ entry.contact}}</td>
+            <!--<td>{{ entry.reference_no }}</td>-->
+
+            <td>
+              <div class="note-icon" data-toggle="tooltip" data-placement="top" title="{{ entry.notes }}"><i
+                  class="fas fa-sticky-note"></i></div>
+            </td>
+            <td><i class="fa fa-inr"></i>{{ entry.journal.total_debit }}</td>
+            <td>
+              {% if entry.status == 'save' %}
+              <span class="status save text-light">{{ entry.journal.status }}</span>
+              {% else %}
+              <span class="status" style="color: whitesmoke;">{{ entry.journal.status }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <!--<script>
+    $(document).ready(function () {
+      $('[data-toggle="tooltip"]').tooltip();
+
+      $('.journal-row').click(function () {
+        var journalId = $(this).data('journal-id');
+        localStorage.setItem('selectedJournalId', journalId);
+        window.location.href = "{% url 'journal_list' %}";
+      });
+    });
+  </script>-->
+  <script>
+    function myyFunction() {
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("myyInput");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("myTable");
+      tr = table.getElementsByTagName("tr");
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[0];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          }
+          else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
+  </script>
+
+
+
+  <script>
+    jQuery(document).ready(function ($) {
+      $(".clickable-row").click(function () {
+        window.location = $(this).data("href");
+      });
+    });
+  </script>
+
+
+  <script>
+    var $rows = $('table tbody tr');
+    $('#search').keyup(function () {
+      var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+      $rows.hide().filter(function () {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return ~text.indexOf(val);
+      }).show();
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+    </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+    </script>
+  {% endblock %}

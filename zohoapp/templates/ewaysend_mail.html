@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<div class="col-md-12 text-dark" style=" width: 100%;">
+    <div class="col-md-3 m-0 p-0">
+        <a class="text-white fs-3">Mail Eway Bill</a>
+    </div>
+
+    <br>
+    {% if error_message %}
+    <div class="alert alert-primary" role="alert">
+        {{error_message}}
+    </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'ewaysend_mail' eway.id %}" enctype="multipart/form-data"
+        style="width: 80%;">
+        {% csrf_token %}
+        <label class="text-white" for="">Mail To</label>
+        <input class="form-control text-dark" style="color: black;" type="text" name="email" placeholder="user@gmail.com"><p></p>
+        <label class="text-white" for="">Subject</label>
+        <input class="form-control text-dark" type="text" name="subject" placeholder="subject here.."><p></p>
+        <label class="text-white" for="">Attatch </label>
+        <input class="form-control text-dark" type="file" name="attach" placeholder="select the fiel..."><p></p>
+        <label class="text-white " for="">Messege</label> <br>
+        <textarea class="text-dark w-100 p-2" style="border-radius: 5px;" name="messege" id="" cols="105" rows="7" placeholder="message here.."></textarea> <br><p></p>
+        <button style="margin-bottom: 15rem;" type="submit" class="btn btn-primary">Send Email</button>
+
+        <br><br><br><br><br>
+    </form>
+
+</div>
+
+
+
+<!-- Bootstrap core JavaScript -->
+
+</div>
+</div>
+
+
+{% endblock %}

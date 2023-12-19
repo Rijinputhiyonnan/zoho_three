@@ -1,0 +1,657 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load mathfilters %}
+{% load social_share %}
+
+<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.js"></script>
+<!-- <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script> -->
+<!-- <script src="path/to/jquery.min.js"></script> -->
+
+<style>
+  .page[size="A4"] {
+    width: 21cm;
+    height: 29.7cm;
+    overflow: hidden;
+}
+    .searchbar {
+        z-index: 9999;
+    }
+
+    .addform {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        /* margin: 0 1rem; */
+    }
+
+    .fc-button-group {
+        color: rgb(255, 196, 0);
+    }
+
+    .fc .fc-button-group .fc-button {
+        background-color: rgb(255, 196, 0);
+        color: black;
+    }
+
+    /* .fc .fc-content {
+    padding-bottom: 2px;
+    } */
+    .fc-ltr .fc-basic-view .fc-day-top .fc-day-number {
+        float: right;
+        font-size: .8rem;
+        color: white;
+    }
+
+    .fc-unthemed td.fc-today {
+        background: #a77c07;
+    }
+
+    /* .fc table .fc-row{
+       color: red;
+    } */
+    #exTab2 .nav .active {
+        border-bottom: 3px solid rgb(255, 255, 255);
+    }
+
+    #exTab2 .nav li a {
+        text-decoration: none;
+        color: white;
+    }
+
+    a {
+        text-decoration: none;
+        color: red;
+    }
+
+    /* #calendar {
+        height: 700px;
+        width: 700px;
+    } */
+
+ 
+  /* Style for the black overlay */
+  .modal {
+    position: fixed;
+    top: 100px;
+    left: 400px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Black semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99;
+  }
+
+  /* Style for the modal content */
+  .modal-content {
+    background-color: black;
+    /* White background for the modal */
+    color: black;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 10px 8px rgba(0, 0, 0, 0.9);
+    max-width: 500px;
+    /* You can adjust the width as needed */
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Style for the close button (you can customize this) */
+  .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+  }
+
+  .modal-title {
+    color: white;
+    size: 20px;
+  }
+
+  .dropdown-item:hover {
+    color: white;
+  }
+</style>
+<div class="row container-fluid">
+
+    <div class="col-3 col-md-3 col-sm-3 col-lg-3">
+        <div class="header ">
+            <h3>All Holyday</h3>
+          </div>
+    
+          <!-- style="display: flex;" -->
+          <div class="searchbar">
+            <input type="text" id="searchInput" class="form-control text-dark bg-white" placeholder="Search Items..."
+                   style="color: rgb(255, 255, 255); background: transparent; margin-right: 5px;">
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <a class="btn btn-outline-warning mt-2 p-2" href="#" data-bs-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false" role="button" style="width: 60px;">
+                        <i class="fa fa-filter "></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item text-light" href="#" onclick="reloadPage()">All</a>
+                        <a class="dropdown-item text-light" onclick="sortTableByMonthAsc()">Month</a>
+                        <a class="dropdown-item text-light" onclick="sortTableByCountAsc()">Count</a>
+                    </div>
+                </div>
+                
+                
+                <div class="col-md-4"></div>
+                <div class="col-md-4" style="text-align: right;">
+                    <a class="btn btn-outline-warning p-2 " href="{% url 'holiday_add' %}" style="margin-top: 8px;">
+                        <i class="fa fa-plus"></i><span>New</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+          
+          <table class="table table-borderless mt-3" id="mytable">
+            <thead>
+              <tr >
+                <th style="color: rgb(214, 141, 5);text-align: left;">Month</th>
+                <th style="color: rgb(214, 141, 5);text-align:right">Holiday</th>
+              </tr>
+              
+            </thead>
+            
+            <tbody id="tableBody">
+                {% for key, value in formatted_event_counts.items %}
+                <tr class="text-light mt-2 pt-1 clickable-row" data-href="{% url 'holidays' key %}">
+
+                        <td>{{ value.month }}</td>
+                        <td>{{ value.count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            
+            
+          </table>
+    </div>
+   
+
+    <div class="card-body col-9 col-md-9 col-lg-9 col-sm-9" id="exTab2">
+        <a id="close" type="button" class="btn btn-danger" href="{% url 'holiday_list' %}"><i class="fa fa-arrow-left" aria-hidden="true"></i></a>
+
+        <ul class="nav nav-tabs row">
+            <li class="active col-6 text-center" id="list1"><a id="id1" class="btn">CALENDAR</a></li>
+            <li class="col-6 text-center" id="list2"><a id="id2" class="btn">HOLIDAYS</a>
+            </li>
+        </ul>
+
+
+        <div class="tab-content" style="border: none;padding: 0px;">
+            <div class="tab-pane active" id="1" data-title="Sale">
+                <div class="row">
+
+                    <div class="col-lg-12 col-md-12 col-sm-12" style="background-color: black;color: white;padding: 10px;">
+                        <div id="calendar"></div>
+                        <div style="display: none;" id="eventCounts">{{event_counts_json}}</div>
+
+                    </div>
+                    <!-- <div class="col-lg-3 col-md-12 col-sm-12" style="background-color: rgba(0, 0, 0, 0.603);">
+
+                        <div class="row mx-3 my-5">
+                            <a class="btn btn-warning " style="font-size: 1.2rem;" href="{% url 'holiday_add' %}"></i> Add Holiday</a>
+                        </div>
+                        <div style="display: none;" id="eventCounts">{{event_counts_json}}</div>
+
+                        <div class="mx-2 mb-0">Holidays: <p class="d-inline-block" id="idd"></p>
+                        </div>
+                        <hr>
+                        <div class="mx-3">
+                            {% for key, value in event_dict.items %}
+                            <div class="mt-4">
+                                <div class="text-center d-inline-block"
+                                    style="background-color: rgb(150, 19, 19);color: white; width: 25px;height: 25px;">
+                                    {{ key }}</div>
+                                &nbsp;&nbsp;{{ value|join:", " }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <hr>
+                        <div class="m-2 mt-5"><canvas id="myCanvas" width="15" height="15"
+                                style="background-color: rgb(19, 150, 74);"></canvas>&nbsp;Workingdays: <p
+                                class="d-inline-block" id="idd2"></p>
+                        </div>
+
+                    </div> -->
+                </div>
+
+            </div>
+
+            
+            
+            <div class="row" id="2" style="display: none;background-color: rgba(0, 0, 0, 0.568);">
+                <div class="row container-fluid mt-3" >
+                    
+                    <div class="col-md-4">
+                        
+                    </div>
+                    <div class="col-md-8 ml-3" >
+                      <div class="dropdown d-flex">
+                        
+                        <a class="btn text-center px-4 pt-1 btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                          <i class="fa fa-share-alt mt-1"></i>Share
+                      </a>
+                      <div class="dropdown-menu m-1">
+                        <a class="dropdown-item" href="https://www.google.com/gmail" target="_blank">Email</a>
+                        <a class="dropdown-item" href="https://web.whatsapp.com/" target="_blank">Whatsapp</a>
+                      </div>
+                      
+                        <a style="height: 5vh; margin-left: 2vh;" class="btn btn-outline-warning text-right" onclick="printSection('selected-area')" role="button" style="margin-left: 5px;"  >
+                            <i class="fa fa-print" style="font-size: large;"></i><span style="font-size: 3vh;">Print</span>
+                          </a>
+                        <a style="height: 5vh; margin-left: 2vh;" class="btn btn-outline-warning text-right " role="button" style="margin-left: 5px;" onclick="exportToPDF()" >
+                            <i class="fa fa-file-pdf-o" style="font-size: large;"></i><span style="font-size: 3vh;">Pdf</span>
+                          </a>
+                          
+                          <button style="height: 5vh; margin-left: 2vh;" onclick="toggleModal()" class="btn btn-outline-warning ">
+                            <i class="fa fa-solid fa-comment"></i>
+                          </button>
+                      </div>
+                      
+                    </div>
+                  </div>
+                <table class="table mt-3" style="background-color: rgba(0, 0, 0, 0.568);">
+                  <thead>
+                    <th>Sl no.</th>
+                    <th >name</th>
+                    <th>start_date</th>
+                    <th>end_date</th>
+                   
+                </thead>
+                    {% for i in eve %}
+                    <tr class="text-light mt-2 pt-1">
+                        <td>{{forloop.counter }}</td>
+                        <td>{{i.name}}</td>
+                        <td>{{i.start_date | date:"M. d, Y" }}</td>
+                        <td>{{i.end_date | date:"M. d, Y" }}</td>
+                        <td style="font-size: 1.2rem;">
+                            <a class="text-danger"  href="{% url 'remove' i.id %}"><i class="fa fa-trash"></i></a>&nbsp;&nbsp;
+                            <a class="text-primary"  href="{% url 'holiday_edit' i.id %}"><i class="fa fa-edit"></i></a>
+                        </td>
+                        
+                    </tr>
+                    {% endfor %}
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9" id="templatediv"  style="display:none;background-color: rgb(255, 221, 176);">
+
+         <div class=""  style="width: 100%; margin-left: -1vh;background-color: rgb(255, 221, 176);">
+     
+    <section id="selected-area" style="background-color: rgb(255, 221, 176);"class=" p-2 ">
+           
+               <header style="	background-color: #8b3131;border-radius: 1rem;">
+                  
+                   <div style="background: #8b3131;color: rgb(0, 0, 0);" class="text-center">
+                       <h2 class="text-black">{{company.company_name}}</h2>
+                       <p class="text-black"> {{company.address}}<br>{{comp.city}}</p><p> {{company.contact_number}}</p><p>{{company.company_email}}</p>
+                   </div>
+               </header>
+               <div class="invoice-box">
+                   <h1 class="text-dark text-center">Holiday report</h1>
+              
+                   
+                   <table class="table mt-3">
+                    <thead>
+                      <th>Sl no.</th>
+                      <th >name</th>
+                      <th>start_date</th>
+                      <th>end_date</th>
+                     
+                  </thead>
+                    {% for i in eve %}
+                    <tr class="text-light mt-2 pt-1">
+                        <td class="text-black">{{forloop.counter }}</td>
+                        <td class="text-black">{{i.name}}</td>
+                        <td class="text-black">{{i.start_date | date:"M. d, Y" }}</td>
+                        <td class="text-black">{{i.end_date | date:"M. d, Y" }}</td>
+                       
+                        
+                    </tr>
+                    {% endfor %}
+                </table><br>
+                   
+
+                  
+               </div>
+                <div style="height: 580px;">
+
+                </div>
+               <footer class="mb-5">
+                   <p class="text-dark">&copy; Zho Books 2023 | Info park kakkanad kochi, Ernamkulam, kerala India 12345 | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+               </footer>
+               <div class="mt-5 mb-5">
+   
+               </div>
+              </section>
+
+   
+
+        </div>
+
+
+           </div>
+</div>
+
+
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">Add Comment</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="commentForm" method="post" action="{% url 'do_comments' %}">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="commentInput">Comment:</label>
+            <textarea class="form-control bg-white text-dark" id="commentInput" name="comments" rows="3" style="height: 80px;"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="submitCommentBtn" onclick="submitComment()">Submit</button>
+          </div>
+          <div class="container-fluid">
+            <table class="table table-responsive-md mt-4 table text-white">
+              <thead>
+                <tr>
+                  <th>sl no.</th>
+                  <th>Comments</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for com in comments %}
+                <tr class="table-row">
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ com.comments }}</td>  
+                  <td><a href="">Delete</a></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script>
+    function exportToPDF(){
+      var content = document.getElementById('selected-area');
+      html2pdf()
+      .from(content)
+      .save('holidays.pdf')
+  }
+</script>
+<script>
+  function printSection(sectionId) {
+      var printContents = document.getElementById(sectionId).innerHTML;
+      var originalContents = document.body.innerHTML;
+  
+      document.body.innerHTML = printContents;
+  
+      window.print();
+  
+      document.body.innerHTML = originalContents;
+     
+      window.location.reload(); 
+
+  }
+  </script>    
+<script>
+     
+    function toggleModal() {
+      const modal = document.getElementById("myModal");
+      if (modal.style.display === "none") {
+        modal.style.display = "block";
+        // You can add an AJAX call here to load comments dynamically, if needed
+      } else {
+        modal.style.display = "none";
+      }
+    }
+
+    // Function to close the modal
+    function closeModal() {
+      const modal = document.getElementById("myModal");
+      modal.style.display = "none";
+    }
+
+    function submitComment() {
+      document.getElementById('commentForm').submit();
+    }
+  </script>
+
+
+
+<script>
+    function reloadPage() {
+        // Get the current URL
+        var currentUrl = window.location.href;
+
+        // Reload the page
+        window.location.href = currentUrl;
+    }
+</script>
+<script>
+    function sortTableByCountAsc() {
+        var rows = $('tr.clickable-row').get();
+        console.log(rows);
+        console.log('Sorting by Count');
+
+        rows.sort(function (a, b) {
+            var countA = parseInt($(a).find('td:eq(1)').text()); // Assuming count is in the second column
+            var countB = parseInt($(b).find('td:eq(1)').text());
+
+            return countA - countB;
+        });
+
+        $.each(rows, function (index, row) {
+            $('#mytable tbody').append(row);
+        });
+    }
+</script>
+
+<script>
+    function sortTableByMonthAsc() {
+        var rows = $('tr.clickable-row').get();
+        console.log(rows);
+        console.log('suuupi');
+
+        rows.sort(function (a, b) {
+            var monthA = $(a).find('td:eq(0)').text(); // Assuming month is in the first column
+            var monthB = $(b).find('td:eq(0)').text();
+
+            var yearA = $(a).find('td:eq(1)').text(); // Assuming year is in the second column
+            var yearB = $(b).find('td:eq(1)').text();
+
+            var monthOrder = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            var monthAIndex = monthOrder.indexOf(monthA);
+            var monthBIndex = monthOrder.indexOf(monthB);
+
+            if (yearA === yearB) {
+                return monthAIndex - monthBIndex;
+            } else {
+                return yearA - yearB;
+            }
+        });
+
+        $.each(rows, function (index, row) {
+            $('#mytable tbody').append(row);
+        });
+    }
+</script>
+
+<script>
+    jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+    // Add this inside the $(document).ready function
+    $("#searchInput").on("keyup", function() {
+        searchFunction();
+});
+
+});
+   
+   
+</script>
+
+<script>
+    $(document).ready(function () {
+        // var eventCountsJson =JSON.parse($('#eventCounts').text());
+
+        // for (var key in eventCountsJson) {
+        //     if (eventCountsJson.hasOwnProperty(key)) {
+        //         $('#idd').text( key);
+        //         var value = eventCountsJson[key];
+        //         console.log('Key: ' + key);
+        //         console.log('Value: ' + value);
+        //     }
+        // }
+
+
+        $("#id1").click(function () {
+            $("#1").show();
+            $("#2").hide();//: 3px solid rgb(255, 255, 255);
+
+            $("#list1").css("border-bottom", "3px solid rgb(255, 255, 255)");
+            $("#list2").css("border-bottom", "none");
+            // $("#t-btn").css("background-color", "rgb(243, 188, 9)").css("color", "white");
+        });
+
+        $("#id2").click(function () {
+            $("#2").show();
+            $("#1").hide();//: 3px solid rgb(255, 255, 255);
+
+            $("#list2").css("border-bottom", "3px solid rgb(255, 255, 255)");
+            $("#list1").css("border-bottom", "none");
+        });
+    });
+    // 
+    const monthNameToNumber = {
+        'January': 1,
+        'February': 2,
+        'March': 3,
+        'April': 4,
+        'May': 5,
+        'June': 6,
+        'July': 7,
+        'August': 8,
+        'September': 9,
+        'October': 10,
+        'November': 11,
+        'December': 12
+    };
+    // var monthYearCounts = '{{event_counts_json}}';
+    var monthYearCounts = JSON.parse($('#eventCounts').text());
+    var defaultDate = "{{ default }}";
+    // const currentDate = new Date();
+    $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next ',
+                center: 'title',
+                right: 'today',
+            },
+            initialView: 'dayGridMonth',
+        defaultDate: defaultDate,
+        // navLinks: true,
+        eventLimit: true,
+
+        events: '/all_events',
+
+
+        // eventColor: '#378006',
+        eventDisplay: 'list-item',
+
+        viewRender: function (view, element) {
+            var displayedTitle = view.title;
+
+            // Update the content of a <div> with the current title
+            var parts = displayedTitle.split(' '); // Split into ['Month', 'Year']
+            console.log(parts[0]);
+            var year = parts[1]
+            var monthNumber = monthNameToNumber[parts[0]];
+            var formattedMonth = ('0' + monthNumber).slice(-2);
+            var tot = new Date(year, monthNumber, 0).getDate();
+
+            var monthYear = year + '-' + formattedMonth;
+
+            $('#currentmonthyear').text(monthYear);
+            // Check if the displayedTitle exists as a key in the dictionary
+            if (monthYearCounts.hasOwnProperty(monthYear)) {
+                // If it exists, get the corresponding value and display it
+                var count = monthYearCounts[monthYear];
+                var wrk = tot - count
+                $('#idd2').text(wrk);
+                $('#idd').text(count);
+
+
+            }
+            else {
+                // If it doesn't exist, display a message indicating no count found
+                $('#idd').text('0');
+                $('#idd2').text(tot);
+
+            }
+        }
+
+
+    });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+   function searchFunction() {
+    console.log("Search function called"); // Check if the function is called
+
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchInput");
+    filter = input.value.toLowerCase();
+    table = document.getElementById("mytable");
+    tr = table.getElementsByTagName("tr");
+
+    for (i = 1; i < tr.length; i++) {
+        let rowVisible = false;
+        td = tr[i].getElementsByTagName("td");
+        for (j = 0; j < td.length; j++) {
+            if (td[j]) {
+                txtValue = td[j].textContent || td[j].innerText;
+                if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                    rowVisible = true;
+                    break;
+                }
+            }
+        }
+
+        // Show/hide the row based on the search results
+        tr[i].style.display = rowVisible ? "" : "none";
+    }
+}
+
+function demo(){
+    console.log('hai')
+}
+</script>
+  
+{% endblock %}

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>
+        .table2 {
+            text-align: center;
+            padding-top: 6px;
+            font-size: 1.1em;
+            background-color: rgb(221, 247, 247);
+
+        }
+
+        .table-head {
+            color: rgb(52, 49, 58);
+        }
+
+        .table2 .tbody tr {
+            margin-bottom: 3px;
+        }
+
+        .table3 {
+            width: 75px;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        body {
+            font-size: 14px;
+        }
+        .col {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+  }
+  
+  @media print {
+    table, th, td, tr {
+      border: 1px solid black;
+      padding: 10px; /* Ensure black borders when printing */
+     
+    }
+    table {
+    margin: 0 auto; /* Center the table horizontally */
+  }
+
+  }
+  @media (max-width: 768px) {
+  
+      #d1,
+      #d2,
+      #search-box {
+          width: 30%;
+      }
+
+
+  }
+
+  .daterangepicker {
+      background-color: #f0f0f0;
+      color: #000;
+  }
+  .dropdown-item:hover{
+    color: chocolate;
+  }
+ 
+    </style>
+</head>
+
+<body>
+    <div class="my-5 page" size="A4">
+        <div class="p-5">
+            <div id="ember2512" class="row tooltip-container ember-view ribbon text-ellipsis"
+                style="display: flex; justify-content: space-between;">
+                <div class="col-md-4 ribbon-inner ribbon-open" style="
+                margin-right: 600px;
+                color: white;
+                text-align: center;
+                padding-top: 10px;
+              ">
+                </div>
+                <div class="col-md-4">
+                    <h3>
+                        <center class="text-black"><b>{{ cmp.company_name }}</b></center>
+                        <center class="text-black"><b>GODOWN DETAILS</b></center>
+                        
+                    </h3>
+                </div>
+                <div class="col-md-4 graphic-path" style="
+                  text-align: right;
+                  padding-top: 10px;
+                  margin-left: 550px;
+                  text-align: center;
+                  color: rgb(0, 0, 0);
+                ">
+                  
+
+                </div>
+            </div>
+        
+            <hr />
+            <section class="product-area mt-4">
+                <table class="table table-bordered table-striped mt-4" id="data-table">
+                    <thead class="text-white">
+                      
+                        <tr>
+                            <th style="color: rgb(5, 5, 5);">GODOWN NAME</th>
+                            <th style="color: rgb(0, 0, 0);">STOCK QUANTITY</th>
+                            <th style="color: rgb(0, 0, 0);">STATUS</th>
+                            
+                        </tr>
+                    </thead>
+                  <tbody>
+                     {% for i in data %}
+                    <tr>         
+                        <td style="color: rgb(5, 5, 5);">{{i.godownname}}</td>
+                        <td style="color: rgb(0, 0, 0);">{{i.stockkeeping}}</td>
+                        <td style="color: rgb(0, 0, 0);">{{ i.satus }}</td>
+                        {% endfor %} 
+                    </tr>
+              
+                  </tbody>
+                                            
+                  </table> 
+            </section>
+            <hr />
+            
+            
+        </div>
+    </div>
+</body>
+
+</html>

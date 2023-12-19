@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="row text-start text-uppercase">
+    <div class="col-sm-12" >
+        <h3 class="mt-1 text-start">Edit Transaction</h3>
+    </div>
+</div>
+
+<form action="{% url 'updateLoanAccountTransaction' trans.id %}" method="post">
+    {% csrf_token %}
+    <div class="row mt-5 d-flex justify-content-start">
+        <div class="col-sm-6">
+            <div class="from-group">
+                <label for="">Type</label>
+                <input type="text" class="form-control text-dark" readonly name="trans_type" value="{{trans.type}}" id="">
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2 d-flex justify-content-start">
+        <div class="col-sm-6">
+            <div class="from-group">
+                <label for="">Date</label>
+                <input class="form-control text-dark" type="date" value="{{trans.date|date:'Y-m-d'}}" name="trans_date" id="transDate">
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2 d-flex justify-content-start">
+        <div class="col-sm-6">
+            <div class="from-group">
+                <label for="">Principal Amount</label>
+                <input class="form-control text-dark" type="number" min="0" step="any" value="{{trans.principal}}" required onkeyup="calc()" name="principal_amount" id="transPrincipalAmount">
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2 d-flex justify-content-start">
+        <div class="col-sm-6">
+            <div class="from-group">
+                <label for="">Interest</label>
+                <input class="form-control text-dark" type="number" min="0" step="any" value="{{trans.interest}}" required onkeyup="calc()" name="trans_interest" id="transInterest">
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2 d-flex justify-content-start">
+        <div class="col-sm-6">
+            <div class="from-group">
+                <label for="">Total</label>
+                <input class="form-control text-dark" readonly type="number" value="{{trans.total}}" name="trans_total" id="transTotal">
+            </div>
+        </div>
+    </div>
+
+    
+
+
+
+
+
+    <!-- <div class="row mt-5">
+        <div class="col-sm-12" style="text-align: center;">
+            <input type="reset" style="width: 150px; height: 40px;" onclick="window.location.href=`{% url 'viewLoanAccount' trans.loan_account.id %}`" class="btn btn-outline-primary" value="CANCEL">
+            <input type="submit" style="width: 150px; height: 40px;" class="btn btn-success" value="SAVE">
+        </div>
+    </div> -->
+    <div class="row mt-5 mb-3">
+        <input style="width: 150px;margin-right: 1vh; background-color: chocolate;" type="submit" class="btn mt-2" value="Save" name="Save">
+        <input style="width: 150px; background-color: chocolate;" class="btn mt-2" type="reset" onclick="window.location.href=`{% url 'viewLoanAccount' trans.loan_account.id %}`" value="Cancel">
+    </div>
+</form>
+
+<script>
+    function calc(){
+        var amount = $('#transPrincipalAmount').val();
+        var int = $('#transInterest').val();
+        if (amount == ""){
+            amount = 0
+        }
+        if (int == ""){
+            int = 0
+        }
+
+        $('#transTotal').val(parseFloat(amount)+parseFloat(int))
+    }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA==" crossorigin="anonymous" referrerpolicy="no-referrer" ></script>
+{%if messages%} {%for message in messages%} {%if message.tags == "success"%}
+<script>
+  swal({
+    position: "top-end",
+    icon: "success",
+    title: "{{message}}",
+  });
+</script>
+{%elif message.tags == "warning"%}
+<script>
+  swal({
+    position: "top-end",
+    icon: "warning",
+    title: "{{message}}",
+  });
+</script>
+{%elif message.tags == "error"%}
+<script>
+  swal({
+    position: "top-end",
+    icon: "error",
+    title: "{{message}}",
+  });
+</script>
+{%else%}
+<script>
+  swal({
+    position: "top-end",
+    icon: "info",
+    title: "{{message}}",
+  });
+</script>
+{%endif%} {%endfor%} {%endif%}
+{% endblock %}

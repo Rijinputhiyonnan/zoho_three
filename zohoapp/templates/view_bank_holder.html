@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{%load static%}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/print-js/1.6.0/print.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ 
+<style>
+    a {
+        list-style: none;
+        color: azure;
+    }
+
+    a:hover {
+        color: rgb(218, 164, 48);
+        text-decoration: none;
+    }
+
+    .tab a {
+
+        font-family: inherit;
+        background-color: inherit;
+        float: left;
+        outline: none;
+        cursor: pointer;
+        padding: 10px 5px;
+        transition: 0.3s;
+        color: azure;
+        border: none;
+    }
+
+    .btn{
+        color: rgb(218, 164, 48);
+        outline-color: azure;
+        border: 2px solid rgb(167, 122, 24);
+    }
+
+    .btn:hover{
+        color: white;
+        background-color: rgb(167, 117, 10);
+        outline: none;   
+    }
+
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Left Side: Table -->
+        <div class="col-md-4">
+            <div class="row">
+                <div class="col-md-12 py-2">
+                    <a class="text-white" style="font-size: 1.5rem;">All Banks Holders</a>
+                </div>
+            </div>
+        
+            <div class="row mt-3">
+                <div class="col-md-8">
+                    <input type="text" id="search" placeholder="Search..." class="form-control text-dark bg-light" autocomplete="off">
+                </div>
+                <div class="col-md-4 d-flex justify-content-end align-items-center">
+                    <a class="btn btn-outline-warning mx-1" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button"><i class="fa fa-filter mt-0 mx-1 "></i></a>
+                    <div class="dropdown-menu ">
+                        <a class="dropdown-item text-white" href="{% url 'holderNameAsc' holder.id %}">Name A-Z</a>
+                        <a class="dropdown-item text-white" href="{% url 'holderNameDesc' holder.id %}">Name Z-A</a>
+                    </div>
+                    <a class="btn btn-outline-warning mr-1" role="button" href="{%url 'newBankHolder'%}"><i class="fa fa-plus"></i>
+                        <span class="mt-2"></span>
+                    </a>
+                </div>
+            </div>
+        
+            <div class="row mt-3">
+                <div class="col-md-12" style= "overflow-y: auto;">
+                    <table class="table table-responsive text-white" id="table">
+                        <thead>
+                            <tr>
+                                <th class="text-white fs-5">Holder Name</th>
+                                <th class="text-white fs-5">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in all_bank_holders %}
+                            <tr style="cursor: pointer;" onclick="window.location.href=`{% url 'viewBankHolder' item.id %}`">
+                                <td>{{item.holder_name}}</td>
+                                <td>{{item.status}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card" style="background-color: transparent;">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- <a class="tablinks p-1 text-white" role="button"  style="background-color: orange;"><i class="fa fa-eye"></i>Overview</a> -->
+                            <a class="btn text-white" style="background-color: chocolate; margin-right: 2vh; border: none;"><i class="fas fa-eye"></i> Overview</a>
+                        </div>
+                    
+                        <div class="col-md-6 d-flex justify-content-end align-items-start p-2 gap-2">
+                            <a style="color: orange; width: 2rem;" class="btn btn-outline-warning p-2" href="{% url 'editBankHolder' holder.id %}">
+                                <i class="fa fa-pencil"></i>
+                            </a>
+                            <a href="{% url 'deleteBankHolder' holder.id %}">
+                                <button style="color: orange; width: 2rem;" class="btn btn-outline-warning p-2" onclick="return confirm('Are you sure you want to delete this bank holder.?')"><i class="fa fa-trash"></i></button>
+                            </a>
+                            {% if holder.status == 'Inactive' %}
+                            <a class="btn btn-outline-warning p-2" style="width: 6rem;" href="{% url 'bankHolderStatusActive' holder.id %}"  id="sts">Inactive</a>
+                            {% elif holder.status == 'Active' %}
+                            <a class="btn btn-outline-warning p-2" style="width: 6rem;" href="{% url 'bankHolderStatusInactive' holder.id %}"  id="sts">Active</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body" style="background-color: #ffddb0">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <h5 class="text-center text-dark text-uppercase">Bank Holder Info</h5>
+                                <div class="col-12 d-flex justify-content-between align-items-center">
+                                    <span class="col-4 text-dark">Name :</span>
+                                    <span class="col-8 text-end fs-4 fw-bold" style="color:#d0681e;">{{holder.holder_name}}</span>
+                                </div>
+                                <div class="col-12 mt-3 text-dark d-flex justify-content-between align-items-center">
+                                    <span>Contact :</span>
+                                    <span class="">{{holder.phone_number}}</span>
+                                </div>
+                                <div class="col-12 mt-3 text-dark d-flex justify-content-between align-items-center">
+                                    <span>Email :</span>
+                                    <span class="">{{holder.email_id}}</span>
+                                </div>
+                                <div class="col-12 mt-3 text-dark d-flex justify-content-between align-items-center">
+                                    <span>Acc. Type :</span>
+                                    <span class="">{{holder.acc_type}}</span>
+                                </div>
+                            </div>
+                            <hr style="background-color: black;">
+                            <div class="row">
+                                <h5 class="text-center text-dark text-uppercase">Tax Registration Details</h5>
+                                <div class="col-12 text-dark mt-3 d-flex justify-content-between align-items-center">
+                                    <span>Pan Number :</span>
+                                    <span class="">{{holder.pan_number}}</span>
+                                </div>
+                                <div class="col-12 text-dark mt-3 d-flex justify-content-between align-items-center">
+                                    <span>Reg. Type :</span>
+                                    <span class="">{{holder.registration_type}}</span>
+                                </div>
+                                <div class="col-12 text-dark mt-3 d-flex justify-content-between align-items-center">
+                                    <span>GSTIN/UN :</span>
+                                    <span class="">{{holder.gstin}}</span>
+                                </div>
+                            </div>
+                            <hr style="background-color: black;">
+                            <div class="row">
+                                <h5 class="text-center text-dark text-uppercase">Opening Balance Details</h5>
+                                <div class="col-12 text-dark mt-3 d-flex justify-content-between align-items-center">
+                                    <span>Date :</span>
+                                    <span class="">{{holder.openbal_date}}</span>
+                                </div>
+                                <div class="col-12 text-dark mt-3 d-flex justify-content-between align-items-center">
+                                    <span>Balance Type :</span>
+                                    <span class="">{{holder.openbal_type}}</span>
+                                </div>
+                                <div class="col-12 text-dark mt-3 d-flex justify-content-between align-items-center">
+                                    <span>Amount :</span>
+                                    <span class="">{{holder.openbal_amount}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card" style="background-color: rgb(110, 61, 46)">
+                                <div class="card-header d-flex justify-content-center">
+                                    <h5 class="m-0">Bank Details</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label for="">Bank Name</label>
+                                        <input type="text" readonly value="{{holder.bank_name}}" class="border-0 w-100 py-1 text-white" style="background-color: #8d5747;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="">Acc. Number</label>
+                                        <input type="text" readonly value="{{holder.acc_number}}" class="border-0 w-100 py-1 text-white" style="background-color: #8d5747;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="">Branch</label>
+                                        <input type="text" readonly value="{{holder.branch_name}}" class="border-0 w-100 py-1 text-white" style="background-color: #8d5747;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="">IFSC Code</label>
+                                        <input type="text" readonly value="{{holder.ifsc_code}}" class="border-0 w-100 py-1 text-white" style="background-color: #8d5747;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="">Swift Code</label>
+                                        <input type="text" readonly value="{{holder.swift_code}}" class="border-0 w-100 py-1 text-white" style="background-color: #8d5747;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr style="background-color: black;">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card" style="background-color: rgb(110, 61, 46);">
+                                <div class="card-header d-flex justify-content-center">
+                                    <h5 class="m-0">Mailing Address</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group d-flex justify-content-between">
+                                        <label class="col-4" for="">Mailing Name</label>
+                                        <input type="text" readonly value="{{holder.mail_name}}" class="col-8 border-0 py-1 text-white" style="background-color: #8d5747;">
+                                    </div>
+                                    <div class="form-group d-flex justify-content-between">
+                                        <label class="col-4" for="">Address</label>
+                                        <textarea class="col-8 border-0 p-2 text-white text-start" style="background-color: #8d5747;" name="" id="" cols="" readonly rows="3">{{holder.mail_address}}</textarea>
+                                    </div>
+                                    <div class="form-group d-flex justify-content-between">
+                                        <label class="col-4" for="">Country</label>
+                                        <input type="text" readonly value="{{holder.mail_country}}" class="col-8 border-0 py-1 text-white" style="background-color: #8d5747;">
+                                    </div>
+                                    <div class="form-group d-flex justify-content-between">
+                                        <label class="col-4" for="">State</label>
+                                        <input type="text" readonly value="{{holder.mail_state}}" class="col-8 border-0 py-1 text-white" style="background-color: #8d5747;">
+                                    </div>
+                                    <div class="form-group d-flex justify-content-between">
+                                        <label class="col-4" for="">Pin</label>
+                                        <input type="text" readonly value="{{holder.mail_pin}}" class="col-8 border-0 py-1 text-white" style="background-color: #8d5747;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+  <script>
+    $(document).ready(function() {
+      var $rows = $('#table tbody tr');
+      $('#search').keyup(function() {
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+        $rows.show().filter(function() {
+          var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+          return !~text.indexOf(val);
+        }).hide();
+      });
+    });
+
+</script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA==" crossorigin="anonymous" referrerpolicy="no-referrer" ></script>
+{%if messages%} {%for message in messages%} {%if message.tags == "success"%}
+<script>
+  swal({
+    position: "top-end",
+    icon: "success",
+    title: "{{message}}",
+  });
+</script>
+{%elif message.tags == "warning"%}
+<script>
+  swal({
+    position: "top-end",
+    icon: "warning",
+    title: "{{message}}",
+  });
+</script>
+{%elif message.tags == "error"%}
+<script>
+  swal({
+    position: "top-end",
+    icon: "error",
+    title: "{{message}}",
+  });
+</script>
+{%else%}
+<script>
+  swal({
+    position: "top-end",
+    icon: "info",
+    title: "{{message}}",
+  });
+</script>
+{%endif%} {%endfor%} {%endif%}
+{%endblock%}

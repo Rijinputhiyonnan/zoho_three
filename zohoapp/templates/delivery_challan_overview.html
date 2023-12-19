@@ -1,0 +1,742 @@
+<!-- edit-Rijin-->
+
+
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+
+.modal{
+      z-index: 9999;
+      overflow: scroll;
+    }
+
+    /* width */
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background: rgb(252, 236, 217);
+
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+    #selected-area{
+        font-size: 20px;
+    }
+    #tr_data:hover{
+    background-color: #757575;
+  }
+  .dropdown-item:hover{
+    color: rgb(226, 149, 5);
+}
+
+
+
+.searchbar,
+.overview .bar {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    /* margin: 0 1rem; */
+}
+
+.searchbar .btn {
+    width: 5vw;
+    background-color: rgb(28, 117, 233);
+    font-size: 1vw;
+    color: rgb(255, 255, 255);
+}
+    
+</style>
+
+
+
+<script>
+    function printForm() {
+        var selectedArea = document.getElementById("selected-area");
+
+        var printWindow = window.open('', 'PrintWindow', 'height=800,width=800');
+
+        // Check if selectedArea exists
+        if (selectedArea) {
+            printWindow.document.write('<html><head><title>Print Selected Area</title></head><body>' + selectedArea.innerHTML + '</body></html>');
+            printWindow.print();
+            printWindow.close();
+        } else {
+            alert("No content to print!");
+        }
+    }
+    
+
+</script>
+
+
+<div class="row">
+    <div class="col-sm-4">
+       
+        <div class="row p-3 ">
+            
+                <div class="header">
+                    <h5>ALL DELIVERY CHALLAN LIST</h5>
+                </div>
+                <div class="searchbar">
+                    
+                    <input class="form-control" type="text" placeholder="Search by Name" name="search" id="search"
+                        
+                        style="color: rgb(255, 255, 255);background: transparent;margin-right: 5px;">
+                    <a class="btn btn-outline mx-1" style="color: #ffffff;background-color: rgb(210, 132, 30);"  href="" data-bs-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false" role="button">
+                        <i class="fa fa-filter"></i>
+                    </a>
+                   
+                    <div class="dropdown-menu m-1">
+                        <a class="dropdown-item" href="{% url 'delivery_challan_overview' estimate.id %}">All</a>
+                        <a class="dropdown-item" href="{% url 'filter_by_draft_chellan_overview' estimate.id %}">Draft</a>
+                        <a class="dropdown-item" href="{% url 'filter_by_sent_chellan_overview' estimate.id %}">Sent</a>
+                    </div>
+                    
+                    <a class="btn btn-outline mr-1" style="color: #fdfdfd;background-color: rgb(210, 132, 30);" href="{% url 'create_delivery_chellan' %}"><i class="fa fa-plus"></i></a>
+                </div>
+            <div>
+                <br>
+            </div>
+                <hr>
+        
+    </div>
+        <div class="row">
+            <div class="col-sm-12 col-lg-12 col-md-12">
+                <div class="pt-3 ps-2 " style="height: 600px; overflow-y: scroll;overflow-x: hidden;">
+                    <table class="text-white" style="width: 100%; ">
+                        {% for estimate in all_estimates %}
+                        <tbody id="table">
+                        <tr id="tr_data" class="clickable-row border-bottom" style="cursor: pointer;" data-href="{% url 'delivery_challan_overview' estimate.id %}">
+                            <td>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5 style="color: rgb(218, 143, 5);">{{estimate.customer_name}}</h5>
+                                    </div>
+                                    <div class="col-md-6 text-right" style="color: rgb(218, 143, 5);">&#x20B9;{{estimate.total}}.00</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <p>{{estimate.chellan_no}}</p>
+                                    </div>
+                                    <div class="col-md-3 text-left">
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <p>{{estimate.status}}</p>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+    
+                                </div>
+                            </td>
+                        </tr>
+                       
+                    </tbody>
+    
+                        {% endfor %}
+                    </table>
+                   
+                </div>
+            </div>
+       
+        </div>
+
+    </div>
+    <div class="col-sm-8">
+        <div class="row  mx-1 py-3" style="background-color: rgba(136, 136, 135, 0.1)">
+            
+                <div class="p-name">
+                    <h3 class="px-2 pb-2" id="id1">   {{estimate.chellan_no }} </h3>
+                </div>
+                
+                <div class="col-sm-5 text-right my-auto">
+                    <a class="btn fa fa-file-word" href="{% url 'delivery_challan_view' id=estimate.id %}" style="background-color: rgb(212, 139, 3); border-radius: 5px; height: 1.7rem; font-size: 0.7rem;" class="btn btn-sm m-1 text-white">Template</a>
+                
+                    <a class="btn fa fa-eye" href="#home" style="background-color: rgb(212, 139, 3); border-radius: 5px; height: 1.7rem; font-size: 0.7rem;" class="btn btn-sm m-1 text-white">Overview</a>
+                
+                    <a class="btn fas fa-file-invoice" href="{% url 'delivery_challan_slip' id=estimate.id %}" style="background-color: rgb(212, 139, 3); border-radius: 5px; height: 1.7rem; font-size: 0.7rem;" class="btn btn-sm m-1 text-white">Slip</a>
+                </div>
+                
+            
+            <div class="col-sm-7 text-white text-right " style="text-align: end;">
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <a href="{% url 'delivery_challan_edit' estimate.id %}" style="background-color:  rgb(212, 139, 3);border-radius: 5px;height: 1.7rem;  font-size: 0.7rem;"  class="btn btn-sm m-1 text-white"
+                         data-toggle="tooltip" title="Edit">
+                        <i class="mdi mdi-pencil"></i></a>
+                    <a href="{% url 'render_challan_pdf' estimate.id %}" style="background-color:  rgb(212, 139, 3);border-radius: 5px;height: 1.7rem;  font-size: 0.7rem;" class="btn btn-sm m-1 text-white " 
+                        data-toggle="tooltip" title="PDF" id="pdf">
+                        <i class="mdi mdi-file-pdf-box"></i></a>
+                    <a href="" onclick="printForm()" style="background-color:  rgb(212, 139, 3);border-radius: 5px;height: 1.7rem;  font-size: 0.7rem;" class="btn btn-sm m-1 text-white btn_print" 
+                        data-toggle="tooltip" title="Print">
+                        <i class="mdi mdi-printer"></i></a>
+                    <a href="{% url 'emailattachment' %}" style="background-color:  rgb(212, 139, 3);border-radius: 5px;height: 1.7rem;  font-size: 0.7rem;" class="btn btn-sm m-1 text-white"
+                         data-toggle="tooltip" title="Email">
+                        <i class="mdi mdi-email"></i></a>
+            
+                       
+                        <div class="dropdown m-0 p-0 ms-1 mt-1" title="convert" style="background-color:  rgb(212, 139, 3);border-radius: 5px;height: 1.7rem;  ">
+                            <a href=" " class=" fas fa-exchange-alt dropdown-toggle  btn-sm text-white ms-1 "  style="font-size: 0.7rem;"
+                                data-bs-toggle="dropdown" id="attachmentDropdown" aria-haspopup="true" aria-expanded="false"> 
+                            </a>
+        
+                            <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                                {% if estimate.status == 'Draft' %}
+                                    <a href="{% url 'change_statusdel' id=estimate.id %}" style="background-color:  rgb(212, 139, 3); border-radius: 5px; height: 1.7rem;   font-size: 0.7rem;" class="btn btn-sm m-1 text-white" data-toggle="tooltip" title="Change Status">
+                                        <i class="fas fa-exchange-alt"> Change status</i>
+                                    </a>
+                                {% endif %}
+                                {% if not estimate.invoice %}
+                                    <form action="{% url 'convert_challan_to_invoice' estimate.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" style="background-color:  rgb(212, 139, 3); border-radius: 5px; height: 1.7rem;  font-size: 0.7rem;" class="btn btn-sm m-1 text-white"  onclick="convertToInvoice()" {% if is_converted %}disabled{% endif %}>
+                                            <i class="fas fa-exchange-alt">Convert to Invoice</i>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <script>
+                            function convertToInvoice() {
+                              var button = document.getElementById('convert-to-invoice');
+                              button.innerHTML = 'Converting...';
+                              button.disabled = true;
+                          
+                              // Save the conversion status in local storage
+                              localStorage.setItem('isConverted', true);
+                          
+                              // Additional logic for the conversion process
+                            }
+                          
+                            // Check the conversion status on page load
+                            document.addEventListener('DOMContentLoaded', function () {
+                              var isConverted = localStorage.getItem('isConverted');
+                              if (isConverted === 'true') {
+                                var button = document.getElementById('convert-to-invoice');
+                                button.innerHTML = 'Already converted';
+                                button.disabled = true;
+                              }
+                            });
+                          </script>
+
+             
+                           
+                        <div class="dropdown m-0 p-0 ms-1 mt-1" title="comments" style="background-color:  rgb(212, 139, 3);border-radius: 5px;height: 1.7rem;  font-size: 0.7rem;">
+                            <a href=" " class=" fas fa-comment-dots dropdown-toggle  btn-sm text-white ms-1"  style="font-size: 0.7rem;"
+                                data-bs-toggle="dropdown" id="attachmentDropdown" aria-haspopup="true" aria-expanded="false"> 
+                            </a>
+        
+                            <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                                <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                                 data-target="#cmnts"><i class="fa-solid fa fa-plus"></i>Add</a>
+                                <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                                data-target="#cmt_list"><i class="fas fa-list"></i>&nbsp;View List</a>
+                                        
+                            </div>
+                        </div>
+                    
+                       
+                    
+                    {% if estimate.attachment != ""%}
+                    <a href="{{estimate.attachment.url}}"  style="background-color:  rgb(212, 139, 3);border-radius: 5px;height: 1.7rem;  font-size: 0.7rem; " class="btn  m-1 text-white"
+                        data-toggle="tooltip" title="Download Attached File">
+                        <span class="mdi mdi-download"></span></a>
+                    {%endif%}
+                    
+                </div>
+               
+        
+                <a href="{% url 'deletechallan' estimate.id %}" style="background-color:  rgb(212, 139, 3);border-radius: 5px;height: 1.7rem;  font-size: 0.7rem;" class="btn btn-sm text-white"  
+                onclick="return confirm('Do you want to Delete this Delivery Challan?');"><i class="mdi mdi-delete"></i></a>
+            </div>
+        </div>
+
+<!-- .................................................................................. -->
+
+<div id="selected-area">
+<div id="div_estimate" class="mx-2 my-4 p-4 "
+style="background-color: rgba(124, 124, 123, 0); height: 1200px;">
+
+<div class="slip p-5 convert_to_pdf " id="whatToPrint"
+style="height: auto;background-color: burlywood">
+    <div class="row ">
+        <div class="col-md-6 ">
+            <h2 class="text-dark" style="text-transform: uppercase;">{{ company.company_name }}</h2>
+            <h6 class="text-dark">{{ company.address }}</h6>
+            <h6 class="text-dark">{{ company.city }},{{ company.state }}</h6>
+        </div>
+        <div class="col-md-6 text-right">
+            <h1 class="text-dark" style="font-size: 2rem; ">DELIVERY CHALLAN</h1>
+            <h6 class="text-dark">Delivery Challan Number : {{estimate.chellan_no }}</h6>
+        </div>
+        <div class="bar pt-2 pb-4">
+            <div class="left" style="font-size: 1rem;font-weight: 600;"> {{p.designation}}
+                <h6 class="text-dark">Client :</h6>
+                <h6  style="color: #000000;font-weight: bold"><div class="text-uppercase">{{ estimate.cu.customerName }} </div><span class="text-dark" style="color: rgb(0, 0, 0);font-weight: bold">{{ estimate.cu.customerEmail }}</span>  <br><span class="text-dark">{{ estimate.cu.customerMobile }}</span></h6>
+            </div>
+            <div class="right" style=" color: #000000; font-size: 1rem;">Order No &nbsp;&nbsp;&nbsp;&nbsp; : {{ estimate.chellan_no }} <br> Challan Date&nbsp;: {{estimate.chellan_date}}  </div>
+        </div>
+        
+       
+            <table class="table  " style="border-color: black;">
+                <thead >
+                    <tr>
+                        <th style="color: black;font-weight: bold;text-align: center;">#</th>
+                        <th style="width: 10rem;color: black;font-weight: bold;text-align: center;">Product</th>
+                        <!-- <th class="text-right;" style="color: black;font-weight: bold;">Hsn</th> -->
+                        <!-- <th class="text-right;" style="color: black;font-weight: bold;">Description</th> -->
+                        <th class="text-right;" style="color: black;font-weight: bold;text-align: center;">HSN</th>
+                        <th class="text-right;" style="color: black;font-weight: bold;text-align: center;">Quantity</th>
+                        <th class="text-right;" style="color: black;font-weight: bold;text-align: center;">Price</th>
+                        <th class="text-right;" style="color: black;font-weight: bold;text-align: center;">Discount</th>
+        
+                        <th class="text-right;" style="color: black;font-weight: bold;text-align: center;">Tax%</th>
+                        <th class="text-right;" style="color: black;font-weight: bold;text-align: center;">Total</th>
+                    </tr>
+                    
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td style="color: black;font-weight: bold; text-align: center;">{{ forloop.counter }}</td>
+                        <td style="width: 10rem; color: black; font-weight: bold; text-align: center;">{{ item.item_name }}</td>
+
+                        <!-- <td class="text-right">{{ item.hsn }}</td> -->
+                        <!-- <td class="text-right">{{ item.desc }}</td> -->
+
+
+                        <td class="text-right" style="color: black;font-weight: bold; text-align: center;">{{ item.hsn }}</td>
+                        <td class="text-right" style="color: black;font-weight: bold; text-align: center;">{{ item.quantity }}</td>
+                        <td class="text-right" style="color: black;font-weight: bold; text-align: center;">{{ item.rate|floatformat:1 }}</td>
+                        <td class="text-right" style="color: black;font-weight: bold; text-align: center;">{{ item.discount|floatformat:1 }}</td>
+        
+                        <td class="text-right" style="color: black;font-weight: bold; text-align: center;">{{ item.tax_percentage }}</td>
+                        <td class="text-right" style="color: black;font-weight: bold; text-align: center;">{{ item.amount|floatformat:1 }}</td>
+                    </tr>
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+            <div class="gen-info col-6 " style="padding-left: 3rem;">
+                    <table class="table ">
+                        <tr>
+                            <td class="text-dark" style="font-weight: bold;">Sub-Total:</td>
+                            <td class="text-right" style="color: black;font-weight: bold; text-align: end;" style="">{{ estimate.sub_total|floatformat:1 }}</td>
+                        </tr>
+                        {% if estimate.cgst|floatformat:1 != 0|floatformat:1 %}
+                        <tr>
+                            <td class=" text-dark"  style="color: black;font-weight: bold;" >CGST:</td>
+                            <td class="text-right" style="color: black;font-weight: bold; text-align: end;" >{{ estimate.cgst|floatformat:1 }}</td>
+                        </tr>
+                        {% endif %}
+        
+                        {% if estimate.sgst|floatformat:1 != 0|floatformat:1 %}
+                        <tr>
+                            <td class="text-dark"  style="color: black;font-weight: bold;" >SGST:</td>
+                            <td class="text-right"  style="color: black;font-weight: bold; text-align: end;" >{{ estimate.sgst|floatformat:1 }}</td>
+                        </tr>
+                        {% endif %}
+        
+                        {% if estimate.igst|floatformat:1 != 0|floatformat:1 %}
+                        <tr>
+                            <td class="text-dark" style="color: black;font-weight: bold;" >IGST:</td>
+                            <td class="text-right" style="color: black;font-weight: bold; text-align: end;" >{{ estimate.igst|floatformat:1 }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                          <td class="text-dark"  style="color: black;font-weight: bold;" >TAX:</td>
+                          <td class="text-right" style="color: black;font-weight: bold; text-align: end;" >{{ estimate.tax_amount}}</td>
+                      </tr>
+                      {% if estimate.shipping_charge != 0 %}
+                        <tr>
+                            <td class="text-dark"  style="color: black;font-weight: bold;" >Shipping Charge:</td>
+                            <td class="text-right"  style="color: black;font-weight: bold; text-align: end;" >{{ estimate.shipping_charge }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if estimate.adjustment != 0 %}
+                        <tr>
+                            <td class="text-dark"  style="color: black;font-weight: bold;" >Adjustment Charge:</td>
+                            <td class="text-right" style="color: black;font-weight: bold; text-align: end;" >{{ estimate.adjustment|floatformat:1}}</td>
+                        </tr>
+                        {% endif %}
+                        
+                        
+                        <tr>
+        
+                            <td class="text-right"  style="color: black;font-weight: bold;" >Total:</td>
+                            
+                            <td class="text-right " style="color: black;font-weight: bold; text-align: end;" >{{ estimate.total|floatformat:1}}</td>
+                        </tr>
+                       
+
+                       
+                    </table>
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="m-0 font-weight-bold" style="color:black">Customer Note: {{estimate.customer_notes}}</p>
+                            <div class="col-6">
+                            <label> <p class="m-0 font-weight-bold" style="color:black "> </p></label>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="m-0 font-weight-bold" style="color:black">Terms & Conditions: {{estimate.terms_conditions}}</p>
+                            <p style="color:black"></p>
+                        </div>
+                    </div>
+        
+                </div>    <div class="p-info col-6 my-2" style="height: auto;">
+                    <div class="card" style=" padding:0.9rem;">       
+                       
+                        <div class="row">
+                            
+                            <div class="col-4"><label for="">Place of Supply:</label></div>
+                            <div class="col-8">
+                                <p>{{ estimate.cu.placeofsupply }}</p>
+                               
+                        </div>
+                        <hr>
+
+                        <div class="row my-2"><h4>Delivery Challan Details</h4></div>
+                        
+                        <div class="row">
+                            
+                            <div class="col-6"><label for="">Challan Date:</label></div>
+                            <div class="col-6">
+                            <label>  <p>{{ estimate.chellan_date|date:"d/m/Y" }}</p><label>
+                        </div>
+
+
+                        <div class="row">
+                            
+                            <div class="col-6"><label for="">Challan Type:</label></div>
+                            <div class="col-6">
+                            <label>  <p>{{ estimate.chellan_type}}</p></label>
+                            </div>
+                        </div>
+                        <div class="row my-2"><label><h4>GST Details</h4></label></div>
+                        
+                        <div class="row">
+                            
+                            <div class="col-6"><label for="">GST Treatment:</label></div>
+
+                            <div class="col-6 text-uppercase" >
+                                
+                            <label>  <p>{{ estimate.cu.GSTTreatment }}</p></label>
+                               
+                        </div>
+
+                        {% if estimate.cu.GSTTreatment != "Unregistered Business-not Registered under GST" %}
+                        <div class="row">
+                            
+                            <div class="col-6"><label for="">GST Number:</label></div>
+
+                            <div class="col-6 text-uppercase" >
+                                
+                            <label>  <p>{{ estimate.cu.GSTIN }}</p></label>
+                               
+                        </div>
+
+{% endif %}
+                       
+                      
+                    
+                               
+
+                    </div>     
+                </div>
+            </div>     
+                    </div>
+        
+                </div>  
+               
+    </div>
+
+    
+</div>
+
+</div>
+
+</div>
+
+    
+
+
+</div>
+</div>
+</div>
+
+<!-- comment modal -->
+
+<div class="modal fade " id="cmnts"
+style="width: 750px; margin-left: 350px; justify-content: center; overflow: hidden;">
+<div class="modal-dialog modal-xl m-5 p-5">
+    <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+        <div class="modal-header " style="background: rgb(32, 35, 37);">
+            <h5 class="m-3 text-uppercase text-light">Enter Comment</h5>
+            <button type="button" class="close text-dark bg-none" data-dismiss="modal"
+                aria-label="Close">&times;</button>
+
+        </div>
+        <div class="modal-body" style="background: rgb(32, 35, 37); justify-content: center; overflow: hidden;">
+            <div class="card p-0 m-0">
+                <form action="{% url 'add_delivery_chellan_comment' estimate.id %}" method="post" class="needs-validation" novalidate autocomplete="off"
+                    id="modalComment">
+                    {% csrf_token %}
+                    <div class="row mt-2">
+                        <div class="col-md-6 mt-2">
+                            <textarea class="form-control text-dark bg-light" id="comment" name="comments" required
+                                style="height: 200px; width: 520px;"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
+                            <div class="d-flex">
+                                <button class="btn save_btn rounded-pill text-grey w-50 my-4 mx-3" type="submit">Save </button>
+                                <button type="button"
+                                    class="close btn save_btn rounded-pill text-grey w-50 my-4"
+                                    data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">Cancel</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+
+
+
+<!-- ....................................  comment list modal ................ -->
+
+<div class="modal fade " id="cmt_list"
+   style="width: 750px; margin-left: 350px; justify-content: center; overflow: hidden;">
+ <div class="modal-dialog modal-dialog-scrollable modal-xl m-5 p-5">
+    <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+        <div class="modal-header " style="background: rgb(32, 35, 37);">
+            <h5 class="m-3 text-uppercase text-light">LIST</h5>
+            <button type="button" class="close text-dark bg-none" data-dismiss="modal"
+                aria-label="Close">&times;</button>
+
+        </div>
+        <div class="modal-body" style="background: rgb(32, 35, 37); justify-content: center; overflow-x: hidden;">
+            <div class="card p-0 m-0">
+
+                <div class="row mt-3">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="p-2">
+                            <table class="table table-bordered" style="table-layout: fixed;">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center" style="background-color:rgb(218, 143, 3) ;color: white;">Comments</th>
+                                    </tr>
+                                </thead>
+                                {% for comt in comments %}
+                                <tbody>
+                                    <tr>
+                                        <!-- <td><input type="text" value="{{ comt.comments }}" style="width: 100%;height: 20px;"></td> -->
+                                        <td><textarea name="" id="" cols="80" rows="5" style="border: none;background-color:transparent ;color: white;">{{ comt.comments }}</textarea></td>
+                                    </tr>
+                                </tbody>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+ <!-- .....................................................................................................        -->
+<!--         
+            <div class="slip p-5 mx-1 convert_to_pdf bg-light" id="selected-area"
+                style="box-shadow: 5px 5px 10px rgb(45, 45, 45);">
+               
+                
+
+                <div class="row ">
+                    <div class="col-sm-6 ">
+                        <h4 class="text-dark" style="text-transform: uppercase;">{{ company.company_name }}</h4>
+                        <h6 class="text-dark">{{ company.address }}</h6>
+                        <h6 class="text-dark">{{ company.city }},{{ company.state }}</h6>
+                    </div>
+                    <div class="col-sm-6" style="text-align: right;">
+                        <h1 class="text-dark" style="font-size: 1.2rem; ">Delivery Challan</h1>
+                        <h6 class="text-dark">DC-{{estimate.chellan_no }}</h6>
+                    </div>
+                </div>
+                <hr>
+                <div class="row ">
+                    <div class="col-sm-6 mt-auto">
+                        <h6 class="text-dark">Bill To</h6>
+                        <h6 class="text-dark">{{ estimate.customer_name }}</h6>
+                    </div>
+                    <div class="col-sm-6  mt-auto" style="text-align: right;">
+                        <h6 class="text-dark ">Date : {{ estimate.chellan_date }}</h6>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table mt-2" style="border-color: black; color: black;">
+                            <thead class="bg-secondary text-white">
+                                <tr>
+                                    <th class="text-center text-dark" style="width: 200px;">#</th>
+                                    <th class="text-center text-dark" style="width: 200px;">Item</th>
+                                    <th class="text-center text-dark" style="width: 200px;">Quantity</th>
+                                    <th class="text-center text-dark" style="width: 200px;">Rate</th>
+                                    <th class="text-center text-dark" style="width: 200px;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr> 
+                                    
+                                    <td  class="text-center" style="text-align: center">{{ forloop.counter }}</td>
+                                    <td class="text-center" style="text-align: center">{{ item.item_name }}</td>
+                                    <td class="text-center" style="text-align: center">{{ item.quantity }}</td>
+                                    <td class="text-center" style="text-align: center">{{ item.rate|floatformat:3 }}</td>
+                                    <td class="text-center" style="text-align: center">{{ item.amount|floatformat:3 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+                
+                <div class="row" >
+                    <div class="col-sm-6" style="padding-left: 75%;  margin-top: 1%;">
+                        <table class="table" style="color: black">
+                            <tr>
+        
+                                <td class="text-right">Sub-Total:</td>
+                                <td class="text-right">{{ estimate.sub_total|floatformat:3}}</td>
+                            </tr>
+                            {% if estimate.cgst != 0 %}
+                            <tr>
+                                <td class="text-right">CGST:</td>
+                                <td class="text-right">{{ estimate.cgst|floatformat:3}}</td>
+                            </tr>
+                            {% endif %}
+                            {% if estimate.sgst != 0 %}
+                            <tr>
+                                <td class="text-right">SGST:</td>
+                                <td class="text-right">{{ estimate.sgst|floatformat:3}}</td>
+                            </tr>
+                            {% endif %}
+                            {% if estimate.igst != 0 %}
+                            <tr>
+        
+                                <td class="text-right">IGST:</td>
+                                <td class="text-right">{{ estimate.igst|floatformat:3}}</td>
+                            </tr>
+                            {% endif %}
+                            {% if estimate.shipping_charge != 0 %}
+                            <tr>
+        
+                                <td class="text-right">Shipping Charge:</td>
+                                <td class="text-right">{{ estimate.shipping_charge|floatformat:3}}</td>
+                            </tr>
+                            {% endif %}
+                            {% if estimate.adjustment != 0 %}
+                            <tr>
+        
+                                <td class="text-right">Adjustment:</td>
+                                <td class="text-right">{{ estimate.adjustment|floatformat:3}}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+        
+                                <td class="text-right">Total:</td>
+                                <td class="text-right">{{ estimate.total|floatformat:3}}</td>
+                            </tr>
+        
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-sm-6" style="text-align: justify;">
+                        <p class="m-0 font-weight-bold" style="color:black">Customer Note : </p>
+                        <p style="color:black">{{estimate.customer_notes}}</p>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-6" style="text-align: justify;">
+                        <p class="m-0 font-weight-bold" style="color:black">Customer Note : </p>
+                        <p style="color:black">{{estimate.customer_notes}}</p>
+                    </div>
+                </div>
+
+
+            </div> -->
+         
+     
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+<script>
+    // Add click event listener to all rows with class "clickable-row"
+    const rows = document.querySelectorAll('.clickable-row');
+    rows.forEach(row => {
+        row.addEventListener('click', () => {
+            // Get the URL from the "data-href" attribute
+            const url = row.getAttribute('data-href');
+            // Navigate to the URL
+            window.location.href = url;
+        });
+    });
+</script>
+
+<script>
+    var $rows = $('#table tr');
+    $('#search').keyup(function() {
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+        
+        $rows.hide().filter(function() {
+            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return ~text.indexOf(val);
+        }).show();
+    });
+  
+  </script>
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+
+
+{% endblock %}

@@ -1,0 +1,1084 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<script src="https://unpkg.com/htmx.org@1.6.0/dist/htmx.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+<style>
+  #over:hover{
+    background-color: rgba(110, 110, 110, 0.616);
+  }
+
+  .dropdown-item:hover{
+    color: rgb(39, 210, 30);
+  }
+
+  #myTable tbody{
+    cursor: pointer;
+  }
+  .tg{
+    color: rgb(13, 215, 13);
+  }
+  .to{
+    color: rgb(223, 146, 3);
+  }
+  .modal {
+    margin-top: 5rem;
+    z-index: 1;
+    overflow: scroll;
+  }
+
+  .modal-backdrop {
+    display: none;
+    z-index: 1 !important;
+  }
+
+  .modal-content {
+    margin: 2px auto;
+    z-index: 1 !important;
+  }
+  .red_hover{
+    color: rgb(255, 255, 255);
+  }
+  .red_hover:hover{
+    color: red;
+  }
+  .green_hover
+  {
+    color: white;
+  }
+  .green_hover:hover{
+    color: rgb(97, 255, 97)
+  }
+  ::-webkit-scrollbar{
+    display: none;
+  }
+  .class1{
+    padding-bottom: 1rem;
+  }
+  .table-custom-hover:hover{
+    background-color: rgba(0, 0, 0, 0.276);
+  }
+  .ornage_hover:hover{
+    color: orange;
+  }
+  #template1,#template2{
+    max-height: 35rem;
+  }
+</style>
+
+{% if messages %}
+    {% for i in messages %}
+      {% if i.tags == 'warning' %}
+      <div class="alert alert-warning alert-dismissible fade show" role="alert" style="z-index: 1;">
+        <strong>WARNING:</strong> {{ i }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% elif i.tags == 'info' %}
+      <div class="alert alert-info alert-dismissible fade show" role="alert"  style="z-index: 1;">
+        <strong>INFO:</strong> {{ i }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% elif i.tags == 'success' %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert" style="z-index: 1;">
+        <strong>SUCCESS:</strong> {{ i }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% elif i.tags == 'error' %}
+      <div class="alert bg-danger alert-dismissible fade show" role="alert" style="z-index: 1;">
+        <strong>ERROR:</strong> {{ i }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12 col-lg-3 pe-3" style="border-right: 1px solid white;background-color: rgba(0, 0, 0, 0);">
+            <label class="fs-4" style="font-weight: 500;" for="">Payment Recieved</label>
+            <input class="form-control text-dark" type="text" id="my_input" placeholder="Search Here.." style="z-index: 10;">
+            <div class="d-flex justify-content-between mt-3">
+              <div class="d-flex justify-content-between mt-3">
+                <div class="dropdown me-2">
+                  <a class="btn btn-sm btn-outline-warning" href="" data-bs-toggle="dropdown" aria-expanded="false"><span class="fa fa-sort"> Sort</span></a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item ornage_hover" href="{% url 'payment_recieved_overview' 0 %}">All</a></li>
+                    <li><a class="dropdown-item ornage_hover" href="{% url 'payment_recieved_overview_sort_by_name' pay_data.id %}">Name</a></li>
+                    <li><a class="dropdown-item ornage_hover" href="{% url 'payment_recieved_overview_sort_paynum' 0 %}">Payment Number</a></li>
+                  </ul>
+                </div>
+                <div class="dropdown">
+                  <a class="btn btn-sm btn-outline-warning" href="" data-bs-toggle="dropdown" aria-expanded="false"><span class="fa fa-sort"> Filter</span></a>
+                  <ul class="dropdown-menu dropdown-menu-top">
+                    <li><a class="dropdown-item ornage_hover" onclick="all_filter()" href="#">All</a></li>
+                    <li><a class="dropdown-item ornage_hover" onclick="draft_filter()" href="#">Draft</a></li>
+                    <li><a class="dropdown-item ornage_hover" onclick="saved_filter()" href="#">Saved</a></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="d-flex justify-content-between mt-3">
+                <a class="btn btn-sm btn-outline-warning" href="{% url 'payment_recieved_create' %}"><span class="fa fa-plus"> New</span></a>
+              </div>
+            </div>
+            <div style="overflow-x: auto;max-height: 33rem;">
+                <table id="myTable" class="w-100">
+                    <thead>
+                        <th></th>
+                        <th></th>
+                    </thead>
+                    <tbody>
+                        {% for i in pay_datas %}
+                        <tr onclick="call_pay_data('{{ i.id }}')" class="table-custom-hover" style="border-bottom:1px solid white">
+                            <td>
+                                <label style="color: rgb(255, 255, 255);" for="">{{ i.payment_recieved_number }}</label>
+                                <br>
+                                <label style="color: rgb(198, 198, 198);padding-top: 5px;" for="">Paid : <span class="text-light">{{ i.pay_rec_paid }}</span></label>
+                                <br>
+                                <label style="color: rgb(198, 198, 198);" for=""><span class="text-light">{{ i.customer_name }}</span></label>
+                            </td>
+                            <td>
+                                <br><br>
+                                <div class="text-end p-0 m-0">
+                                    <label style="color: rgb(198, 198, 198);" for="">Bal : <span class="text-light">{{ i.pay_rec_balance }}</span></label>
+                                </div>
+                                <div class="text-end p-0 m-0">
+                                    <label style="color: rgb(198, 198, 198);" for="">Status : <span {% if i.status == 'save' %} style="color: rgb(255, 255, 255);" {% else %} style="color: rgb(255, 255, 255);" {% endif %}>{{ i.status|capfirst }}</span></label>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm-12 col-lg-9">
+          <label class="fs-4 ps-2" style="font-weight: 500;" for="">[ {{ pay_data.payment_recieved_number }} ]</span></label>
+            <div class="p-2">
+              <div class="d-lg-flex d-sm-block justify-content-between">
+                <div>
+                  <a style="background-color: rgb(204, 109, 0);" class="btn " onclick="template1()"><span class="fa fa-eye"></span> Overview</a>
+                  <a class="btn bg-light text-dark ms-2" onclick="template2()"><span class="fa fa-file-text"></span> Template</a>
+                </div>
+                <div class="d-flex">
+                  <a class="btn btn-outline-warning ms-2" href="{% url 'payment_recieved_view_or_edit' pay_data.id %}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="EDIT"><span class="fa fa-edit"></span></a>
+                  <div class="dropdown">
+                    <a class="btn btn-outline-warning ms-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" ><span data-bs-toggle="tooltip" data-bs-placement="bottom" title="SHARE" class="fa fa-share"></span></a>
+                    <ul class="dropdown-menu dropdown-menu-top">
+                      <li><a id="send_mail" class="dropdown-item ornage_hover"  data-bs-toggle="modal" data-bs-target="#exampleModal2"><span class="fa fa-envelope"></span> Mail</a></li>
+                      <li><a id="whatsapp_modal" class="dropdown-item ornage_hover" href="whatsapp://send?text=Check out this website: [Your URL]" data-action="share/whatsapp/share"><span class="fa fa-whatsapp"></span> Whatsapp</a></li>
+                    </ul>
+                  </div>
+                  <a class="btn btn-outline-warning ms-2" type="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="PRINT" onclick="print_content()"><span class="fa fa-print"></span></a>
+                  <a class="btn btn-outline-warning ms-2" onclick="exportToPDF()" type="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="PDF"><span class="fa fa-file-pdf-o"></span></a>
+                  <div class="dropdown">
+                    <a class="btn btn-outline-warning ms-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" ><span data-bs-toggle="tooltip" data-bs-placement="bottom"  title="COMMENT" class="fa fa-comment"></span></a>
+                    <ul class="dropdown-menu dropdown-menu-top">
+                      <li><a class="dropdown-item ornage_hover" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" ><span class="fa fa-plus"></span> Add</a></li>
+                      <li><a id="lsit_comments" class="dropdown-item ornage_hover" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal2" ><span class="fa fa-list"></span> List</a></li>
+                    </ul>
+                  </div>
+
+                  <div class="dropdown">
+                    <a id="attatch_file" class="btn btn-outline-warning ms-2" type="button" data-bs-toggle="dropdown" aria-expanded="false"><span data-bs-toggle="tooltip" data-bs-placement="bottom" title="ATTATCH" class="fa fa-paperclip"></span></a>
+                    <!-- <a class="btn btn-outline-warning ms-2" type="button"  ><span data-bs-toggle="tooltip" data-bs-placement="bottom"  title="COMMENT" class="fa fa-comment"></span></a> -->
+                    <ul class="dropdown-menu dropdown-menu-top">
+                      <li><a class="dropdown-item ornage_hover" type="button"  data-bs-toggle="modal" data-bs-target="#exampleModal2"><span class="fa fa-paperclip"></span> Attatch</a></li>
+                      <li><a id="lsit_comments" class="dropdown-item ornage_hover" href="{% url 'download_pdf_payment_recieved' pay_data.id %}"><span class="fa fa-download"></span> Download</a></li>
+                    </ul>
+                  </div>
+                  <a class="btn btn-outline-warning ms-2" onclick="confirm_delete('{{ pay_data.id }}')" type="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="DELETE"><span class="fa fa-trash-o"></span></a>
+                </div>
+              </div>
+            </div>
+      
+            <div id="template1" class="card p-2 mt-2  text-dark" style="overflow-x: auto;background-color: #ffddb0;">
+              <h2 style="font-weight: normal;" class="text-center pt-2">PAYMENT RECIEVED <hr></h3>
+              <!-- <div class="card bg-success rounded p-2">
+                <h3 style="font-weight: normal;">CUSTOMER DETAILS</h3>
+                <div class="row p-2">
+                  <div style="border-bottom: 1px solid white;border: 1px solid rgba(255, 255, 255, 0.253)"  class="col-sm-12 col-lg-4 p-2">
+                    <label for="">NAME : </label>
+                    <p>{{ pay_data.customer_name|upper }}</p>
+                  </div>
+                  <div style="border: 1px solid rgba(255, 255, 255, 0.253);border-bottom: 1px solid white;" class="col-sm-12 col-lg-4 p-2">
+                    <label for="">EMAIL : </label>
+                    <p>{{ pay_data.customer.customerEmail|upper }}</p>
+                  </div>
+                  <div style="border: 1px solid white;" class="col-sm-12 col-lg-4 p-2">
+                    <label for="">ADDRESS : </label>
+                    <p>{{ pay_data.customer_bill_address }}</p>
+                  </div>
+                  <div style="border: 1px solid rgb(255, 255, 255);"  class="col-sm-12 col-lg-4 p-2">
+                    <label for="">GST TREATMENT : </label>
+                    <p>{{ pay_data.customer_gst_treatment }}</p>
+                  </div>
+                  <div style="border: 1px solid rgba(255, 255, 255, 0.301);" class="col-sm-12 col-lg-4 p-2">
+                    <label for="">GST NUMBER : </label>
+                    <p>{{ pay_data.customer_gst_number }}</p>
+                  </div>
+                </div>
+              </div> -->
+              <p></p>
+              <div class="row">
+                <div class="col-sm-12 col-lg-6 ps-3">
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">Payment Rec. No :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6">
+                      <label for=""> {{ pay_data.payment_recieved_number }}</label>
+                    </div>
+                  </div>
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">Reference No :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6" style="word-break: break-all;">
+                      <label for=""> {{ pay_data.reference_number }}</label>
+                    </div>
+                  </div>
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">Customer Name :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6" style="word-break: break-all;">
+                      <label for=""> {{ pay_data.customer_name }}</label>
+                    </div>
+                  </div>
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">Customer Email :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6" style="word-break: break-all;">
+                      <label for=""> {{ pay_data.customer_mail }}</label>
+                    </div>
+                  </div>
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">Bill Address :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6" style="word-break: break-all;">
+                      <label for=""> {{ pay_data.customer_bill_address }}</label>
+                    </div>
+                  </div>
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">GST Treatment :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6" style="word-break: break-all;">
+                      <label for=""> {{ pay_data.customer_gst_treatment }}</label>
+                    </div>
+                  </div>
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">GST Number :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6" style="word-break: break-all;">
+                      <label for=""> {{ pay_data.customer_gst_number }}</label>
+                    </div>
+                  </div>
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">Date :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6">
+                      <label for=""> {{ pay_data.payment_recieved_date|date:'Y-m-d' }}</label>
+                    </div>
+                  </div>
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">Payment Method :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6">
+                      <label for=""> {{ pay_data.payment_recieved_method|capfirst }}</label>
+                    </div>
+                  </div>
+                  {% if cheque_id %}
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">Cheque Id :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6">
+                      <label for=""> {{ pay_data.cheque_id }}</label>
+                    </div>
+                  </div>
+                  {% endif %}
+                  {% if upi_id %}
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">UPI Id :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6">
+                      <label for=""> {{ pay_data.upi_id }}</label>
+                    </div>
+                  </div>
+                  {% endif %}
+                  {% if bank %}
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">Bank Name :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6">
+                      <label for=""> {{ pay_data.bank.name|upper }}</label>
+                    </div>
+                  </div>
+                  {% endif %}
+                  {% if bank %}
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">Account no :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6">
+                      <label for=""> {{ pay_data.acc_num }}</label>
+                    </div>
+                  </div>
+                  {% endif %}
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">Status :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6">
+                      <label for=""> {{ pay_data.status|capfirst }}</label>
+                    </div>
+                  </div>
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">Amount :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6">
+                      <label for=""> {{ pay_data.pay_rec_amount }}</label>
+                    </div>
+                  </div>
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">Paid Amount :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6">
+                      <label for=""> {{ pay_data.pay_rec_paid }}</label>
+                    </div>
+                  </div>
+                  <div class="row class1">
+                    <div class="col-sm-12 col-lg-6">
+                      <label for="">Balance :</label>
+                    </div>
+                    <div class="col-sm-12 col-lg-6">
+                      <label for=""> {{ pay_data.pay_rec_balance }}</label>
+                    </div>
+                  </div>
+              </div>
+              <div class="col-sm-12 col-lg-6 pe-3">
+                <div class="p-3 text-light" style="border: 1px solid white;border-radius: 5px;background-color: rgb(110, 61, 46);">
+                  <div class="row class1">
+                      <label style="font-weight: bold;" class="fs-3" for="">ALL INVOICES</label>
+                      <hr class="ms-2 me-3">
+                  </div>
+
+                  {% if all_inv_data %}
+                    {% for i in all_inv_data %}
+                        <div class="row class1">
+                          <div class="col-sm-12 col-lg-6">
+                            <label for="">DATE :</label>
+                          </div>
+                          <div class="col-sm-12 col-lg-6">
+                            <label for=""> {{ i.date }}</label>
+                          </div>
+                        </div>
+                        <div class="row class1">
+                          <div class="col-sm-12 col-lg-6">
+                            <label for="">DUE DATE :</label>
+                          </div>
+                          <div class="col-sm-12 col-lg-6">
+                            <label for=""> {{ i.due_date }}</label>
+                          </div>
+                        </div>
+                        <div class="row class1">
+                          <div class="col-sm-12 col-lg-6">
+                            <label for="">INVOICE TYPE :</label>
+                          </div>
+                          <div class="col-sm-12 col-lg-6">
+                            <label for=""> {{ i.invoice_type }}</label>
+                          </div>
+                        </div>
+                        <div class="row class1">
+                          <div class="col-sm-12 col-lg-6">
+                            <label for="">INVOICE NUMBER :</label>
+                          </div>
+                          <div class="col-sm-12 col-lg-6">
+                            <label for=""> {{ i.invoice_number }}</label>
+                          </div>
+                        </div>
+                        <div class="row class1">
+                          <div class="col-sm-12 col-lg-6">
+                            <label for="">INVOICE AMOUNT :</label>
+                          </div>
+                          <div class="col-sm-12 col-lg-6">
+                            <label for=""> {{ i.invoice_amount }}</label>
+                          </div>
+                        </div>
+                        <div class="row class1">
+                          <div class="col-sm-12 col-lg-6">
+                            <label for="">PAYMENT :</label>
+                          </div>
+                          <div class="col-sm-12 col-lg-6">
+                            <label for=""> {{ i.paid }}</label>
+                          </div>
+                        </div>
+                        <div class="row class1">
+                          <div class="col-sm-12 col-lg-6">
+                            <label for="">BALANCE :</label>
+                          </div>
+                          <div class="col-sm-12 col-lg-6">
+                            <label for=""> {{ i.balance }}</label>
+                          </div>
+                        </div>
+                        <hr>
+                    {% endfor %}
+                  {% else %}
+                    <div class="row class1">
+                      <div class="col-sm-12 col-lg-6">
+                        <label for="">DATE :</label>
+                      </div>
+                      <div class="col-sm-12 col-lg-6">
+                        <label for=""> {{ pay_data.payment_recieved_date|date:'Y-m-d' }}</label>
+                      </div>
+                    </div>
+                    <div class="row class1">
+                      <div class="col-sm-12 col-lg-6">
+                        <label for="">Pay Rec No :</label>
+                      </div>
+                      <div class="col-sm-12 col-lg-6">
+                        <label for=""> {{ pay_data.payment_recieved_number }}</label>
+                      </div>
+                    </div>
+                    <div class="row class1">
+                      <div class="col-sm-12 col-lg-6">
+                        <label for="">Reference No :</label>
+                      </div>
+                      <div class="col-sm-12 col-lg-6">
+                        <label for=""> {{ pay_data.reference_number }}</label>
+                      </div>
+                    </div>
+                  {% endif %}
+
+
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div hidden id="template2" class="card p-1 mt-2 text-dark" style="overflow-x: auto;background-color: #ffddb0;">
+          <div class="row p-2" style="background-color: #8b3131;margin: 3px;border-radius: 20px;"> 
+            <div class="col-sm-12 col-lg-7">
+              <!-- <h1 class="text-end">PAYMENT RECIEVED</h1>
+              <br>
+              <p class="text-end fw-5" id="today">DATE : </p> -->
+            </div>
+            <div class="col-sm-12 col-lg-5 d-flex justify-content-end">
+              <div class="text-start text-light p-2" >
+                <h3>{{ company.company_name|upper }}</h3><p></p>
+                <label>{{ company.city }} , {{ company.state }} , {{ company.pincode }}</label><br>
+                <label>Phone : {{ company.contact_number }}</label><br>
+                <label>EMAIL : {{ company.company_email }}</label>
+              </div>
+            </div>
+          </div>
+          <!-- <hr class="mt-0 pt-0"> -->
+          <br>
+          <div class="card rounded p-2" style="border: 1px solid rgba(0, 0, 0, 0);background-color: #ffddb0;">
+            <h2>PAYMENT RECIEVED</h2>
+            <p></p>    
+          </div>
+          <p></p>
+          <div class="row print-flex p-2">
+            <div class="col-sm-12 col-lg-5 ps-1">
+              <br>
+              <div class="row class1 print-flex m-0 p-0 mt-2">
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for="">Payment Rec. No :</label>
+                </div>
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for=""> {{ pay_data.payment_recieved_number }}</label>
+                </div>
+              </div>
+              <div class="row class1 print-flex m-0 p-0">
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for="">Reference No :</label>
+                </div>
+                <div class="col-sm-12 col-lg-6" style="word-break: break-all;">
+                  <label style="font-weight: 500;" for=""> {{ pay_data.reference_number }}</label>
+                </div>
+              </div>
+              <div class="row class1 print-flex  m-0 p-0">
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for="">Pay Rec. Date :</label>
+                </div>
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for=""> {{ pay_data.payment_recieved_date|date:'Y-m-d' }}</label>
+                </div>
+              </div>
+              <div class="row class1 print-flex  m-0 p-0">
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for="">Payment Method:</label>
+                </div>
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for=""> {{ pay_data.payment_recieved_method|capfirst }}</label>
+                </div>
+              </div>
+              {% if cheque_id %}
+              <div class="row class1 print-flex  m-0 p-0">
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for="">Cheque Id :</label>
+                </div>
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for=""> {{ pay_data.cheque_id }}</label>
+                </div>
+              </div>
+              {% endif %}
+              {% if upi_id %}
+              <div class="row class1 print-flex  m-0 p-0">
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for="">UPI Id :</label>
+                </div>
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for=""> {{ pay_data.upi_id }}</label>
+                </div>
+              </div>
+              {% endif %}
+              {% if bank %}
+              <div class="row class1 print-flex m-0 p-0">
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for="">Bank Name :</label>
+                </div>
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for=""> {{ pay_data.bank.name }}</label>
+                </div>
+              </div>
+              {% endif %}
+              {% if bank %}
+              <div class="row class1 print-flex m-0 p-0">
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for="">Account no :</label>
+                </div>
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for=""> {{ pay_data.acc_num }}</label>
+                </div>
+              </div>
+              {% endif %}
+              <!-- <div class="row class1 print-flex m-0 p-0">
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for="">Status :</label>
+                </div>
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for=""> {{ pay_data.status|capfirst }}</label>
+                </div>
+              </div> -->
+
+              <div class="row class1 print-flex m-0 p-0">
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for="">GST NO :</label>
+                </div>
+                <div class="col-sm-12 col-lg-6">
+                  <label style="font-weight: 500;" for=""> {{ pay_data.customer_gst_number }}</label>
+                </div>
+              </div> 
+          </div>
+          <div class="col-sm-12 col-lg-7">
+            <div class="p- print-amount" style="border: 1px solid rgba(0, 0, 0, 0);border-radius: 5px;">
+              <div class="row class1 print-flex">
+                <div class="col-sm-12 col-lg-5"></div>
+                <div class="col-sm-12 col-lg-7">
+                  <label style="font-weight: bolder;" class="fs-6" for="">{{ pay_data.customer_name|upper }}</label>
+                </div>
+              </div>
+              <div class="row class1 print-flex">
+                <div class="col-sm-12 col-lg-5">
+                </div>
+                <div class="col-sm-12 col-lg-7">
+                  <label style="word-break: break-all;" for=""> {{ pay_data.customer_bill_address }} , {{ pay_data.customer_mail }}</label>
+                </div>
+              </div>
+              <div class="row class1 print-flex">
+                <div class="col-sm-12 col-lg-5">
+                </div>
+                <div class="col-sm-12 col-lg-7">
+                  <label style="word-break: break-all;" for=""> {{ pay_data.customer_gst_treatment }}</label>
+                </div>
+              </div>
+              <!-- <div class="row class1 print-flex">
+                <div class="col-sm-12 col-lg-5">
+                </div>
+                <div class="col-sm-12 col-lg-7">
+                  <label style="word-break: break-all;" for=""> {{ pay_data.customer_gst_number }}</label>
+                </div>
+              </div> -->
+            </div>
+          </div>
+        </div>
+        <div class="p-2">
+          <!-- <table style="color: black;" class="table">
+            <thead class="bg-light">
+              <th style="color: black;">#</th>
+              <th style="color: black;">DATE</th>
+              <th style="color: black;">DUE DATE</th>
+              <th style="color: black;">INVOICE TYPE</th>
+              <th style="color: black;">INVOICE NUMBER</th>
+              <th style="color: black;">INVOICE AMOUNT</th>
+              <th style="color: black;">PAYMENT</th>
+              <th style="color: black;">BALANCE</th>
+            </thead>
+            <tbody>
+              {% for i in all_inv_data %}
+              <tr class="table-custom-hover">
+                <td>{{ forloop.counter }}</td>
+                <td>{{ i.date }}</td>
+                <td>{{ i.due_date }}</td>
+                <td>{{ i.invoice_type }}</td>
+                <td>{{ i.invoice_number }}</td>
+                <td>{{ i.invoice_amount }}</td>
+                <td>{{ i.paid }}</td>
+                <td>{{ i.balance }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table> -->
+        </div>
+        <br>
+        <div class="">
+          <div class="row p-2">
+            <div class="col-sm-12 col-lg-8"></div>
+            <div class="col-sm-12 col-lg-4">
+              <div class="row">
+                <div class="col-sm-12 col-lg-7">
+                  <label style="font-weight: 600;" class="fs-6" for="">PARTICULARS:</label>
+                </div>
+                <div class="col-sm-12 col-lg-5 text-end">
+                  <label style="font-weight: 600;" class="pe-5 fs-6" for="">{{ pay_data.pay_rec_amount }}</label>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-12 col-lg-8"></div>
+            <div class="col-sm-12 col-lg-4">
+              <div class="row">
+                <div class="col-sm-12 col-lg-7">
+                  <label style="font-weight: 600;" class="fs-6" for="">AMOUNT:</label>
+                </div>
+                <div class="col-sm-12 col-lg-5 text-end">
+                  <label style="font-weight: 600;" class="pe-5 fs-6" for="">{{ pay_data.pay_rec_paid }}</label>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="col-sm-12 col-lg-8"></div>
+            <div class="col-sm-12 col-lg-4">
+              <div class="row">
+                <div style="font-weight: 600;" class="col-sm-12 col-lg-6">
+                  <label for="">Balance :</label>
+                </div>
+                <div class="col-sm-12 col-lg-6 text-end">
+                  <label style="font-weight: 600;" class="pe-5" for="">{{ pay_data.pay_rec_balance }}</label>
+                </div>
+              </div>
+            </div> -->
+          </div>
+        </div>
+        <br><br>
+    </div>
+
+    </div>
+</div>
+
+
+<!-- Modal01 -->
+<div class="modal fade" id="exampleModal" tabindex="0" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index: 10;">
+  <div class="modal-dialog">
+    <div style="background-color: rgb(63, 63, 63);width: 40rem;" class="modal-content">
+      <!-- <div class="modal-header">
+        
+      </div> -->
+      <div class="modal-body">
+        <div class="d-flex justify-content-between">
+          <h1 class="modal-title fs-5 " id="exampleModalLabel">ADD COMMENT</h1>
+          <button type="button" class="btn-close text-light" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <hr class="mb-3">
+          <form action="{% url 'add_comment_payment_recieved' pay_data.id %}" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+              <label class="text- fw-bold pb-2" for="">Title</label>
+              <div style="overflow-x: auto;">
+                <input type="text" class="form-control text-dark" name="comment_title" id="comment_title" placeholder="title here..">
+                <p></p>
+              </div>
+              <hr>
+              <label style="color: rgb(255, 255, 255);" class=" fw-bolder" for="">Comments</label>
+              <br>
+              <textarea name="comments" class="w-100 rounded p-2 text-dark" id="comments" cols="30" rows="5" placeholder="comments here.."></textarea>
+              <hr>
+              <div class="d-flex justify-content-end">
+                <button type="button" class="btn bt-lg btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn bt-lg btn-primary">Save</button>
+              </div>
+          </form>
+          </div>
+          <br>
+      <!-- <div class="modal-footer">
+        
+      </div> -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal02 -->
+<div class="modal fade" id="exampleModal2" tabindex="0" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index: 10;">
+  <div class="modal-dialog">
+    <div style="background-color: rgb(63, 63, 63);width: 40rem;" class="modal-content">
+      <!-- <div class="modal-header">
+        
+      </div> -->
+      <div class="modal-body">
+        
+        <div id="modal2">
+          <div class="d-flex justify-content-between">
+            <h1 class="modal-title fs-5 " id="exampleModalLabel">ALL COMMENTS</h1>
+            <button type="button" class="btn-close text-light" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <hr class="mb-3">
+          <div style="overflow-y: auto;max-height: 30rem;">
+          {% for i in comments %}
+            <label class="text-light fw-normal pb-2" for="">{{ i.date }}</label>
+            <p></p>
+            <label for="">{{ i.title|capfirst }}</label>
+            <p>{{ i.comment|capfirst }}</p>
+          <hr>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div id="modal3">
+        <div class="d-flex justify-content-between">
+          <h1 class="modal-title fs-5 " id="exampleModalLabel">ATTATCH FILE</h1>
+          <button type="button" class="btn-close text-light" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <hr class="mb-3">
+        <div style="overflow-y: auto;max-height: 30rem;">
+          <form action="{% url 'attatch_file_payment_revieved' pay_data.id %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+                <label class="text- fw-bold pb-2" for="">FILE</label>
+                <div style="overflow-x: auto;">
+                  <input type="file" class="form-control text-dark" name="my_file" id="my_file" placeholder="title here..">
+                  <p></p>
+                </div>
+                <hr>
+                <label style="color: rgb(255, 255, 255);" class=" fw-bolder" for="">Comments</label>
+                <br>
+                <textarea name="file_comment" class="w-100 rounded p-2 text-dark" id="file_comment" cols="30" rows="5" placeholder="comments here.."></textarea>
+                <hr>
+                <div class="d-flex justify-content-end">
+                  <button type="button" class="btn bt-lg btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                  <button type="submit" class="btn bt-lg btn-primary">Save</button>
+                </div>
+            </form>
+      </div>
+    </div>
+
+
+    <div id="modal4">
+      <div class="d-flex justify-content-between mb-5">
+        <h1 class="modal-title fs-5 " id="exampleModalLabel">SHARE PAYMENT RECEIVED VIA EMAIL</h1>
+        <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+        <form action="{% url 'payment_recieved_to_mail' pay_data.id %}" method="post" enctype="multipart/form-data" class="needs-validation"
+        id="share_to_email_form" autocomplete="off">
+            {% csrf_token %}
+
+            <div class="bg-dark p-3 rounded">
+              <div class="form-group">
+                <label for="emailIds">Email IDs</label>
+                <input class="form-control text-dark" type="email" placeholder="user@gmail.com" name="email_ids" id="emailIds" required>
+              </div>
+              <div class="form-group mt-2">
+                <label for="item_unitname">Message(optional)</label><p class="m-0"></p>
+                <textarea name="email_message" id="email_message" class="text-dark rounded w-100 p-2" cols=""
+                  rows="3" placeholder="This message will be sent along with Bill details."></textarea>
+              </div>
+            </div>
+            <br>
+            <div class="modal-footer d-flex justify-content-center" style="border-top: 1px solid #ffff;">
+              <input type="submit" id="share_with_email"
+                class="submitShareEmailBtn rounded-pill text-grey w-50 my-4 mx-3" value="SEND MAIL">
+            </div>
+      </form>
+    </div>
+
+    
+      <!-- <div class="modal-footer">
+        
+      </div> -->
+    </div>
+  </div>
+</div>
+
+<!-- Share bill Modal -->
+<div class="modal fade" id="shareBillEmail">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+      <div class="modal-header" style="background: rgb(32, 35, 37);">
+        <h5 class="m-3 text-uppercase" id="shareBillEmailLabel">Share Sales Order Via Email</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body" style="background: rgb(32, 35, 37);">
+        <div class="card p-3 m-3">
+          <form action="{% url 'payment_recieved_to_mail' pay_data.id %}" method="post" class="needs-validation"
+            id="share_to_email_form" autocomplete="off">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="emailIds">Email IDs</label>
+              <textarea class="form-control text-dark" name="email_ids" id="emailIds" rows="5"
+                placeholder="Multiple emails can be added by separating with a comma(,)." required></textarea>
+            </div>
+            <div class="form-group mt-2">
+              <label for="item_unitname">Message(optional)</label>
+              <textarea name="email_message" id="email_message" class="text-dark form-control" cols=""
+                rows="4" placeholder="This message will be sent along with Bill details."></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer d-flex justify-content-center" style="border-top: 1px solid #ffff;">
+          <input type="submit" id="share_with_email"
+            class="submitShareEmailBtn rounded-pill text-grey w-50 my-4 mx-3" value="SEND MAIL">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<br><br>
+
+<script>
+    $(document).ready(function(){
+        var table = $('#myTable')
+        $('#my_input').on('keyup',function(){
+            var input = $(this).val()
+            table.find('tbody tr').each(function(){
+                if($(this).text().toLowerCase().indexOf(input.toLowerCase())>-1)
+                {
+                    $(this).show()
+                }
+                else{
+                    $(this).hide()
+                }
+            })
+        })
+    })
+    // filter
+    function all_filter(){
+      table = $('#myTable')
+      table.find('tbody tr').each(function(){
+        $(this).show()
+      })
+    }
+    function saved_filter(){
+      table = $('#myTable')
+      table.find('tbody tr').each(function(){
+        if($(this).text().toLowerCase().indexOf('save')>-1)
+        {
+          $(this).show()
+        }
+        else{
+          $(this).hide()
+        }
+      })
+    }
+    function draft_filter(){
+      table = $('#myTable')
+      table.find('tbody tr').each(function(){
+        if($(this).text().toLowerCase().indexOf('draft')>-1)
+        {
+          $(this).show()
+        }
+        else{
+          $(this).hide()
+        }
+      })
+    }
+    function sortTable(columnIndex) {
+        var table, rows, switching, i, x, y, shouldSwitch;
+        table = document.getElementById("myTable");
+        switching = true;
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("td")[columnIndex];
+                y = rows[i + 1].getElementsByTagName("td")[columnIndex];
+                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+    }
+    // Initialize Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    $(document).ready(function(){
+      var date = new Date();
+      formatted_date =  date.toISOString().split('T')[0]
+      $('#today').text($('#today').text()+formatted_date)
+    })
+    function template1()
+    {
+      $('#template1').attr('hidden',false)
+      $('#template2').attr('hidden',true)
+    }
+    function template2()
+    {
+      $('#template2').attr('hidden',false)
+      $('#template1').attr('hidden',true)
+    }
+    function print_content()
+    {
+      $('#template2').attr('hidden',false)
+      $('#template1').attr('hidden',true)
+      
+      
+      // Create an iframe to render the content
+      $('.over').css({'overflow':'hidden'})
+            // $('body').css({'color':'black'})
+            $('html').css({'color':'black','font-size': '11px'})
+            const iframe = document.createElement('iframe');
+            // iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            // Get the printable content
+            const printableContent = document.getElementById('template2').innerHTML;
+            iframe.contentDocument.open();
+            iframe.contentDocument.write('<html><head><title></title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.5.0/css/bootstrap.min.css">');
+            iframe.contentDocument.write('<style>');
+            iframe.contentDocument.write(`
+                /* Custom alignment styles for printed content */
+                body {
+                    font-family: Arial, sans-serif; /* Change font-family if needed */
+                    // text-align: center; /* Center-align the content */
+                    
+                }
+                table {
+                    width: 100%; /* Make the table width 100% */
+                    border:1px solid black;
+                    border-collapse:collapse;
+                }
+                th, td {
+                    border:1px solid black;
+                    border-collapse:collapse;
+                    // text-align:center;
+                    padding: 10px; /* Add padding for better spacing */
+                }
+                .p-2{
+                  padding:5px;
+                }
+               .print-flex{
+                display:flex;
+               }
+               .print-amount{
+                padding:20px;
+                width:20rem;
+                margin-left:8rem;
+               }
+            `);
+            iframe.contentDocument.write('</style>');
+            iframe.contentDocument.write('</head><body>' + printableContent + '</body></html>');
+            iframe.contentDocument.close();
+    
+        
+            // Print the iframe content
+            iframe.contentWindow.print();
+            document.body.removeChild(iframe);
+
+            $('.over').css({'overflow':'visible'})
+            // $('body').css({'color':'inherit'})
+            $('html').css({'color':'inherit','font-size': 'inherit'})
+
+    }
+    function call_pay_data(Id)
+    {
+      window.location.href="{% url 'payment_recieved_overview' 0 %}".replace('0',Id) 
+    }
+    function confirm_delete(Id)
+    {
+        swal({
+            title: "Confirmation !",
+            text: "Do you want to Delete this ?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                swal({
+                    title: "Deleted !",
+                    text: "Deleted Successfilly!",
+                    icon: "success",
+                    buttons: false,
+                })
+                // 
+                .then((willDelete) => {
+                if (willDelete) {
+                    // Redirect to the delete_teacher view with the teacher's ID
+                    window.location.href = "{% url 'payment_recieved_delete' 0 %}".replace('0', Id);
+                    
+                } else {
+                    window.location.href = "{% url 'payment_recieved_delete' 0 %}".replace('0', Id);
+                }
+            });
+                // 
+            } else {
+                swal("Action Cancelled!");
+            }
+        });
+    }
+    function exportToPDF(){
+        $('#template2').attr('hidden',false)
+        $('#template2').css({'max-height':'100%'})
+        $('#template1').css({'max-height':'100%'})
+        $('#template1').attr('hidden',true)
+        var content = document.getElementById('template2');
+        html2pdf()
+        .from(content)
+        .save('payment_recieved.pdf')
+        setInterval(function(){
+          $('#template2').css({'max-height':'35rem'})
+          $('#template1').css({'max-height':'35rem'})
+        },2000)
+    }
+    $(document).ready(function(){
+      $('#lsit_comments').on('click',function(){
+        $('#modal3').attr('hidden',true)
+        $('#modal2').attr('hidden',false)
+        $('#modal4').attr('hidden',true)
+      })
+    })
+    $(document).ready(function(){
+      $('#attatch_file').on('click',function(){
+        $('#modal2').attr('hidden',true)
+        $('#modal3').attr('hidden',false)
+        $('#modal4').attr('hidden',true)
+      })
+    })
+    $(document).ready(function(){
+      $('#send_mail').on('click',function(){
+        $('#modal2').attr('hidden',true)
+        $('#modal3').attr('hidden',true)
+        $('#modal4').attr('hidden',false)
+      })
+    })
+</script>
+{% endblock %}

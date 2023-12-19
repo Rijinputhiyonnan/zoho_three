@@ -1,0 +1,2309 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+
+
+
+
+<!--<script type="text/javascript">
+    $(document).ready(function ($) {
+        console.log('print');
+
+        $(document).on('click', '.btn_print', function (event) {
+            console.log('print1');
+            event.preventDefault();
+
+            //credit : https://ekoopmans.github.io/html2pdf.js
+
+            var element = document.getElementById('whatToPrint');
+
+            //easy
+            //html2pdf().from(element).save();
+
+            //custom file name
+            //html2pdf().set({filename: 'code_with_mark_'+js.AutoCode()+'.pdf'}).from(element).save();
+
+
+            //more custom settings
+            var opt =
+            {
+                margin: 1,
+                filename: 'Retainer Invoice_' + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            // New Promise-based usage:
+            html2pdf().set(opt).from(element).save();
+
+
+        });
+
+
+
+    });
+</script>
+
+
+
+<script>
+
+    $(function () {
+        $("#slip").click(printSelectedArea1);
+    });
+
+
+</script>-->
+
+
+
+<style>
+      .modal {
+    z-index: 9999;
+    overflow: scroll;
+  }
+
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+  }
+    @media print {
+
+        .unwanted,
+        .sidebar,
+        .sectionhtml {
+            display: none !important;
+        }
+
+        body {
+            visibility: hidden !important;
+        }
+
+        html {
+            overflow: hidden ! important;
+            visibility: hidden !important;
+        }
+
+
+        .printContainer {
+            visibility: visible !important;
+            /* Override the rule above to only show the printables*/
+            z-index: 99999;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+        }
+
+    }
+
+    .slip-page {
+        background: #ffffff;
+        display: block;
+        margin: 0 auto;
+        position: relative;
+        box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+    }
+
+    .slip-page[size="A4"] {
+        width: 21cm;
+        height: 29.7cm;
+        overflow: hidden;
+    }
+
+    .equal-length-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+        /* Make the container fill the height of the column */
+        margin-left: 2vh;
+        margin-right: 2vh;
+    }
+
+    .equal-length-item {
+        flex: 1;
+        text-align: center;
+    }
+
+    .store-user {
+        padding-bottom: 25px;
+    }
+
+    .store-user p {
+        margin: 0;
+        font-weight: 600;
+        color: #000000;
+    }
+
+    .store-user .address {
+        font-weight: 400;
+    }
+
+    .store-user h5 {
+        color: #22b8d1;
+        font-family: 'Rajdhani', sans-serif;
+    }
+
+    .bb {
+        border-bottom: 3px solid #ccc;
+    }
+
+    .top-content {
+        padding-bottom: 15px;
+    }
+
+    .ribbon .ribbon-inner {
+        text-align: center;
+        color: #fff;
+        top: -20px;
+        left: -90px;
+        width: 120px;
+        padding: 3px;
+
+    }
+
+    .ribbon .ribbon-open {
+        background-color: #268ddd;
+        border-color: #1c72b4;
+    }
+
+    .template .ribbon .ribbon-open {
+        background-color: #616263;
+        border-color: #616263;
+    }
+
+    .top-left p {
+        margin: 0;
+        color: #000000;
+    }
+
+    .top-left .graphic-path {
+        height: 40px;
+        position: relative;
+    }
+
+    .top-left .graphic-path::before {
+        content: "";
+        height: 20px;
+        background-color: #615c60;
+        position: absolute;
+        left: 15px;
+        right: 0;
+        top: -15px;
+        z-index: 2;
+    }
+
+    .top-left .graphic-path::after {
+        content: "";
+        height: 22px;
+        width: 17px;
+        background: #000000;
+        position: absolute;
+        top: -13px;
+        left: 6px;
+        transform: rotate(45deg);
+    }
+
+    .template3 .top-left .graphic-path::before {
+        background-color: #bbbbbb;
+    }
+
+    .template3 .top-left .graphic-path::after {
+        background: #616263b3;
+    }
+
+    .top-left .graphic-path p {
+        height: 40px;
+        left: 0;
+        right: 0;
+        text-transform: uppercase;
+        background-color: #22b8d1;
+        font: 26px;
+        z-index: 3;
+        position: absolute;
+        padding-left: 10px;
+    }
+
+    .template3 .top-left .graphic-path p {
+        background-color: #616263;
+        color: white;
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+    }
+
+    .logo img {
+        max-height: 100px;
+    }
+
+    .company-info h2 {
+        margin: 0;
+        font-size: 2em;
+    }
+
+    .i.invoice-box {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .invoice-box h1 {
+        font-size: 2em;
+        margin-bottom: 20px;
+    }
+
+    .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .invoice-details p,
+    .client-details p {
+        margin: 5px 0;
+    }
+
+    .company-info p {
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .dropdown-item:hover {
+        color: rgb(226, 149, 5);
+    }
+
+    .modal {
+        z-index: 9999;
+        overflow: scroll;
+    }
+
+    footer {
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        font-size: 0.8em;
+        color: #888;
+        margin-top: 20px;
+    }
+
+    footer p {
+        margin: 5px 0;
+    }
+
+
+    #tr_data:hover {
+        background-color: #757575;
+    }
+</style>
+
+<section>
+    <div class="row unwanted" style="top:7rem;">
+
+        <div>
+            <div class="col-md-12" style="width: auto;">
+                <div class="row">
+                    <div class="col-md-4" style="border-right: 1px solid white; overflow-y: scroll; height: 84vh;">
+                        <div class="row">
+                            <a class="text-white" style="font-size: 1.5rem;">All Retainer Invoices</a>
+                            <div class="col-md-6">
+                                <input type="text" id="search" class="form-control text-dark bg-light mt-2"
+                                    placeholder="search......" autocomplete="off">
+                            </div>
+
+                            <div class="col-md-2">
+                                <div class="dropdown">
+                                    <a class="btn text-center mt-2 btn-outline-warning" id="sortbutton"
+                                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                        role="button" style="margin-left: 0px; height: 38px;">
+                                        <i class="fa fa-sort m-1"></i>
+                                    </a>
+                                    <div class="dropdown-menu m-1">
+                                        <a class="dropdown-item" href="{% url 'invoice_view' invoice.id %}">All</a>
+                                        <a class="dropdown-item" onclick="sortTable()">Name</a>
+                                        <a class="dropdown-item" onclick="sortTablebybillno()">Retainer Invoice
+                                            Number</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="dropdown">
+                                    <a class="btn text-center mt-2 btn-outline-warning" data-bs-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false" role="button"
+                                        style="margin-left: 0px; height: 38px;">
+                                        <i class="fa fa-filter mt-1"></i>
+                                    </a>
+                                    <div class="dropdown-menu m-1">
+                                        <a class="dropdown-item" href="{% url 'invoice_view' invoice.id %}">All</a>
+                                        <a class="dropdown-item"
+                                            href="{% url 'invoice_view_draft' invoice.id %}">Draft</a>
+                                        <a class="dropdown-item"
+                                            href="{% url 'invoice_view_send' invoice.id %}">Sent</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <a class="btn btn btn-outline-warning text-right mt-2"
+                                    style="height: 38px; padding-top: 12px; padding-left: 17px;"
+                                    href="{% url 'add_invoice' %}"><i class="fa fa-plus "></i></a>
+                            </div>
+                            <div class="col-md-6"></div>
+                        </div>
+                        <div class="scrollable-table">
+                            <table id="table" class="table text-white">
+                                <tbody>
+                                    {% for i in invoices %}
+
+                                    <tr class="clickable" id="{{i.id}}">
+
+                                        <td class="justify-content-between align-items-center ">
+                                            <p class="text-white"><b>{{i.retainer_invoice_number}}</b></p>
+                                            <label class="text-white">{{i.customer_name1}} </label>
+                                        </td>
+                                        <td>
+                                            {% if i.is_draft == 1 %}
+                                            <label class="text-end d-block text-white">Draft</label>
+                                            {% else %}
+                                            <label class="text-end d-block text-white">Send</label>
+                                            {% endif %}
+                                            <label class="text-end d-block text-white">₹{{i.total_amount}}</label>
+
+                                        </td>
+                                    </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+                    <!-- .................................................................................................................. -->
+                    <div class="col-md-8 ml-1 mb-5">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <a class="text-white" style="font-size: 1.5rem;">
+                                    <h2>{{invoice.retainer_invoice_number}}</h2>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button class="btn" onclick="overview_function()"
+                                    style="background-color:chocolate ;margin-left: 2vh;"><i
+                                        class="fa fa-eye"></i>overview</button>
+
+                                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown"
+                                    id="attachmentDropdown" aria-haspopup="true" aria-expanded="false"
+                                    style="background-color: white; color: black; margin-right: 2vh;"> Templates
+                                </a>
+
+                                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                                    <a class="dropdown-item" onclick="template_function()"><i
+                                            class="fa fa-file-alt"></i> Template 1</a>
+
+                                    <a class="dropdown-item" onclick="show_template2()"><i class="fa fa-file-alt"></i>
+                                        Template 2</a>
+
+                                    <a class="dropdown-item" onclick="show_template3()"><i class="fa fa-file-alt"></i>
+                                        Template 3</a>
+                                </div>
+
+                            </div>
+                            <div class="col-md-6" style="text-align: center;">
+                                {% if invoice.is_draft == 1 %}
+                                <a href="{% url 'ret_invoice_status_edit' invoice.id %}" class="btn btn-outline-warning"
+                                    title="Save"><i class="fas fa-save"></i></a>
+                                {% endif %}
+                                <a href="{% url 'retainer_edit_page' invoice.id %}" class="btn btn-outline-warning"
+                                    data-toggle="tooltip" title="Edit">
+                                    <i class="fas fa-edit"></i> </a>
+
+                                <a class="text-dark" data-toggle="dropdown">
+                                    <button class="btn btn-outline-warning " title="Share"><i
+                                            class="fas fa-share"></i></button>
+                                </a>
+                                <div class="dropdown-menu ">
+                                    <a class="dropdown-item" data-target="#shareBillEmail" data-toggle="modal">GMAIL</a>
+                                    <a class="dropdown-item" href="javascript:void(0);"
+                                        onclick="shareOnWhatsApp()">WhatsApp</a>
+                                </div>
+
+                                <button href="" class="btn btn-outline-warning btn_print" data-toggle="tooltip"
+                                    title="PDF" id="pdf-button">
+                                    <i class="far fa-file-pdf"></i></button>
+
+                                <button class="btn btn-outline-warning print-button" data-toggle="tooltip" title="Print"
+                                    id="print-button">
+                                    <i class="fa fa-print"></i></button>
+
+                                <!-- <button  class="btn btn-sm text-white ms-1 attach-button"
+                        style="background-color:  rgb(212, 139, 3);border-radius: 5px;" id="attach-button" data-toggle="tooltip" title="Email">
+                            <i class="fas fa-paperclip"></i></button>
+
+                            <form method="post" action="{% url 'mail_send' invoice.id %}" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <button class="mail-button btn btn-sm text-white ms-1 pt-1 pb-2" 
+                                style="background-color:  rgb(212, 139, 3);border-radius: 5px;" data-toggle="tooltip" title="Email">
+                                <i class="fas fa-envelope"></i>
+                                
+                                </button>
+                                <input type="file" id="file-input" name="files" style="display:none;margin-left: 590px;"  multiple>
+                                <div id="hiddencomments"></div>
+                                
+
+                            </form> -->
+                                <a href=" " class=" fas fa-comment-dots  btn-outline-warning btn"
+                                    data-bs-toggle="dropdown" id="attachmentDropdown" aria-haspopup="true"
+                                    aria-expanded="false">
+                                </a>
+
+                                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                                    <a id="add-comment-link" class="dropdown-item" style="cursor: pointer;"
+                                        data-toggle="modal" data-target="#cmnts"><i
+                                            class="fa-solid fa fa-plus"></i>Add</a>
+                                    <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                                        data-target="#cmt_list"><i class="fas fa-list"></i>&nbsp;View
+                                        List</a>
+
+                                </div>
+                                <button class="btn btn-outline-warning print-button" data-toggle="tooltip" title="Slip"
+                                    onclick="show_slip()">
+                                    <i class="fas fa-receipt"></i></button>
+
+
+
+                                <a href="{% url 'retainer_delete' invoice.id %}" class="btn btn-outline-warning"
+                                    title="Delete" onclick="return confirm('Do you want to Delete this Invoice?');"><i
+                                        class="fas fa-trash-alt"></i></a>
+                            </div>
+                        </div>
+
+                        <div id="div_estimate" class="mx-2 my-4 p-4 "
+                            style="background-color: rgba(124, 124, 123, 0.507);display: none;">
+                            <div class="slip p-5 convert_to_pdf bg-light" id="whatToPrint"
+                                style="box-shadow: 5px 5px 10px rgb(45, 45, 45);">
+                                <div class="row">
+                                    <div class="col-sm-2 col-lg-2 col-md-2">
+                                        {% if invoice.is_draft == 1 %}
+                                        <h4 class="pt-2" style="color: rgb(192, 128, 8);">Draft</h4>
+                                        {% elif invoice.is_draft == 0 and invoice.is_sent == 0 %}
+                                        <h4 class="pt-2" style="color: rgb(192, 128, 8);">Draft</h4>
+                                        {% else %}
+                                        <h4 class="pt-2" style="color: rgb(192, 128, 8);">Sent</h4>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="row" style=" border-bottom:1px solid rgb(24, 24, 24);">
+                                    <div class="col-md-12 col-lg-12 col-sm-12">
+                                        <h3 class="text-black" style="text-transform: uppercase;">
+                                            {{company.company_name}}</h3>
+                                        <h6 class="text-dark" style="margin-top: 0%;">{{company.address}}
+                                            <br>{{company.city}},{{ company.state }}
+                                        </h6>
+                                        <!-- <h6 class="text-dark mb-5"></h6> -->
+
+                                        <h3 class="text-black"
+                                            style="font-size: 1.6rem;margin-left:55%;margin-top: -10%; ">
+                                            RETAINER INVOICE</h3>
+                                        <h6 class="text-dark" style="margin-left: 60%;">Retainer Number : <span
+                                                class="text-black"
+                                                style="font-weight: bold;">{{invoice.retainer_invoice_number}}</span>
+                                        </h6>
+                                    </div>
+                                </div>
+
+                                <div class="row " style="padding-top: 3%;">
+                                    <div class="col-md-12  col-lg-12">
+                                        <h6 class="text-dark">Bill To</h6>
+                                        <h6 style="color: rgb(218, 142, 3);">{{invoice.customer_name.customerName}}
+                                            <br><span class="text-dark">{{ invoice.customer_name.customerEmail
+                                                }}</span><br>
+                                            <span class="text-dark">{{invoice.customer_name.customerMobile}}</span>
+                                            {% if invoice.customer_name.GSTIN %}
+                                            <h6 class="text-dark ">GSTIN : {{ invoice.customer_name.GSTIN }}</h6>
+                                            {% endif %}
+                                        </h6>
+
+                                        <h6 class="text-dark " style="margin-left: 60%;margin-top: -10%;">Retainer
+                                            <br>Invoice Date : {{invoice.retainer_invoice_date}}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <br>
+                                <table class="table mt-2 " style="border-color: black;">
+                                    <thead>
+                                        <tr
+                                            style="border-bottom: 1px solid black;border-left: 1px solid black;border-right: 1px solid black;border-top: 1px solid black;">
+                                            <th style="color: black;">#</th>
+                                            <th style="width: 30rem;color: black;text-align: center;">Description
+                                            </th>
+                                            <th class="text-right;" style="color: black;">Amount</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in item %}
+                                        <tr
+                                            style="border-bottom: 1px solid black;border-left: 1px solid black;border-right: 1px solid black;border-top: 1px solid black;">
+                                            <td style="border-bottom: 1px solid black;">{{forloop.counter}}</td>
+                                            <td style="text-align: center;border-bottom: 1px solid black;">
+                                                <p>{{i.description}}</p>
+                                            </td>
+                                            <td style="border-bottom: 1px solid black;">{{i.amount}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+
+
+
+
+                                <div class="row mt-3">
+
+                                    <div class="col-sm-12 col-md-12 col-lg-12">
+                                        <h6 class="text-warning"
+                                            style="font-weight: bold;color: rgb(204, 135, 6);margin-left: 80%;">
+                                            Total:
+                                            <span style="font-weight: bold;color: black;">{{
+                                                invoice.total_amount|floatformat:1}}</span>
+                                        </h6>
+
+
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-sm-12 col-md-12 col-lg-12">
+                                        <div class='row'>
+                                            <div class=" col-sm-12 col-md-4 col-lg-4">
+                                                <b class="text-black">Customer Notes:</b>
+                                            </div>
+                                            <div class="col-sm-12 col-md-8 col-lg-8">
+                                                <textarea name="" id="" cols="60" rows="3"
+                                                    style="background-color: transparent;border: none;"
+                                                    class="text-dark border-0">{{invoice.customer_notes}}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class='row'>
+                                            <div class="col-sm-12 col-md-4 col-lg-4">
+                                                <b class="text-black">Terms and Conditions:</b>
+                                            </div>
+                                            <div class="col-sm-12 col-md-8 col-lg-8">
+                                                <textarea name="" id="" cols="60" rows="3"
+                                                    style="background-color: transparent;border: none;"
+                                                    class="text-dark border-0">{{invoice.terms_and_conditions}}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            <!-- <h4 class="text-light pt-5">More Information</h4>
+            <h6 class="text-light">Sales Person: Xyz</h6> -->
+                        </div>
+
+                        <fieldset id="fieldset1" class="mt-3">
+                            <div class="p-2" style="background-color: #ffddb0;">
+                                <div class="p-2" style="background-color: #ffddb0;border-radius: 10px;">
+                                    <div class="row">
+                                        <div class="col-sm-6 col-md-6 col-lg-6 text-dark">
+                                            <div class="row mt-3">
+                                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                                    <h2 style="text-align: center;">RETAINER INVOICE</h2>
+
+                                                </div>
+                                            </div>
+                                            <div class="row mt-3">
+                                                <div class="col-sm-6 col-md-6 col-lg-6">
+                                                    <label for="" style="font-weight: 500;">Customer Name:</label>
+
+                                                </div>
+                                                <div class="col-sm-6 col-md-6 col-lg-6">
+                                                    <label for=""
+                                                        style="color: #000000;"><b>{{invoice.customer_name.customerName}}</b></label>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-sm-6 col-md-6 col-lg-6">
+                                                    <label for="" style="font-weight: 500;">Customer Mail
+                                                        ID:</label>
+
+                                                </div>
+                                                <div class="col-sm-6 col-md-6 col-lg-6">
+                                                    <label for=""
+                                                        style="color: #000000;width: 100%;word-break: break-all;"><b>{{invoice.customer_mailid}}</b></label>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-sm-6 col-md-6 col-lg-6">
+                                                    <label for="" style="font-weight: 500;">GST Treatment:</label>
+
+                                                </div>
+                                                <div class="col-sm-6 col-md-6 col-lg-6">
+                                                    <label for="">{{invoice.customer_name.GSTTreatment}}</label>
+                                                </div>
+                                            </div>
+                                            {% if invoice.customer_name.GSTIN %}
+                                            <div class="row mt-2">
+                                                <div class="col-sm-6 col-md-6 col-lg-6">
+                                                    <label for="" style="font-weight: 500;">GST Number:</label>
+
+                                                </div>
+                                                <div class="col-sm-6 col-md-6 col-lg-6">
+                                                    <label for=""><b>{{invoice.customer_name.GSTIN}}</b></label>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                            <div class="row mt-1  pb-4">
+                                                <div class="col-sm-6 col-md-6 col-lg-6">
+                                                    <label for="" style="font-weight: 500;">Place Of Supply:</label>
+
+                                                </div>
+                                                <div class="col-sm-6 col-md-6 col-lg-6">
+                                                    <label for="">{{invoice.customer_placesupply}}</label>
+                                                </div>
+                                            </div>
+                                            <hr>
+
+                                            {% if invoice.customer_notes %}
+
+                                            <div class="row mt-3">
+                                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                                    <label for="" style="font-weight: 500;">Customer Notes:</label>
+                                                    <textarea name="" id="" cols="35" rows="3"
+                                                        style="border: transparent;background-color: transparent;"
+                                                        readonly>{{invoice.customer_notes}}</textarea>
+                                                </div>
+                                            </div>
+                                            <hr>
+
+                                            {% endif %}
+
+                                            {% if invoice.terms_and_conditions %}
+                                            <div class="row mt-1">
+                                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                                    <label for="" style="font-weight: 500;">Terms &
+                                                        Conditions:</label>
+                                                    <textarea name="" id="" cols="35" rows="3"
+                                                        style="border: transparent;background-color: transparent;"
+                                                        readonly>{{invoice.terms_and_conditions}}</textarea>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-sm-6 col-md-6 col-lg-6 " style="padding-top: 5%;">
+                                            <div class="p-2"
+                                                style="width: 100%;background-color: rgb(110, 61, 46);border-radius: 5px;">
+                                                <div class="row mt-3">
+                                                    <div class="col-sm-8 col-md-8 col-lg-8 ">
+                                                        <label for="" style="font-weight: 500;">Retainer Invoice
+                                                            No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</label>
+
+                                                    </div>
+                                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                                        <label for="">{{invoice.retainer_invoice_number}}</label>
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="row mt-1">
+                                                    <div class="col-sm-8 col-md-8 col-lg-8 ">
+                                                        <label for=""
+                                                            style="font-weight: 500;">Reference&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</label>
+
+                                                    </div>
+                                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                                        <label for="">{{invoice.refrences}}</label>
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="row mt-1">
+                                                    <div class="col-sm-8 col-md-8 col-lg-8 ">
+                                                        <label for="" style="font-weight: 500;">Retainer Invoice
+                                                            Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</label>
+
+                                                    </div>
+                                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                                        <label for="">{{invoice.retainer_invoice_date}}</label>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <hr>
+
+                                                <h4 style="color: rgb(233, 153, 5);text-align: center;">Details</h4>
+
+                                                <div class="row mt-4">
+                                                    <div class="col-sm-8 col-md-8 col-lg-8 ">
+                                                        <label for="" style="font-weight: 500;">Total
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            :</label>
+
+                                                    </div>
+                                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                                        <label for=""><b>{{invoice.total_amount}}</b></label>
+                                                    </div>
+                                                </div>
+                                                {% if invoice.advance %}
+
+                                                <div class="row">
+                                                    <div class="col-sm-8 col-md-8 col-lg-8 ">
+                                                        <label for="" style="font-weight: 500;">Advance
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            :</label>
+
+                                                    </div>
+                                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                                        <label for=""><b>{{invoice.advance}}</b></label>
+                                                    </div>
+                                                </div>
+                                                <div class="row ">
+                                                    <div class="col-sm-8 col-md-8 col-lg-8 ">
+                                                        <label for="" style="font-weight: 500;">Balance
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            &nbsp;&nbsp;&nbsp;&nbsp; :</label>
+
+                                                    </div>
+                                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                                        <label for=""><b>{{ invoice.balance }}</b></label>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                                <hr>
+                                                {% if ret_payments.payment_opt %}
+                                                <h4 style="color: rgb(233, 153, 5);text-align: center;">Payment
+                                                    Details
+                                                </h4>
+                                                <div class="row">
+                                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                                        <label class="text-light" for=""
+                                                            style="font-weight: 500;">Payment
+                                                            Method &nbsp;&nbsp;&nbsp;
+                                                            :</label>
+
+                                                    </div>
+                                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                                        <label for=""><b>{{ ret_payments.payment_opt }}</b></label>
+                                                    </div>
+                                                </div>
+
+                                                {% if ret_payments.acc_no %}
+                                                <div class="row">
+                                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                                        <label class="text-light" for="" style="font-weight: 500;">Ac/No
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :</label>
+
+                                                    </div>
+                                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                                        <label for=""><b>{{ ret_payments.acc_no }}</b></label>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                                {% if ret_payments.upi_id %}
+                                                <div class="row">
+                                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                                        <label class="text-light" for="" style="font-weight: 500;">UPI
+                                                            Id
+                                                            &nbsp;&nbsp;&nbsp;
+                                                            :</label>
+
+                                                    </div>
+                                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                                        <label for=""><b>{{ ret_payments.upi_id }}</b></label>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                                {% if ret_payments.cheque_no %}
+                                                <div class="row">
+                                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                                        <label class="text-light" for=""
+                                                            style="font-weight: 500;">Cheque No
+                                                            &nbsp;&nbsp;&nbsp;
+                                                            :</label>
+
+                                                    </div>
+                                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                                        <label for=""><b>{{ ret_payments.cheque_no }}</b></label>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                                {% endif %}
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row ">
+                                        {% for i in item %}
+                                        <div class="col-sm-12 col-md-4 col-lg-4 mt-1">
+
+                                            <div class="p-2"
+                                                style="width: 100%;height: auto;background-color: rgb(110, 61, 46);border-radius: 5px;">
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-md-12 col-lg-12">
+                                                        <h6 style="text-align: center;">{{ forloop.counter }}</h6>
+
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+                                                        <p><span class="text-warning">Product Name : </span>
+                                                            {{i.itemname }}</p>
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+
+                                                        <p><span class="text-warning">Description :
+                                                            </span>{{i.description }}</p>
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+
+                                                        <p><span class="text-warning">Rate : </span>{{ i.rate }}
+                                                        </p>
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+
+                                                        <p><span class="text-warning">Quantity : </span>{{ i.quantity }}
+                                                        </p>
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+
+                                                    <div class="col-sm-12 col-md-12 col-lg-12 text-center">
+
+                                                        <p><span class="text-warning">Amount : </span>{{i.amount }}</p>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div id="template1" style="display: none;" class="printTemplates template1">
+                            <div class="my-3 page" size="A4" style="background-color: rgb(255, 221, 176);"
+                                id="selected-area">
+                                <div class="p-5">
+                                    <div style="background-color: #8b3131;border-radius: 1rem;padding: 20px;">
+                                        <center class="h3"><b>RETAINER INVOICE</b></center>
+                                    </div>
+                                    <div class="row mt-5">
+                                        <div class="col-md-8">
+                                            <h4 class="text-secondary" style="font-weight: bold;">
+                                                {{company.company_name}}</h4>
+                                            <p class="address" style="font-weight: bold;color: #000;">
+                                                {{company.address}}<br>
+                                                {{company.city}},
+                                                {{company.state}}<br>
+                                                {{company.pincode}}<br>
+                                                {{company.company_email}}<br>
+                                                {{company.contact_number}}<br>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="top-left">
+                                                <div class="graphic-path">
+                                                    <p>Retainer Invoice #:<b>{{invoice.retainer_invoice_number }}</b>
+                                                    </p>
+                                                </div>
+                                                <div class="mt-2">
+
+                                                    <p style="color: #000;">Date:
+                                                        <b>{{ invoice.retainer_invoice_date | date:'d-m-Y'}}</b>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <section class="top-content bb d-flex justify-content-between">
+                                        <div class="logo">
+
+                                        </div>
+
+                                    </section>
+
+                                    <section class="store-user">
+                                        <div class="col-12">
+                                            <div class="row bb pb-2 mt-3">
+                                                <div class="col-4 pl-0">
+                                                    <label class="text-white bg-secondary w-100 p-1"><b>BILL
+                                                            TO</b></label>
+                                                    <h5 class="" style="font-weight: bold; color: #8b3131;">
+                                                        {{invoice.customer_name1}}</h5>
+                                                    <p class="address" style="font-weight: bold;color: #000;">
+                                                        {{cust.customerEmail}}
+                                                        <br>
+                                                        {{cust.Address1}}
+                                                        <br>
+
+                                                        <span>Mob: </span><b>{{cust.phone1}}</b>
+                                                    </p>
+                                                </div>
+                                                <div class="col-4"></div>
+                                                <div class="col-4 pr-0">
+                                                    <label class="text-white bg-secondary w-100 p-1"><b>GST
+                                                            Details</b></label>
+                                                    <h5 class="" style="font-weight: bold; color: #8b3131;">
+                                                        {{cust.GSTTreatment}}</h5>
+                                                    <p class="address" style="font-weight: bold;color: #000;">
+                                                        {{ cust.GSTIN}}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </section>
+
+                                    <section class="product-area mt-2">
+                                        <table class="table table-hover table-bordered table-secondary">
+                                            <thead>
+                                                <tr class="">
+                                                    <th class="text-center" style="color:#8b3131;">Items</th>
+                                                    <th class="text-center" style="color:#8b3131;">Description</th>
+                                                    <th class="text-center" style="color:#8b3131;">Rate</th>
+                                                    <th class="text-center" style="color:#8b3131;">Quantity</th>
+                                                    <th class="text-center" style="color:#8b3131;">Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for itm in item %}
+                                                <tr>
+                                                    <td class="text-center" style="color:#000">{{ itm.itemname }}</td>
+                                                    <td class="text-center" style="color:#000">{{ itm.description }}
+                                                    </td>
+                                                    <td class="text-center" style="color:#000">{{ itm.rate }}</td>
+
+                                                    <td class="text-center" style="color:#000">{{ itm.quantity }}</td>
+                                                    <td class="text-center" style="color:#000">{{ itm.amount }}</td>
+
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </section>
+
+                                    <section class="balance-info">
+                                        <div class="row mt-3">
+                                            <div class="col-4">
+                                                <table class="table table-borderless">
+                                                    <tbody>
+
+                                                        <!-- <tr >
+                                                            <td style="color: #000;text-align: left;">Payment Type</td>
+                                                            <td style="color: #000;text-align: left;">:</td>
+                                                            {% if bank %}
+                                                            <th style="color: #000;text-align: center;">{{bank.bankname}}</th>
+                                                            {% else %}
+                                                            <th style="color: #000;text-align: center;">{{pbill.payment_type}}</th>
+                                                            {% endif %}
+                                                        </tr>
+                                                        <tr>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            
+                                                        </tr> -->
+                                                        {% if ewbill.note %}
+                                                        <tr>
+                                                            <td style="color: #000;text-align: left;">Note</td>
+                                                            <td style="color: #000;text-align: left;">:</td>
+                                                            <th style="color: #000;text-align: center;">{{ewbill.note}}
+                                                            </th>
+                                                        </tr>
+                                                        {% endif %}
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-4"></div>
+                                            <div class="col-4">
+                                                <table class="table table-borderless">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="color: #000;">Sub Total</td>
+                                                            <td style="color: #000;">:</td>
+                                                            <td class="text-center" style="color: #000;">
+                                                                {{invoice.total_amount}}</td>
+                                                        </tr>
+                                                        {% if invoice.advance %}
+                                                        <tr>
+                                                            <td style="color: #000;">Advance</td>
+                                                            <td style="color: #000;">:</td>
+                                                            <td class="text-center" style="color: #000;">
+                                                                {{invoice.advance}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="color: #000;">Balance</td>
+                                                            <td style="color: #000;">:</td>
+                                                            <td class="text-center" style="color: #000;">
+                                                                {{invoice.balance}}</td>
+                                                        </tr>
+                                                        {% endif %}
+                                                    </tbody>
+
+                                                </table>
+
+                                            </div>
+                                        </div>
+                                        <footer class="mb-5">
+                                            <p class="text-dark">&copy; Zho Books 2023 | Info park kakkanad kochi,
+                                                Ernamkulam,
+                                                kerala India 12345
+                                                | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+                                        </footer>
+                                    </section>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3" id="template2"
+                            style="display: none;height: auto;width: 100%; margin-left: -1vh">
+
+                            <section id="selected-area2" style="background-color: rgb(255, 221, 176);" class=" p-2 m-2">
+                                <header style="	background-color: #8b3131;border-radius: 1rem;">
+                                    <div class="logo">
+                                        <img class="ml-2" width="100rem" style="border-radius: 50%;"
+                                            src="{% static 'images/zlogo.png' %}" alt="Company Logo">
+                                    </div>
+                                    <div style="background: #8b3131;color: white;" class="company-info">
+                                        <h2 class="text-white">{{company.company_name}}</h2>
+                                        <p class="text-white"> {{company.address}}<br>{{company.city}}</p>
+                                        <p> {{company.contact_number}}</p>
+                                        <p>{{company.company_email}}</p>
+                                    </div>
+                                </header>
+                                <div class="invoice-box">
+                                    <h1 class="text-dark">Retainer Invoice</h1>
+                                    <div class="invoice-header">
+                                        <div class="invoice-details text-dark">
+                                            <table>
+                                                <tr>
+                                                    <td class="table-cell text-black" style="border: none;">Retainer
+                                                        No#
+                                                    </td>
+                                                    <td class="table-cell text-black" style="border: none;">:</td>
+                                                    <td class="table-cell text-black" style="border: none;">
+                                                        {{invoice.retainer_invoice_number}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-cell text-black" style="border: none;">Retainer
+                                                        Invoice
+                                                        Date
+                                                    </td>
+                                                    <td class="table-cell text-black" style="border: none;">:</td>
+                                                    <td class="table-cell text-black" style="border: none;">
+                                                        {{invoice.retainer_invoice_date|date:'d-m-Y'}}</td>
+                                                </tr>
+
+                                            </table>
+                                        </div>
+                                        <div class="client-details" style="width: 50vh;">
+                                            <table>
+                                                <tr>
+                                                    <td class="table-cell text-black" style="border: none;">
+                                                        <b>{{invoice.customer_name1}}</b>
+                                                    </td>
+                                                </tr>
+                                                {% if cust.Address1 %}
+                                                <tr>
+                                                    <td class="table-cell text-black" style="border: none;">
+                                                        {{cust.Address1}}</td>
+                                                </tr>
+                                                {% endif %}
+                                                <tr>
+                                                    <td class="table-cell text-black" style="border: none;">
+                                                        {{cust.GSTTreatment}}</td>
+                                                </tr>
+                                                {% if cust.GSTIN %}
+                                                <tr>
+                                                    <td class="table-cell text-black" style="border: none;">
+                                                        {{cust.GSTIN}}</td>
+                                                </tr>
+                                                {% endif %}
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <table>
+                                        <thead>
+                                            <tr>
+
+                                                <th id="th" style="text-align: center;">Product</th>
+                                                <th id="th" style="text-align: center;">Description</th>
+                                                <th id="th" style="text-align: center;">Rate</th>
+                                                <th id="th" style="text-align: center;">Quantity</th>
+                                                <th id="th" style="text-align: center;"> Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for i in item %}
+                                            <tr style="color: black;">
+                                                <td style="text-align: center;">{{i.itemname}}</td>
+                                                <td style="text-align: center;">{{i.description}}</td>
+                                                <td style="text-align: center;">{{i.rate}}</td>
+                                                <td style="text-align: center;">{{i.quantity}}</td>
+                                                <td style="text-align: center;">{{i.amount}}</td>
+                                            </tr>
+                                            {% endfor %}
+
+                                        </tbody>
+                                    </table><br>
+
+                                    <div class="invoice-total">
+                                        <div class="row">
+                                            <div class="col-5"></div>
+                                            <div class="col-4">
+                                                <table style="margin-left: 10vh;">
+                                                    <tr>
+                                                        <td class="table-cell text-black" style="border: none;">
+                                                            Subtotal
+                                                        </td>
+                                                        <td class="table-cell text-black" style="border: none;">:
+                                                        </td>
+                                                        <td class="table-cell text-black" style="border: none;">
+                                                            <b>{{invoice.total_amount}}</b>
+                                                        </td>
+                                                    </tr>
+                                                    {% if invoice.advance %}
+                                                    <tr>
+                                                        <td class="table-cell text-black" style="border: none;">
+                                                            Advance
+                                                        </td>
+                                                        <td class="table-cell text-black" style="border: none;">:
+                                                        </td>
+                                                        <td class="table-cell text-black" style="border: none;">
+                                                            <b>{{invoice.advance}}</b>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="table-cell text-black" style="border: none;">
+                                                            Balance
+                                                        </td>
+                                                        <td class="table-cell text-black" style="border: none;">:
+                                                        </td>
+                                                        <td class="table-cell text-black" style="border: none;">
+                                                            <b>{{invoice.balance}}</b>
+                                                        </td>
+                                                    </tr>
+                                                    {% endif %}
+
+                                                </table>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <footer class="mb-5">
+                                    <p class="text-dark">&copy; Zho Books 2023 | Info park kakkanad kochi,
+                                        Ernamkulam,
+                                        kerala India 12345
+                                        | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+                                </footer>
+                                <div class="mt-5 mb-5">
+
+                                </div>
+                            </section>
+                        </div>
+
+                        <div id="template3" class="template3" style="display: none;">
+                            <div class="my-5 page" size="A4" style="background-color: rgb(255, 221, 176);">
+                                <div class="p-5" id="selected-area3">
+                                    <section class="top-content bb d-flex justify-content-between"
+                                        style="background-color: #8b3131;">
+                                        <div class="logo">
+                                            <!-- <img src="logo.png" alt="" class="img-fluid"> -->
+                                        </div>
+                                        <div class="top-left">
+                                            <div class="graphic-path">
+                                                <p>Retainer Invoice</p>
+                                            </div>
+                                            <div class="position-relative" style="margin-right: 5px;">
+                                                <p>Retainer Invoice No.
+                                                    <span>{{invoice.retainer_invoice_number}}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section class="store-user mt-5">
+                                        <div class="col-12">
+                                            <div class="row bb pb-3">
+                                                <div class="col-7">
+                                                    <p>FROM,</p>
+                                                    <h5>{{company.company_name }}</h5>
+                                                    <p class="address "> {{company.address}}<br>
+                                                        {{company.city}},
+                                                        {{company.state}}<br>
+                                                        {{company.pincode}}<br>
+                                                    </p>
+
+                                                </div>
+                                                <div class="col-5">
+                                                    <p>TO,</p>
+                                                    <h5>{{invoice.customer_name1}}</h5>
+                                                    <p class="address col-9" style="margin-left: 0px;">
+                                                        {{cust.Address1}} </p><br>
+                                                    <p class="address col-9">{{cust.GSTTreatment}}</p><br>
+                                                    <p class="address col-9">{{cust.GSTIN}}</p>
+
+
+                                                </div>
+                                            </div>
+                                            <div class="row extra-info pt-3">
+                                                <div class="col-7">
+                                                    <p>Reatiner Invoice Date:
+                                                        <span>{{invoice.retainer_invoice_date |date:'d-m-Y'}}</span>
+                                                    </p>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section class="product-area mt-4">
+                                        <table class=" table table-hover table-bordered " id="table1">
+                                            <thead>
+                                                <tr>
+                                                    <td style="text-align: center; font-weight:bold; color:black ">Items
+                                                    </td>
+                                                    <td style="font-weight:bold; color:black">Description</td>
+                                                    <td style="font-weight:bold; color:black">Rate</td>
+                                                    <td style="font-weight:bold; color:black">Quantity</td>
+                                                    <td style="font-weight:bold; color:black">Amount</td>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                {% for j in item %}
+                                                <tr>
+                                                    <td style="color:black; text-align: center;">
+                                                        {{j.itemname}}
+                                                    </td>
+                                                    <td style="color:black">{{j.description}}</td>
+                                                    <td style="color:black">{{j.rate}}</td>
+                                                    <td style="color:black">{{j.quantity}}</td>
+                                                    <td style="color:black">{{j.amount}} </td>
+
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table><br><br>
+                                    </section>
+
+                                    <section class="balance-info">
+                                        <div class="row mt-3">
+                                            <div class="col-2"></div>
+                                            <div class="col-4"></div>
+
+                                            <div class="col-4">
+                                                <table class="table table-borderless">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="color: #000;">Sub Total</td>
+                                                            <td style="color: #000;">:</td>
+                                                            <td class="text-right" style="color: #000;">
+                                                                {{invoice.total_amount}}</td>
+                                                        </tr>
+                                                        {% if invoice.advance %}
+                                                        <tr>
+                                                            <td style="color: #000;">Advance</td>
+                                                            <td style="color: #000;">:</td>
+                                                            <td class="text-right" style="color: #000;">
+                                                                {{invoice.advance}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="color: #000;">Balance</td>
+                                                            <td style="color: #000;">:</td>
+                                                            <td class="text-right" style="color: #000;">
+                                                                {{invoice.balance}}</td>
+                                                        </tr>
+                                                        {% endif %}
+
+
+                                                    </tbody>
+
+                                                </table>
+
+                                            </div>
+
+                                            <footer class="mb-5">
+                                                <p class="text-dark">&copy; Zho Books 2023 | Info park kakkanad kochi,
+                                                    Ernamkulam,
+                                                    kerala India 12345
+                                                    | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+                                            </footer>
+                                        </div>
+                                    </section>
+
+                                    <!-- Cart BG -->
+                                    <img src="cart.jpg" class="img-fluid cart-bg" alt="">
+
+                                    <!-- <footer>
+                                                <hr>
+                                                <p class="m-0 text-center">
+                                                    View THis Invoice Online At - <a href="#!"> invoice/saburbd.com/#868 </a>
+                                                </p>
+                                                <div class="social pt-3">
+                                                    <span class="pr-2">
+                                                        <i class="fas fa fa-mobile-alt"></i>
+                                                        <span>0123456789</span>
+                                                    </span>
+                                                    <span class="pr-2">
+                                                        <i class="fas fa fa-envelope"></i>
+                                                        <span>me@saburali.com</span>
+                                                    </span>
+                                                    <span class="pr-2">
+                                                        <i class="fab fa-facebook-f"></i>
+                                                        <span>/sabur.7264</span>
+                                                    </span>
+                                                    <span class="pr-2">
+                                                        <i class="fab fa-youtube"></i>
+                                                        <span>/abdussabur</span>
+                                                    </span>
+                                                    <span class="pr-2">
+                                                        <i class="fab fa-github"></i>
+                                                        <span>/example</span>
+                                                    </span>
+                                                </div>
+                                            </footer> -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <fieldset2 id="est_slip" style="display: none;">
+                            <div style="background-color: rgb(255, 221, 176);" class="mx-2 my-4">
+
+                                <div class="my-5 slip-page" size="A4">
+                                    <div class="row" style="margin-top: 20%; " id="printslip">
+                                        <div class="col-md-3"></div>
+                                        <div class="col-md-7">
+                                            <div class="card bg-white" style="border: 1px dotted black;padding: 20px;">
+                                                <div class="mt-2" style="text-align: center;padding: 15px;">
+                                                    <div class="text-center" style="font-size: 3vh; color: black;">
+                                                        <b>{{company.company_name}} </b>
+                                                    </div>
+                                                    <span style="font-size: x-small; color: black;">{{company.address}}
+                                                        <br>
+                                                        {{company.city}},
+                                                        {{company.state}}
+                                                        {{company.pincode}} <br>
+                                                        {{ company.contact_number }} <br>{{ company.company_email }}
+                                                    </span>
+                                                </div>
+                                                <div class="ml-4 mt-2" style="color: black;">
+                                                    <div class="row">
+                                                        <div class="col-md-6 text-left">Retainer Invoice No:</div>
+                                                        <div class="col-md-5 text-right">
+                                                            {{invoice.retainer_invoice_number}}</div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6 text-left">Customer Name:</div>
+                                                        <div class="col-md-5 text-right">{{cust.customerName}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6 text-left">Retainer Invoie Date :</div>
+                                                        <div class="col-md-5 text-right">
+                                                            {{invoice.retainer_invoice_date |date:'d-m-Y'}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div><br>
+                                                    <div class="equal-length-container"
+                                                        style="color: black; font-weight: bold;">
+                                                        <div class="equal-length-item" style=" text-align: center;">
+                                                            Product
+                                                            <hr
+                                                                style="border-bottom: 1px solid black; margin-top:1vh; width:95%">
+                                                        </div>
+                                                        <div class="equal-length-item ml-1" style=" text-align:center;">
+                                                            Description
+                                                            <hr
+                                                                style="border-bottom: 1px solid black; margin-top:1vh; width:99%;">
+                                                        </div>
+                                                        <div class="equal-length-item" style=" text-align:center;">
+                                                            Rate
+                                                            <hr
+                                                                style="border-bottom: 1px solid black; margin-top:1vh; width:95%;">
+                                                        </div>
+                                                        <div class="equal-length-item" style=" text-align: center; ">
+                                                            Qty
+                                                            <hr
+                                                                style="border-bottom: 1px solid black; margin-top:1vh; width:95%">
+                                                        </div>
+
+
+
+                                                        <div class="equal-length-item" style=" text-align: center; ">
+                                                            Amount
+                                                            <hr
+                                                                style="border-bottom: 1px solid black; margin-top:1vh; width:95%">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    {% for j in item %}
+                                                    <div class="equal-length-container"
+                                                        style="color: black; font-size: small; word-wrap: break-word; margin-bottom: 1vh;">
+                                                        <div class="equal-length-item"
+                                                            style="text-align: center; margin-left: 2px;">
+                                                            {{j.itemname}}
+                                                        </div>
+                                                        <div class="equal-length-item" style="text-align: right;">
+                                                            {{j.description}}
+                                                        </div>
+                                                        <div class="equal-length-item" style="text-align: center;">
+                                                            {{j.rate}}
+                                                        </div>
+                                                        <div class="equal-length-item" style="text-align: center; ">
+                                                            {{j.quantity}}
+                                                        </div>
+                                                        <div class="equal-length-item" style="text-align: center; ">
+                                                            {{j.amount}}
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                                {% if invoice.advance %}
+                                                <div><br>
+                                                    <div class="row">
+                                                        <div class="col-md-5 text-left" style=" color: black;">
+                                                            Sub Total
+                                                        </div>
+                                                        <div class="col-md-6" style="color: black;text-align: end;">
+                                                            {{ invoice.total_amount }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5" style=" color: black;">
+                                                            Advance
+                                                        </div>
+                                                        <div class="col-md-6" style="color: black;text-align: end;">
+                                                            {{ invoice.advance }} </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 text-left" style=" color: black;">
+                                                            Balance
+                                                        </div>
+                                                        <div class="col-md-6" style="color: black; text-align: end;">
+                                                            {{ invoice.balance }} </div>
+                                                    </div>
+                                                    <hr class="ml-2 mr-2"
+                                                        style="color: black; border-bottom: 1px solid black; ">
+                                                </div>
+
+                                                <div class="mb-2">
+                                                    <div class="row">
+                                                        <div class="col-md-5 text-left ml-2"
+                                                            style=" font-size: large; color: black; font-weight: bold;">
+                                                            Total
+                                                        </div>
+                                                        <div class="col-md-6"
+                                                            style="font-size: large; color: black; font-weight: bold;text-align: end;">
+                                                            {{ invoice.balance }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% else %}
+                                                <div><br>
+
+                                                    <hr class="ml-2 mr-2"
+                                                        style="color: black; border-bottom: 1px solid black; ">
+                                                </div>
+
+                                                <div class="mb-2">
+                                                    <div class="row">
+                                                        <div class="col-md-5 text-left ml-2"
+                                                            style=" font-size: large; color: black; font-weight: bold;">
+                                                            Total
+                                                        </div>
+                                                        <div class="col-md-6"
+                                                            style="font-size: large; color: black; font-weight: bold;text-align: end;">
+                                                            {{ invoice.total_amount }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset2>
+
+
+                    </div>
+
+
+                    <!-- ...................................................................         -->
+
+
+
+
+                    <!-- ........................................................... -->
+
+
+                    <!-- comment modal -->
+
+                    <div class="modal fade " id="cmnts"
+                        style="width: 750px; margin-left: 350px; justify-content: center; overflow: hidden;">
+                        <div class="modal-dialog modal-xl m-5 p-5">
+                            <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+                                <div class="modal-header " style="background: rgb(32, 35, 37);">
+                                    <h5 class="m-3 text-uppercase text-light">Enter Comment</h5>
+                                    <button type="button" class="close text-dark bg-none" data-dismiss="modal"
+                                        aria-label="Close">&times;</button>
+
+                                </div>
+                                <div class="modal-body"
+                                    style="background: rgb(32, 35, 37); justify-content: center; overflow: hidden;">
+                                    <form action="{% url 'add_ret_invoice_comment' invoice.id %}" method="post"
+                                        class="needs-validation" novalidate autocomplete="off" id="modalComment">
+                                        {% csrf_token %}
+                                        <div class="row mt-2">
+                                            <div class="col-md-6 mt-2">
+                                                <textarea class="form-control text-dark bg-light" name="comments"
+                                                    required style=" width: 520px;height: 100px;"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-5">
+                                            <div class="col-md-4"></div>
+                                            <div class="col-md-4">
+                                                <div class="d-flex">
+                                                    <button class="btn save_btn rounded-pill text-grey w-50 my-4 mx-3"
+                                                        type="submit">Save </button>
+                                                    <button type="button"
+                                                        class="close btn save_btn rounded-pill text-grey w-50 my-4"
+                                                        data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">Cancel</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4"></div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <!-- ....................................  comment list modal ................ -->
+
+                    <div class="modal fade " id="cmt_list"
+                        style="width: 750px; margin-left: 350px; justify-content: center; overflow: hidden;">
+                        <div class="modal-dialog modal-dialog-scrollable modal-xl m-5 p-5">
+                            <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+                                <div class="modal-header " style="background: rgb(32, 35, 37);">
+                                    <h5 class="m-3 text-uppercase text-light">LIST</h5>
+                                    <button type="button" class="close text-dark bg-none" data-dismiss="modal"
+                                        aria-label="Close">&times;</button>
+
+                                </div>
+                                <div class="modal-body"
+                                    style="background: rgb(32, 35, 37); justify-content: center; overflow-x: hidden;">
+                                    <div class="card p-0 m-0">
+
+                                        <div class="row mt-3">
+                                            <div class="col-sm-12 col-md-12 col-lg-12">
+                                                <div class="p-2">
+                                                    <table class="table table-bordered" style="table-layout: fixed;">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="text-center"
+                                                                    style="background-color:rgb(218, 143, 3) ;color: white;">
+                                                                    Comments</th>
+                                                            </tr>
+                                                        </thead>
+                                                        {% for comt in ret_comments %}
+                                                        <tbody>
+                                                            <tr>
+                                                                <!-- <td><input type="text" value="{{ comt.comments }}" style="width: 100%;height: 20px;"></td> -->
+                                                                <td><textarea name="" id="" cols="80" rows="5"
+                                                                        style="border: none;background-color:transparent ;color: white;">{{ comt.comments }}</textarea>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                        {% endfor %}
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+
+
+                    <!-- ..................................................................................................................... -->
+                    <!--     
+                    <div class="col-md-8" style="border: 1px solid;border-color: white; height: 820px;">
+
+                        <section>
+
+                            <div class="row">
+                                <div class="col-md-4"><br>
+                                    <h3>{{invoice.retainer_invoice_number}}</h3>
+                                </div>
+                                <div class="col-md-8"><br>
+                                    <div class="button-group">
+                                        <a href="{% url 'retainer_edit_page' invoice.id %}"><button class="edit-button">
+                                            <i class="fas fa-edit"></i>
+                                            Edit
+                                          </button></a>
+                                        <button class="pdf-button" onclick="convertHTMLtoPDF()" >
+                                          <i class="fas fa-file-pdf"></i>
+                                          PDF
+                                        </button>
+                                        <button class="print-button" onclick="printRetainerInvoice()">
+                                          <i class="fas fa-print"></i>
+                                          Print
+                                        </button>
+
+                                        <form method="post" action="{% url 'mail_send' invoice.id %}" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <button class="mail-button">
+                                            <i class="fas fa-envelope"></i>
+                                            Mail
+                                            </button>
+                                            <input type="file" id="file-input" name="files" style="display:none;margin-left: 590px;"  multiple>
+                                            <div id="hiddencomments"></div>
+                                            
+
+                                        </form>
+
+                                        <button class="attach-button" id="attach-button">
+                                            <i class="fas fa-paperclip"></i>
+                                            Attach
+                                        </button>
+                                        <a href="{% url 'retainer_delete' invoice.id %}">
+                                            <button class="close-button">
+                                            <i class="fas fa-trash-alt"></i>
+                                            Delete
+                                          </button>
+                                        </a>
+
+                                    </div>
+                                      
+                                </div>
+                            </div>
+                            <div class="row"><br>
+
+                                
+
+                                <div class="col-md-12"><br>
+
+                                    <div id="comment-section"></div>
+                                    <a href="#" id="add-comment-link"><i class="fas fa-plus "></i> Add Comment</a>
+                                    <div id="comment-form" style="display: none;">
+                                        <textarea id="comment-text" rows="2" cols="85"></textarea><br>
+                                        <button id="submit-comment" type="button" class="btn btn-primary">Add Comment</button>
+                                    </div>
+                                    
+
+                                </div>
+                            </div><br><br>
+
+                           
+                          <div class="row">
+                                <div class="col-md-2"></div>
+                                <div id="invoice-section" class="col-md-9   border"  style="background-color: rgb(251, 251, 251);border-color: #000000;" >
+
+                                    <div class="invoice-header">
+                                        <p style="color: #000000;font-size: x-large;text-align: center;margin-top: 10px;">RETAINER  INVOICE</p>
+                                        
+                                        
+                                    </div>
+                                    <div class="details">
+                                        <p style="text-align: end;color: rgb(0, 0, 0);">Retainer Invoice Date: {{invoice.retainer_invoice_date}}</p>
+                                        <p style="text-align: end;color: rgb(0, 0, 0);">Retainer Invoice Number:<b>{{invoice.retainer_invoice_number}}</b></p>
+                                        <p style="color: rgb(0, 0, 0);">Bill To,</p>
+                                        <p style="color: rgb(0, 0, 0);">{{invoice.customer_name.customerName}}</p>
+                                        <p style="color: rgb(0, 0, 0);">{{invoice.customer_name.companyName}}</p>
+                                        <p style="color: rgb(0, 0, 0);">{{invoice.customer_name.customerMobile}}</p>
+                                        
+                                        
+                                    </div>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Description</th>
+                                                <th style="text-align: end;">Amount</th>
+                                                
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for i in item %}
+                                            <tr>
+                                                <td></td>
+                                                
+                                                <td>{{i.description}}</td>
+                                            
+                                                <td style="text-align: end;">{{i.amount }}</td>
+                                                
+                                              
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <div class="invoice-footer">
+                                        <p>Total: <span class="invoice-total">{{invoice.total_amount}}</span></p>
+                                    </div><br>
+
+                                    <div class="details">
+                                        <p style="color: rgb(0, 0, 0);">Customer Notes: {{invoice.customer_notes}}</p>
+                                        <p style="color: rgb(0, 0, 0);">Terms and Conditions: {{invoice.terms_and_conditions}}</p>
+                                        
+                                    </div>
+
+
+
+                                </div>
+                                <div class="col-md-1"></div>
+                            </div>
+
+                        </section>
+
+    
+                    </div><br> -->
+                    <!-- Share bill Modal -->
+                    <div class="modal fade" id="shareBillEmail">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+                                <div class="modal-header" style="background: rgb(32, 35, 37);">
+                                    <h5 class="m-3 text-uppercase" id="shareBillEmailLabel">Share Sales Order Via Email
+                                    </h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                            aria-hidden="true">&times;</span></button>
+                                </div>
+                                <div class="modal-body" style="background: rgb(32, 35, 37);">
+                                    <div class="card p-3 m-3">
+                                        <form action="{% url 'shareRetInvoiceToEmail' invoice.id %}" method="post"
+                                            class="needs-validation" id="share_to_email_form" autocomplete="off">
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                <label for="emailIds">Email IDs</label>
+                                                <textarea class="form-control text-dark" name="email_ids" id="emailIds"
+                                                    rows="5"
+                                                    placeholder="Multiple emails can be added by separating with a comma(,)."
+                                                    required></textarea>
+                                            </div>
+                                            <div class="form-group mt-2">
+                                                <label for="item_unitname">Message(optional)</label>
+                                                <textarea name="email_message" id="email_message"
+                                                    class="text-dark form-control" cols="" rows="4"
+                                                    placeholder="This message will be sent along with Bill details."></textarea>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer d-flex justify-content-center"
+                                        style="border-top: 1px solid #ffff;">
+                                        <input type="submit" id="share_with_email"
+                                            class="submitShareEmailBtn rounded-pill text-grey w-50 my-4 mx-3"
+                                            value="SEND MAIL">
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</section>
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+</script>
+{% for message in messages %}
+
+<script>
+    let msg = '{{message}}';
+    alert(msg);
+</script>
+{% endfor %}
+
+
+
+<script>
+
+$(document).ready(function () {
+    $('#share_with_email').on('click', function () {
+      var emailsInput = document.getElementById('emailIds');
+      var emailsString = emailsInput.value.trim();
+
+      var emails = emailsString.split(',').map(function (email) {
+        return email.trim();
+      });
+
+      var emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+
+      var invalidEmails = []
+      if (emailsString == "") {
+        alert('Enter valid email addresses..')
+      }
+      else {
+        for (var i = 0; i < emails.length; i++) {
+          var currentEmail = emails[i];
+
+          if (currentEmail != "" && !emailRegex.test(currentEmail)) {
+            console.log(currentEmail + ' is invalid!');
+            invalidEmails.push(currentEmail)
+          }
+        }
+
+        if (invalidEmails.length > 0) {
+          alert('Invalid emails..Please check!\n' + invalidEmails)
+          // alert(invalidEmails)
+        } else {
+          $('#share_to_email_form').submit();
+        }
+      }
+    })
+  });
+
+
+    function shareOnWhatsApp() {
+        var url = window.location.href;
+        var text = url;
+        text = encodeURIComponent(text);
+        var whatsappUrl = "whatsapp://send?text=" + text;
+        window.location.href = whatsappUrl;
+    }
+
+    const rows = document.querySelectorAll('.clickable');
+
+    rows.forEach(row => {
+        row.addEventListener('click', () => {
+            var currentURL = window.location.href
+            const rowId = row.id;
+            var newURL = currentURL.replace(/\d+$/, rowId);
+            window.location.href = newURL;
+        });
+    });
+
+    function sortTablebybillno() {
+        var table, rows, switching, i, x, y, shouldSwitch;
+        table = document.getElementById("table");
+        switching = true;
+
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+
+            for (i = 0; i < rows.length - 1; i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("p")[0];
+                y = rows[i + 1].getElementsByTagName("p")[0];
+
+                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+    }
+
+    function sortTable() {
+        var table, rows, switching, i, x, y, shouldSwitch;
+        table = document.getElementById("table");
+        switching = true;
+
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+
+            for (i = 0; i < rows.length - 1; i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("label")[0];
+                y = rows[i + 1].getElementsByTagName("label")[0];
+
+                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+    }
+
+    var rdx = 1;
+    function overview_function() {
+        rdx = 1;
+        document.getElementById("template2").style.display = "none";
+        document.getElementById("template1").style.display = "none";
+        document.getElementById("est_slip").style.display = "none";
+        document.getElementById("fieldset1").style.display = "block";
+        document.getElementById("template3").style.display = "none";
+
+    }
+    function template_function() {
+        rdx = 1;
+        document.getElementById("template2").style.display = "none";
+        document.getElementById("template1").style.display = "block";
+        document.getElementById("fieldset1").style.display = "none";
+        document.getElementById("est_slip").style.display = "none";
+        document.getElementById("template3").style.display = "none";
+
+    }
+    function show_template2() {
+        rdx = 2;
+        document.getElementById("est_slip").style.display = "none";
+        document.getElementById("template1").style.display = "none";
+        document.getElementById("fieldset1").style.display = "none";
+        document.getElementById("template2").style.display = "block";
+        document.getElementById("template3").style.display = "none";
+
+    }
+    function show_template3() {
+        rdx = 3;
+        document.getElementById("est_slip").style.display = "none";
+        document.getElementById("template1").style.display = "none";
+        document.getElementById("fieldset1").style.display = "none";
+        document.getElementById("template2").style.display = "none";
+        document.getElementById("template3").style.display = "block";
+
+    }
+    function show_slip() {
+        rdx = 4;
+        document.getElementById("template2").style.display = "none";
+        document.getElementById("est_slip").style.display = "block";
+        document.getElementById("template1").style.display = "none";
+        document.getElementById("fieldset1").style.display = "none";
+        document.getElementById("template3").style.display = "none";
+
+    }
+
+    p = rdx;
+    function printSelectedArea(p) {
+
+        console.log(p);
+        if (p === 1) {
+            var printContents = document.getElementById("selected-area").innerHTML;
+            document.getElementById("selected-area").style.backgroundColor = "white"
+            var $printerDiv = $('<div class="printContainer bg-white style="display:block !important;"></div>'); // create the div that will contain the stuff to be printed
+            $printerDiv.html(printContents); // add the content to be printed
+            $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+            window.print(); // call print
+            $printerDiv.remove(); // remove the div
+            $('body').removeClass("printingContent");
+        } if (p === 2) {
+            var printContents = document.getElementById("selected-area2").innerHTML;
+            document.getElementById("selected-area2").style.backgroundColor = "white"
+            var $printerDiv = $('<div class="printContainer bg-white style="display:block !important;"></div>'); // create the div that will contain the stuff to be printed
+            $printerDiv.html(printContents); // add the content to be printed
+            $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+            window.print(); // call print
+            $printerDiv.remove(); // remove the div
+            $('body').removeClass("printingContent");
+        } if (p === 3) {
+            var printContents = document.getElementById("selected-area3").innerHTML;
+            document.getElementById("selected-area3").style.backgroundColor = "white"
+            var $printerDiv = $('<div class="printContainer bg-white style="display:block !important;"></div>'); // create the div that will contain the stuff to be printed
+            $printerDiv.html(printContents); // add the content to be printed
+            $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+            window.print(); // call print
+            $printerDiv.remove(); // remove the div
+            $('body').removeClass("printingContent");
+        } if (p === 4) {
+            var printContents = document.getElementById("printslip").innerHTML;
+            document.getElementById("printslip").style.backgroundColor = "white"
+            var $printerDiv = $('<div class="printContainer bg-white style="display:block !important;"></div>'); // create the div that will contain the stuff to be printed
+            $printerDiv.html(printContents); // add the content to be printed
+            $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+            window.print(); // call print
+            $printerDiv.remove(); // remove the div
+            $('body').removeClass("printingContent");
+        }
+    }
+
+    // Get the button element
+    var printButton = document.getElementById("print-button");
+
+    // Add an event listener to the button for the click event
+    printButton.addEventListener("click", function () {
+        printSelectedArea(rdx); // Call the printSelectedArea function on button click
+    });
+
+
+
+    function exportToPDF(p) {
+        if (p === 1) {
+            var content = document.getElementById('selected-area');
+            html2pdf()
+                .from(content)
+                .save('Retainer_invoice.pdf')
+        }
+        if (p === 2) {
+            var content = document.getElementById('selected-area2');
+            html2pdf()
+                .from(content)
+                .save('Retainer_invoice.pdf')
+        }
+        if (p === 3) {
+            var content = document.getElementById('selected-area3');
+            html2pdf()
+                .from(content)
+                .save('Retainer_invoice.pdf')
+        }
+        if (p === 4) {
+            var content = document.getElementById('printslip');
+            html2pdf()
+                .from(content)
+                .save('Retainer_invoice.pdf')
+        }
+    }
+
+    var pdftButton = document.getElementById("pdf-button");
+
+    // Add an event listener to the button for the click event
+    pdftButton.addEventListener("click", function () {
+        exportToPDF(rdx); // Call the printSelectedArea function on button click
+    });
+</script>
+
+
+<script>
+    var $rows = $('#table tr');
+    $('#search').keyup(function () {
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+        $rows.hide().filter(function () {
+            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return ~text.indexOf(val);
+        }).show();
+    });
+
+</script>
+
+<script type="text/javascript">
+    /*function convertHTMLtoPDF() {
+        const { jsPDF } = window.jspdf;
+
+        var doc = new jsPDF('l', 'mm', [630, 630]);
+        var pdfjs = document.querySelector('#invoice-section');
+
+        doc.html(pdfjs, {
+            callback: function (doc) {
+                doc.save("retainer-invoice.pdf");
+            },
+            x: 12,
+            y: 12
+        });
+    }           */
+</script>
+
+
+<script>
+
+
+
+</script>
+
+<script>
+    const attachButton = document.getElementById("attach-button");
+    const fileInput = document.getElementById("file-input");
+
+    attachButton.addEventListener("click", () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener("change", () => {
+        fileInput.style.display = "none";
+    });
+
+</script>
+
+
+
+<!-- <script>
+    const addCommentLink = document.getElementById("add-comment-link");
+    const commentForm = document.getElementById("comment-form");
+
+    addCommentLink.addEventListener("click", () => {
+    addCommentLink.style.display = "none";
+    commentForm.style.display = "block";
+    });
+
+    const submitCommentBtn = document.getElementById("submit-comment");
+    const commentText = document.getElementById("comment-text");
+    const commentSection = document.getElementById("comment-section");
+    const hiddencomment = document.getElementById("hiddencomments")
+
+    submitCommentBtn.addEventListener("click", () => {
+    const comment = commentText.value;
+    const newCommentElement = document.createElement("p");
+    newCommentElement.setAttribute('name', 'comments');
+    newCommentElement.textContent = comment;
+    commentSection.appendChild(newCommentElement);
+    const newcomment = document.createElement("input")
+    newcomment.setAttribute('type','hidden');
+    newcomment.setAttribute('name','mailcomments');
+    newcomment.value=comment;
+    hiddencomment.appendChild(newcomment);
+    commentText.value = "";
+    commentForm.style.display = "none";
+    addCommentLink.style.display = "block";
+    });
+</script>
+
+
+
+ -->
+
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    th,
+    td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        color: rgb(0, 0, 0);
+    }
+
+    th {
+        background-color: #f2f2f2;
+        color: black;
+    }
+
+    .invoice-footer {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
+    .invoice-footer p {
+        margin: 0;
+        font-size: 14px;
+        color: #000000;
+    }
+
+    .invoice-total {
+        font-weight: bold;
+    }
+</style>
+<style>
+    .button-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .button-group button {
+        border: none;
+        background-color: #fff;
+        margin-right: 10px;
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .button-group button i {
+        margin-right: 5px;
+    }
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+
+
+{% endblock %}

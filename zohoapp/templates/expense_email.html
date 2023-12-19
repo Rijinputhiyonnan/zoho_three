@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <!-- <h2>helllllllllllllllllllllllooooooooooooooooooooo</h2> -->
+ <!-- ....................................................... Template 3..................................... -->
+ <!-- <div id="whatToPrint3" class="print-only page tabcontent  printTemplates" style="display:none; background-color: rgb(255, 221, 176)">
+    <div class="text-center"> -->
+        <center>
+        <h2 class="text-uppercase text-black">Expense Detail </h2>
+        <p class="address p-2" style="color: rgb(7, 6, 6);">
+        {{company.company_name}}<br>
+        {{company.company_email}}&nbsp; ,{{company.state}}<br>
+        
+        {{company.pincode}}<br>
+        (<span style="color: rgb(185, 122, 5);">{{expense.status}}</span>)
+        </p>
+    </center>
+    <!-- </div> -->
+
+    <!-- <div class="extra-info mt-3">
+        <div class="row ps-3">
+            <div class="col-6"> -->
+                <h6 style="color: black; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+                    <b>Expense Account : </b>{{expense.expense_account}} <br>
+                    <b>Expense Type &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </b>{{expense.expense_type}} <br>
+                    <b>Amount &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : </b>{{expense.amount}} <br>
+                </h6>
+                 
+            <!-- </div>
+        </div>
+    </div> -->
+
+    <section class="store-user mt-3">
+        <div class="row ps-3">
+            <div class="col-6">
+                <h4 style="font-weight: 700; border-bottom: 1px solid #ccc; padding-bottom: 10px;color: #8b3131;">Bill To</h4>
+                <h6 class="text-capitalize" style="color: black;">{{expense.vendor.first_name}}</h6>
+                <p class="address p-2">
+                    {{expense.vendor.vendor_email}}<br>
+                    {{expense.vendor.bcity}}<br>
+                    {{expense.vendor.bstate}}<br>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="store-user mt-3">
+        <div class="row ps-3">
+            <div class="col-6">
+                <h4 style="font-weight: 700; border-bottom: 1px solid #ccc; padding-bottom: 10px;color: #8b3131;">Deliver To</h4>
+                <h6 class="text-capitalize" style="color: black;">{{expense.customer_name.customerName}}</h6>
+                <p class="address p-2">
+                    {{expense.customer_name.customerEmail}}<br>
+                    {{expense.customer_name.city}}<br>
+                    {{expense.customer_name.state}}<br>
+                    {{expense.customer_name.zipcode}}<br>
+                </p>
+            </div>
+        </div>
+    </section>
+ </div>
+
+ <!-- .........................template 3 END  ........................ -->
+</body>
+</html>

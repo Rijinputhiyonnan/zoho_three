@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    .modal{
+        z-index: 9999;
+        overflow: scroll;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    input[type="email"],
+    input[type="file"],
+    .gen-info textarea,
+    .gen-info select,
+    .data select,
+    .data option,
+    .gen-info option {
+        color: rgb(7, 7, 7);
+        border: 1px solid rgb(0, 0, 0);
+    }
+
+    .gen-info .left {
+        padding-right: 2rem;
+    }
+
+
+    .action-button {
+        display: flex;
+        align-items: center;
+    }
+
+    .action-button button {
+        width: 8vw;
+        font-size: 1.2vw;
+        margin: 0.5rem .3rem;
+    }
+
+    label {
+        font-size: 1.2vw;
+    }
+
+    .containerprof {
+        position: relative;
+    }
+
+    .fixed-width-label {
+        display: inline-block;
+        width: 150px; 
+        margin-right: 10px;
+    }
+</style>
+
+<section>
+    <div class="containerprof p-5">
+        <div class="header pb-5">
+            <h2 class="mb-0 text-uppercase text-right">Edit Loan Repayment</h2>
+            <hr>
+            {% for message in messages %}
+            <h5>
+                <div class="alert alert-danger message">
+                    {{ message }}
+                </div>
+            </h5>
+            {% endfor %}
+        </div>
+
+        <form method="POST" action="{% url 'edit_repayment' repay.id %}" id="myForm" onsubmit="return validateform()">
+            {% csrf_token %}
+            <div class="row">
+                <div class="data">
+                    <div class="row pb-3">
+                        <div class="col-3">
+                            <label for="">Employee Name</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" class="form-control text-dark bg-white" name="empname" id="empname" value="{{repay.loan.payroll.first_name}} {{repay.loan.payroll.last_name}}" readonly>                                
+                        </div>
+                    </div>
+                    <div class="row pb-3">
+                        <div class="col-md-3">
+                            <label for="">Pricipal Amount</label>
+                        </div>
+                        <div class=" col-5">
+                            <input type="number" class="form-control text-dark bg-light" name="pamnt" id="pamnt" value="{{repay.payment_made}}" onchange="gettotal()" required >
+                        </div>
+                    </div>
+                    <div class="row pb-3">
+                        <div class="col-3">
+                            <label for="">Interest Amount</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="number" class="form-control text-dark bg-light" name="interest" id="interest" value="{{repay.interest}}" onchange="gettotal()" required>
+                        </div>
+                    </div>
+                    <div class="row pb-3">
+                        <div class="col-3">
+                            <label for="">Payment Date</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="date" class="form-control text-dark bg-light" name="paydate" id="paydate" value="{{repay.payment_date | date:'Y-m-d'}}">
+                        </div>
+                    </div>
+                    
+                    <div class="row pb-3">
+                        <div class="col-3">
+                            <label for="">Payment Method</label>
+                        </div>
+                        <div class="col-5">
+                            <select class="form-control text-dark bg-light" name="payment_method" id="payment_method" required>
+                                <option value="{{repay.payment_method}}" selected hidden>{{repay.payment_method}}</option>
+                                <option value="Cash">Cash</option>
+                                <option value="UPI">UPI</option>
+                                <option value="Cheque">Cheque</option>
+                                {% for item in bank %}
+                                <option value="{{item.name}}">{{item.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    {% if repay.cheque_id %}
+                    <div class="row pb-3" id="chequediv">
+                        <div class="col-3">
+                            <label for="date2">Cheque ID</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" class="form-control text-black bg-white" name="cheque_id" id="cheque_id" value="{{repay.cheque_id}}">
+                        </div>
+                    </div>  
+                    {% else %}
+                    <div class="row pb-3" id="chequediv" style="display: none;">
+                        <div class="col-3">
+                            <label for="date2">Cheque ID</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" class="form-control text-black bg-white" name="cheque_id" id="cheque_id">
+                        </div>
+                    </div>  
+                    {% endif %}
+                    {% if repay.upi_id %}
+                    <div class="row pb-3" id="upidiv">
+                        <div class="col-3">
+                            <label for="date2">UPI ID</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" class="form-control text-black bg-white" name="upi_id" id="upi_id" value="{{repay.upi_id}}">
+                        </div>
+                    </div>  
+                    {% else %}
+                    <div class="row pb-3" id="upidiv" style="display: none;">
+                        <div class="col-3">
+                            <label for="date2">UPI ID</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" class="form-control text-black bg-white" name="upi_id" id="upi_id" >
+                        </div>
+                    </div>  
+                    {% endif %}
+                    {% if repay.bank_id %}
+                    <div class="row pb-3" id="bnkdiv">
+                        <div class="col-3">
+                            <label for="date2">Bank Account</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" class="form-control text-black bg-white" name="bnk_id" id="bnk_id" value="{{repay.bank_id}}" readonly>
+                        </div>
+                    </div>  
+                    {% else %}
+                    <div class="row pb-3" id="bnkdiv" style="display: none;">
+                        <div class="col-3">
+                            <label for="date2">Bank Account</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" class="form-control text-black bg-white" name="bnk_id" id="bnk_id" readonly>
+                        </div>
+                    </div>  
+                    {% endif %}
+                    <div class="row pb-3" >
+                        <div class="col-3">
+                            <label for="total" class="mr-2 mb-0" style="width: 150px;">Total Amount</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="number" class="form-control text-dark bg-light" name="total" id="total" step="0.01" min="0" value="{{repay.total_payment}}" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="action-button">
+                <button class="btn" type="submit" style="background-color: chocolate;">Submit</button>
+                <button class="btn" type="reset" style="background-color: chocolate;">Cancel</button>
+            </div>
+            <div class="text-center">
+                <!-- ... (Message alerts) ... -->
+            </div>
+        </form>
+    </div>
+</section>
+
+<script>
+    function validateform() {
+        var pay_method = document.getElementById('payment_method').value;
+        var cheque_id = document.getElementById('cheque_id').value;
+        var upi_id = document.getElementById('upi_id').value;
+
+        if (pay_method === ''){
+            alert('Please select a Payment Method');
+            return false;
+        }else if(pay_method === 'Cheque'){
+            if (cheque_id === ''){
+                alert('Add a cheque number');
+                return false;
+            }
+        }else if(pay_method === 'UPI'){
+            if (upi_id === ''){
+                alert('Add a UPI number');
+                return false;
+            }
+        }
+        return true; 
+    }
+</script>
+
+<script>
+    function gettotal(){
+        pamnt = parseFloat($('#pamnt').val())
+        interest = parseFloat($('#interest').val())
+        if(pamnt < 0 || interest < 0 ){
+            $('#pamnt').val('{{loan.monthly_cutting_amount}}')
+            $('#interest').val(0)
+            $('#total').val('{{loan.monthly_cutting_amount}}')
+            alert('Amount cannot be Negative')
+        }else{
+            $('#total').val(pamnt+interest)
+        }
+    }
+</script>
+        
+<script>
+    $(document).ready(function() {
+      $("#payment_method").change(function() {
+        var x=$('#payment_method').val();
+        if(x==='Cash'){
+          $('#chequediv').hide()
+          $('#bnkdiv').hide()
+          $('#upidiv').hide()
+          document.getElementById('cheque_id').value=null
+          document.getElementById('upi_id').value=null
+        }else if(x==='Cheque'){
+          $('#chequediv').show()
+          $('#bnkdiv').hide()
+          $('#upidiv').hide()
+          document.getElementById('upi_id').value=null
+        }else if(x==='UPI'){
+          $('#upidiv').show()
+          $('#bnkdiv').hide()
+          $('#chequediv').hide()
+          document.getElementById('cheque_id').value=null
+        }else{
+          $('#bnkdiv').show()
+          $('#chequediv').hide()
+          $('#upidiv').hide()
+          document.getElementById('cheque_id').value=null
+          document.getElementById('upi_id').value=null
+
+          $.ajax({
+              type: "GET",
+              url: "{% url 'bankdata' %}",
+              data: {
+                  id: x,
+              },
+              success: function (response) {
+                  data = response.bank
+                  document.getElementById('cheque_id').value=null
+                  document.getElementById('upi_id').value=null
+                  document.getElementById("bnk_id").value = data
+              }
+          });
+        }
+      });
+    });
+</script>
+{% endblock %}

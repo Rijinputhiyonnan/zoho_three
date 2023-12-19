@@ -1,0 +1,984 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<style>
+    .form-control{
+      background-color: #fff transparent;
+    }
+    .close-button {
+    cursor: pointer;
+    font-weight: bold;
+    position: relative;
+    top: 25px;
+    left: 370px;
+    color: rgb(204, 156, 54);
+    background-color: #111;
+    font-size: 20px;
+  }
+  .form-popup {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #f1f1f1;
+      border: 3px solid black;
+      z-index: 9999;
+      padding: 20px;
+      max-width: 300px;
+    }
+  
+    /* Full-width input fields */
+    .form-popup input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0 20px 0;
+      border: none;
+      background: #f1f1f1;
+    }
+    .form-popup .btn {
+      background-color: #04aa6d;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  
+    /* Set a style for the close button */
+    .form-popup .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      line-height: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+  
+    /* Change the color of the close button on hover */
+    .form-popup .close:hover {
+      color: black;
+    }
+    .modal{
+      z-index:9999;
+      overflow: scroll;
+    }
+
+    
+    
+  </style>
+    
+    <div class="modal fade" id="Add_option">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+          <div class="modal-header " style="background: rgb(32, 35, 37);">
+              <h3 class="m-3 text-uppercase">Add Option</h3>
+              <button type="button" class="close btn btn-sm btn-danger " data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body" style="background: rgb(32, 35, 37);">
+            <div class="card p-3 m-3">
+              <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalOptions">
+                 {% csrf_token %}
+                <div class="row mt-5">
+                  <div class="col-sm-8">
+                      <div class="row">
+                          <div class="col-sm-4">
+                              <label for="">Add Option</label>
+                          </div>
+                          <div class="col-sm-8">
+                              <input type="text" name="option" id="option" class="form-control bg-light text-dark"> 
+                          </div>
+                      </div>
+          
+                  </div>
+              </div>
+              <div class="row mt-5">
+                <div class="col-sm-12" style="text-align: center;">
+                    <button type="button" id="CreateOption" data-dismiss="modal" aria-label="Close" style="width: 200px; height: 50px;"  class="btn btn-success" value="Add">Add</button>
+                </div>
+            </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>  
+    </div>
+  <div class="container-fluid  bg-dark " style="border-radius: 20px; margin-bottom: 40px; padding-bottom: 40px;">
+    <div class="heading" style="padding: 20px;">
+    <h2>Add Payment</h2>
+  </div>
+<form action="" id="myForm" style="width: 95%; height: 100%; margin-top: 40px;" class="text-center" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+            <div class="form-group row">
+                <label  class="col-sm-2 col-form-label">Vendor *</label>
+                <div class="col-sm-10 col-md-7 col-9 ml-5">
+                    <div class="input-group mb-2">
+                        <select name="select" id="vendor-select" class="form-control bg-light text-dark"  onchange="fetchBillData()" style="margin-left: 40px;">
+                                  <option value="">Select Vendor</option>
+                            {% for p in vendors %}
+                            <option value="{{ p.id }}" data-email="{{ p.vendor_email }}" data-balance="{{ p.opening_bal }}" data-gst="{{ p.gst_treatment }}" data-gstnumber="{{ p.gst_number }}">{{ p.first_name }} {{ p.last_name }}</option>
+
+                                      {% endfor %}
+
+                            </select>                              
+
+                    
+
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+              <label  class="col-sm-2 col-form-label">Email *</label>
+
+            <div class="col-sm-10 col-md-7 col-9">
+              <div class="input-group mb-2">
+                <input type="email" name="email" style="margin-left: 40px;" class="form-control bg-light text-dark" id="email-input" placeholder="Enter Email Address" value="{{ user.vendor_email }}">
+
+
+            </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label  class="col-sm-2 col-form-label">GST Treatment *</label>
+          <div class="col-sm-10 col-md-7 col-9">
+            <div class="input-group mb-2">
+            <input  type="text" id="gst" style="margin-left: 40px;" name="gst" placeholder="GST Treatment" class="form-control bg-light text-dark"  >
+          </div>
+          </div>
+        </div>
+        <div class="form-group row" id="gst-number-section" style="display: none;">
+          <label class="col-sm-2 col-form-label" id="gst-label">GST Number *</label>
+          <div class="col-sm-10 col-md-7 col-9">
+              <div class="input-group mb-2">
+                  <input type="text" id="gst_no"  name="gst_number" placeholder="GST Number" class="form-control bg-light text-dark">
+              </div>
+          </div>
+      </div>
+      
+            <div class="form-group row">
+                <label for="prof_name"  class="col-sm-2 col-form-label">Payment Number *</label>
+                <div class="col-sm-10 col-md-7 col-9 ml-5">
+                    <div class="input-group mb-2">
+                      <input type="text" id="prof_name" style="margin-left: 40px;" name="payment_no" placeholder="Payment Number" class="form-control bg-light text-dark" value="{{remaining_characters}}">
+
+                          
+                        
+                          
+                    </div>
+                    <label id="order_label" style="display: none;"></label>
+
+                </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-sm-2 col-form-label" for="prof_name">Reference *</label>
+              <div class="col-sm-10 col-md-7 col-9">
+                  <div class="input-group mb-2">
+                      <input type="text"  style="margin-left: 40px;" name="reference" placeholder="Reference" class="form-control bg-light text-dark" id="reference-field" value="{{reford}}" readonly>
+                  </div>
+              </div>
+          </div>
+            
+
+        
+   
+
+  
+    <div class="form-group row">
+        <label  class="col-sm-2 col-form-label">Payment Date *</label>
+        <div class="col-sm-10 col-md-7 col-9 ml-5">
+          <div class="input-group mb-2">
+            <input type="date" style="margin-left: 40px;" class="form-control bg-light text-dark form-control is-invalid" name="date" id="dateInput" required>
+          </div>
+    </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-lg-2 col-form-label">Paid Through *</label>
+      <div class="col-sm-10 col-md-7 col-9 ml-5">
+          <div class="input-group mb-2">
+              <select style="margin-left: 40px;" id="paymentMethod" name="paid_through" class="form-control bg-light text-dark">
+                  <option value="cash"> Cash</option>
+                  <option value="cheque">Cheque</option>
+                  <option value="UPI">UPI</option>
+                  {% for v in bank %}
+                      <option value="{{ v.name }}">{{ v.name }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+      </div>
+  </div>
+          
+       
+  <div id="bankAccountNumber" class="form-group row" style="display: none;">
+    <label class="col-lg-2 col-form-label">Account Number *</label>
+    <div class="col-sm-10 col-md-7 col-9">
+        <div class="input-group mb-2">
+            <input type="text" id="accountNumber" style="margin-left: 40px;" name="account_number" class="form-control bg-light text-dark" readonly >
+        </div>
+    </div>
+</div>
+      
+      <div class="form-group row" id="chequeDetails" style="display: none;">
+        <label class="col-sm-2 col-form-label" id="gst-label">Cheque Number *</label>
+        <div class="col-sm-10 col-md-7 col-9">
+            <div class="input-group mb-2">
+                <input type="text" id="gst_no" style="margin-left: 40px;"  name="cheque_number" placeholder="Enter Cheque Number" class="form-control bg-light text-dark ">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group row" id="UPIdetails" style="display: none;">
+      <label class="col-sm-2 col-form-label" id="gst-label">UPI ID *</label>
+      <div class="col-sm-10 col-md-7 col-9">
+          <div class="input-group mb-2">
+              <input type="text" id="gst_no" style="margin-left: 40px;"  name="upi_numbaer" placeholder="Enter UPI ID" class="form-control bg-light text-dark">
+          </div>
+      </div>
+  </div>
+  <div id="chequeValidationMessage" class="text-center text-warning" style="display: none;">
+    Please enter the Cheque Number.
+</div>
+<div id="UPIValidationMessage" class="text-center text-warning" style="display: none;">
+  Please enter the UPI ID.
+</div>
+    
+    <div class="small-form" style="margin-top: 100px; width: 95%; margin-left: 40px;">
+      <h4>Bill Section</h4>
+      <div class="row clearfix">
+        <div class="col-md-12 table-responsive-md">
+            <table class="table table-bordered table-responsive" id="item_table" style="background-color: rgba(58, 57, 57, 0.8);">
+                <thead>
+                <tr>
+                    <th class="text-center" >Type</th>
+                    <th class="text-center" >Date</th>
+                    <th class="text-center" >Bill Number</th>
+                    <th class="text-center" >Bill Amount</th>
+                    <th class="text-center" >Due Date</th>
+                    <th class="text-center">Amount Due</th>
+                    <th class="text-center">Payment</th>
+
+                </tr>
+                </thead>
+                
+                <tbody id='billdata'>
+                   
+                </tbody>
+                
+            </table>
+        </div>
+    </div>
+    <div class="row clearfix mt-4">
+        <div class="col-md-7"></div>
+        <div class="col-md-5 table-responsive-md">
+            <table class="table table-bordered " id="tab_logic_total"style="background-color: rgba(58, 57, 57, 0.8);">
+                <tbody>
+
+                  <tr>
+                    <th class="text-center" hidden>Current Balance</th>
+                    <td class="text-center" hidden><input type="hidden" name='amount' id="opening-bal"
+                        class="form-control bg-light text-dark">
+                     
+                      </td>
+                </tr> 
+                <tr>
+                    <th class="text-center">Amount to Apply</th>
+                    <td class="text-center"><input type="text" name='balance' id="amtoapply"
+                      placeholder='0.00' class="form-control bg-light text-dark">
+                      <input type="hidden" name='payment_type' id="amtpaymenttype">
+                      <input type="hidden" name='bill_id' id="amtbillId">
+                      
+
+                    </td>
+                </tr>
+                <tr>
+                    <th class="text-center" hidden>Amount to Credit</th>
+                    <td class="text-center" hidden><input type="hidden" name='difference' id="amtcredit" placeholder='0.00' class="form-control bg-light text-dark" onchange="updateDatabase()">
+
+                        <input type="hidden" name="opening_balance" id="amout-save">
+                        <input type="hidden" class="total-sum-amount" name="total_sum" id="total-sum-amount">
+                      </td>
+                </tr>
+
+                <tr>
+                  <th class="text-center">Opening Balance</th>
+                  <td class="text-center">
+                    <input type="text" name="total_amountdue" id="total-sum" class="form-control bg-light text-dark">
+                  </td>
+                </tr>
+
+                
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row" style="margin-left: 670px; margin-top: -20px;">
+      <div class="col-sm-12 col-md-8 col-lg-12">
+        <input type="submit" class="btn text-white mt-5" style="background-color: rgb(59, 59, 58);" onclick="saveAsDraftDialog()" value="Save As Draft" id="submitForm">
+        <input type="submit" class="btn text-white mt-5" style="background-color: rgb(210, 132, 30);" onclick="saveAndOpenDialog()" value="Save And Send" id="submitForm">
+        <input type="submit" class="btn text-white mt-5" style="background-color: rgb(59, 59, 58);" onclick="cancelDialog()" value="Cancel">
+      </div>
+      <div class="-sm-12 col-md-4 col-lg-2"></div>
+  </div>
+
+</div>
+    
+
+</form>
+
+</div>
+<div class="modal fade" id="Add_bank">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+      <div class="modal-header " style="background: rgb(32, 35, 37);">
+          <h3 class="m-3 text-uppercase">Add Bank</h3>
+          <button type="button" class="close btn btn-sm btn-danger " data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <div class="modal-body" style="background: rgb(32, 35, 37);">
+        <div class="card p-3 m-3">
+          <div class="card radius-15 p-5">
+            <form action="" method="post" enctype="multipart/form-data"id="myForm">
+              {% csrf_token %}
+              
+                <div class="row">
+                  <label for="date" class="col-md-3 p-3">Date</label>
+                  <div class="col-md-6 p-3">
+                    <input type="date" class="form-control text-dark bg-light" id="date" name="date" required>
+                  </div>
+                </div>
+                
+                <div class="row">
+                    <label for="name" class="col-md-3 p-3">Bank Name</label>
+                    <div class="col-md-6 p-3">
+                      <input type="text" class="form-control text-dark bg-light" id="name" name="name">
+                    </div>
+                  </div>
+        
+                  <div class="row">
+                    <label for="ac_no" class="col-md-3 p-3 ">Account Number</label>
+                    <div class="col-md-6 p-3">
+                      <input type="text" class="form-control text-dark bg-light" id="ac_no" name="ac_no" placeholder="15 Digits">
+                    </div>
+                  </div>
+            <script>
+        
+          const acNoInput = document.getElementById('ac_no');
+        
+          acNoInput.addEventListener('input', function () {
+            const inputValue = this.value.trim();
+            const isValid = /^\d{15}$/.test(inputValue); 
+        
+            if (!isValid) {
+           
+              this.setCustomValidity('Account number must be 15 digits');
+            } else {
+              this.setCustomValidity(''); 
+            }
+          });
+        </script>
+                  <div class="row">
+                    <label for="opn_bal" class="col-md-3 p-3">Opening Balance</label>
+                    <div class="col-md-6 p-3">
+                      <div class="input-group">
+                        <div class="input-group-append">
+                          <select class="form-control form-select text-dark bg-light" id="bal_type" name="bal_type" style="background-color: #888; width: 100px;">
+                            <option value="Credit">Credit</option>
+                            <option value="Debit">Debit</option>
+                           
+                          </select>
+                        </div>
+                        <input type="number" class="form-control text-dark bg-light" id="opn_bal" name="opn_bal">
+                      </div>
+                    </div>
+                  </div>
+                  
+                
+                  <div class="row">
+                    <label for="branch" class="col-md-3 p-3">Branch</label>
+                    <div class="col-md-6 p-3">
+                      <input type="text" class="form-control text-dark bg-light" id="branch" name="branch">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <label for="ifsc" class="col-md-3 p-3">IFSC</label>
+                    <div class="col-md-6 p-3">
+                      <input type="text" class="form-control text-dark bg-light" id="ifsc" name="ifsc">
+                    </div>
+                  </div>
+                  <div class="col-sm-12 " style="margin-left: 460px;">
+                    <button type="button"  data-dismiss="modal" aria-label="Close" style="width: 200px; height: 50px;" id="CreateBanking" class="btn btn-success text-center" value="Add">Add</button>
+                </div>                  
+                </div>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>  
+</div>
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
+<script>
+
+document.getElementById('dateInput').valueAsDate = new Date();
+
+
+
+$(document).ready(function () {
+    $("#prof_name").keyup(function () {
+      var x = $('#prof_name').val();
+      reford = "{{reference}}"
+      if (reford != x) {
+        document.getElementById("order_label").style.display = "block"
+        document.getElementById("order_label").style.color = "yellow"
+        document.getElementById("order_label").innerHTML = "Sale Order is not Continuous"
+      } else {
+        document.getElementById("order_label").style.display = "block"
+        document.getElementById("order_label").style.color = "green"
+        document.getElementById("order_label").innerHTML = "Sale Order is now Continuous"
+      }
+    });
+  });
+
+
+
+function updateAmountDues(row) {
+        // Get the table row data
+        var rowData = row.cells;
+
+        // Assuming the amount due is in the sixth column (index 5)
+        var amountDue = rowData[5].innerText;
+
+        // Update the "opening-bal" input field with the amount due
+        document.getElementById("opening-bal").value = amountDue;
+    }
+
+
+function cancelDialog() {
+
+var frm = document.getElementById("forms");
+let customMsg = "Do you want to cancel?";
+
+if (confirm(customMsg)) {
+    alert("payment cancelled !")
+}
+}
+
+
+ function saveAsDraftDialog() {
+
+  var frm = document.getElementById("myForm");
+    
+    // Your validation logic
+    var selectedOption = $('#paymentMethod').val();
+    if (selectedOption === 'cheque' && $('#chequeDetails input').val() === '') {
+        $('#chequeValidationMessage').show();
+        event.preventDefault(); // Prevent form submission
+        return;
+    } else if (selectedOption === 'UPI' && $('#UPIdetails input').val() === '') {
+        $('#UPIValidationMessage').show();
+        event.preventDefault(); // Prevent form submission
+        return;
+    }
+
+    frm.action = ("{% url 'payment_add_details_1' %}");
+}
+function saveAndOpenDialog(event) {
+    var frm = document.getElementById("myForm");
+    
+    // Your validation logic
+    var selectedOption = $('#paymentMethod').val();
+    if (selectedOption === 'cheque' && $('#chequeDetails input').val() === '') {
+        $('#chequeValidationMessage').show();
+        event.preventDefault(); // Prevent form submission
+        return;
+    } else if (selectedOption === 'UPI' && $('#UPIdetails input').val() === '') {
+        $('#UPIValidationMessage').show();
+        event.preventDefault(); // Prevent form submission
+        return;
+    }
+
+    frm.action = ("{% url 'payment_add_details' %}");
+}
+
+ 
+// Variables to store original values
+let originalTotalAmountDue = 0;
+let originalTotalPayment = 0;
+
+// Fetch and display bill data when vendor is selected
+function fetchBillData() {
+  const vendorId = document.getElementById('vendor-select').value;
+
+  fetch(`/fetch-bill-data/?vendor_id=${vendorId}`)
+    .then(response => response.json())
+    .then(data => {
+      populateBillTable(data);
+    })
+    .catch(error => {
+      console.error('Error fetching bill data: ', error);
+    });
+}
+
+// Populate bill table with fetched data
+function populateBillTable(data) {
+  const billDataBody = document.getElementById('billdata');
+  billDataBody.innerHTML = '';
+
+  let totalAmountDue = 0; // Variable to store the total amount due
+
+  data.forEach(bill => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${bill.bill_type}</td>
+      <td>${bill.bill_date}</td>
+      <td>${bill.bill_no}</td>
+      <td>${bill.total}</td>
+      <td>${bill.due_date}</td>
+      <td class="amount-due" data-amount="${bill.sub_total}" data-number="78"><input type="number" id="amount-input" name="opening" class="amount-due form-control bg-light text-dark" value="${bill.sub_total}" readonly></td>
+      <td>
+        <div style='opacity:0;'id="payment-id">${bill.bill_id}</div><input type="number" id="payment-input" oninput='AmoutTosave(${bill.sub_total})' class="payment-input form-control bg-light text-dark" data-serial="${bill.bill_id}" data-type="${bill.bill_type}" data-amount="${bill.sub_total}" data-bill-id="${bill.bill_id}" data-bill-type="${bill.bill_type}" value="0">
+      </td>
+    `;
+
+    billDataBody.appendChild(row);
+
+    updateTotalAmountDueField(); // Update the total amount due field
+  });
+
+  originalTotalAmountDue = totalAmountDue;
+  originalTotalPayment = 0; // Assuming no payments initially
+
+  document.getElementById('opening-bal').value = totalAmountDue.toFixed(2);
+
+  billDataBody.addEventListener('input', handlePaymentInput);
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  updateTotalAmountDueField();
+});
+
+function AmoutTosave(total){
+  console.log(total)
+  const amounttosave = document.getElementById('amout-save')
+  const paymetapplied = document.getElementById('amount-input').value
+  amounttosave.value = total
+  console.log('amoutapplies',paymetapplied)
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  updateTotalAmountDueField();
+  updateTotalSumAmountField(); // Call the function to update total-sum-amount field
+});
+
+function updateTotalSumAmountField() {
+  const amountDueElements = document.querySelectorAll('.amount-due');
+  let totalAmountDue = 0;
+
+  amountDueElements.forEach(element => {
+    const amount = parseFloat(element.getAttribute('data-amount'));
+    if (!isNaN(amount)) {
+      totalAmountDue += amount;
+    }
+  });
+
+  document.getElementById('total-sum-amount').value = totalAmountDue.toFixed(2);
+}
+
+function handlePaymentInput(event) {
+  if (event.target.classList.contains('payment-input')) {
+    const paymentType = event.target.getAttribute('data-type');
+    const paymentSerial = event.target.getAttribute('data-serial');
+    const paymentAmount = parseFloat(event.target.value);
+    const amountDueElement = event.target.parentElement.previousElementSibling;
+    const billId = event.target.getAttribute('data-bill-id');
+    const billType = event.target.getAttribute('data-bill-type');
+
+    let totalAmountDue = parseFloat(amountDueElement.getAttribute('data-amount'));
+
+    let totalPayment = 0;
+    const paymentInputs = document.querySelectorAll('.payment-input');
+    paymentInputs.forEach(input => {
+      totalPayment += parseFloat(input.value);
+    });
+
+    console.log('Before updateAmountFields - Total Amount Due:', totalAmountDue);
+
+    if (paymentType === 'Recurring Bill' || paymentType === 'Purchase Bill') {
+      totalAmountDue -= paymentAmount; // Add the payment for Recurring and Purchase Bills
+    } else if (paymentType === 'Openning Balance') {
+      totalAmountDue -= paymentAmount; // Subtract the payment for Opening Balance
+    }
+
+    console.log('After updateAmountFields - Total Amount Due:', totalAmountDue);
+
+    updateAmountFields(totalAmountDue, totalPayment, paymentSerial, paymentType, paymentAmount, billId, billType);
+
+    // Pass the applied payment amount to updateTotalAmountDueField
+    updateTotalAmountDueField(paymentAmount);
+
+    // Update the total-sum-amount field independently
+    updateTotalSumAmountField();
+  }
+}
+function updateAmountFields(totalAmountDue, totalPayment, paymentSerial, paymentType, paymentAmount, billId, billType) {
+  const amountToApply = document.getElementById('amtoapply');
+  const amountToPaymentType = document.getElementById('amtpaymenttype');
+  const amountToCredit = document.getElementById('amtcredit');
+  const amountBillId = document.getElementById('amtbillId');
+  
+  amountToPaymentType.value = paymentType;
+  amountBillId.value = paymentSerial;
+
+  let newAmountDue = totalAmountDue;
+
+  if (totalPayment >= 0) {
+    amountToApply.value = totalPayment;
+  } else {
+    amountToApply.value = totalPayment;
+    newAmountDue = totalAmountDue - totalPayment; // Update Amount Due by subtracting payment
+  }
+
+  amountToCredit.value = newAmountDue;
+  console.log(newAmountDue);
+  updateDatabase(newAmountDue, paymentSerial, paymentType, paymentAmount, billId, billType);
+
+  // Ensure the opening balance is subtracted only once
+  if (amountToApply.id === 'amtoapply' && amountToCredit.id === 'amtcredit') {
+    amountToCredit.value = newAmountDue;
+  }
+}
+
+function updateDatabase(newAmountDue, paymentSerial, paymentType, paymentAmount, billId, billType) {
+  const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+  fetch('/update-amount-due/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    body: JSON.stringify({ newAmountDue, paymentSerial, paymentType, paymentAmount, billId, billType }),
+  })
+    .then(response => {
+      // Handle response as needed
+      console.log('Database updated with new Amount Due for', response);
+    })
+    .catch(error => {
+      console.error('Error updating database:', error);
+    });
+}
+
+function updateTotalAmountDueField(appliedPayment = 0) {
+  const amountDueElements = document.querySelectorAll('.amount-due');
+  let totalAmountDue = 0;
+
+  amountDueElements.forEach(element => {
+    const amount = parseFloat(element.getAttribute('data-amount'));
+    if (!isNaN(amount)) {
+      totalAmountDue += amount;
+    }
+  });
+
+  // Subtract the applied payment amount
+  totalAmountDue -= appliedPayment;
+
+  document.getElementById('total-sum').value = totalAmountDue.toFixed(2);
+}
+
+
+
+
+
+
+
+// const cashRadio = document.getElementById('cashRadio');
+// const bankRadio = document.getElementById('bankRadio');
+// const bankOptionsDiv = document.getElementById('bankOptions');
+// const bankSelect = document.getElementById('bankName');
+// const addBankButton = document.getElementById('addBankButton');
+
+// bankRadio.addEventListener('change', function() {
+//   if (this.checked) {
+//     bankOptionsDiv.style.display = 'block';
+//   } else {
+//     bankOptionsDiv.style.display = 'none';
+//   }
+// });
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    var vendorSelect = document.getElementById('vendor-select');
+    var emailInput = document.getElementById('email-input');
+    var GSTinput = document.getElementById('gst');
+    var GSTnumberSection = document.getElementById('gst-number-section');
+    var GSTnumber = document.getElementById('gst_no');
+    var gstLabel = document.getElementById('gst-label');
+
+    var initialEmail = emailInput.value;
+    var intitialGST = GSTinput.value;
+
+    vendorSelect.addEventListener('change', function() {
+        var selectedOption = vendorSelect.options[vendorSelect.selectedIndex];
+        var email = selectedOption.getAttribute('data-email') || initialEmail;
+        var gst = selectedOption.getAttribute('data-gst') || intitialGST;
+        var gst_no = selectedOption.getAttribute('data-gstnumber');
+
+        emailInput.value = email;
+        GSTinput.value = gst;
+
+        if (gst_no != 'null' ) {
+            GSTnumberSection.style.display = 'block';
+            GSTnumber.value = gst_no;
+            gstLabel.style.display = 'block';
+            GSTnumberSection.style.marginLeft = '215px';
+            GSTnumberSection.style.width = '93.8%';
+            gstLabel.style.marginLeft = '-190px';
+            GSTnumber.style.marginTop = '-37px';
+        } 
+        else {
+            GSTnumberSection.style.display = 'none';
+            GSTnumber.value = '0';
+            gstLabel.style.display = 'none';
+        }
+    });
+
+    // Initial toggle based on the selected vendor's GST number presence
+    // var initialSelectedOption = vendorSelect.options[vendorSelect.selectedIndex];
+    // var initialGSTNumber = initialSelectedOption.getAttribute('data-gstnumber');
+    // if (initialGSTNumber) {
+    //     GSTnumberSection.style.display = 'block';
+    //     GSTnumber.value = initialGSTNumber;
+    //     gstLabel.style.display = 'block';
+    // } else {
+    //     GSTnumberSection.style.display = 'none';
+    //     GSTnumber.value = '';
+    //     gstLabel.style.display = 'none';
+    // }
+});
+
+
+ function clearForm() {
+  // Get the form element
+  var form = document.getElementById('myForm');
+  
+  // Reset the form to clear all the input fields
+  form.reset();
+}
+
+$(document).ready(function() {
+    $('#paymentMethod').on('change', function() {
+        var selectedOption = $(this).val();
+
+        // Reset previous validation messages
+        $('.validation-message').hide();
+
+        if (selectedOption !== 'cash' && selectedOption !== 'cheque' && selectedOption !== 'UPI') {
+            // Assuming 'selectedOption' contains the selected bank name
+            $('#bankAccountNumber').show();  // Display the account number field
+
+            // AJAX call to fetch the account number based on the selected bank
+            $.ajax({
+                url: '/get_account_number/',
+                type: 'GET',
+                data: {
+                    'paid_through': selectedOption
+                },
+                success: function(response) {
+                    if (response.ac_no) {
+                        $('#accountNumber').val(response.ac_no);
+                    }
+                },
+                error: function(error) {
+                    console.log('Error fetching account number:', error);
+                }
+            });
+
+            $('#chequeDetails').hide();  // Hide the input field for cheque number
+            $('#UPIdetails').hide();
+        } else if (selectedOption === 'cheque') {
+            $('#chequeDetails').show();  // Display the input field for cheque number
+            $('#bankAccountNumber').hide();  // Hide the account number field
+            $('#UPIdetails').hide();
+        } else if (selectedOption === 'UPI'){
+            $('#chequeDetails').hide();  // Hide the input field for cheque number
+            $('#bankAccountNumber').hide();  // Hide the account number field
+            $('#UPIdetails').show();
+        } else {
+            $('#bankAccountNumber').hide();  // Hide the account number field for other options
+            $('#chequeDetails').hide();  // Hide the input field for cheque number
+            $('#UPIdetails').hide();
+        }
+    });
+
+    
+});
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+      $(document).ready(function() {
+    $('#amount').on('input', function() {
+        var balance = parseFloat($('#balance').val());
+        var amount = parseFloat($(this).val());
+        var difference = balance - amount;
+        
+        // Update the difference input field with the calculated value
+        $('#difference').val(difference);
+    });
+});
+
+
+function closeDiv() {
+  var divElement = document.getElementById("dynamicForm");
+  divElement.style.display = "none";
+}
+
+
+$(document).on("click", "#CreateBanking", function () {
+  $.ajax({
+    type: 'POST',
+    url: "{% url 'added_banking' %}",
+    data: {
+      
+      name:$("#name").val(),
+      date:$('#date').val(),
+      ac_no:$('#ac_no').val(),
+      bal_type:$('#bal_type').val(),
+      opn_bal:$('#opn_bal').val(),
+      branch:$('#branch').val(),
+      ifsc:$('#ifsc').val(),
+      
+      
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+    },
+   
+    success: function (response) {
+      $("#Add_bank").modal("hide"); // Close the modal
+      reloadbank(); // Refresh the dropdown
+    },
+    error: function (xhr, status, error) {
+      console.error(xhr.responseText);
+    }
+  });
+});
+
+function reloadbank() {
+  $.ajax({
+    url: "{% url 'banking_dropdown' %}",
+    type: "GET",
+    dataType: "json",
+    headers: { "X-CSRFToken": '{{ csrf_token }}' }, // Include CSRF token in headers
+
+    success: function (data) {
+      var dropdown = $('#paymentMethod');
+      dropdown.empty();
+      $.each(data, function(id, name) {
+        dropdown.append($("<option>").attr("value", id).text(name));
+      });
+    },
+    error: function (xhr, status, error) {
+      console.error(xhr.responseText);
+    }
+  });
+}
+
+$(document).on("click", "#CreateOption", function () {
+  $.ajax({
+    type: "POST",
+    url: "{% url 'add_option' %}",
+    data: {
+      option: $("#option").val(),
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+    },
+    success: function (response) {
+      $("#Add_option").modal("hide"); // Close the modal
+      reloadVendor(); // Refresh the dropdown
+    },
+    error: function (xhr, status, error) {
+      console.error(xhr.responseText);
+    }
+  });
+});
+
+function reloadVendor() {
+  $.ajax({
+    url: "{% url 'option_dropdown' %}",
+    type: "GET",
+    dataType: "json",
+    data: $(this).serialize(),
+    headers: { "X-CSRFToken": '{{ csrf_token }}' }, // Use headers to send CSRF token
+
+    success: function(data) {
+      var dropdown = $('#selectField1');
+      dropdown.empty();
+
+      $.each(data, function(id, name) {
+        dropdown.append($("<option>").attr("value", id).text(name));
+      });
+    },
+    error: function(xhr, status, error) {
+      console.error(xhr.responseText);
+    }
+  });
+}
+
+
+
+// function reloadBanking(event) {
+
+//   $.ajax({
+//     url: "",
+//     type: "GET",
+//     dataType: "json",
+//     data: $(this).serialize(),
+
+//     csrfmiddlewaretoken: '{{ csrf_token }}',
+
+//     success: function (data) {
+//       var dropdown = $('#bank');
+//       dropdown.empty();
+//       $.each(data, function (key, value) {
+//         if (value) { // Check if bnk_name exists and is not None
+//           dropdown.append($('<option></option>').paymentSerial('value', key).text(value[0]+" " +value[1] + ' ' + value[2]).val(value[3]+' '+ value[1] + ' ' + value[2]+ ' ' +value[3]));
+//         }
+//       });
+//     },
+//     error: function (xhr, status, error) {
+//       console.error(xhr.responseText);
+//     }
+//   });
+// }
+
+
+
+  </script>
+
+
+
+{% endblock %}

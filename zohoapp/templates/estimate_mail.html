@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <!-- ..............................................  template 3..................................................... -->
+    
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div id="outer" style="width: 100%;border-radius: 15px;background-color: rgba(31, 31, 31, 0.774);">
+                        <div class="row">
+                            <div class="col-sm-3 col-md-3 col-lg-3"></div>
+                            <div class="col-sm-6 col-md-6 col-lg-6">
+                                <div id="print_slip" class="p-1 pb-5" style="width: 100%;background-color: beige;">
+                                    <div class="row">
+                                        <div class="col-sm-12 col-lg-12 col-md-12">
+                                          <h1 class="text-black" style="text-align: center;">ESTIMATE</h1>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12 col-lg-12 col-md-12">
+                                            <h3 class="text-dark mt-1" style="text-transform: uppercase;text-align: center;">{{ company.company_name }}</h3>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12 col-lg-12 col-md-12">                            
+                                           <p class="text-dark" style="text-align: center;"> {{ company.address }} , {{ company.city }} ,{{ company.state }}  </p>                           
+                                        </div>
+                                  </div>
+                                  <br>
+                                  
+                                        <h3 class="text-dark"><span class="text-primary" >Bill to :</span> <br>
+                                        
+                                         {{ estimate.customer_name }} <br>{{ estimate.customer.customerEmail }} <br><span class="text-black " style="font-size: medium;">Order date:</span> <br> {{estimate.estimate_date }} </h3>
+                                         <div>
+                                            <h3 class="text-dark" ><span class="text-black" >Estimate no:</span>{{estimate.estimate_no }}</h3>
+                                         </div>
+        
+        
+        <br><br>
+                                    
+                                  <div class="row ">
+                                    <div class="col-sm-12 col-md-12 col-lg-12">
+                                        <table class=" table table-bordered mb-3" style="margin-top: 8%;">
+                                            <thead >
+                                                <tr style="border-left: 1px solid black;border-top:1px solid black ;border-right: 1px solid black;border-bottom: 1px solid black;">
+                                                    <th style="color: black;">#</th>
+                                                    <th style="color: black;">Item</th>
+                                                    <th style="color: black;">Hsn</th>
+                                                    <th style="color: black;">Qty</th>
+                                                    <th style="color: black;">Rate</th>
+                                                    <th style="color: black;">Discount</th>
+                                                    <th style="color: black;">Tax</th>
+                                                    <th style="color: black;">Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                     {% for item in items %}
+                                       <tr style="border-left: 1px solid black;border-top:1px solid black ;border-right: 1px solid black;border-bottom: 1px solid black;">
+                                        <td style="color: black;">{{ forloop.counter }}</td>
+                                        <td style="color: black;">{{ item.item_name }}</td>
+                                        <td style="color: black;">{{ item.hsn }}</td>
+                                        <td style="color: black;">{{ item.quantity }}</td>
+                                        <td style="color: black;">{{ item.rate|floatformat:1 }}</td>
+                                        <td style="color: black;">{{ item.discount|floatformat:1 }}</td>
+                                        <td style="color: black;">{{ item.tax_percentage }}</td>
+                                        <td style="color: black;">{{ item.amount|floatformat:1 }}</td>
+                                      </tr>
+                                    {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                               <br><br>
+                               <hr>
+                                    
+                                        <table >
+                                            <tr >
+                                                <td class=" text-dark" >Sub-Total:</td>                                       
+                                                <td class="text-right text-dark" > {{estimate.sub_total|floatformat:1}}</td>
+                                            </tr>
+                                            {% if estimate.cgst != 0 %}
+                                            <tr >
+                                                <td class="text-right text-dark" >CGST:</td>
+                                                <td class="text-right text-dark" >{{ estimate.cgst|floatformat:1}}</td>
+                                            </tr>
+                                            {% endif %}
+                                               
+                                            {% if estimate.sgst != 0 %}
+                                            <tr >
+                                                <td class="text-right text-dark" >SGST:</td>
+                                                <td class="text-right text-dark" >{{ estimate.sgst|floatformat:1}}</td>
+                                            </tr>
+                                            {% endif %}
+                                            {% if estimate.igst != 0 %}
+                                            <tr >
+                                                <td class="text-right text-dark" >IGST:</td>
+                                                <td class="text-right text-dark" >{{ estimate.igst|floatformat:1}}</td>
+                                            </tr>
+                                            {% endif %}
+                                            {% if estimate.shipping_charge != 0 %}
+                                            <tr >
+                                                <td class="text-right text-dark" >Shipping Charge:</td>
+                                                <td class="text-right text-dark" >{{ estimate.shipping_charge|floatformat:1}}</td>
+                                            </tr>
+                                            {% endif %}
+                                            {% if estimate.adjustment != 0 %}
+                                            <tr >
+                                                <td class="text-right text-dark" >Adjustment:</td>
+                                                <td class="text-right text-dark" >{{ estimate.adjustment|floatformat:1}}</td>
+                                            </tr>
+                                            {% endif %}
+                                            <tr >
+                    
+                                                <td class="text-right text-dark" style="font-weight: bold;">Total:</td>
+                                                <!-- <td class="text-right text-dark "></td>
+                                                <td class="text-right text-dark"></td>
+                                                <td class="text-right text-dark"></td> -->
+                                                <td class="text-right text-dark " style="font-weight: bold;text-align: end;font-weight: bold;">{{ estimate.total|floatformat:1}}</td>
+                                            </tr>
+                    
+                                        </table>
+                        </div>
+        
+                    </div>
+        
+                </div>
+            </div>
+        
+   
+</body>
+</html>

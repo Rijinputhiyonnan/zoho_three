@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<style>
+  #over:hover{
+      background-color: rgba(110, 110, 110, 0.616);
+      cursor: pointer;
+    }
+</style>
+
+  <div  style="top: 7rem;" >
+    <div class="pb-4"><a class="text-white" style="font-size: 2rem;">Bank Account Holders</a></div>
+    <div class="row mb-4">
+      <div class=" col-md-3 d-flex justify-content-between align-items-center">
+              <input type="text" id="search" placeholder="Search..." class="form-control text-dark bg-light" autocomplete="off">
+              <!-- <a href="" class="btn btn-outline-warning fa fa-sort text-right px-3 py-2" role="button"
+              style="margin-left: 5px;"></a> -->
+              <a class="btn text-center px-3 py-2 btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+              role="button" style="margin-left: 5px;"><i class="fa fa-sort "></i>
+              </a>
+              <div class="dropdown-menu ">
+                  <a class="dropdown-item text-white" href="{% url 'bankHolders' %}">All</a>
+                  <a class="dropdown-item text-white" href="{% url 'bankHoldersSortByName' %}">Holder Name</a>
+                  <a class="dropdown-item text-white" href="{% url 'bankHoldersSortByBankName' %}">Bank Name</a>
+              </div>
+      </div>
+      <div class="col-md-5"></div>
+      <div class="col-md-4 d-flex justify-content-end">
+
+        <a class="btn text-center px-4 pt-2 btn-outline-warning" title="SORT" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+        role="button" ><i class="fa fa-filter"></i>
+        </a>
+        <div class="dropdown-menu ">
+            <a class="dropdown-item text-white" href="{% url 'bankHolders' %}">All</a>
+            <a class="dropdown-item text-white" href="{% url 'bankHoldersActive' %}">Active</a>
+            <a class="dropdown-item text-white" href="{% url 'bankHoldersInactive' %}">Inactive</a>
+        </div>
+        <!-- <a href="#" class="btn btn-outline-warning px-3 py-2" title="IMPORT" role="button" style="margin-left: 5px;">
+            <i class="fas fa-file-import"></i>
+        </a> -->
+        <a href="#" class="btn btn-outline-warning px-3 py-2" onclick="exportToExcel('xlsx')" title="EXPORT" role="button" style="margin-left: 5px;">
+            <i class="fas fa-file-excel"></i>
+        </a>
+        <a href="{% url 'addBankHolder' %}" class="btn btn-outline-warning fa fa-plus text-right px-3 py-2" role="button" style="margin-left: 5px;">
+            <span class="mt-2">&nbsp;&nbsp;New</span>
+        </a>
+      </div>
+  </div>
+        <!-- <div class="row">
+            
+            <div class="col-md-6 form-inline" style="margin-left: 55rem;margin-top: -2rem;"><a style="color: #ccc;background-color: rgb(190, 131, 4);" class="btn  mr-2"  href="{% url 'vendor' %}"><i class="fa-solid fa-plus "></i>New</a>
+
+            </div>
+        </div>    -->
+    
+        <div class="row">
+            <div class="col-sm-12 ">
+              <div style="width: 100%; overflow-x: auto;">
+                <table class="table  text-white" id="bankHoldersTable" >
+                    <thead>
+                      <tr>
+                        <th>Holder Name</th>
+                        <th>Acc. Number</th>
+                        <th>IFSC Code</th>
+                        <th>BANK Name</th>
+                        <th>Branch Name</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      {% for person in bank_holders %}
+                      <tr id="over" class="clickable-row" data-href="{% url 'viewBankHolder' person.id %}">
+                        <td>{{person.holder_name}}</td>
+                        <td>{{person.acc_number}}</td>
+                        <td>{{person.ifsc_code}}</td>
+                        <td>{{person.bank_name}}</td>
+                        <td>{{person.branch_name}}</td>
+                        <td>{{person.status}}</td>
+                      </tr>
+                      {% endfor %}
+
+                    </tbody>
+                </table>
+                </div>
+                <br><br><br><br><br>
+            </div>
+            <div class="col-sm-12 col-md-1 col-lg-1"></div>
+
+        </div>
+      
+
+           
+        
+
+    <!-- </div> -->
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $("#search").on("keyup", function () {
+      var value = $(this).val().toLowerCase();
+      $("#bankHoldersTable tr").filter(function () {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+    });
+  });
+
+  // Add click event listener to all rows with class "clickable-row"
+  const rows = document.querySelectorAll('.clickable-row');
+  rows.forEach(row => {
+    row.addEventListener('click', () => {
+      // Get the URL from the "data-href" attribute
+      const url = row.getAttribute('data-href');
+      // Navigate to the URL
+      window.location.href = url;
+    });
+  });
+
+
+    function exportToExcel(type, fn, dl) {
+        var elt = document.getElementById('bankHoldersTable');
+        var wb = XLSX.utils.table_to_book(elt, { sheet: "sheet1" });
+        return dl ? XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }) : XLSX.writeFile(wb, fn || ('Bank_Holders.' + (type || 'xlsx')));
+    }
+</script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA==" crossorigin="anonymous" referrerpolicy="no-referrer" ></script>
+{%if messages%} {%for message in messages%} {%if message.tags == "success"%}
+<script>
+  swal({
+    position: "top-end",
+    icon: "success",
+    title: "{{message}}",
+  });
+</script>
+{%elif message.tags == "warning"%}
+<script>
+  swal({
+    position: "top-end",
+    icon: "warning",
+    title: "{{message}}",
+  });
+</script>
+{%elif message.tags == "error"%}
+<script>
+  swal({
+    position: "top-end",
+    icon: "error",
+    title: "{{message}}",
+  });
+</script>
+{%else%}
+<script>
+  swal({
+    position: "top-end",
+    icon: "info",
+    title: "{{message}}",
+  });
+</script>
+{%endif%} {%endfor%} {%endif%}
+{% endblock %}

@@ -1,0 +1,2091 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  .modal {
+    z-index: 9999;
+    overflow: scroll;
+  }
+
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+  }
+
+  .slip-page {
+    background: #ffffff;
+    display: block;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+  }
+
+  .slip-page[size="A4"] {
+    width: 21cm;
+    height: 29.7cm;
+    overflow: hidden;
+  }
+
+  .equal-length-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    /* Make the container fill the height of the column */
+    margin-left: 2vh;
+    margin-right: 2vh;
+  }
+
+  .equal-length-item {
+    flex: 1;
+    text-align: center;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    padding: 1px;
+    margin: 0;
+  }
+
+  .store-user {
+    padding-bottom: 25px;
+  }
+
+  .store-user p {
+    margin: 0;
+    font-weight: 600;
+    color: #000000;
+  }
+
+  .store-user .address {
+    font-weight: 400;
+  }
+
+  .store-user h5 {
+    color: #22b8d1;
+    font-family: 'Rajdhani', sans-serif;
+  }
+
+  .bb {
+    border-bottom: 3px solid #ccc;
+  }
+
+  .top-content {
+    padding-bottom: 15px;
+  }
+
+  .ribbon .ribbon-inner {
+    text-align: center;
+    color: #fff;
+    top: -20px;
+    left: -90px;
+    width: 120px;
+    padding: 3px;
+
+  }
+
+  .ribbon .ribbon-open {
+    background-color: #268ddd;
+    border-color: #1c72b4;
+  }
+
+  .template .ribbon .ribbon-open {
+    background-color: #616263;
+    border-color: #616263;
+  }
+
+  .top-left p {
+    margin: 0;
+    color: #000000;
+  }
+
+  .top-left .graphic-path {
+    height: 40px;
+    position: relative;
+  }
+
+  .top-left .graphic-path::before {
+    content: "";
+    height: 20px;
+    background-color: #615c60;
+    position: absolute;
+    left: 15px;
+    right: 0;
+    top: -15px;
+    z-index: 2;
+  }
+
+  .top-left .graphic-path::after {
+    content: "";
+    height: 22px;
+    width: 17px;
+    background: #000000;
+    position: absolute;
+    top: -13px;
+    left: 6px;
+    transform: rotate(45deg);
+  }
+
+  .template3 .top-left .graphic-path::before {
+    background-color: #bbbbbb;
+  }
+
+  .template3 .top-left .graphic-path::after {
+    background: #616263b3;
+  }
+
+  .top-left .graphic-path p {
+    height: 40px;
+    left: 0;
+    right: 0;
+    text-transform: uppercase;
+    background-color: #22b8d1;
+    font: 26px;
+    z-index: 3;
+    position: absolute;
+    padding-left: 10px;
+  }
+
+  .template3 .top-left .graphic-path p {
+    background-color: #616263;
+    color: white;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+  }
+
+  .logo img {
+    max-height: 100px;
+  }
+
+  .company-info h2 {
+    margin: 0;
+    font-size: 2em;
+  }
+
+  .company-info p {
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .i.invoice-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .invoice-box h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+
+  .invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .invoice-details p,
+  .client-details p {
+    margin: 5px 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  #th {
+    background-color: #f2f2f2;
+    color: black;
+  }
+
+  .invoice-total {
+    margin-top: 20px;
+    text-align: right;
+  }
+
+  .invoice-total p {
+    margin: 5px 0;
+  }
+
+  footer {
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 20px;
+  }
+
+  footer p {
+    margin: 5px 0;
+  }
+
+  .dropdown-item:hover {
+    color: chocolate;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  .saleordertable {
+    border-collapse: collapse;
+    /* Collapse table borders */
+    border: none;
+    /* Remove table border */
+  }
+
+  .saleordertable td {
+    border: none;
+    /* Remove cell borders */
+    padding: 8px;
+    /* Add padding for cell content */
+    text-align: left;
+    /* Optional: Adjust text alignment */
+  }
+
+  #producttable {
+    border-collapse: collapse;
+    /* Collapse table borders */
+    border: none;
+    /* Remove table border */
+    color: white;
+  }
+
+  #producttable td {
+    border: none;
+    /* Remove cell borders */
+    padding: 8px;
+    /* Add padding for cell content */
+    text-align: left;
+    /* Optional: Adjust text alignment */
+  }
+
+  tr.clickable {
+    cursor: pointer;
+  }
+
+
+  @media print {
+
+    .unwanted,
+    .sidebar,
+    .sectionhtml {
+      display: none !important;
+    }
+
+    body {
+      visibility: hidden !important;
+    }
+
+    html {
+      overflow: hidden ! important;
+      visibility: hidden !important;
+    }
+
+
+    .printContainer {
+      visibility: visible !important;
+      /* Override the rule above to only show the printables*/
+      z-index: 99999;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: auto;
+    }
+
+
+
+  }
+
+  .scrollable-table {
+    max-height: 80%;
+    /* Maximum height for the tooltip */
+    overflow-y: auto;
+    /* Add vertical scrollbar when content overflows */
+  }
+
+  /* Style for the container */
+
+
+  /* Style for table cell */
+  .table-cell {
+    padding: 5px;
+  }
+</style>
+
+<section>
+  <div class="row " style="top: 7rem; ">
+
+    <div>
+      <div class="col-md-12" style="width: auto;">
+        <div class="row">
+          <div class="col-md-3" style="border-right: 1px solid white; overflow-y: scroll; height: 84vh;">
+            <div class="row">
+              <a class="text-white" style="font-size: 1.5rem;">All Expenses</a>
+           
+              <br>  
+           
+
+              <div class="col-md-2 mt-2 mx-1">
+                <a id="sort-button" class="btn text-center btn-outline-warning text-warning fa fa-sort px-3" data-bs-toggle="dropdown" role="button"></a>&nbsp;&nbsp;&nbsp;
+                <div class="dropdown-menu " >
+                    <a class="dropdown-item" href="{% url 'expense_details' expense.id %}">All</a>
+                    <a class="dropdown-item" href="{% url 'exp_view_sort_by_account' expense.id %}">Expense A/C</a>
+                    <a class="dropdown-item" href="{% url 'exp_view_sort_by_amount' expense.id %}">Amount</a>
+                </div>
+            </div>
+              <div class="col-md-3   ">
+                <div class="col-md-2  mt-2 mx-1">
+                    <a class="btn text-center btn-outline-warning text-warning  px-3 fa fa-filter" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    </a>
+                    <div class="dropdown-menu " >
+                        <a class="dropdown-item" href="{% url 'expense_details' expense.id %}">All</a>
+                        <a class="dropdown-item" href="{% url 'filter_expense_view_draft' expense.id %}">Draft</a>
+                        <a class="dropdown-item" href="{% url 'filter_expense_view_save' expense.id %}">Save</a>
+                    </div>
+                 <!-- </div> -->
+
+                </div>
+
+                <script>
+                    function filterProjects() {
+                        var actionFilter = document.getElementById('actionFilter');
+                        var selectedAction = actionFilter.options[actionFilter.selectedIndex].value;
+                
+                        var projects = document.querySelectorAll('.table.customer-table tbody tr');
+                
+                        projects.forEach(function (project) {
+                            var action = project.querySelector('.text-white').getAttribute('data-action');
+                
+                            if (selectedAction === 'all' || action === selectedAction) {
+                                project.style.display = 'table-row';
+                            } else {
+                                project.style.display = 'none';
+                            }
+                        });
+                    }
+                </script>
+                    <br>
+              
+       
+            </div>
+              <div class="col-md-3 ">
+                <a href="{% url 'save_expense' %}" class="btn btn-outline-warning text-warning fa fa-plus  pt-2"
+                                role="button">
+                            </a>
+              </div>
+              <div class="col-md-6"></div>
+
+            </div>
+
+            <div class="scrollable-table">
+                <div class="row">
+                    <div class="col-md-12">
+                        <input type="text" id="search" placeholder="Search..." class="form-control text-dark bg-light" autocomplete="off" >
+                    </div>
+                </div>
+                  <table class="table customer-table" style="border:1px solid black;">
+                    <tbody>
+                      {%for expense in expenses%}
+                      <tr>
+                        <td>
+                          <a class="text-white"  href="{% url 'expense_details' expense.id %}"><b>{{expense.date}}</b> <span class="d-flex justify-content-end text-warning align-items-start" > {{expense.amount}}</span> <br>
+                              <span class="d-flex  align-items-start text-warning"> {{expense.expense_account}}</span> <span class="d-flex justify-content-end align-items-start"> {{expense.status}}</span>
+                          </a> 
+                      </td>
+                      </tr>
+                      {%endfor%}
+                    </tbody>
+                  </table>
+            </div>
+
+
+          </div>
+
+          <div class="col-md-9 ml-1  mb-5 " id="overviewdiv">
+            <div class="row">
+              <div class="col-md-7">
+                <a class="text-white" style="font-size: 1.5rem;">
+                  <h2>{{expense.expense_account}}</h2>
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <a class="btn" style="background-color: chocolate; margin-right: 2vh;"><i class="fas fa-eye"></i>
+                  Overview</a>
+               
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                  aria-haspopup="true" aria-expanded="false"
+                  style="background-color: white; color: black; margin-right: 2vh;"> Templates
+                </a>
+      
+                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                  <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
+
+                  <a class="dropdown-item" onclick="totemplate2()"><i class="fa fa-file-alt"></i>
+                    Template 2</a>
+
+                  <a class="dropdown-item" onclick="totemplate3()"><i class="fa fa-file-alt"></i>
+                    Template 3</a>
+
+
+                </div>
+
+              </div>
+
+              <div class="col-md-6" style="text-align: center;">
+      
+                <a href="{% url 'edit_expensee' expense.id %}" class=" fa fa-pencil btn btn-outline-warning text-warning  py-2"
+                data-toggle="tooltip" title="EDIT"> </a>
+          
+          <a href="{% url 'delet' expense.id %} " class="delete fa fa-trash btn btn-outline-warning text-warning px-2 py-2"
+           data-toggle="tooltip" title="DELETE" onclick="return confirm('Do you want to Delete this creditnote?');"> </a>
+           
+                    {% if expense.status == 'draft' %}
+                    <a href="{% url 'expense_status_edit' expense.id %}" class="btn btn-outline-warning py-2  text-warning 
+                     " title="save this draft" ><i class="fas fa-save"></i></a>
+                    {% endif %}
+          
+             
+          
+                <a class="text-dark" data-toggle="dropdown">
+                  <button class="btn btn-outline-warning " title="Share"><i class="fas fa-share"></i></button>
+                </a>
+                <div class="dropdown-menu ">
+                  <a class="dropdown-item" data-target="#shareBillEmail" data-toggle="modal">GMAIL</a>
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
+                </div>
+               
+                <a class="  text-dark" onclick="exportToPDF3()">
+                  <button class="btn btn-outline-warning" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+                </a>
+                <a class=" text-dark" onclick="printSelectedArea2()">
+                  <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
+                  </button>
+                </a>
+                
+                    <!-- <a href="" class=" far fa-comment-alt btn btn-outline-warning text-warning px-2 py-2" title="COMMENTS"
+                        data-toggle="modal" data-target="#cmnts"> </a> -->
+                       
+                            <a href=" " class="btn  btn-outline-warning py-2  fas fa-comment-dots dropdown-toggle text-warning "  
+                                data-bs-toggle="dropdown" id="attachmentDropdown" aria-haspopup="true" aria-expanded="false"> 
+                            </a>
+
+                            <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                                <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                                 data-target="#cmnts"><i class="fa-solid fa fa-plus"></i>Add</a>
+                                <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                                data-target="#cmt_list"><i class="fas fa-list"></i>&nbsp;View List</a>
+                                        
+                            </div>
+                  
+           
+     
+           
+               
+                    <a href=" " class=" fas fa-paperclip dropdown-toggle btn btn-outline-warning text-warning py-2 "  
+                        data-bs-toggle="dropdown" id="attachmentDropdown" aria-haspopup="true" aria-expanded="false"> 
+                    </a>
+
+                    <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                        <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                            data-target="#files"><i class="fa fa-paperclip"></i> Attach File</a>
+                        {% if expense.attachment != "" %}
+                        <a class="dropdown-item" href="{{expense.attachment.url}}"><i
+                                class="fa fa-download"></i> Download File</a>
+                        {% endif %}
+                    </div>
+            </div>
+            </div><br>
+
+            <div class="row" id="div-to-pdf"
+              style="background-color: #ffddb0;  height: auto; margin-left:1px; margin-right: 1rem; ">
+
+              <div class="row text-center">
+                <h2 style="color: #000000;"><br>Expense Details
+            
+                  ({{ expense.status}})
+                  <hr>
+                </h2>
+              </div>    
+              <div class="gen-info col-6 " style="padding-left: 3rem; overflow-y: scroll; ">
+                <div class="row mt-1">
+                  <div class="col-5"><label class="text-dark" for="">Date:</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{ expense.date |date:'d-m-Y' }}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Destination of Supply:</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{expense.destination_of_supply}}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Tax:</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">
+                        {{expense.tax}} %</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Notes :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">
+                        {{expense.notes}}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Expense Account</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">
+                        {{expense.expense_account}}</p>
+                  </div>
+                </div>
+          
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Paid Through :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{expense.paid}}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">>Expense Type:</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{ expense.expense_type }}</p>
+                  </div>
+                </div>
+                <!-- <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Amount:</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{project.rateperhour}}</p>
+                  </div>
+                </div> -->
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Customer Name: </label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{expense.customer_name.customerName}}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Customer Address:</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{expense.customer_name.Address1}}<br>
+                        {{expense.customer_name.city}},{{expense.customer_name.state}} ,{{expense.customer_name.country}} ,
+                       </p>
+                  </div>
+                </div>
+              
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Customer Email:</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;"> {{expense.customer_name.customerEmail}}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="p-info col-6" style="height: 100%; margin-bottom: 1vh;">
+                <div class="card" style="background-color: rgb(110, 61, 46); padding-left: 1rem; padding-top: 1rem;">
+                  <div class="row text-center">
+                    <h2>COMPANY INFORMATION
+                      <hr>
+                    </h2>
+                  </div>
+
+
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Company Name :</label></div>
+                    <div class="col-7">
+                      <p class="bold">{{company.company_name}}</p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Company Address</label></div>
+                    <div class="col-7">
+                      <p class="bold">{{company.address}} <br>
+                        {{company.city}}  <br> {{company.state}},{{company.pincode}} <br> </p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Contact Number :</label></div>
+                    <div class="col-7">
+                      <p class="bold">{{company.contact_number}} </p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Company Email:</label></div>
+                    <div class="col-7">
+                      <p class="bold">{{company.company_email}}</p>
+                    </div>
+                  </div>
+
+                  
+           
+                </div><br>
+              </div>
+            </div>
+
+            
+
+          </div>
+
+       
+          <div class="col-md-9" id="templatediv" style="display: none;">
+            <div class="row">
+              <div class="col-md-7">
+                <a class="text-white" style="font-size: 1.5rem;">
+                  <h2>{{sale.sales_no}}</h2>
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate; "><i
+                    class="fas fa-eye"></i> Overview</a>
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                  aria-haspopup="true" aria-expanded="false"
+                  style="background-color: white; color: black; margin-left: 2vh;"> Templates
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                  <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
+
+                  <a class="dropdown-item" onclick="totemplate2()"><i class="fa fa-file-alt"></i>
+                    Template 2</a>
+
+                  <a class="dropdown-item" onclick="totemplate3()"><i class="fa fa-file-alt"></i>
+                    Template 3</a>
+
+
+                </div>
+
+              </div>
+
+              <div class="col-md-6" style="text-align: center;">
+                {% if sale.status == "draft" %}
+                <a href="" class="btn btn-outline-warning" title="Save">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'edit_expensee' expense.id %}" class=" fa fa-pencil btn btn-outline-warning text-warning  py-2"
+                data-toggle="tooltip" title="EDIT"> </a>
+          
+          <a href="{% url 'delet' expense.id %} " class="delete fa fa-trash btn btn-outline-warning text-warning px-2 py-2"
+           data-toggle="tooltip" title="DELETE" onclick="return confirm('Do you want to Delete this creditnote?');"> </a>
+           
+                    {% if expense.status == 'draft' %}
+                    <a href="{% url 'expense_status_edit' expense.id %}" class="btn btn-outline-warning py-2  text-warning 
+                     " title="save this draft" ><i class="fas fa-save"></i></a>
+                    {% endif %}
+          
+             
+          
+                <a class="text-dark" data-toggle="dropdown">
+                  <button class="btn btn-outline-warning " title="Share"><i class="fas fa-share"></i></button>
+                </a>
+                <div class="dropdown-menu ">
+                  <a class="dropdown-item" data-target="#shareBillEmail" data-toggle="modal">GMAIL</a>
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
+                </div>
+               
+                <a class="  text-dark" onclick="exportToPDF2()">
+                  <button class="btn btn-outline-warning" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+                </a>
+                <a class=" text-dark" onclick="printSelectedArea2()">
+                  <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
+                  </button>
+                </a>
+                
+                    <!-- <a href="" class=" far fa-comment-alt btn btn-outline-warning text-warning px-2 py-2" title="COMMENTS"
+                        data-toggle="modal" data-target="#cmnts"> </a> -->
+                       
+                            <a href=" " class="btn  btn-outline-warning py-2  fas fa-comment-dots dropdown-toggle text-warning "  
+                                data-bs-toggle="dropdown" id="attachmentDropdown" aria-haspopup="true" aria-expanded="false"> 
+                            </a>
+
+                            <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                                <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                                 data-target="#cmnts"><i class="fa-solid fa fa-plus"></i>Add</a>
+                                <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                                data-target="#cmt_list"><i class="fas fa-list"></i>&nbsp;View List</a>
+                                        
+                            </div>
+                  
+           
+     
+           
+               
+                    <a href=" " class=" fas fa-paperclip dropdown-toggle btn btn-outline-warning text-warning py-2 "  
+                        data-bs-toggle="dropdown" id="attachmentDropdown" aria-haspopup="true" aria-expanded="false"> 
+                    </a>
+
+                    <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                        <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                            data-target="#files"><i class="fa fa-paperclip"></i> Attach File</a>
+                        {% if expense.attachment != "" %}
+                        <a class="dropdown-item" href="{{expense.attachment.url}}"><i
+                                class="fa fa-download"></i> Download File</a>
+                        {% endif %}
+                    </div>
+              </div>
+            </div>
+
+
+
+
+
+            <div class="mt-3 template2 whatToPrint2" style="height: auto;width: 100%; margin-left: -1vh">
+
+              <section id="selected-area2" style="background-color: rgb(255, 221, 176);height: auto;" class=" p-2 m-2">
+                <header style="	border-radius: 1rem;color: #000;">
+                  <div class="logo ">
+                  <H1>EXPENSE DETAILS</H1>
+                  </div>
+                  <div style="color: #000;" class="company-info">
+                    <h2 >{{company.company_name}}</h2>
+                    <p > {{company.address}}<br>{{company.city}}</p>
+                    <p> {{company.contact_number}}</p>
+                    <p>{{company.company_email}}</p>
+                  </div>
+                </header>
+                <div class="invoice-box">
+                  <h1 class="text-dark">{{project.name}}</h1>
+                  <div class="invoice-header">
+                    <div class="invoice-details text-dark">
+                      <table>
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">Expense code#</td>
+                          <td class="table-cell text-black" style="border: none;">:</td>
+                          <td class="table-cell text-black" style="border: none;">{{expense.expense_number}}</td>
+                        </tr>
+                        <!-- <tr>
+                          <td class="table-cell text-black" style="border: none;">Start Date</td>
+                          <td class="table-cell text-black" style="border: none;">:</td>
+                          <td class="table-cell text-black" style="border: none;">{{project.start}}</td>
+                        </tr> -->
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;"> Date</td>
+                          <td class="table-cell text-black" style="border: none;">:</td>
+                          <td class="table-cell text-black" style="border: none;">{{expense.date}}</td>
+                        </tr>
+                      </table><br><br>
+                      <table>
+                        <th>Bill To,</th>
+                <tr>
+                          <td class="table-cell text-black" style="border: none;"> {{expense.vendor_name}}</td>
+                    
+                        </tr>
+                        <!-- <tr>
+                          <td class="table-cell text-black" style="border: none;">Start Date</td>
+                          <td class="table-cell text-black" style="border: none;">:</td>
+                          <td class="table-cell text-black" style="border: none;">{{project.start}}</td>
+                        </tr> -->
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">    {{expense.vendor.vendor_email}}</td>
+                 
+                        </tr>
+                      </table>
+                      <table>
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">   {{expense.vendor.bcity}}</td>
+                     
+                        </tr>
+                        <!-- <tr>
+                          <td class="table-cell text-black" style="border: none;">Start Date</td>
+                          <td class="table-cell text-black" style="border: none;">:</td>
+                          <td class="table-cell text-black" style="border: none;">{{project.start}}</td>
+                        </tr> -->
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">  {{expense.vendor.bstate}}</td>
+                 
+                        </tr>
+                      </table>
+                    </div>
+                    <div class="client-details" style="width: 50vh;">
+                      <br><br>       <br><br>
+                      <table>
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;"><b> Deliver To,</b>
+                          </td>
+                        </tr>
+                    
+               
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">  {{expense.customer_name.customerName}}</td>
+                        </tr>
+           
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">   {{expense.customer_name.customerEmail}}</td>
+                        </tr>
+      
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">     {{expense.customer_name.city}}</td>
+                        </tr>
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">     {{expense.customer_name.state}}</td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+<br><br>
+<table class="table table-hover table-bordered table-secondary">
+  <thead>
+      <tr>
+
+        <th id="th" style="text-align: center;">Account</th>
+        <th id="th" style="text-align: center;">Date</th>
+        <!-- <th id="th" style="text-align: center;">Quantity</th> -->
+        <th id="th" style="text-align: center;">Tax</th>
+        <th id="th" style="text-align: center;">Amount</th>
+        <th id="th" style="text-align: center;">GSTIN</th>
+   
+      
+      </tr>
+    </thead>
+    <tbody>
+   
+      <tr style="color: black;">
+        <td style="text-align: center;"> {{expense.expense_account}}</td>
+        <td style="text-align: center;"> {{expense.date}}</td>
+        <!-- <td style="text-align: center;">{{i.quantity}}</td> -->
+        <td style="text-align: center;">{{expense.tax}}</td>
+        <td style="text-align: center;">{{expense.amount}}</td>
+        <td style="text-align: center;">{{expense.customer_name.GSTIN}} </td>
+     
+      </tr>
+
+
+    </tbody>
+</table><br>
+                  <div class="invoice-details text-dark">
+                    <table>
+                      <tr>
+                        <td class="table-cell text-black" style="border: none;"></td>
+                        <td class="table-cell text-black" style="border: none;"></td>
+                        <td class="table-cell text-black" style="border: none;"></td>
+                      </tr>
+                  
+                      </tr>
+                      <tr>
+                        <td class="table-cell text-black" style="border: none;"></td>
+                        <td class="table-cell text-black" style="border: none;"></td>
+                        <td class="table-cell text-black" style="border: none;"></td>
+                      </tr>
+                  
+                      </tr>
+                      <tr>
+                        <td class="table-cell text-black" style="border: none;"></td>
+                        <td class="table-cell text-black" style="border: none;"></td>
+                        <td class="table-cell text-black" style="border: none;"></td>
+                      </tr>
+                  
+                      </tr>
+                      <tr>
+                        <td class="table-cell text-black" style="border: none;"></td>
+                        <td class="table-cell text-black" style="border: none;"></td>
+                        <td class="table-cell text-black" style="border: none;"></td>
+                      </tr>
+                  
+                      </tr>
+                    </table>
+                  </div>
+         
+
+                </div><br><br><br>
+                <br><br><br><br><br><br>
+                <footer class="mb-5">
+                  <p class="text-dark">&copy; Zho Books 2023 | Info park kakkanad kochi, Ernamkulam, kerala India 12345
+                    | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+                </footer>
+              </section>
+            </div>
+          </div>
+
+          <div class="col-md-9" id="templatediv2" style="display: none;">
+            <div class="row">
+              <div class="col-md-7">
+                <a class="text-white" style="font-size: 1.5rem;">
+                  <h2>{{sale.sales_no}}</h2>
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate; "><i
+                    class="fas fa-eye"></i> Overview</a>
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                  aria-haspopup="true" aria-expanded="false"
+                  style="background-color: white; color: black; margin-left: 2vh;"> Templates
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                  <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
+
+                  <a class="dropdown-item" onclick="totemplate2()"><i class="fa fa-file-alt"></i>
+                    Template 2</a>
+
+                  <a class="dropdown-item" onclick="totemplate3()"><i class="fa fa-file-alt"></i>
+                    Template 3</a>
+
+
+                </div>
+
+              </div>
+
+              <div class="col-md-6" style="text-align: center;">
+                {% if sale.status == "draft" %}
+                <a href="" class="btn btn-outline-warning" title="Save">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'edit_expensee' expense.id %}" class=" fa fa-pencil btn btn-outline-warning text-warning  py-2"
+                data-toggle="tooltip" title="EDIT"> </a>
+          
+          <a href="{% url 'delet' expense.id %} " class="delete fa fa-trash btn btn-outline-warning text-warning px-2 py-2"
+           data-toggle="tooltip" title="DELETE" onclick="return confirm('Do you want to Delete this creditnote?');"> </a>
+           
+                    {% if expense.status == 'draft' %}
+                    <a href="{% url 'expense_status_edit' expense.id %}" class="btn btn-outline-warning py-2  text-warning 
+                     " title="save this draft" ><i class="fas fa-save"></i></a>
+                    {% endif %}
+          
+             
+          
+                <a class="text-dark" data-toggle="dropdown">
+                  <button class="btn btn-outline-warning " title="Share"><i class="fas fa-share"></i></button>
+                </a>
+                <div class="dropdown-menu ">
+                  <a class="dropdown-item" data-target="#shareBillEmail" data-toggle="modal">GMAIL</a>
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
+                </div>
+               
+                <a class="  text-dark" onclick="exportToPDF3()">
+                  <button class="btn btn-outline-warning" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+                </a>
+                <a class=" text-dark" onclick="printSelectedArea3()">
+                  <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
+                  </button>
+                </a>
+                
+                    <!-- <a href="" class=" far fa-comment-alt btn btn-outline-warning text-warning px-2 py-2" title="COMMENTS"
+                        data-toggle="modal" data-target="#cmnts"> </a> -->
+                       
+                            <a href=" " class="btn  btn-outline-warning py-2  fas fa-comment-dots dropdown-toggle text-warning "  
+                                data-bs-toggle="dropdown" id="attachmentDropdown" aria-haspopup="true" aria-expanded="false"> 
+                            </a>
+
+                            <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                                <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                                 data-target="#cmnts"><i class="fa-solid fa fa-plus"></i>Add</a>
+                                <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                                data-target="#cmt_list"><i class="fas fa-list"></i>&nbsp;View List</a>
+                                        
+                            </div>
+                  
+           
+     
+           
+               
+                    <a href=" " class=" fas fa-paperclip dropdown-toggle btn btn-outline-warning text-warning py-2 "  
+                        data-bs-toggle="dropdown" id="attachmentDropdown" aria-haspopup="true" aria-expanded="false"> 
+                    </a>
+
+                    <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                        <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                            data-target="#files"><i class="fa fa-paperclip"></i> Attach File</a>
+                        {% if expense.attachment != "" %}
+                        <a class="dropdown-item" href="{{expense.attachment.url}}"><i
+                                class="fa fa-download"></i> Download File</a>
+                        {% endif %}
+                    </div>
+              </div>
+            </div>
+
+
+
+
+
+            <div id="template1" class="printTemplates template1">
+              <div class="my-3 page" style="background-color: rgb(255, 221, 176);" id="selected-area3">
+                <div class="p-5">
+                  <div style="background-color: #8b3131;border-radius: 1rem;padding: 20px;">
+                    <center class="h3"><b style="color: #000;">EXPENSE DETAILS</b></center>
+                  </div>
+                  <div class="row mt-5">
+                    <div class="col-md-8">
+                      <h4 class="text-secondary" style="font-weight: bold;">{{company.company_name }}</h4>
+                      <p class="address" style="font-weight: bold;color: #000;">
+                        {{company.address}}<br>
+                        {{company.city}},
+                        {{company.state}}<br>
+                        {{company.pincode}}<br>
+                        {{company.company_email}}<br>
+                        {{company.contact_number}}<br>
+                      </p>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="top-left">
+                        <div class="graphic-path">
+                          <p><b>{{expense.date}}</b></p>
+                        </div>
+                       
+                      </div>
+                    </div>
+                  </div>
+                  <section class="top-content bb d-flex justify-content-between">
+                    <div class="logo">
+
+                    </div>
+
+                  </section>
+
+                  <section class="store-user">
+                    <div class="col-12">
+                      <div class="row bb pb-2 mt-3">
+                        <div class="col-4 pl-0">
+                          <label class=" bg-secondary w-100 p-1"><b style="color: #000;">Bill To</b></label><br>
+                          <h5 class="" style="font-weight: bold; color: #8b3131;">
+                            {{expense.vendor_name}}</h5>
+                          <p class="address" style="font-weight: bold;color: #000;">
+                            {{expense.vendor.vendor_email}}
+                            <br>
+                            {{expense.vendor.bcity}}
+                            <br>
+
+                            <span></span><b> {{expense.vendor.bstate}}</b>
+                          </p>
+                        </div>
+                        <div class="col-4"></div>
+                        <div class="col-4 pr-0">
+                          <label class=" bg-secondary w-100 p-1"><b style="color: #000;">Deliver To,</b></label><br>
+                          <h5 class="" style="font-weight: bold; color: #8b3131;">
+                            {{expense.customer_name.customerName}}</h5>
+                          <p class="address" style="font-weight: bold;color: #000;">
+                            {{expense.customer_name.customerEmail}}<br1></br1>
+                            {{expense.customer_name.city}}<br>
+                            {{expense.customer_name.state}}<br>
+                            {{expense.customer_name.zipcode}}<br>
+                          </p>
+                        </div>
+                      </div>
+
+                    </div>
+                  </section>
+
+                  <section class="product-area mt-2">
+                    <table class="table table-hover table-bordered table-secondary">
+                        <thead>
+                            <tr>
+      
+                              <th id="th" style="text-align: center;">Account</th>
+                              <th id="th" style="text-align: center;">Date</th>
+                              <!-- <th id="th" style="text-align: center;">Quantity</th> -->
+                              <th id="th" style="text-align: center;">Tax</th>
+                              <th id="th" style="text-align: center;">Amount</th>
+                              <th id="th" style="text-align: center;">GSTIN</th>
+                         
+                            
+                            </tr>
+                          </thead>
+                          <tbody>
+                         
+                            <tr style="color: black;">
+                              <td style="text-align: center;"> {{expense.expense_account}}</td>
+                              <td style="text-align: center;"> {{expense.date}}</td>
+                              <!-- <td style="text-align: center;">{{i.quantity}}</td> -->
+                              <td style="text-align: center;">{{expense.tax}}</td>
+                              <td style="text-align: center;">{{expense.amount}}</td>
+                              <td style="text-align: center;">{{expense.customer_name.GSTIN}} </td>
+                           
+                            </tr>
+        
+      
+                          </tbody>
+                    </table>
+                  </section>
+<br><br><br><br><br><br><br><br><br><br>
+                                     <footer class="mb-5">
+                      <p class="text-dark">&copy; Zho Books 2023 | Info park kakkanad kochi,
+                        Ernamkulam,
+                        kerala India 12345
+                        | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+                    </footer>
+             
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="col-md-9" id="templatediv3" style="display: none;">
+            <div class="row">
+              <div class="col-md-7">
+                <a class="text-white" style="font-size: 1.5rem;">
+                  <h2>{{sale.sales_no}}</h2>
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate;"><i
+                    class="fas fa-eye"></i> Overview</a>
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                  aria-haspopup="true" aria-expanded="false"
+                  style="background-color: white; color: black; margin-left: 2vh;"> Templates
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                  <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
+
+                  <a class="dropdown-item" onclick="totemplate2()"><i class="fa fa-file-alt"></i>
+                    Template 2</a>
+
+                  <a class="dropdown-item" onclick="totemplate3()"><i class="fa fa-file-alt"></i>
+                    Template 3</a>
+
+
+                </div>
+
+              </div>
+
+              <div class="col-md-6" style="text-align: center;">
+                {% if sale.status == "draft" %}
+                <a href="" class="btn btn-outline-warning" title="Save">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'edit_expensee' expense.id %}" class=" fa fa-pencil btn btn-outline-warning text-warning  py-2"
+                data-toggle="tooltip" title="EDIT"> </a>
+          
+          <a href="{% url 'delet' expense.id %} " class="delete fa fa-trash btn btn-outline-warning text-warning px-2 py-2"
+           data-toggle="tooltip" title="DELETE" onclick="return confirm('Do you want to Delete this creditnote?');"> </a>
+           
+                    {% if expense.status == 'draft' %}
+                    <a href="{% url 'expense_status_edit' expense.id %}" class="btn btn-outline-warning py-2  text-warning 
+                     " title="save this draft" ><i class="fas fa-save"></i></a>
+                    {% endif %}
+          
+             
+          
+                <a class="text-dark" data-toggle="dropdown">
+                  <button class="btn btn-outline-warning " title="Share"><i class="fas fa-share"></i></button>
+                </a>
+                <div class="dropdown-menu ">
+                  <a class="dropdown-item" data-target="#shareBillEmail" data-toggle="modal">GMAIL</a>
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
+                </div>
+               
+                <a class="  text-dark" onclick="exportToPDF4()">
+                  <button class="btn btn-outline-warning" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+                </a>
+                <a class=" text-dark" onclick="printSelectedArea4()">
+                  <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
+                  </button>
+                </a>
+                
+                    <!-- <a href="" class=" far fa-comment-alt btn btn-outline-warning text-warning px-2 py-2" title="COMMENTS"
+                        data-toggle="modal" data-target="#cmnts"> </a> -->
+                       
+                            <a href=" " class="btn  btn-outline-warning py-2  fas fa-comment-dots dropdown-toggle text-warning "  
+                                data-bs-toggle="dropdown" id="attachmentDropdown" aria-haspopup="true" aria-expanded="false"> 
+                            </a>
+
+                            <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                                <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                                 data-target="#cmnts"><i class="fa-solid fa fa-plus"></i>Add</a>
+                                <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                                data-target="#cmt_list"><i class="fas fa-list"></i>&nbsp;View List</a>
+                                        
+                            </div>
+                  
+           
+     
+           
+               
+                    <a href=" " class=" fas fa-paperclip dropdown-toggle btn btn-outline-warning text-warning py-2 "  
+                        data-bs-toggle="dropdown" id="attachmentDropdown" aria-haspopup="true" aria-expanded="false"> 
+                    </a>
+
+                    <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                        <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                            data-target="#files"><i class="fa fa-paperclip"></i> Attach File</a>
+                        {% if expense.attachment != "" %}
+                        <a class="dropdown-item" href="{{expense.attachment.url}}"><i
+                                class="fa fa-download"></i> Download File</a>
+                        {% endif %}
+                    </div>
+              </div>
+            </div>
+
+
+
+
+
+            <div id="template3" class="template3">
+              <div class="my-5 page" size="A4" style="background-color: rgb(255, 221, 176);">
+                <div class="p-5" id="selected-area4">
+                  <section class="top-content bb d-flex justify-content-between" style="background-color: #8b3131;">
+                    <div class="logo">
+                      <!-- <img src="logo.png" alt="" class="img-fluid"> -->
+                    </div>
+                    <div class="top-left">
+                      <div class="graphic-path">
+                        <p>Expense Details</p>
+                      </div>
+                      <div class="position-relative" style="margin-right: 5px;">
+                        <p>Status
+                          <span>{{expense.status}}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="store-user mt-5">
+                    <div class="col-12">
+                      <div class="row bb pb-3">
+                        <div class="col-7">
+                          <p>Comapny Details,</p>
+                          <h5>{{company.company_name }}</h5>
+                          <p class="address "> {{company.address}}<br>
+                            {{company.city}},
+                            {{company.state}}<br>
+                            {{company.pincode}}<br>
+                          </p>
+
+                        </div>
+                        <div class="col-5">
+                          <p>Customer Details,</p>
+                          <h5>{{expense.customer_name.customerName}}</h5>
+                          <p class="address col-9" style="margin-left: 0px;">
+                            {{expense.customer_name.customerEmail}} </p>
+                          <p class="address col-9">       {{expense.customer_name.Address1}}</p>
+                          <p class="address col-9">       {{expense.customer_name.city}}</p>
+
+
+                        </div>
+                        <div class="row extra-info pt-3">
+                        <br><br>
+                        <div class="col-7">
+                            <p>Bill To,</p>
+                            <h5>{{expense.vendor_name}}</h5>
+                            <p class="address "> {{company.address}}<br>
+                                {{expense.vendor.vendor_email}}<br>
+                                {{expense.vendor.bcity}}<br>
+                                {{expense.vendor.bstate}}<br>
+                            </p>
+  
+                          </div>
+                      </div>
+                      <div class="row extra-info pt-3">
+                        <div class="col-7">
+                          <p> Date:
+                            <span>{{project.start |date:'d-m-Y'}}</span>
+                          </p>
+                          <p>Due Date:
+                            <span>{{project.end |date:'d-m-Y'}}</span>
+                          </p>
+                        </div>
+
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="product-area mt-4">
+                    <table class=" table table-hover table-bordered " id="table1">
+                        <thead>
+                            <tr>
+      
+                              <th id="th" style="text-align: center;">Account</th>
+                              <th id="th" style="text-align: center;">Date</th>
+                              <!-- <th id="th" style="text-align: center;">Quantity</th> -->
+                              <th id="th" style="text-align: center;">Tax</th>
+                              <th id="th" style="text-align: center;">Amount</th>
+                              <th id="th" style="text-align: center;">GSTIN</th>
+                              <!-- <th id="th" style="text-align: center;">GSTTYPE</th> -->
+                            
+                            </tr>
+                          </thead>
+                          <tbody>
+                         
+                            <tr style="color: black;">
+                              <td style="text-align: center;"> {{expense.expense_account}}</td>
+                              <td style="text-align: center;"> {{expense.date}}</td>
+                              <!-- <td style="text-align: center;">{{i.quantity}}</td> -->
+                              <td style="text-align: center;">{{expense.tax}}</td>
+                              <td style="text-align: center;">{{expense.amount}}</td>
+                              <td style="text-align: center;">{{expense.customer_name.GSTIN}} </td>
+                              <!-- <td style="text-align: center;">{{expense.customer_name.GSTTreatment}} </td> -->
+                            </tr>
+        
+      
+                          </tbody>
+                    </table><br><br>
+                  </section>
+
+                  <section class="balance-info">
+                    <div class="row">
+                      <div class="col-4"></div>
+                      <div class="col-4"></div>
+                      <div class="col-4">
+                        <table class="table table-borderless">
+                          <tbody>
+                            <tr>
+                              <td style="color: #000;"></td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-right" style="color: #000;">
+                               </td>
+                            </tr>
+                       
+                            <tr>
+                              <td style="color: #000;"></td>
+                              <td style="color: #000;"></td>
+                              <td class="text-right" style="color: #000;">
+                                </td>
+                            </tr>
+          
+                            <tr>
+                              <td style="color: #000;"></td>
+                              <td style="color: #000;"></td>
+                              <td class="text-right" style="color: #000;">
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style="color: #000;"></td>
+                              <td style="color: #000;"></td>
+                              <td class="text-right" style="color: #000;">
+                              </td>
+                            </tr>
+                       
+                            <tr>
+                              <td style="color: #000;"></td>
+                              <td style="color: #000;"></td>
+                              <td class="text-right" style="color: #000;">
+                          </td>
+                            </tr>
+                            <tr>
+                                <td style="color: #000;"></td>
+                                <td style="color: #000;"></td>
+                                <td class="text-right" style="color: #000;">
+                            </td>
+                              </tr>   <tr>
+                                <td style="color: #000;"></td>
+                                <td style="color: #000;"></td>
+                                <td class="text-right" style="color: #000;">
+                            </td>
+                              </tr>   <tr>
+                                <td style="color: #000;"></td>
+                                <td style="color: #000;"></td>
+                                <td class="text-right" style="color: #000;">
+                            </td>
+                              </tr>   <tr>
+                                <td style="color: #000;"></td>
+                                <td style="color: #000;"></td>
+                                <td class="text-right" style="color: #000;">
+                            </td>
+                              </tr>
+                              <tr>
+                                <td style="color: #000;"></td>
+                                <td style="color: #000;"></td>
+                                <td class="text-right" style="color: #000;">
+                            </td>
+                              </tr>   <tr>
+                                <td style="color: #000;"></td>
+                                <td style="color: #000;"></td>
+                                <td class="text-right" style="color: #000;">
+                            </td>
+                              </tr>
+                          </tbody>
+
+                        </table>
+
+                      </div>
+
+                      <footer class="mb-5">
+                        <p class="text-dark">&copy; Zho Books 2023 | Info park kakkanad kochi,
+                          Ernamkulam,
+                          kerala India 12345
+                          | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+                      </footer>
+                    </div>
+                  </section>
+
+                  <!-- Cart BG -->
+                  <img src="cart.jpg" class="img-fluid cart-bg" alt="">
+
+            
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- Share bill Modal -->
+          <div class="modal fade" id="shareBillEmail">
+            <div class="modal-dialog modal-xl">
+              <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+                <div class="modal-header" style="background: rgb(32, 35, 37);">
+                  <h5 class="m-3 text-uppercase" id="shareBillEmailLabel">Share Sales Order Via Email</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                      aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body" style="background: rgb(32, 35, 37);">
+                  <div class="card p-3 m-3">
+                    <form action="{% url 'shareExpenseToEmail' expense.id %}" method="post" class="needs-validation"
+                      id="share_to_email_form" autocomplete="off">
+                      {% csrf_token %}
+                      <div class="form-group">
+                        <label for="emailIds">Email IDs</label>
+                        <textarea class="form-control text-dark" name="email_ids" id="emailIds" rows="5"
+                          placeholder="Multiple emails can be added by separating with a comma(,)." required></textarea>
+                      </div>
+                      <div class="form-group mt-2">
+                        <label for="item_unitname">Message(optional)</label>
+                        <textarea name="email_message" id="email_message" class="text-dark form-control" cols=""
+                          rows="4" placeholder="This message will be sent along with Bill details."></textarea>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="modal-footer d-flex justify-content-center" style="border-top: 1px solid #ffff;">
+                    <input type="submit" id="share_with_email"
+                      class="submitShareEmailBtn rounded-pill text-grey w-50 my-4 mx-3" value="SEND MAIL">
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+
+      <script src="https://code.jquery.com/jquery-3.x.x.min.js"></script>
+
+
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+</section>
+{% for message in messages %}
+
+<script>
+  let msg = '{{message}}';
+  alert(msg);
+</script>
+{% endfor %}
+
+
+
+
+<script>
+  
+  $(document).ready(function () {
+    $('#share_with_email').on('click', function () {
+      var emailsInput = document.getElementById('emailIds');
+      var emailsString = emailsInput.value.trim();
+
+      var emails = emailsString.split(',').map(function (email) {
+        return email.trim();
+      });
+
+      var emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+
+      var invalidEmails = []
+      if (emailsString == "") {
+        alert('Enter valid email addresses..')
+      }
+      else {
+        for (var i = 0; i < emails.length; i++) {
+          var currentEmail = emails[i];
+
+          if (currentEmail != "" && !emailRegex.test(currentEmail)) {
+            console.log(currentEmail + ' is invalid!');
+            invalidEmails.push(currentEmail)
+          }
+        }
+
+        if (invalidEmails.length > 0) {
+          alert('Invalid emails..Please check!\n' + invalidEmails)
+          // alert(invalidEmails)
+        } else {
+          $('#share_to_email_form').submit();
+        }
+      }
+    })
+  });
+
+
+  function shareOnWhatsApp() {
+    var url = window.location.href;
+    var text = url;
+    text = encodeURIComponent(text);
+    var whatsappUrl = "whatsapp://send?text=" + text;
+    window.location.href = whatsappUrl;
+  }
+
+  function exportToPDF() {
+  var content = document.getElementById('selected-area1');
+  
+  // Apply styles to the content
+  content.style.backgroundColor = 'white';
+  content.style.color = 'black';
+
+  // Apply styles to h1 elements within the content
+  var h1Elements = content.getElementsByTagName('h1');
+  for (var i = 0; i < h1Elements.length; i++) {
+    h1Elements[i].style.color = 'black';
+  }
+
+  // Generate PDF using html2pdf
+  html2pdf()
+    .from(content)
+    .save('{{sale.sales_no}}' + '.pdf');
+}
+
+function exportToPDF1() {
+  var content = document.getElementById('selected-area1');
+  
+  // Apply styles to the content
+  content.style.backgroundColor = 'white';
+  content.style.color = 'black';
+
+  // Apply styles to h1 elements within the content
+  var h1Elements = content.getElementsByTagName('h1');
+  for (var i = 0; i < h1Elements.length; i++) {
+    h1Elements[i].style.color = 'black';
+  }
+
+  // Generate PDF using html2pdf
+  html2pdf()
+    .from(content)
+    .save('{{sale.sales_no}}' + '.pdf');
+}
+
+function exportToPDF2() {
+  var content = document.getElementById('selected-area2');
+  
+  // Apply styles to the content
+  content.style.backgroundColor = 'white';
+  content.style.color = 'black';
+
+  // Apply styles to h1 elements within the content
+  var h1Elements = content.getElementsByTagName('h1');
+  for (var i = 0; i < h1Elements.length; i++) {
+    h1Elements[i].style.color = 'black';
+  }
+
+  // Generate PDF using html2pdf
+  html2pdf()
+    .from(content)
+    .save('{{sale.sales_no}}' + '.pdf');
+}
+
+function exportToPDF3() {
+  var content = document.getElementById('selected-area3');
+  
+  // Apply styles to the content
+  content.style.backgroundColor = 'white';
+  content.style.color = 'black';
+
+  // Apply styles to h1 elements within the content
+  var h1Elements = content.getElementsByTagName('h1');
+  for (var i = 0; i < h1Elements.length; i++) {
+    h1Elements[i].style.color = 'black';
+  }
+
+  // Generate PDF using html2pdf
+  html2pdf()
+    .from(content)
+    .save('{{sale.sales_no}}' + '.pdf');
+}
+
+function exportToPDF4() {
+  var content = document.getElementById('selected-area14');
+  
+  // Apply styles to the content
+  content.style.backgroundColor = 'white';
+  content.style.color = 'black';
+
+  // Apply styles to h1 elements within the content
+  var h1Elements = content.getElementsByTagName('h1');
+  for (var i = 0; i < h1Elements.length; i++) {
+    h1Elements[i].style.color = 'black';
+  }
+
+  // Generate PDF using html2pdf
+  html2pdf()
+    .from(content)
+    .save('{{sale.sales_no}}' + '.pdf');
+}
+
+
+</script>
+
+<script>
+  // Get the div element by its ID
+  var divElement = document.getElementById("orderinfo");
+
+  // Get the height of the div using offsetHeight
+  var divHeight = divElement.offsetHeight;
+
+  var divElement = document.getElementById("productinfo");
+
+  // Set the height of the div
+  divElement.style.height = `${divHeight}px`;
+
+  // Log the height to the console
+</script>
+
+<script>
+  function printSelectedArea(area) {
+
+    var printContents = document.getElementById("selected-area").innerHTML;
+    document.getElementById("selected-area").style.backgroundColor = "white"
+    var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
+    $printerDiv.html(printContents); // add the content to be printed
+    $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+    window.print(); // call print
+    $printerDiv.remove(); // remove the div
+    $('body').removeClass("printingContent");
+
+  }
+
+  function printSelectedArea1(area) {
+
+    var printContents = document.getElementById("selected-area1").innerHTML;
+    document.getElementById("selected-area1").style.backgroundColor = "white"
+    var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
+    $printerDiv.html(printContents); // add the content to be printed
+    $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+    window.print(); // call print
+    $printerDiv.remove(); // remove the div
+    $('body').removeClass("printingContent");
+
+  }
+  function printSelectedArea2(area) {
+
+    var printContents = document.getElementById("selected-area2").innerHTML;
+    document.getElementById("selected-area2").style.backgroundColor = "white"
+    var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
+    $printerDiv.html(printContents); // add the content to be printed
+    $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+    window.print(); // call print
+    $printerDiv.remove(); // remove the div
+    $('body').removeClass("printingContent");
+
+  }
+  function printSelectedArea3(area) {
+
+    var printContents = document.getElementById("selected-area3").innerHTML;
+    document.getElementById("selected-area3").style.backgroundColor = "white"
+    var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
+    $printerDiv.html(printContents); // add the content to be printed
+    $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+    window.print(); // call print
+    $printerDiv.remove(); // remove the div
+    $('body').removeClass("printingContent");
+
+  }
+  function printSelectedArea4(area) {
+
+var printContents = document.getElementById("selected-area4").innerHTML;
+document.getElementById("selected-area4").style.backgroundColor = "white"
+var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
+$printerDiv.html(printContents); // add the content to be printed
+$('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+window.print(); // call print
+$printerDiv.remove(); // remove the div
+$('body').removeClass("printingContent");
+
+}
+</script>
+
+<script>
+
+  const rows = document.querySelectorAll('.clickable');
+
+  rows.forEach(row => {
+    row.addEventListener('click', () => {
+      var currentURL = window.location.href
+      const rowId = row.id;
+      var newURL = currentURL.replace(/\d+$/, rowId);
+      window.location.href = newURL;
+    });
+  });
+
+
+
+
+
+</script>
+
+<script>
+
+
+  function totemplate() {
+    document.getElementById('templatediv').style.display = 'block'
+    document.getElementById('overviewdiv').style.display = 'none'
+    document.getElementById('templatediv2').style.display = 'none'
+    document.getElementById('templatediv3').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'none'
+
+  }
+  function totemplate2() {
+    document.getElementById('templatediv').style.display = 'none'
+    document.getElementById('templatediv2').style.display = 'block'
+    document.getElementById('templatediv3').style.display = 'none'
+    document.getElementById('overviewdiv').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'none'
+
+  }
+  function totemplate3() {
+    document.getElementById('templatediv').style.display = 'none'
+    document.getElementById('templatediv2').style.display = 'none'
+    document.getElementById('templatediv3').style.display = 'block'
+    document.getElementById('overviewdiv').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'none'
+  }
+  function tooverview() {
+    document.getElementById('templatediv').style.display = 'none'
+    document.getElementById('overviewdiv').style.display = 'block'
+    document.getElementById('templatediv2').style.display = 'none'
+    document.getElementById('templatediv3').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'none'
+  }
+  function show_slip() {
+    document.getElementById('templatediv').style.display = 'none'
+    document.getElementById('overviewdiv').style.display = 'none'
+    document.getElementById('templatediv2').style.display = 'none'
+    document.getElementById('templatediv3').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'block'
+  }
+</script>
+
+<script>
+  var $rows = $('#myTable tbody tr');
+  $('#search').keyup(function () {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+    $rows.hide().filter(function () {
+      var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+      return ~text.indexOf(val);
+    }).show();
+  });
+
+</script>
+
+<script>
+  // Function to sort the table by the selected column
+  function sortTable() {
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementById("myTable");
+    switching = true;
+
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+
+      for (i = 0; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("label")[0];
+        y = rows[i + 1].getElementsByTagName("label")[0];
+
+        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          shouldSwitch = true;
+          break;
+        }
+      }
+
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+      }
+    }
+  }
+
+
+  function sortTablebybillno() {
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementById("myTable");
+    switching = true;
+
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+
+      for (i = 0; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("p")[0];
+        y = rows[i + 1].getElementsByTagName("p")[0];
+
+        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          shouldSwitch = true;
+          break;
+        }
+      }
+
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+      }
+    }
+  }
+
+</script>
+<script>
+    $(document).ready(function() {
+        // Cache the customer table for faster access
+        var customerTable = $("table");
+    
+        // Handle keyup event on the search input
+        $("#search").keyup(function() {
+            var searchText = $(this).val().toLowerCase();
+    
+            // Hide all rows initially
+            customerTable.find("tbody tr").hide();
+    
+            // Show rows that match the search criteria
+            customerTable.find("tbody tr").each(function() {
+                var customerName = $(this).find("td:eq(0)").text().toLowerCase();
+                var creditNoteNumber = $(this).find("td:eq(1)").text().toLowerCase();
+                var totalAmount = $(this).find("td:eq(2)").text().toLowerCase();
+    
+                // Clean up creditNoteNumber and totalAmount by removing special characters and whitespace
+                creditNoteNumber = creditNoteNumber.replace(/[^0-9]/g, '');
+                totalAmount = totalAmount.replace(/[^0-9.]/g, '');
+    
+                if (
+                    customerName.includes(searchText) ||
+                    creditNoteNumber.includes(searchText) ||
+                    totalAmount.includes(searchText)
+                ) {
+                    $(this).show();
+                }
+            });
+        });
+    });
+    </script>
+
+  <!-- ....................................  comment list modal ................ -->
+
+  <div class="modal fade " id="cmt_list"
+  style="width: 750px; margin-left: 350px; justify-content: center; overflow: hidden;">
+  <div class="modal-dialog modal-dialog-scrollable modal-xl m-5 p-5">
+  <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+      <div class="modal-header " style="background: rgb(32, 35, 37);">
+          <h5 class="m-3 text-uppercase text-light">LIST</h5>
+          <button type="button" class="close text-dark bg-none" data-dismiss="modal"
+              aria-label="Close">&times;</button>
+ 
+      </div>
+      <div class="modal-body" style="background: rgb(32, 35, 37); justify-content: center; overflow-x: hidden;">
+          <div class="card p-0 m-0">
+ 
+              <div class="row mt-3">
+                  <div class="col-sm-12 col-md-12 col-lg-12">
+                      <div class="p-2">
+                          <table class="table table-bordered" style="table-layout: fixed;">
+                              <thead>
+                                  <tr>
+                                     <th class="text-center" style="background-color:rgb(218, 143, 3) ;color: white;">Date</th>
+                                     <th class="text-center" style="background-color:rgb(218, 143, 3) ;color: white;">Comments</th>
+                                  </tr>
+                              </thead>
+                              {% for comt in est_comments %}
+                              <tbody>
+                                  <tr>
+                                      <td><input type="text" value="{{ comt.date }}" style="width: 100%;height: 20px;border: none;background-color:transparent ;color: white;"></td>
+                                      <td><textarea name="" id="" cols="80" rows="5" style="border: none;background-color:transparent ;color: white;">{{ comt.comments }}</textarea></td>
+                                  </tr>
+                              </tbody>
+                              {% endfor %}
+                          </table>
+                      </div>
+                  </div>
+              </div>
+              
+          </div>
+      </div>
+  </div>
+ 
+  </div>
+  </div>
+  <!-- ................................................end  comment list modal ........................................ -->
+  
+     
+ 
+     <!-- attach file modal -->
+ 
+     <div class="modal fade" id="files" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog" role="document">
+             <div class="modal-content" style="background-color: #213b52;">
+                 <div class="modal-header">
+                     <h5 class="modal-title" id="exampleModalLabel">Add File</h5>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                         <span aria-hidden="true">&times;</span>
+                     </button>
+                 </div>
+                 <form action="{% url 'attach_expense_file' expense.id %}" method="POST" enctype="multipart/form-data">
+                     {% csrf_token %}
+                     <div class="modal-body">
+                         <input type="file" class="form-control text-black" name="file">
+                     </div>
+                     <div class="modal-footer">
+                         <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                         <button type="submit" class="btn btn-outline-info">Save</button>
+                     </div>
+                 </form>
+             </div>
+         </div>
+     </div>
+     
+     <!-- email modal -->
+ 
+     <div class="modal fade p-3" id="emails" style="width: 800px; margin-left: 350px; overflow-x: hidden;">
+         <div class="modal-dialog modal-xl m-5 p-5">
+             <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+                 <div class="modal-header " style="background: rgb(32, 35, 37);">
+                     <h5 class="m-3 text-uppercase text-light" id="exampleModalLabel">Send Email</h5>
+                     <button type="button" class="close text-dark bg-none" data-dismiss="modal"
+                         aria-label="Close">&times;</button>
+                 </div>
+                 <div class="modal-body" style="background: rgb(32, 35, 37); justify-content: center; overflow: hidden;">
+                     <div class="card p-0 m-0">
+                         <form action="" id="modalEmail">
+                             <!-- <input type="hidden" value="{{recur_bill.id}}" id="email_id"> -->
+                             <div class="row mt-2">
+                                 <div class="col-md-3 mt-2">
+                                   <label for="">To : </label><br>
+                                 </div>
+                                 <div class="col-md-6 mt-2">
+                                   <input type="text" class="form-control text-dark bg-light" id="to" name="to" required style="width: 350px;">
+                                 </div>
+                             </div>
+ 
+                             <div class="row mt-2">
+                                 <div class="col-md-3 mt-2">
+                                   <label for="">From : </label><br>
+                                 </div>
+                                 <div class="col-md-6 mt-2">
+                                   <input type="text" class="form-control text-dark bg-light" id="from" name="from" required style="width: 350px;">
+                                 </div>
+                             </div>
+ 
+                             <div class="row mt-2">
+                                 <div class="col-md-3 mt-2">
+                                   <label for="">Subject : </label><br>
+                                 </div>
+                                 <div class="col-md-6 mt-2">
+                                   <input type="text" class="form-control text-dark bg-light" id="sub" name="sub" required style="width:350px;">
+                                 </div>
+                             </div>
+ 
+                             <div class="row mt-2">
+                                 <div class="col-md-3 mt-2">
+                                   <label for="">Message : </label><br>
+                                 </div>
+                                 <div class="col-md-6 mt-2">
+                                     <textarea class="form-control text-dark bg-light" id="msg" name="msg" required
+                                     style="height: 200px; width: 350px;"> </textarea>
+                                 </div>
+                             </div>
+ 
+                             <div class="row mt-5">
+                                 <div class="col-md-4"></div>
+                                 <div class="col-md-4">
+                                     <div class="d-flex">
+                                         <button
+                                             class=" font-weight-bold save_btn rounded-pill text-light w-50 my-4 mx-2"
+                                             type="submit" data-dismiss="modal" id="emailSave">Send </button>
+ 
+ 
+                                         <button type="button"
+                                             class="font-weight-bold save_btn rounded-pill text-light w-50 my-4"
+                                             data-dismiss="modal" aria-label="Close"> Cancel</button>
+                                     </div>
+                                 </div>
+                                 <div class="col-md-4"></div>
+                             </div>
+                         </form>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+ </div>
+ <div id="editor"></div>
+  <!-- comment modal -->
+
+  <div class="modal fade" id="cmnts" style="width: 750px; margin-left: 350px; justify-content: center; overflow: hidden;">
+    <div class="modal-dialog modal-xl m-5 p-5">
+        <div class="modal-content" style="background: rgb(32, 35, 37); border-radius: 20px;">
+            <div class="modal-header" style="background: rgb(32, 35, 37);">
+                <h5 class="m-3 text-uppercase text-light">Enter Comment</h5>
+                <button type="button" class="close text-dark bg-none" data-dismiss="modal" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body" style="background: rgb(32, 35, 37); justify-content: center; overflow: hidden;">
+                <div class="card p-0 m-0">
+                    <form action="{% url 'add_exp_comment' expense.id %}" method="post" id="modalComment">
+                        {% csrf_token %}
+                        <input type="hidden" value="" id="com_id">
+                        <div class="row mt-2">
+                            <div class="col-md-6 mt-2">
+                                <textarea class="form-control text-dark bg-light" id="comment1" name="comment" required style="height: 200px; width: 550px;"></textarea>
+                            </div>
+                        </div>
+                        <div class="row mt-5">
+                            <div class="col-md-4"></div>
+                            <div class="col-md-4">
+                                <div class="d-flex">
+                                    <button type="submit" class="btn save_btn rounded-pill text-grey w-50 my-4 mx-3" id="commentSave">Save</button>
+                                    <button type="button" class="close btn save_btn rounded-pill text-grey w-50 my-4" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">Cancel</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

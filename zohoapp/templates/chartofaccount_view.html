@@ -1,0 +1,760 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  .modal {
+    z-index: 9999;
+    overflow: scroll;
+  }
+
+  a:hover {
+    color: rgb(214, 141, 5);
+  }
+
+  /* #aover:hover{
+  font-weight: bold;
+} */
+  tr:hover {
+    background-color: #8f8e8e2a;
+    font-weight: bold;
+
+  }
+
+
+  /* width */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: rgb(252, 236, 217);
+
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  #selected-area {
+    font-size: 20px;
+  }
+
+
+
+  /* .......................................... search box.............. */
+  .select-box {
+    position: relative;
+  }
+
+  .select-option {
+    position: relative;
+  }
+
+  .select-option input {
+    width: 100%;
+    cursor: pointer;
+    background-color: white;
+    color: black;
+    border-radius: 7px;
+    padding: 10px 15px;
+    border: 0 !important;
+    outline: 0 !important;
+  }
+
+  .select-option:after {
+    content: "";
+    border-top: 12px solid #000;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    margin-top: -8px;
+
+  }
+
+  .content {
+    background-color: white;
+    position: absolute;
+    color: black;
+    border-radius: 7px;
+    margin-top: 15px;
+    width: 100%;
+    z-index: 999;
+    padding: 20px;
+    display: none;
+  }
+
+  .search input {
+    width: 100%;
+    font-size: 17px;
+    padding: 15px;
+    outline: 0;
+    border: 1px solid #b3b3b3;
+    border-radius: 5px;
+  }
+
+  .options {
+    margin-top: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 0;
+
+  }
+
+  .options li {
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    border-bottom: 1px solid gray;
+  }
+
+  .select-box.active .content {
+    display: block;
+  }
+
+  .select-box.active .select-option:after {
+    transform: rotate(-180deg);
+  }
+
+
+
+  /* .......................................... search box1.............. */
+  .select-box1 {
+    position: relative;
+  }
+
+  .select-option1 {
+    position: relative;
+  }
+
+  .select-option1 input {
+    width: 100%;
+    cursor: pointer;
+    background-color: white;
+    color: black;
+    border-radius: 7px;
+    padding: 10px 15px;
+    border: 0 !important;
+    outline: 0 !important;
+  }
+
+  .select-option1:after {
+    content: "";
+    border-top: 12px solid #000;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    margin-top: -8px;
+
+  }
+
+  .content1 {
+    background-color: white;
+    position: absolute;
+    color: black;
+    border-radius: 7px;
+    margin-top: 15px;
+    width: 100%;
+    z-index: 999;
+    padding: 20px;
+    display: none;
+  }
+
+  .search1 input {
+    width: 100%;
+    font-size: 17px;
+    padding: 15px;
+    outline: 0;
+    border: 1px solid #b3b3b3;
+    border-radius: 5px;
+  }
+
+  .options1 {
+    margin-top: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 0;
+
+  }
+
+  .options1 li {
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    border-bottom: 1px solid gray;
+  }
+
+  .select-box1.active .content1 {
+    display: block;
+  }
+
+  .select-box1.active .select-option1:after {
+    transform: rotate(-180deg);
+  }
+
+  
+</style>
+<style>
+  .filter-button {
+    position: relative;
+    display: inline-block;
+  }
+
+  .btn-outline-warning {
+    /* Add your button styles here */
+  }
+
+  .scrollable-list-container {
+    max-height: 200px; /* Set your desired max height */
+    overflow-y: auto;
+    border: 1px solid #ccc; /* Optional: Add a border for aesthetics */
+    position: absolute;
+    top: 100%; /* Position below the button */
+    left: 0;
+    display: none; /* Hide initially */
+    z-index: 1;
+  }
+
+  .dropdown-item {
+    /* Add your dropdown item styles here */
+    display: block;
+    padding: 0.5rem 1rem;
+    clear: both;
+    font-weight: normal;
+    color: #fff;
+    text-decoration: none;
+    white-space: nowrap;
+    background-color: #343a40; /* Adjust background color */
+  }
+</style>
+
+
+<script>
+  //print form
+  function printForm() {
+
+    var selectedArea = document.getElementById("selected-area");
+
+
+    var printWindow = window.open('', 'PrintWindow', 'height=800,width=800');
+
+
+    printWindow.document.write('<html><head><title>Print Selected Area</title></head><body>' + selectedArea.innerHTML + '</body></html>');
+
+
+    printWindow.print();
+
+
+    printWindow.close();
+  }
+
+
+</script>
+
+<h2 class="mb text-white" style="margin-left: 8px;"> All Accounts</h2>
+
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-md-4 vertical-separator">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="search-bar">
+          <form action="" method="GET" class="input-group">
+            <input type="text" id="myyInput" onkeyup="myyFunction()" placeholder="Search..."
+              class="form-control custom-height text-dark">
+          </form>
+        </div>
+
+        <div class="filter-button" onclick="toggleDropdown()">
+          <button class="btn btn-outline-warning text-right px-3 py-2" style="height: 38px;" type="button">
+              <i class="fa fa-filter"></i>
+          </button>
+          <div class="scrollable-list-container" id="myDropdown">
+           
+              <a class="dropdown-item" href="#" onclick="filterData('All')">All</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Other Assets')">Other Assets</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Other Current Assets')">Other Current Assets</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Cash')">Cash</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Bank')">Bank</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Fixed Asset')">Fixed Asset</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Stock')">Stock</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Payment Clearing')">Payment Clearing</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Other Liability)">Other Liability</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Other Current Liability')">Other Current Liability</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Credit Card')">Credit Card</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Long Term Liability')">Long Term Liability</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Overseas Tax Payable')">Overseas Tax Payable</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Equity')">Equity</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Income')">Income</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Other Income')">Other Income</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Expense')">Expense</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Cost Of Goods Sold')">Cost Of Goods Sold</a>
+              <a class="dropdown-item" href="#" onclick="filterData('Other Expense')">Other Expense</a>
+           </ul>
+         </div>
+       </div>
+          
+
+        <a href="{% url 'create_new_chart_of_account' %}" class="btn btn-outline-warning text-right px-3 py-2"
+          style="height: 38px;">
+          <i class="fa fa-plus"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<!--<script>
+
+  //Dropdown data
+  function toggleDropdown() {
+    var dropdown = document.getElementById("myDropdown");
+    if (dropdown.style.display === "block") {
+      dropdown.style.display = "none";
+    } else {
+      dropdown.style.display = "block";
+    }
+  }
+
+  //filter data
+  function filterData(selectedOption) {
+    console.log("Selected option:", selectedOption);
+
+    var rows = document.querySelectorAll('#MyTable tr');
+    rows.forEach(function (row) {
+        var category = row.getAttribute('data-category');
+
+        if (selectedOption === 'All' || category === selectedOption) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+
+    toggleDropdown(); // Close the dropdown after selecting an option
+}
+</script>-->
+<script>
+  function toggleDropdown() {
+    var dropdown = document.getElementById('myDropdown');
+    dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
+  }
+
+   //filter data
+   function filterData(selectedOption) {
+    console.log("Selected option:", selectedOption);
+
+    var rows = document.querySelectorAll('#MyTable tr');
+    rows.forEach(function (row) {
+        var category = row.getAttribute('data-category');
+
+        if (selectedOption === 'All' || category === selectedOption) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+
+    toggleDropdown(); // Close the dropdown after selecting an option
+}
+</script>
+
+
+
+<div class="row">
+  <div class="col-sm-4">
+    <div class="row  mx-2">
+      <div class="col-md-2 form-inline justify-content-end py-2">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+        
+
+
+      </div>
+    </div>
+  
+    <div class="pt-3" style="height: 450px;overflow-y: scroll;width: 100%;overflow-x: hidden;">
+      <table class="text-white" style="width: 100%;" id="MyTable">
+        {% for view in view %}
+       
+        {% if view.status == "inactive" %}
+        <tr class="mt-5 pt-5 pb-5 mb-5" data-category="{{ view.account_type }}">
+
+          {% if view.parent_account == "GST Payable" %}
+          <td class="text-light pt-4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <img width="30" height="25" src="https://img.icons8.com/nolan/64/arrow.png" alt="arrow" />
+            <a id="aover" href="{% url 'chartofaccount_view' view.id%}">{{view.account_name}}</a>
+            <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;{{view.account_type}}
+          </td>
+          {% endif %}
+          {% if view.parent_account == "Input Tax Credits" %}
+          <td class="text-light pt-4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <img width="30" height="25" src="https://img.icons8.com/nolan/64/arrow.png" alt="arrow" />
+            <a id="aover" href="{% url 'chartofaccount_view' view.id%}">{{view.account_name}}</a>
+            <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{view.account_type}}
+          </td>
+          {% endif %}
+          {% if view.parent_account != "Input Tax Credits" %}
+          {% if view.parent_account != "GST Payable" %}
+
+          {% if view.account_name == "GST Payable" or view.account_name == "Input Tax Credits" %}
+          <td class="text-light pt-4">
+            <img width="35" height="35" src="https://img.icons8.com/avantgarde/100/folder-invoices.png"
+              alt="folder-invoices" />
+
+            <a id="aover" href="{% url 'chartofaccount_view' view.id%}">{{view.account_name}}</a>
+            <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{view.account_type}}
+          </td>
+          {% else %}
+          <td class="text-light pt-4"><a id="aover"
+              href="{% url 'chartofaccount_view' view.id%}">{{view.account_name}}</a> <br> {{view.account_type}} </td>
+          {% endif %}
+
+          {% endif %}
+          {% endif %}
+
+
+
+
+          <td class="pt-4">
+            {% if view.status == "active" %}
+            <span style="color: rgb(4, 190, 4);">{{view.status}}</span>
+            {% else %}
+            <span style="color: red">{{view.status}}</span>
+            {% endif %}
+          </td>
+
+        </tr>
+        {% else %}
+        <tr class="mt-5 pt-5 pb-5 mb-5" data-category="{{ view.account_type }}">
+
+          {% if view.parent_account == "GST Payable" %}
+          <td class="text-light pt-4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <img width="30" height="25" src="https://img.icons8.com/nolan/64/arrow.png" alt="arrow" />
+            <a id="aover" href="{% url 'chartofaccount_view' view.id%}">{{view.account_name}}</a>
+            <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;{{view.account_type}}
+          </td>
+          {% endif %}
+          {% if view.parent_account == "Input Tax Credits" %}
+          <td class="text-light pt-4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <img width="30" height="25" src="https://img.icons8.com/nolan/64/arrow.png" alt="arrow" />
+            <a id="aover" href="{% url 'chartofaccount_view' view.id%}">{{view.account_name}}</a>
+            <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{view.account_type}}
+          </td>
+          {% endif %}
+          {% if view.parent_account != "Input Tax Credits" %}
+          {% if view.parent_account != "GST Payable" %}
+
+          {% if view.account_name == "GST Payable" or view.account_name == "Input Tax Credits" %}
+          <td class="text-light pt-4">
+            <img width="35" height="35" src="https://img.icons8.com/avantgarde/100/folder-invoices.png"
+              alt="folder-invoices" />
+
+            <a id="aover" href="{% url 'chartofaccount_view' view.id%}">{{view.account_name}}</a>
+            <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{view.account_type}}
+          </td>
+          {% else %}
+          <td class="text-light pt-4"><a id="aover"
+              href="{% url 'chartofaccount_view' view.id%}">{{view.account_name}}</a> <br> {{view.account_type}} </td>
+          {% endif %}
+
+          {% endif %}
+          {% endif %}
+
+
+
+
+          <td class="pt-4">
+            {% if view.status == "active" %}
+            <span style="color: rgb(4, 190, 4);">{{view.status}}</span>
+            {% else %}
+            <span style="color: red">{{view.status}}</span>
+            {% endif %}
+          </td>
+
+        </tr>
+        {% endif %}
+        <tr></tr>
+
+        {% endfor %}
+      </table>
+
+    </div>
+  </div>
+  <div class="col-sm-8">
+
+    <div class="row  mx-1 py-3 p-3 mb-2 bg-warning">
+      <div class="col-sm-5 text-dark" style="font-size: 2.5rem;">
+        <div class="col-sm-6 ">
+          
+
+          <h4 class="text-dark" style="text-transform: uppercase;">{{ind.account_name}}
+            {% if ind.status == "active" %}
+            <input type="radio" title="active" style="accent-color: rgb(4, 209, 4);" checked readonly>
+            {% else %}
+            <input type="radio" title="inactive" style="accent-color: red;" checked readonly>
+            {% endif %}
+          </h4>
+          <h6 class="text-dark">{{ind.account_type}}</h6>
+
+        </div>
+      </div>
+      <div class="col-sm-7 p-4 text-white text-right my-auto">
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <a href="{% url 'create_edit_chart_of_account' ind.id %}" class="btn btn-outline-dark text-right px-3 py-2"
+            title="Edit">
+            <i class="mdi mdi-pencil"></i></a>
+          <a href="" class="btn btn-outline-dark text-right px-3 py-2" data-toggle="modal" data-target="#upload_account"
+            title="Upload" id="pdf">
+            <i class="mdi mdi-file-pdf-box"></i></a>
+          <!-- {% if estimate.attachment != ""%} -->
+          <a href="" class="btn btn-outline-dark text-right px-3 py-2" data-toggle="modal"
+            data-target="#download_account" title="Download Attached File">
+            <span class="mdi mdi-download"></span></a>
+          <!-- {%endif%} -->
+          <a href="" onclick="printForm()" class="btn btn-outline-dark text-right px-3 py-2" data-toggle="tooltip"
+            title="Print">
+            <i class="mdi mdi-printer"></i></a>
+          <a href="mailto:example@example.com" class="btn btn-outline-dark text-right px-3 py-2"  title="Email">
+            <i class="mdi mdi-email"></i></a>
+
+          <a href="" class="btn btn-outline-dark text-right px-3 py-2"
+            onclick="return confirm('Do you want to Delete this Estimate?');"><i class="mdi mdi-delete"></i></a>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="slip pt-3 p-5 mx-1 convert_to_pdf bg-light" id="selected-area"
+      style="box-shadow: 5px 5px 10px rgb(45, 45, 45);">
+
+
+
+      <hr>
+
+
+      <h4 class="text-dark text-center" style="text-transform: uppercase;">{{ind.account_name}}
+        {% if ind.status == "active" %}
+        <input type="radio" title="active" style="accent-color: rgb(4, 209, 4);" checked readonly>
+        {% else %}
+        <input type="radio" title="inactive" style="accent-color: red;" checked readonly>
+        {% endif %}
+      </h4>
+      <h6 class="text-dark text-center">{{ind.account_type}}</h6><br><br>
+
+
+      <div class="row">
+        <div class="col-sm-6 mt-auto">
+          <h6 class="text-dark">CLOSING BALANCE</h6>
+          <h3 class="text-dark">₹0.00</h3>
+        </div>
+        <div class="col-sm-6  mt-auto" style="text-align: right;">
+          <h6 class="text-dark "></h6>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12 mt-auto">
+          <hr style="color: black;">
+        </div>
+
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12 mt-auto">
+          <h6 class="text-dark">{{ind.description}}</h6>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- .........................................   DOC  UPLOAD   .............................................. -->
+
+<form action="{% url 'upload_chart_of_account' ind.id %}" method="POST" enctype="multipart/form-data">
+  {% csrf_token%}
+  <div class="modal" id="upload_account">
+    <div class="modal-dialog modal-dialog-centered " role="document" style="max-width: 600px;">
+      <div class="modal-content p-3" style="background-color: #000000;">
+        <div class="modal-header">
+          <h5 class="modal-title text-info">Document Upload</h5>
+          <button type="button" class="close text-light" data-dismiss="modal" aria-label=""
+            style="font-size: 20px;background-color: #000000;border:none;">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-sm-8">
+
+            <div id="name" style="display: block;">
+              <div class="row mt-3">
+                <div class="col-sm-4">
+                  <label for="">Title:</label>
+                </div>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control text-dark bg-light" name="file_title" id="file_title" required>
+                </div>
+              </div>
+
+            </div>
+
+            
+
+            <div class="row mt-3">
+              <div class="col-sm-4">
+                <label for="">Description:</label>
+              </div>
+              <div class="col-sm-8">
+                <textarea name="description" rows="3" cols="30" class="text-dark bg-light" id="description"
+                  placeholder="Max. 500 characters"></textarea>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-sm-4">
+                <label for="">File Upload:</label>
+              </div>
+              <div class="col-sm-8">
+                <input type="file" name="file" required>
+              </div>
+            </div>
+
+
+          </div>
+
+        </div>
+        <div class="row mt-3">
+          <div class="col-sm-12">
+            <input class="btn btn-success" type="submit" value="Save">
+
+            <input class="btn btn-light ml-3" type="reset" value="Cancel">
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</form>
+
+
+
+
+
+
+
+
+
+
+<!-- .................................  DOC DOWNLOAD  ................................................... -->
+
+<div class="modal" id="download_account">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+    <div class="modal-content modal-xl p-3" style="background-color: #000000;">
+      <div class="modal-header">
+        <h5 class="modal-title text-info">Download Attached Document</h5>
+        <button type="button" class="close text-light" data-dismiss="modal" aria-label=""
+          style="font-size: 20px;background-color: #000000;border:none;">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="row">
+        <div class="col-sm-12 col-md-11 col-lg-11">
+          <table class="table  text-white" id="myTable">
+            <thead>
+              <tr>
+
+                <th>TITLE </th>
+                <th>DESCRIPTION</th>
+                <th>DOCUMENT</th>
+                <th>
+                  ACTION
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for v in doc %}
+
+              <tr id="over">
+
+                <!-- <td onclick="location.href ='{% url 'detail' v.id %}' " > {{v.Name}}</td> -->
+                <td>{{ v.title }}</td>
+                <td>{{v.description}}</td>
+                <td>{{ v.document }}</td>
+                <td>
+                  <a href="{% url 'download_chart_of_account' v.id %}" class="btn btn-warning">Download</a>
+                </td>
+
+
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="col-sm-12 col-md-1 col-lg-1"></div>
+
+      </div>
+
+
+
+    </div>
+  </div>
+</div>
+
+
+
+<!-- .........................................search function.................................................... -->
+<script>
+  function myyFunction() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("myyInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("MyTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[0];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        }
+        else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+<script>
+  // Add click event listener to all rows with class "clickable-row"
+  const rows = document.querySelectorAll('.clickable-row');
+  rows.forEach(row => {
+    row.addEventListener('click', () => {
+      // Get the URL from the "data-href" attribute
+      const url = row.getAttribute('data-href');
+      // Navigate to the URL
+      window.location.href = url;
+    });
+  });
+</script>
+
+
+
+
+
+{% endblock %}

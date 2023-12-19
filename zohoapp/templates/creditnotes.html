@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link href='https://unpkg.com/css.gg@2.0.0/icons/css/trash.css' rel='stylesheet'>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+<script src="https://cdn.jsdelivr.net/bootstrap.datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
+<script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
+
+
+
+
+
+
+<style>
+    .card {
+        background: none;
+    }
+
+    tbody tr td {
+        border: none;
+        border-top: none;
+        border-style: none;
+        color: azure;
+        justify-content: center;
+    }
+
+    tr:hover {
+        cursor: pointer;
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    ul.image-bullets {
+        list-style-type: none;
+        padding-left: 30px;
+    }
+
+    ul.image-bullets li:before {
+        content: "";
+        background-image: url('static/images/bullet.png');
+        background-size: 15px 15px;
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        margin-right: 5px;
+        margin-left: 26%;
+    }
+
+    .recurpoints ul li {
+        margin-bottom: 10px;
+    }
+
+    .flowchart {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 20px;
+    }
+
+    .flowchart-item {
+        text-align: center;
+        padding: 10px;
+        background-color: lightblue;
+        border: 3px solid rgb(25, 91, 145);
+        border-radius: 5px;
+        width: 150px;
+        color: black;
+        font-size: 12px;
+    }
+
+    .flowchart-item i {
+        font-size: 15px;
+    }
+
+    .flowchart-connector {
+        flex-grow: 1;
+        height: 2px;
+        background-color: #ccc;
+        margin-top: 0%;
+    }
+
+    .branch {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px 0;
+    }
+
+    .branch .connector {
+        width: 0;
+        height: 50px;
+        border-top: 2px solid black;
+    }
+
+    .btn {
+        color: rgb(222, 220, 233);
+        outline-color: azure;
+        border: 2px solid rgb(25, 91, 145);
+    }
+
+    .btn:hover {
+        color: darkslategray;
+        background-color: lightblue;
+        outline: none;
+
+    }
+
+    a {
+        list-style: none;
+        color: azure;
+    }
+
+    a:hover {
+        color: rgb(218, 164, 48);
+    }
+
+    ::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
+<div class="container-fluid ">
+
+
+    <div class="card radius-15">
+        <div class="card-body">
+            <div class="card-title">
+                <div class="row">
+                    <div class="col-md-10">
+                        <h2 class="mb-0 text-uppercase text-right">ALL CREDIT NOTES</h2>
+                    </div>
+                    <div class="col-md-2">
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card radius-15 mb-5">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" name="usr_in" id="search" class="form-control text-dark bg-light"
+                            placeholder="Search here..." autocomplete="off" oninput="searchTable()" >
+                        <div class="input-group-append">.
+                            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" style="background-color: darkorange; color: black;">
+                                <i class="fas fa-sort-amount-up" style="background-color: darkorange; color:black ;"></i> Sort
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="sortDropdownMenu" style="background-color: darkorange;">
+                                <a class="dropdown-item" href="#" onclick="sortTable(2)">All</a>
+                                <a class="dropdown-item" href="#" onclick="sortTable(3)">Creditnote No</a>
+                                <a class="dropdown-item" href="#" onclick="sortTable(4)">Customer name</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5"></div>
+                <div class="col-md-3">
+                    <a class="btn  btn-outline-warning text-center px-3 py-2" data-bs-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false" role="button" style="background-color: darkorange; color: black;">
+                        <i class="fa fa-filter mx-3"></i>
+                    </a>
+                    <div class="dropdown-menu" style="background-color: darkorange; color: black;">
+                        <a class="dropdown-item" href="#" onclick="filterTable('all')">All</a>
+                        <a class="dropdown-item" href="#" onclick="filterTable('save')">Save</a>
+                        <a class="dropdown-item" href="#" onclick="filterTable('draft')">Draft</a>
+                    </div>
+
+                    <a href="{% url 'newcredit' %}" class="btn fa fa-plus text-right px-3 py-2" role="button" style="background-color: darkorange; color: black;">
+                        <span class="mt-2">&nbsp;&nbsp;NEW</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <div class="container-fluid">
+        <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+        <table class="table  text-white" id="table" >
+            <thead>
+                <tr>
+
+                    <th>Date</th>
+                    <th>Creditnote number</th>
+                    <th>Customer name</th>
+                    <th>Email</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Balance</th>
+
+
+
+
+                </tr>
+            </thead>
+            <tbody>
+
+
+
+
+
+                {% for note in credit_notes %}
+
+                <tr data-creditnote-status="{{ note.active|lower }}">
+
+
+
+
+                    <td><a href="{% url 'creditnote_view' note.id %}">{{ note.creditnote_date }}</a></td>
+                    <td><a href="{% url 'creditnote_view' note.id %}">{{ note.credit_note }}</a></td>
+                    <td><a href="{% url 'creditnote_view' note.id %}">{{ note.customer.customerName }}</a></td>
+                    <td><a href="{% url 'creditnote_view' note.id %}">{{ note.customer.customerEmail }}</a></td>
+                    <td>{{ note.total }}</td>
+                    <td>{{ note.status|lower }}</td>
+                    <td>
+                        <!-- delete icon for the creditnote -->
+                       {{note.balance}}
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+
+
+            </tbody>
+        </div>
+        </table>
+    
+        <div class="card-body" style="margin: 200px;">
+            <!-- <img src="https://www.zoho.com/books/accounting-software-demo//assets/images/2x/creditnotes-workflow.png" width="700" height="250" alt="">
+            </div> -->
+
+    </div>
+</div>
+</div>
+<hr>
+
+</div>
+
+</div>
+<div class="card-body" style="margin: 200px;">
+    <img src="https://www.zoho.com/books/accounting-software-demo//assets/images/2x/creditnotes-workflow.png" width="700" height="250" alt="">
+    </div>
+
+
+<script>
+    ////////////////////////////filteerrrrrrrrrrrr/////////////////////////////
+    function filterTable(filterOption) {
+    var table = document.getElementById("table");
+    var rows = table.getElementsByTagName("tr");
+    console.log("Filter option selected:", filterOption);
+
+    for (var i = 1; i < rows.length; i++) {
+        var statusColumn = rows[i].getElementsByTagName("td")[5]; // Assuming status column is in the sixth column
+
+        if (
+            (filterOption === 'all') ||
+            (filterOption === 'save' && statusColumn.innerText.toLowerCase() === 'save') ||
+            (filterOption === 'draft' && statusColumn.innerText.toLowerCase() === 'draft')
+        ) {
+            rows[i].style.display = "";
+        } else {
+            rows[i].style.display = "none";
+        }
+    }
+
+    console.log("Filtering complete.");
+}
+
+
+// search function
+function searchTable() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("search");
+    filter = input.value.toLowerCase();
+    table = document.getElementById("table");
+    tr = table.getElementsByTagName("tr");
+
+    for (i = 1; i < tr.length; i++) {
+        var creditnoteNumber = tr[i].getElementsByTagName("td")[1];
+        var customerName = tr[i].getElementsByTagName("td")[2];
+
+        if (creditnoteNumber || customerName) {
+            var creditnoteNumberText = creditnoteNumber.textContent || creditnoteNumber.innerText;
+            var customerNameText = customerName.textContent || customerName.innerText;
+            
+            txtValue = creditnoteNumberText.toLowerCase() + " " + customerNameText.toLowerCase();
+            
+            if (txtValue.indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+
+// sort function
+function sortTable(columnIndex) {
+    console.log('Sorting table by column index:', columnIndex);
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementById("table");
+    switching = true;
+
+    while (switching) {
+        switching = false;
+        rows = table.rows;
+
+        for (i = 1; i < (rows.length - 1); i++) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("td")[columnIndex].textContent.trim();
+            y = rows[i + 1].getElementsByTagName("td")[columnIndex].textContent.trim();
+
+            if (columnIndex === 1) {  // Sort by Creditnote Number
+                if (parseInt(x.split('-')[1]) > parseInt(y.split('-')[1])) {
+                    shouldSwitch = true;
+                    break;
+                }
+            } else {
+                // For other columns, use localeCompare for string comparison
+                if (x.localeCompare(y) > 0) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+        }
+
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+        }
+    }
+}
+
+</script>
+
+
+
+
+{% endblock %}

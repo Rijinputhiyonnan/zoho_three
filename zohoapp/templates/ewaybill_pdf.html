@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <style>
+        .table2 {
+            text-align: center;
+            padding-top: 6px;
+            font-size: 1.1em;
+            background-color: rgb(255, 255, 255);
+
+        }
+
+        .table-head {
+            color: rgb(52, 49, 58);
+        }
+
+        .table2 .tbody tr {
+            margin-bottom: 3px;
+        }
+
+        .table3 {
+            width: 75px;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        body {
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="my-5 page" size="A4">
+        <div class="p-5">
+            
+            <div id="Template" class=" print-only page tabcontent p-5 m-3" style="display: block; background-color:rgb(255, 255, 255);visibility: visible;">
+                <div class="row pt-0 m-0 text-center">
+                    <div class="col-4 "></div>
+                    <div class="col-4 ">
+                        <h4 class="text-uppercase text-dark" >eway bill</h4>
+                    </div>
+                    <div class="col-4 "></div>
+                </div>
+                <div class="row extra-info pt-2 mt-3">
+                    <div class="col-1 "></div>
+                    <!-- <div class="col-5 ">{% for v in ewayi %}
+                        <h3 class="text-uppercase" style="color: black;"><b>{{v.cust.customerName }}</b></h3>
+                        <p class="address mx-2 p-2"> {{v.cust.customerEmail }}<br>
+                            {{v.cust.GSTTreatment }} <br>
+                            {{v.invoiceno }}<br>
+                            {{v.vno }}<br>{% endfor %}
+                        </p>                 
+                    </div> -->
+                    <div class="col-5 ">
+                        <h3 class="text-uppercase" style="color: black;"><b>{{company.company_name }}</b></h3>
+                        <p class="address mx-2 p-2"> {{company.address}}<br>
+                            {{company.city}} <br>
+                            {{company.state}}<br>
+                            {{company.pincode}}<br>
+                        </p>                 
+                    </div>
+                    <div class="col-1 "></div>
+                    <div class="col-5">
+                        
+                        <section class="d-flex justify-content-between">
+                            <div class="top-right">
+                                <div class="graphic-path text-center">
+                                    <h5 class="text-capitalize"  >{{recur_bill.profile_name}}</h5>
+                                    <p class="text-capitalize" id="pid" hidden>{{recur_bill.id}}</p>
+
+                                </div>
+                                <div class="position-relative">{% for v in ewayi %}
+                                    <p>Bill Date : &nbsp <span style="color: black;">{{v.date|date:'d-m-Y'}}</span></p>
+                                    <p>Document : &nbsp <span style="color: black;">{{v.doc}}</span></p>
+                                    <p>Transation subtype: &nbsp <span style="color: black;">NET {{v.transsub}}</span></p> {% endfor %}
+                                </div>
+                            </div>
+                        </section>
+
+                    </div>
+                </div>
+
+
+                <section class="store-user mt-2">
+                    <div class="col-12">
+                        <div class="row pb-3">
+
+                            <div class="col-1 "></div>
+                            <div class="col-5">
+                                <p style=" font-size: 18px; font-style: italic; font-weight: 700;">Bill To,</p>{% for v in ewayi %}
+                                <h6  style="color: black;font-weight: bold;">{{v.cust.customerName }}</h6>
+                                <p class="address mx-2 p-2"> {{v.cust.customerEmail }}<br>
+                                    {{v.cust.GSTTreatment }} <br>
+                                    {{v.invoiceno }}<br>
+                                    {{v.vno }}<br>{% endfor %}
+                                </p>          
+                            </div>
+                            <div class="col-1"></div>
+                            <!-- <div class="col-5 mt-5">
+                                <p>Bill Date : &nbsp <span style="color: black;">{{recur_bill.start_date|date:'d-m-Y'}}</span></p>
+                                <p>Due Date : &nbsp <span style="color: black;">{{recur_bill.end_date|date:'d-m-Y'}}</span></p>
+                                <p>Term : &nbsp <span style="color: black;">NET {{recur_bill.payment_terms}}</span></p>
+
+                            </div> -->
+
+                            <div class="col-5">
+                                <p style=" font-size: 18px; font-style: italic; font-weight: 700;">Deliver To,</p>  {% for v in ewayi %}
+                                <h6  class="mx-3 text-capitalize" style="color: black; ">{{ v.cust.customerName}} {{vendor.first_name}} {{ vendor.last_name}}</h6>
+                                <p class="address col-6 mx-4 p-2" style="margin-left: -14px;">{{v.adda}}<br>
+                                    {{v.addb}}<br>
+                                    {{v.srcofsupply}}<br> 
+                                </p>{% endfor %}
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+                <br><br><br>
+                <section class="product-area mt-4 mb-4">
+                    <table class="table table-bordered border-dark">
+                        <thead style="background-color:rgb(255, 255, 255); color: black;">
+                            <tr>
+                                
+                                <td>Item</td>
+                                <td>Hsn</td>
+                                <td>Rate</td>
+                                <td>Quantity</td>
+                                <td>Discount</td>
+                                <td>Tax</td>
+                                <td>Total</td>
+                            </tr>
+                        </thead>
+                        <tbody style=":hover{color: #ffffff; background-color: transparent;}">
+
+                            {% for item in ewayb %}
+                            <tr>
+                                <td>{{ item.item }}</td>
+                                <td>{{ item.hsn }}</td>
+                                <td>{{ item.rate }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.discount }}</td>
+                                <td>{{ item.tax }}</td>
+                                
+                                <td>{{ item.amount|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                </section>
+                <br><br><br>
+                {% for i in ewayi %}
+                <section class="balance-info p-5">
+                    <div class="row">
+                        <div class="col-8 btn-group">
+                            <!-- <p class="m-0 font-weight-bold" style="color: black;"> Note: </p>
+                            <p class="py-0 px-5" style="color: black;">{{recur_bill.note}}</p> -->
+                        </div>
+                        <div class="col-4">
+                            <table class="table border-0 ">
+                                
+                                <tr>
+                                    <td style="font-weight:bold">Sub Total :</td>
+                                    <td style="font-weight:bold">{{i.sub_total}}</td>
+                                </tr>
+                              
+                                {% if i.igst != 0 %}
+                        <tr>
+                            <td style="font-weight:bold">IGST :</td>
+                            <td style="font-weight:bold">{{ i.igst }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if i.cgst != 0 %}
+                        <tr>
+                            <td style="font-weight:bold">CGST :</td>
+                            <td style="font-weight:bold">{{ i.cgst }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if i.sgst != 0 %}
+                        <tr>
+                            <td style="font-weight:bold">SGST :</td>
+                            <td style="font-weight:bold">{{ i.sgst }}</td>
+                        </tr>
+                    {% endif %}
+                               
+                    {% if i.shipping_charge != 0 %}
+                    <tr>
+                        <td style="font-weight:bold">Shipping Charge:</td>
+                        <td style="font-weight:bold">{{i.shipping_charge}}</td>
+                    </tr>
+                {% endif %}
+                {% if i.adj != 0 %}
+                <tr>
+                    <td style="font-weight:bold">Adjustment:</td>
+                    <td style="font-weight:bold">{{i.adj}}</td>
+                </tr>
+            {% endif %}
+                                <tfoot>
+                                    <tr>
+                                        <td style="font-weight:bold">Grand Total:</td>
+                                        <td style="font-weight:bold ;">{{i.grand_total}}</td>
+                                    </tr>
+                                 
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

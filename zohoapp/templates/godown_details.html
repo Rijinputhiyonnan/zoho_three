@@ -1,0 +1,475 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load social_share %}
+{% load static %}
+<style>
+
+.modal {
+    z-index: 9999;
+    overflow: scroll;
+  }
+
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+  }
+
+  .col {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+  }
+  
+  @media print {
+    table, th, td, tr {
+      border: 1px solid black;
+      padding: 10px; /* Ensure black borders when printing */
+     
+    }
+    table {
+    margin: 0 auto; /* Center the table horizontally */
+  }
+
+  }
+  @media (max-width: 768px) {
+  
+      #d1,
+      #d2,
+      #search-box {
+          width: 30%;
+      }
+
+
+  }
+
+  .daterangepicker {
+      background-color: #f0f0f0;
+      color: #000;
+  }
+  .dropdown-item:hover{
+    color: chocolate;
+  }
+ 
+</style>
+<!-- Include jsPDF library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
+
+
+<div class="d-flex justify-content-between align-items-center" style="margin-top: 40px;">
+  <div class="d-flex">
+  </div>
+  
+  <div class="d-flex">
+    <div class="dropdown">
+        <button class="btn btn-light mr-3 dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-share"></i> 
+        </button>
+        <div class="dropdown-menu" aria-labelledby="exportDropdown">
+            <!-- WhatsApp sharing link -->
+          
+            <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">  <i class="fa fa-whatsapp"></i> WhatsApp</a>
+            
+              <!-- Email sharing link -->
+            <a class="dropdown-item" data-target="#shareBillEmail" data-toggle="modal"> <i class="fa fa-envelope"></i> &nbsp; GMAIL</a>
+    
+          
+         
+        </div>
+    </div>
+    <div style="width: 3px;"></div>
+      <!-- <button class="btn btn-light mr-2" id="print" onclick="printPageContent()">   <i class="fa fa-print"></i> Print</button>&nbsp; -->  
+      <button class="btn btn-light mr-2" id="print" onclick="printPageContent()">   <i class="fa fa-print"></i> Print</button>&nbsp;
+
+      <button class="btn btn-light mr-2" id="pdf" onclick="exportAsPDF()"><i class="fa fa-file-pdf-o"></i>PDF</button>
+
+    
+      <div style="width: 3px;"></div>
+      <div class="dropdown">
+          <button class="btn btn-light mr-3 dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              Export
+          </button>
+          <div class="dropdown-menu" aria-labelledby="exportDropdown">
+           
+              <a class="dropdown-item" href="#" onclick="exportToExcel()">XLS (Excel)</a>
+          </div>
+          
+         
+      </div>
+      <div style="width: 3px;"></div>
+      <a href="{% url 'report_inventory_view' %}" class="btn btn-light" style=" color: rgb(1, 1, 1);">
+        <i class="fa fa-times-circle"></i>
+    </a>
+      
+  </div>
+  
+</div>
+<div  style="top: 7rem; " > 
+  <div class="mt-1">
+      <datalist onclick="getValue()" id="customers" >
+        
+        {% for i in items %}
+        <option value="{{ i.Name }}" >
+    {% endfor %}
+
+      
+      </datalist>
+  </div>
+  
+<!-- <input type="text" onclick="getValue()" id="search"  placeholder="Search.." autocomplete="off"  list="customers"> -->
+
+
+<div class="container-fluid" id="container-to-print"> 
+    <section id="selected-area">
+  <div class="row pt-5">
+      <center>
+        <h2 class="text" style="color: white;">{{ company.company_name }}</h2>
+        <h4 id="selected_customer_heading" class="text" style="color: white;">GODOWN DETAILS</h4>
+
+      </center>
+      <div class="table-responsive"> 
+      <table class="table table-bordered table-striped mt-4" id="data-table">
+        <thead class="text-white">
+          
+            <tr>
+                <th style="color: white;">GODOWN NAME</th>
+                <th style="color: white;">STOCK QUANTITY</th>
+                <th style="color: white;">STATUS</th>
+                
+            </tr>
+        </thead>
+      <tbody>
+         {% for i in data %}
+        <tr>         
+            <td style="color: white;">{{i.godownname}}</td>
+            <td style="color: white;">{{i.stockkeeping}}</td>
+            <td style="color: white;">{{ i.satus }}</td>
+          
+        </tr>
+        {% endfor %} 
+      </tbody>
+                                
+      </table> 
+      {% comment %} <div id="total-bill-amount" class="mt-3" style="color: white;"></div> {% endcomment %}
+      <div>
+          <div id="noDataMessage" style="display: none; color: white;">No data found for selected dates.</div>	
+          <br><br><br><br><br>
+      </div>
+  </div>
+</div>
+</section>
+
+
+</div>
+
+<div class="printable-content mt-3">
+  
+</div>
+<div class="modal fade" id="shareBillEmail">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+        <div class="modal-header" style="background: rgb(32, 35, 37);">
+          <h5 class="m-3 text-uppercase" id="shareBillEmailLabel">Share Godown Details Via Email</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body" style="background: rgb(32, 35, 37);">
+          <div class="card p-3 m-3">
+            <form action="{% url 'shareGodownDetailsToEmail' %}" method="post" class="needs-validation"
+              id="share_to_email_form" autocomplete="off">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="emailIds">Email IDs</label>
+                <textarea class="form-control text-dark" name="email_ids" id="emailIds" rows="5"
+                  placeholder="Multiple emails can be added by separating with a comma(,)." required></textarea>
+              </div>
+              <div class="form-group mt-2">
+                <label for="item_unitname">Message(optional)</label>
+                <textarea name="email_message" id="email_message" class="text-dark form-control" cols=""
+                  rows="4" placeholder="This message will be sent along with Bill details."></textarea>
+              </div>
+            
+          </div>
+          <div class="modal-footer d-flex justify-content-center" style="border-top: 1px solid #ffff;">
+            <input type="submit" id="share_with_email"
+              class="submitShareEmailBtn rounded-pill text-grey w-50 my-4 mx-3" value="SEND MAIL">
+          </div>
+        </div>
+    </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+
+<script>
+  const searchInput = document.getElementById("search");
+  const partyNameDisplay = document.getElementById("party_name");
+  
+  searchInput.addEventListener("input", handleInputChange);
+  
+  function handleInputChange() {
+      const selectedCustomer = this.value;
+      const headingElement = document.getElementById("selected_customer_heading");
+      headingElement.innerHTML = selectedCustomer ? <h2>${selectedCustomer} Summary</h2> : "<h2>Inventory Summary</h2>";
+  }
+  
+  // Add event listener to the input field for the "input" event
+  searchInput.addEventListener("input", handleInput);
+  
+  // Function to handle input changes
+  function handleInput() {
+      const checkbox = document.getElementById('myCheckbox');
+      const startDateInput = document.getElementById('startDate');
+      const endDateInput = document.getElementById('endDate');
+      // Add an event listener to the checkbox to toggle the date input
+      checkbox.addEventListener('change', function() {
+          if (checkbox.checked) {
+              startDateInput.style.display = 'flex';
+              endDateInput.style.display = 'flex'; // Show the date input
+          } else {
+              startDateInput.style.display = 'none';
+              endDateInput.style.display = 'none' // Hide the date input
+          }
+      });
+  }
+  
+</script>
+
+<script>
+
+  function exportAsPDF() {
+    const container = document.getElementById('container-to-print');
+  
+    // Save the original background color
+    const originalBackgroundColor = container.style.backgroundColor;
+  
+    // Set the container's background color to white
+    container.style.backgroundColor = 'white';
+  
+    // Apply styling changes to the container's content
+    const textWhiteElements = container.querySelectorAll('.text');
+    textWhiteElements.forEach(element => {
+      element.style.color = 'black'; // Set text color to black
+    });
+  
+    const tableElements = container.querySelectorAll('table');
+    const tableCells = container.querySelectorAll('td, th');
+    const tableRows = container.querySelectorAll('tr');
+  
+    tableElements.forEach(table => {
+      table.style.backgroundColor = '#ffffff'; // Set background color to white
+      table.style.color = '#000000'; // Set text color to black
+    });
+  
+    tableCells.forEach(cell => {
+      cell.style.backgroundColor = '#ffffff'; // Set background color to white
+      cell.style.color = '#000000'; // Set text color to black
+      cell.style.border = '1px solid black'; // Add a black border
+    });
+  
+    tableRows.forEach(row => {
+      row.style.backgroundColor = '#000000'; // Set background color to black
+    });
+  
+    const pdfOptions = {
+  margin: 0,
+  filename: '{{company.company_name}} godown Details.pdf',
+  image: { type: 'jpeg', quality: 0.98 },
+  html2canvas: { scale: 2 },
+  jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, // Adjust format and orientation
+};
+
+  
+    // Generate PDF from the container
+    html2pdf().from(container).set(pdfOptions).save().then(() => {
+
+      // Restore the original background color
+      container.style.backgroundColor = originalBackgroundColor;
+
+      textWhiteElements.forEach(element => {
+        element.style.color = 'white'; // Restore original text color
+
+      // Remove the pdf-background class after generating the PDF
+      container.classList.remove('pdf-background');
+      });
+      window.location.reload();
+    });
+  }
+
+ // Function to save Excel using XLSX
+ function exportToExcel() {
+     var table = document.querySelector('table');
+     var ws = XLSX.utils.table_to_sheet(table);
+     var wb = XLSX.utils.book_new();
+     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+     XLSX.writeFile(wb, 'report.xlsx');
+ }
+
+ // Function to handle export based on dropdown selection
+ document.getElementById('exportDropdown').addEventListener('change', function () {
+     var selectedValue = this.value;
+     if (selectedValue === 'pdf') {
+         exportToPDF();
+     } else if (selectedValue === 'xls') {
+         exportToExcel();
+     }
+ });
+ const pdfExportLink = document.getElementById('pdf'); 
+pdfExportLink.addEventListener('click', function (event) {
+ event.preventDefault(); 
+ exportToPDF();
+});
+
+//-------PRINT
+
+function printPageContent() {
+  const contentToPrint = document.getElementById('container-to-print');
+  const clonedContent = contentToPrint.cloneNode(true);
+
+  const textElements = clonedContent.querySelectorAll('.text');
+  const filterDropdowns = clonedContent.querySelectorAll('.filter-dropdown');
+
+  textElements.forEach(element => {
+    element.style.color = '#000000'; // Text color (black)
+  });
+
+  filterDropdowns.forEach(dropdown => {
+    dropdown.style.display = 'none';
+  });
+
+  const tableElements = clonedContent.querySelectorAll('table');
+  tableElements.forEach(table => {
+    const tableHeaders = table.querySelectorAll('th');
+    tableHeaders.forEach(th => {
+      th.style.color = '#000000';
+    
+    });
+   
+
+    const tableCells = table.querySelectorAll('td, th, tr');
+    tableCells.forEach(cell => {
+      cell.style.border = '1px solid black';
+      cell.style.padding = '10px';
+      cell.style.color = '#000000';
+      
+    });
+    table.style.margin = '0 auto';
+  });
+
+  const printWindow = window.open('', '_blank');
+  printWindow.document.body.appendChild(clonedContent);
+  printWindow.print();
+  printWindow.close();
+}
+
+
+//date
+
+const d1 = document.getElementById('d1');
+const d2 = document.getElementById('d2');
+const dateError = document.getElementById('date-error');
+const dataTable = document.getElementById('data-table');
+const dateRangeDisplay = document.getElementById('date-range-display');
+
+d1.addEventListener('input', filterData);
+d2.addEventListener('input', filterData);
+
+function filterData() {
+  const fromDate = new Date(d1.value);
+  const toDate = new Date(d2.value);
+
+  if (isNaN(toDate)) {
+      dateError.textContent = '';
+  } else if (fromDate > toDate) {
+      dateError.textContent = 'Invalid date range';
+  } else {
+      dateError.textContent = '';
+      const rows = dataTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+      for (let i = 0; i < rows.length; i++) {
+          const rowDateText = rows[i].getElementsByTagName('td')[1].textContent;
+          const rowDate = new Date(rowDateText);
+
+          if (!isNaN(rowDate)) {
+              // Compare dates without considering the time component
+              const rowDateWithoutTime = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+              const fromDateWithoutTime = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
+              const toDateWithoutTime = new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate());
+
+              if (rowDateWithoutTime >= fromDateWithoutTime && rowDateWithoutTime <= toDateWithoutTime) {
+                  rows[i].style.display = '';
+              } else {
+                  rows[i].style.display = 'none';
+              }
+    dateRangeDisplay.textContent = ` from ${d1.value} to ${d2.value}`;
+    calculateTotalBillAmount();
+  }
+}
+//------------
+function calculateTotalBillAmount() {
+  const visibleRows = Array.from(dataTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr'))
+      .filter(row => row.style.display !== 'none');
+
+  let totalBillAmount = 0;
+
+  visibleRows.forEach(row => {
+      const billAmountCell = row.querySelector('td:nth-child(6)');
+      const billAmount = parseFloat(billAmountCell.textContent);
+      if (!isNaN(billAmount)) {
+          totalBillAmount += billAmount;
+      }
+  });
+
+  const totalBillAmountElement = document.getElementById('total-bill-amount');
+  totalBillAmountElement.textContent = `Total Bill Amount: ${totalBillAmount.toFixed(2)}`;
+}
+ }
+      }
+
+    //Function to change heading with selected customer name
+      document.getElementById('search').addEventListener('input', function() {
+        const selectedCustomer = this.value;
+        const headingElement = document.getElementById('selected_customer_heading');
+        headingElement.innerHTML = selectedCustomer ? `<h2>${selectedCustomer} Summary</h2>` : "<h2>Inventory Summary</h2>";
+    });
+    document.getElementById('search').addEventListener('input', function() {
+      const selectedCustomer = this.value.toLowerCase(); // Convert to lowercase for case-insensitive comparison
+  
+      const rows = document.querySelectorAll('#data-table tbody tr');
+  
+      rows.forEach(row => {
+          const itemName = row.querySelector('td:nth-child(1)').textContent.toLowerCase(); // Assuming item name is in the first column
+          if (itemName.includes(selectedCustomer)) {
+              row.style.display = ''; // Show the row
+          } else {
+              row.style.display = 'none'; // Hide the row
+          }
+      });
+  });
+  
+  
+  function shareOnWhatsApp() {
+    var url = window.location.href;
+    var text = url;
+    text = encodeURIComponent(text);
+    var whatsappUrl = "whatsapp://send?text=" + text;
+    window.location.href = whatsappUrl;
+  }
+
+
+
+</script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+
+{%endblock%}

@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    /* Styles for printing */
+    @media print {
+        body {
+            color: black; /* Change text color to black */
+        }
+        table, th, td {
+            color: black; /* Change text color for table content */
+        }
+    }
+    </style>
+
+<body>
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <div class="mr-3">
+                <!-- Date range calendar input -->
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" onchange="filterByDateRange()"> &nbsp;&nbsp;
+
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" onchange="filterByDateRange()" min="" />
+
+            </div>
+            
+        </div>
+        <div class="d-flex">
+            <!-- Print button -->
+            <button class="btn btn-light mr-2" id="pdf" onclick="printTable()">Print</button>
+            <div style="width: 3px;"></div>
+            <div class="dropdown">
+                <button class="btn btn-light mr-3 dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    Export
+                </button>
+                <div class="dropdown-menu" aria-labelledby="exportDropdown">
+                    
+                    <a class="dropdown-item" href="#" onclick="exportToExcel()">XLS (Excel)</a>
+                </div>
+            
+                    <a class="btn btn-light"  href="#" onclick="exportAsPDF()">PDF</a>
+                
+               
+                <a href="{% url 'report_inventory_view' %}" class="btn btn-light" style=" color: rgb(1, 1, 1);">
+                    <i class="fa fa-times-circle"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="search-bar" style="margin-top: 60px;">
+<input class="form-control bg-light text-dark" style="width: 30%;" type="text" id="searchInput" oninput="searchTable()" placeholder="Search...">
+    
+    </div>
+
+<div class="printable-wrapper" id="container-to-print" style="margin-top: 40px;padding-bottom: 30%;">
+<div class="printable-content">
+
+    <h2 style="color: white;" class="text-center">Payment Made Details</h2>
+    <h3 style="color: white;" class="text-center">{{company.company_name }}</h3> <br>
+    <div id="startDateDisplay" class="text-center" style="color: white;"></div> <br>
+    
+
+    <div id="endDateDisplay" class="text-center" style="color: white;"></div>
+</div>
+
+    <table class="table table-bordered table-striped mt-4" >
+        <thead class="text-white">
+            <tr>
+                <th style="color: white;">Vendor</th>
+                <th style="color: white;">Email Id</th>
+                <th style="color: white;">Reference</th>
+                <th style="color: white;">Payment Date</th>
+                <th style="color: white;">Paid Through</th>
+                <th style="color: white;">Ammount Received</th>
+                <th style="color: white;">Balance</th>
+                <th style="color: white;">status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in paymnt %}
+            <tr>
+                <td style="color: white;">{{ p.vendor.first_name}}&nbsp;{{ p.vendor.last_name}}</td>
+                <td style="color: white;">{{ p.vendor.vendor_email }}</td>
+                <td style="color: white;">{{ p.reference }}</td>
+                <td style="color: white;">{{ p.date }}</td>
+                <td style="color: white;">{{ p.cash }}</td>
+                <td style="color: white;">₹{{ p.balance }}</td>
+                <td style="color: white;">₹{{ p.current_balance }}</td>
+                <td style="color: white;">{{ p.status }}</td>
+                
+                
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+    
+    
+</body>
+
+
+
+<script>
+
+
+// function exportToPDF() {
+//      console.log("Exporting to PDF...");
+//      var pdf = new jsPDF();
+//      var content = document.querySelector('.printable-wrapper');
+//      console.log("Content:", content);
+//      pdf.fromHTML(content, 10, 10, {
+//          width: 180
+//      }, function (dispose) {
+//          pdf.save('report.pdf');
+//      });
+// }
+
+function printTable() {
+    let tableContent = document.getElementById('container-to-print').innerHTML;
+    let originalContent = document.body.innerHTML;
+
+    document.body.innerHTML = tableContent;
+    window.print();
+
+    document.body.innerHTML = originalContent;
+}
+
+
+/// Function to check if both startDateDisplay and endDateDisplay have content
+function displayTO() {
+        var startDateContent = document.getElementById("startDateDisplay").innerHTML;
+        var endDateContent = document.getElementById("endDateDisplay").innerHTML;
+
+        // Check if both startDate and endDate have content
+        if (startDateContent.trim() !== "" && endDateContent.trim() !== "") {
+            // Both startDate and endDate have content, so create a new element for "TO"
+            var toElement = document.createElement("div");
+            toElement.innerHTML = "TO";
+
+            // Append the "TO" element to the document
+            document.body.appendChild(toElement);
+        }
+    }
+
+    // Use the DOMContentLoaded event to ensure the script runs after the DOM has fully loaded
+    document.addEventListener("DOMContentLoaded", displayTO);
+function filterByDateRange() {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+
+    const startDate = new Date(startDateInput.value);
+    const endDate = new Date(endDateInput.value);
+
+    // Set the min attribute of the end date input to the selected start date
+    endDateInput.min = startDateInput.value;
+
+    // Update the start and end date display elements with the desired format
+    const startDateDisplay = document.getElementById('startDateDisplay');
+    const endDateDisplay = document.getElementById('endDateDisplay');
+
+    startDateDisplay.innerText = ' ' + startDate.toLocaleDateString('en-GB');
+    endDateDisplay.innerText = ' ' + endDate.toLocaleDateString('en-GB');
+
+    const tableRows = document.querySelectorAll('tbody tr');
+
+    tableRows.forEach(row => {
+        const paymentDateString = row.cells[3].innerText; // Assuming the payment date is in the 5th cell (index 4)
+        const paymentDate = new Date(paymentDateString);
+
+        // Check if the paymentDate is within the selected range
+        if (paymentDate >= startDate && paymentDate <= endDate) {
+            row.style.display = ''; // Display the row if it's within the range
+        } else {
+            row.style.display = 'none'; // Hide the row if it's outside the range
+        }
+    });
+}
+
+
+
+
+    function exportAsPDF() {
+      const container = document.getElementById('container-to-print');
+    
+      // Save the original background color
+      const originalBackgroundColor = container.style.backgroundColor;
+    
+      // Set the container's background color to white
+      container.style.backgroundColor = 'white';
+    
+      // Apply styling changes to the container's content
+      const textWhiteElements = container.querySelectorAll('.text');
+      textWhiteElements.forEach(element => {
+        element.style.color = 'black'; // Set text color to black
+      });
+    
+      const tableElements = container.querySelectorAll('table');
+      const tableCells = container.querySelectorAll('td, th');
+      const tableRows = container.querySelectorAll('tr');
+    
+      tableElements.forEach(table => {
+        table.style.backgroundColor = '#ffffff'; // Set background color to white
+        table.style.color = '#000000'; // Set text color to black
+      });
+    
+      tableCells.forEach(cell => {
+        cell.style.backgroundColor = '#ffffff'; // Set background color to white
+        cell.style.color = '#000000'; // Set text color to black
+        cell.style.border = '1px solid black'; // Add a black border
+      });
+    
+      tableRows.forEach(row => {
+        row.style.backgroundColor = '#000000'; // Set background color to black
+      });
+    
+      const pdfOptions = {
+        margin: 0,
+        filename: '{{company_data.company_name}}purchasesbyVendor.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+      };
+    
+      // Generate PDF from the container
+      html2pdf().from(container).set(pdfOptions).save().then(() => {
+
+        // Restore the original background color
+        container.style.backgroundColor = originalBackgroundColor;
+
+        textWhiteElements.forEach(element => {
+          element.style.color = 'white'; // Restore original text color
+
+        // Remove the pdf-background class after generating the PDF
+        container.classList.remove('pdf-background');
+        });
+      });
+    }
+
+// Function to save Excel using XLSX
+function exportToExcel() {
+        var table = document.querySelector('table');
+        var ws = XLSX.utils.table_to_sheet(table);
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        XLSX.writeFile(wb, 'report.xlsx');
+    }
+
+    // Function to handle export based on dropdown selection
+    document.getElementById('exportDropdown').addEventListener('change', function () {
+        var selectedValue = this.value;
+        if (selectedValue === 'pdf') {
+            exportToPDF();
+        } else if (selectedValue === 'xls') {
+            exportToExcel();
+        }
+    });
+    const pdfExportLink = document.getElementById('pdf'); // This should be the link for PDF export
+pdfExportLink.addEventListener('click', function (event) {
+    event.preventDefault(); // Prevent the link from navigating
+    exportToPDF();
+});
+
+
+function adjustTableForPrint() {
+
+
+
+
+        
+const table = document.querySelector('.printable-content table');
+const container = document.querySelector('.printable-content');
+
+
+const scaleFactor = container.offsetWidth / table.offsetWidth;
+
+
+table.style.transform = `scale(${scaleFactor})`;
+table.style.transformOrigin = 'top left';
+
+
+const marginTop = (container.offsetHeight - table.offsetHeight * scaleFactor) / 2;
+table.style.marginTop = `${marginTop}px`;
+}
+
+//  "Print" button
+const printButton = document.getElementById('pdf');
+printButton.addEventListener('click', function() {
+adjustTableForPrint();
+window.print();
+});
+
+
+
+function searchTable() {
+    const searchValue = document.getElementById('searchInput').value.toLowerCase();
+    const tableRows = document.querySelectorAll('tbody tr');
+
+    tableRows.forEach(row => {
+        let rowContainsSearchTerm = false;
+
+        row.querySelectorAll('td').forEach(cell => {
+            if (cell.textContent.toLowerCase().includes(searchValue)) {
+                rowContainsSearchTerm = true;
+            }
+        });
+
+        if (rowContainsSearchTerm) {
+            row.style.display = ''; // Display the row if any cell matches the search value
+        } else {
+            row.style.display = 'none'; // Hide the row if no cell matches the search value
+        }
+    });
+}
+
+
+</script>
+
+
+
+
+{% endblock %}

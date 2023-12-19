@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.3/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.0/html2canvas.min.js"></script>
+
+<style>
+    .tr{
+        cursor: pointer;
+    }
+
+    @media print{
+    body{
+        visibility: hidden;
+    }
+
+    #printtable{
+        visibility: visible;
+        width: auto;
+        height: auto;
+        margin-top: -600px;
+        margin-left: -100px;
+    }
+}
+h2{
+    font-size: x-large;
+    font-family: 'Segoe UI', Tahoma,;
+    color:#dfe4e9;
+  }
+  .card{
+        background: none;
+    }
+    tbody tr td{
+        border: none;
+        border-top: none;
+        border-style: none;
+        color:azure;
+        justify-content: center;
+    }
+ 
+
+tr:hover {
+  background-color : rgb(94, 94, 101);
+  color: aliceblue;
+cursor: pointer
+}
+    .btn {
+  background-color: white;
+  border: none;
+  color: green;
+  padding: 12px 16px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: white;
+}
+
+</style>
+<style>
+    .bar {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+
+
+    }
+
+    .bar .left {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .bar .left input {
+        height: 5vh;
+    }
+
+
+    .hidden {
+        display: none;
+    }
+
+    #search-dropdown {
+        position: absolute;
+    }
+
+    @media print and (color) {
+        * {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        #filterBtn {
+            display: none;
+        }
+    }
+</style>
+<div class="page-content">
+   
+        <div class="card-body">
+            <div class="card-title" id="div2">
+                <div class="card-title">
+                    <center><h2 class="mb-0" style="font-size: 35px;color: rgb(218, 164, 48);">{{ company.company_name  }}</h2></center><br>
+                    <center><label  id="headline" style="font-size: 40px;color: rgb(218, 164, 48);">INVENTORY SALE COUNT </label></center>
+                    <center><p id="hdate" style="font-size: 20px;color: rgb(218, 164, 48);"></p></center>
+                </div>
+
+                <p class="text  text-center" style="color:rgb(218, 164, 48);" id="date-range-display"style="display: inline-block;">From:{{start}} _To :{{end}}</p>
+            <hr/>
+            </div>
+        
+
+            <div class="bar">
+
+                <div class=" left">
+                    <form action="{% url 'productsale_filter' %}" method="post">
+                        {% csrf_token %}
+                        From <input type="date" id="d1" name="d1" value="{{start}}"   style="width: 35%; border-radius: 10px;padding: 8px;border: 3px solid rgb(214, 141, 5);" required>
+                        To <input type="date" id="d2" name="d2" value="{{end}}"  style="width: 35%; border-radius: 10px;padding: 8px;border: 3px solid rgb(214, 141, 5);" required>
+                        <button class=" fa fa-filter btn-warning btn-outline-light" style="padding: 10px;border-radius: 10px;background-color: rgb(214, 141, 5);color: white;"></button>
+                        
+                    </form><br><br>
+                    <div class="right" >
+                        <button class="btn btn_print btn-outline-info" onclick="display()" style="background: white; color: rgb(218, 164, 48);"><i class="fa fa-print"></i></button>
+                        <button class="btn btn_pdf btn-outline-info" id="btn-pdf"style="background: white; color: rgb(218, 164, 48);">  <i class="fa fa-file-pdf"></i>    </button>
+                       
+                        <button class=" btn btn-outline-info" id="export-button" onclick="exportAsExcel()" style="background: white; color: rgb(218, 164, 48);">   <i class="fa fa-file-excel"></i></button>
+                        <button class=" btn btn-outline-info"  style="background: white; color: rgb(218, 164, 48);"> <a  href="{% url 'report_inventory_view' %}" class="fa fa-close" style="color:rgb(218, 164, 48);"></a> </button>
+                    </div><br>
+                   
+
+
+                </div>
+             
+
+            </div>
+        </div>
+    </div>
+    <div class=" left">
+        <input name="party" list="party" class="form-control"  id="search" placeholder="Search Type..." style="color: rgb(255, 255, 255);background: transparent;width: 20vw;">
+
+    </div>
+    <div  id="pdf-card">
+        <div class="card-body">
+            <div class="container-fluid">
+
+
+                <table class="table table-responsive-md mt-4 table-bordered"
+                    id="myTable">
+                   
+                        <thead>
+                            <tr>
+                            
+                                <th class="center font-weight-dark border-dark" class="table" style=" color: rgb(218, 164, 48);">
+                                  TYPE
+                                </th>
+                                <th class="center font-weight-dark border-dark"class="table" style=" color: rgb(218, 164, 48);">
+                                   TYPE COUNT
+                                </th>
+                                <th class="center font-weight-dark border-dark" class="table" style=" color: rgb(218, 164, 48);">
+                                    SALES PRICE
+                                </th>
+                                <th class="center font-weight-dark border-dark" class="table" style=" color: rgb(218, 164, 48);">
+                                    SALES WITH TAX
+                                </th>
+                             
+                            </tr>
+                        </thead>
+                        <tbody id="tb">
+                            
+                                <tr class="tr">
+                                    
+                                    <td >Invoice</td> 
+                                    <td>{{count}}</td> 
+                                    
+                                    <td >{{subsale}}</td>         
+                                    <td >{{sale}}</td>   
+                                         
+                                </tr></a>
+
+                          <tr class="tr">
+                            <td >Recurring_Invoice</td> 
+                            <td >{{count1}}</td>  
+                           
+                            <td >{{subsale1}}</td>         
+                            <td >{{sale1}}</td>          
+                           
+                        </tr></a>
+                        <tr class="tr">
+                            <td  >Estimates</td> 
+                            <td >{{count2}}</td>  
+                           
+                            <td >{{subsale2}}</td>         
+                            <td >{{sale2}}</td>          
+                           
+                        </tr>
+                        <tr class="tr">
+                            <td >Sales_Order</td> 
+                            <td >{{count3}}</td>  
+                           
+                            <td >{{subsale3}}</td>         
+                            <td >{{sale3}}</td>          
+                           
+                        </tr>
+
+                        <tr class="tr">
+                            <td  >Credit_Note</td> 
+                            <td >{{count4}}</td>  
+                           
+                            <td >{{subsale4}}</td>         
+                            <td >{{sale4}}</td>   
+                           
+                        </tr>
+                </tbody>
+                    </table>
+            </div>
+           
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    function exportAsExcel() {
+        const table = document.getElementById('myTable'); // Replace 'myTable' with your table's ID
+        const wb = XLSX.utils.table_to_book(table);
+
+        XLSX.writeFile(wb, 'INVENTORY SALE REPORT.xlsx');
+    }
+</script>
+<script>
+     function display() {
+        var printContents = document.getElementById("pdf-card").innerHTML;
+        var div2Contents = document.getElementById('div2').innerHTML;
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = div2Contents + printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload();
+    }
+
+
+    $(document).ready(function ($) {
+        $(document).on('click', '.btn_pdf', function (event) {
+            console.log('print1');
+            event.preventDefault();
+            var name = document.getElementById("headline").innerHTML;
+            var div2 = document.getElementById("div2");
+            var element = document.createElement('div');
+            element.appendChild(div2.cloneNode(true));
+            element.appendChild(document.getElementById('pdf-card').cloneNode(true));
+            element.style.color = 'white';
+            element.style.backgroundColor = '#243e54';
+            var opt = {
+                margin: 1,
+                filename: name + '.pdf',
+                image: { type: 'png', quality: 1.0 },
+                html2canvas: { scale: 3, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait', backgroundColor: '#243e54' }
+            };
+            html2pdf().set(opt).from(element).save();
+        });
+    });
+
+</script>
+
+<script>
+    $(document).ready(function() {
+        var $rows = $('.table tbody tr');
+        $('#search').keyup(function() {
+            var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+            $rows.show().filter(function() {
+                console.log($rows.show())
+    
+                var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+                console.log(text)
+                return !~text.indexOf(val);
+            }).hide();
+        });
+    });
+    </script>
+    <script>
+        function selectParty() {
+           document.getElementById("search").addEventListener("input", function () {
+               var filterValue = this.value.toLowerCase();
+               var table = document.getElementById("saletable");
+               var rows = table.getElementsByTagName("tr");
+   
+               
+               if (document.getElementById("in1").value == '' && document.getElementById("in2").value == '') {
+                   for (var i = 1; i < rows.length; i++) { // Start from 1 to skip the table header row
+                       
+                       var firstColumnValue = rows[i].getElementsByTagName("td")[0].textContent.toLowerCase();
+   
+                       if (firstColumnValue.indexOf(filterValue) > -1) {
+   
+                           rows[i].style.display = "";
+                       } else {
+                           rows[i].style.display = "none";
+                       }
+   
+                   }
+   
+               }
+               else {
+                   var startDate = new Date(document.getElementById("in1").value);
+               var endDate = new Date(document.getElementById("in2").value);
+                   for (var i = 1; i < rows.length; i++) {
+                       var firstColumnValue = rows[i].getElementsByTagName("td")[0].textContent.toLowerCase();
+                       var row = rows[i];
+                       var dateCell = row.cells[1];
+                       var rowDate = new Date(dateCell.textContent);
+   
+                       if (rowDate >= startDate && rowDate <= endDate ) {
+                           row.style.display = "";
+                       } else {
+                           row.style.display = "none";
+                       }
+   
+                   }
+               }
+   
+   
+   
+   
+           });
+       }
+   selectParty();
+   const inputElement = document.querySelector('input[name="party"]');
+   const headlineElement = document.getElementById('headline');
+   inputElement.addEventListener('input', function () {
+   
+       const selectedValue = inputElement.value;
+       if (selectedValue == '') {
+           head = 'INVENTORY SALE COUNT'
+       }
+       else {
+           head = selectedValue + '  SALE COUNT';
+       }
+       headlineElement.textContent = head.toUpperCase();
+   
+   });
+   
+   
+   
+   </script>
+
+
+{% endblock %}

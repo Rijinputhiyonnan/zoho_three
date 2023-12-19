@@ -1,0 +1,1839 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"> -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.3/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/print-this/printThis.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wyj73RNMIpiD6bq5D2ZAdfPI4mM1iS6L4" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<style>
+  .modal {
+    z-index: 9999;
+    overflow: scroll;
+  }
+
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+  }
+
+  .slip-page {
+    background: #ffffff;
+    display: block;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+  }
+
+  .slip-page[size="A4"] {
+    width: 21cm;
+    height: 29.7cm;
+    overflow: hidden;
+  }
+
+  .equal-length-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    /* Make the container fill the height of the column */
+    margin-left: 2vh;
+    margin-right: 2vh;
+  }
+
+  .equal-length-item {
+    flex: 1;
+    text-align: center;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #202325;
+    padding: 1px;
+    margin: 0;
+  }
+
+  .store-user {
+    padding-bottom: 25px;
+  }
+
+  .store-user p {
+    margin: 0;
+    font-weight: 600;
+    color: #000000;
+  }
+
+  .store-user .address {
+    font-weight: 400;
+  }
+
+  .store-user h5 {
+    color: #22b8d1;
+    font-family: 'Rajdhani', sans-serif;
+  }
+
+  .bb {
+    border-bottom: 3px solid #ccc;
+  }
+
+  .top-content {
+    padding-bottom: 15px;
+  }
+
+  .ribbon .ribbon-inner {
+    text-align: center;
+    color: #fff;
+    top: -20px;
+    left: -90px;
+    width: 120px;
+    padding: 3px;
+
+  }
+
+  .ribbon .ribbon-open {
+    background-color: #268ddd;
+    border-color: #1c72b4;
+  }
+
+  .template .ribbon .ribbon-open {
+    background-color: #616263;
+    border-color: #616263;
+  }
+
+  .top-left p {
+    margin: 0;
+    color: #000000;
+  }
+
+  .top-left .graphic-path {
+    height: 40px;
+    position: relative;
+  }
+
+  .top-left .graphic-path::before {
+    content: "";
+    height: 20px;
+    background-color: #615c60;
+    position: absolute;
+    left: 15px;
+    right: 0;
+    top: -15px;
+    z-index: 2;
+  }
+
+  .top-left .graphic-path::after {
+    content: "";
+    height: 22px;
+    width: 17px;
+    background: #000000;
+    position: absolute;
+    top: -13px;
+    left: 6px;
+    transform: rotate(45deg);
+  }
+
+  .template3 .top-left .graphic-path::before {
+    background-color: #bbbbbb;
+  }
+
+  .template3 .top-left .graphic-path::after {
+    background: #616263b3;
+  }
+
+  .top-left .graphic-path p {
+    height: 40px;
+    left: 0;
+    right: 0;
+    text-transform: uppercase;
+    background-color: #22b8d1;
+    font: 26px;
+    z-index: 3;
+    position: absolute;
+    padding-left: 10px;
+  }
+
+  .template3 .top-left .graphic-path p {
+    background-color: #616263;
+    color: white;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+  }
+
+  .logo img {
+    max-height: 100px;
+  }
+
+  .company-info h2 {
+    margin: 0;
+    font-size: 2em;
+  }
+
+  .company-info p {
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .i.invoice-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .invoice-box h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+
+  .invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .invoice-details p,
+  .client-details p {
+    margin: 5px 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  #th {
+    background-color: #f2f2f2;
+    color: black;
+  }
+
+  .invoice-total {
+    margin-top: 20px;
+    text-align: right;
+  }
+
+  .invoice-total p {
+    margin: 5px 0;
+  }
+
+  footer {
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 20px;
+  }
+
+  footer p {
+    margin: 5px 0;
+  }
+
+  .dropdown-item:hover {
+    color: chocolate;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  .saleordertable {
+    border-collapse: collapse;
+    /* Collapse table borders */
+    border: none;
+    /* Remove table border */
+  }
+
+  .saleordertable td {
+    border: none;
+    /* Remove cell borders */
+    padding: 8px;
+    /* Add padding for cell content */
+    text-align: left;
+    /* Optional: Adjust text alignment */
+  }
+
+  #producttable {
+    border-collapse: collapse;
+    /* Collapse table borders */
+    border: none;
+    /* Remove table border */
+    color: white;
+  }
+
+  #producttable td {
+    border: none;
+    /* Remove cell borders */
+    padding: 8px;
+    /* Add padding for cell content */
+    text-align: left;
+    /* Optional: Adjust text alignment */
+  }
+
+  tr.clickable {
+    cursor: pointer;
+  }
+
+
+  @media print {
+
+    .unwanted,
+    .sidebar,
+    .sectionhtml {
+      display: none !important;
+    }
+
+    body {
+      visibility: hidden !important;
+    }
+
+    html {
+      overflow: hidden ! important;
+      visibility: hidden !important;
+    }
+
+
+    .printContainer {
+      visibility: visible !important;
+      /* Override the rule above to only show the printables*/
+      z-index: 99999;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: auto;
+    }
+
+
+
+  }
+
+  .scrollable-table {
+    max-height: 80%;
+    /* Maximum height for the tooltip */
+    overflow-y: auto;
+    /* Add vertical scrollbar when content overflows */
+  }
+
+  /* Style for the container */
+
+
+  /* Style for table cell */
+  .table-cell {
+    padding: 5px;
+  }
+  
+</style>
+
+<section>
+  <div class="row " style="top: 7rem; ">
+
+    <div>
+      <div class="col-md-12" style="width: auto;">
+        <div class="row">
+          <div class="col-md-3" style="border-right: 1px solid white; overflow-y: scroll; height: 84vh;">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="search-bar">
+                <div class="col-md-12">
+                  <form action="{% url 'journal_list' %}" method="GET" class="input-group">
+                    <input type="text" placeholder="Search..." class="form-control custom-height text-dark" id="myyInput" onkeyup="FilterJournals()" autocomplete="off">
+                  </form>
+                </div>
+              </div>
+              <script>
+                function FilterJournals() {
+                  var input, filter, list, items, i, txtValue;
+                  input = document.getElementById("myyInput");
+                  filter = input.value.toUpperCase();
+                  list = document.getElementById("journalList");
+                  items = list.getElementsByClassName("list-item");
+              
+                  for (i = 0; i < items.length; i++) {
+                    var title = items[i].querySelector("span:first-child");
+                    txtValue = title.textContent || title.innerText;
+              
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                      items[i].style.display = "";
+                    } else {
+                      items[i].style.display = "none";
+                    }
+                  }
+                }
+              </script>
+              <div class="dropdown">
+                <button class="btn btn-dark border-warning" style="color: #F86F03;height: 40px;" type="button"
+                  id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fa fa-filter"></i>
+                </button>
+                <ul class="dropdown-menu bg-dark" aria-labelledby="filterDropdown">
+                  <li><a class="dropdown-item custom-item text-light" href="#" onclick="filterJournals('all')">All</a></li>
+                  <li><a class="dropdown-item custom-item text-light" href="#" onclick="filterJournals('draft')">Draft</a>
+                  </li>
+                  <li><a class="dropdown-item custom-item text-light" href="#" onclick="filterJournals('save')">Save</a>
+                  </li>
+                </ul>
+              </div>
+    
+      <script>
+        function filterJournals(filter) {
+          const journalItems = document.querySelectorAll('.list-item');
+      
+          journalItems.forEach(item => {
+            const statusElement = item.querySelector('.status');
+            const status = statusElement.textContent.toLowerCase();
+      
+            item.style.display = 'none';
+      
+            if (filter === 'all' || status === filter) {
+              item.style.display = 'block';
+            }
+          });
+        }
+      </script>
+ 
+              <a href="{% url 'add_journal' %}" class="p-2 btn btn-dark border-warning"
+                style="color: #F86F03;height: 40px;width: 40px;"><i class="fa fa-plus"></i></a>
+            </div>
+
+            <hr>
+            <div class="list-group mt-3"id="journalList">
+              {% for journal in journals %}
+              <a href="{% url 'view_journal' journal.id %}" class="list-item">
+                <div class="d-flex justify-content-between text-white">
+                  <span>{{ journal.date }}</span>
+                  <span><i class="fa fa-inr"></i>{{ journal.total_debit }}</span>
+                </div>
+                <div class="d-flex justify-content-between text-white mt-2">
+                  <span>{{ journal.journal_no }}</span>
+                  {% if journal.status == 'draft' %}
+                  <span class="status draft" style="color: #F86F03;">{{ journal.status }}</span>
+                  {% elif journal.status == 'save' %}
+                  <span class="status save text-success">{{ journal.status }}</span>
+                  {% else %}
+                  <span class="status">{{ journal.status }}</span>
+                  {% endif %}
+                </div>
+              </a>
+              <br>
+              {% endfor %}
+            </div>
+
+
+          </div>
+
+          <div class="col-md-9 ml-1  mb-5 " id="overviewdiv">
+            <div class="row">
+              <div class="col-md-7">
+                <a class="text-white" style="font-size: 1.5rem;">
+                  
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <a class="btn" style="background-color: chocolate; margin-right: 2vh;"><i class="fas fa-eye"></i>
+                  Overview</a>
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                  aria-haspopup="true" aria-expanded="false"
+                  style="background-color: white; color: black; margin-right: 2vh;"> Templates
+                </a>
+                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                  <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
+
+                  <a class="dropdown-item" onclick="totemplate2()"><i class="fa fa-file-alt"></i>
+                    Template 2</a>
+
+                  <a class="dropdown-item" onclick="totemplate3()"><i class="fa fa-file-alt"></i>
+                    Template 3</a>
+
+
+                </div>
+
+              </div>
+
+              <div class="col-md-6" style="text-align: center;">
+                {% if jo.journal.status == "draft" %}
+                <a href="{% url 'update_journal_status' jo.journal.id %}" class="btn btn-outline-warning" title="Save">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'edit_journal' jo.journal.id %}" class="text-dark">
+                  <button class="btn btn-outline-warning">
+                    <i class="fa fa-edit"></i>
+                  </button>
+                </a>
+                <!--<a class="text-dark" data-toggle="dropdown">
+                  <button class="btn btn-outline-warning" title="Share"><i class="fas fa-share"></i></button>
+              </a>
+              <div class="dropdown-menu">
+                  <a class="dropdown-item" data-target="#shareBillEmail" data-toggle="modal">GMAIL</a>
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
+              </div>-->
+              <a href="mailto:example@example.com" class="text-dark">
+                <button class="btn btn-outline-warning" title="Email"><i class="mdi mdi-email"></i></button>
+            </a>
+            
+                <a href="#" class="text-dark" onclick="confirmDelete()">
+                  <button class="btn btn-outline-warning" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                </a>
+                <a class="  text-dark" onclick="exportToPDF()">
+                  <button class="btn btn-outline-warning" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+                </a>
+                <a class=" text-dark" onclick="printSelectedArea()">
+                  <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
+                  </button>
+                </a>
+                <a class="text-dark" onclick="show_slip()">
+                  <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+              </div>
+            </div><br>
+
+            <div class="row" id="div-to-pdf"
+              style="background-color: #ffddb0;  height: auto; margin-left:1px; margin-right: 1rem; ">
+
+              <div class="row text-center">
+                <h2 style="color: #000000;"><br>MANUAL JOURNAL
+                  <hr>
+                </h2>
+              </div>
+              
+              <div class="gen-info col-6 " style="padding-left: 3rem; overflow-y: scroll; ">
+                <div class="row mt-1">
+                  <div class="col-5"><label class="text-dark" for="">Notes </label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">:{{ jo.journal.notes }}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Reference no </label></div>
+                  
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">:{{ jo.journal.reference_no}}</p>
+                  </div>
+                  
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Journal No</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">
+                      :{{jo.journal.journal_no}}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Date </label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">
+                      :{{jo.journal.date}}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Amount </label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">
+                      :{{jo.journal.total_debit}}</p>
+                  </div>
+                </div>
+                
+                
+              </div>
+              
+              <div class="p-info col-6" style="height: 100%; margin-bottom: 1vh;">
+                <div class="card" style="background-color: rgb(110, 61, 46); padding-left: 1rem; padding-top: 1rem;">
+                  <div class="row text-center">
+                    <h2>INFORMATION
+                      <hr>
+                    </h2>
+                  </div>
+                  
+                  
+
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Account Name </label></div>
+                    <div class="col">
+                      <p class="bold">:{{jo.account}}</p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Description </label></div>
+                    <div class="col">
+                      <p class="bold">:{{jo.description}}</p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Contact </label></div>
+                    <div class="col">
+                      <p class="bold">:{{jo.contact}}</p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Credits </label></div>
+                    <div class="col">
+                      <p class="bold">:{{jo.credits}}</p>
+                    </div>
+                  </div>
+
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Debits</label></div>
+                    <div class="col">
+                      <p class="bold">:{{jo.debits}}</p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Total Debit </label></div>
+                    <div class="col">
+                      <p class="bold">:{{jo.journal.total_debit}}</p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Total Credit </label></div>
+                    <div class="col">
+                      <p class="bold">:{{jo.journal.total_credit}}</p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Difference </label></div>
+                    <div class="col">
+                      <p class="bold">:{{jo.journal.difference}}</p>
+                    </div>
+                    <hr>
+                  </div>
+                  
+                </div><br>
+              </div>
+            </div>
+            
+           
+
+          </div>
+
+          <div class="col-md-9" id="slipdiv" style="display: none;">
+            <div class="row">
+              <div class="col-md-7">
+                <a class="text-white" style="font-size: 1.5rem;">
+                  
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate; "><i
+                    class="fas fa-eye"></i> Overview</a>
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                  aria-haspopup="true" aria-expanded="false"
+                  style="background-color: white; color: black; margin-left: 2vh;"> Templates
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                  <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
+
+                  <a class="dropdown-item" onclick="totemplate2()"><i class="fa fa-file-alt"></i>
+                    Template 2</a>
+
+                  <a class="dropdown-item" onclick="totemplate3()"><i class="fa fa-file-alt"></i>
+                    Template 3</a>
+
+
+                </div>
+
+              </div>
+
+              <div class="col-md-6" style="text-align: center;">
+                {% if jo.journal.status == "draft" %}
+                <a href="{% url 'update_journal_status' jo.journal.id %}" class="btn btn-outline-warning" title="Save">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'edit_journal' jo.journal.id %}" class=" text-dark">
+                  <button class="btn btn-outline-warning" title="Edit"><i class="fas fa-edit"></i></button>
+                </a>
+                <a href="mailto:example@example.com" class="text-dark">
+                  <button class="btn btn-outline-warning" title="Email"><i class="mdi mdi-email"></i></button>
+              </a>
+              
+                  <a href="#" class="text-dark" onclick="confirmDelete()">
+                    <button class="btn btn-outline-warning" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                  </a>
+               
+                <a class="  text-dark" onclick="exportToPDF4()">
+                  <button class="btn btn-outline-warning" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+                </a>
+                <a class=" text-dark" onclick="printSelectedArea4()">
+                  <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
+                  </button>
+                </a>
+                <a class="text-dark" onclick="show_slip()">
+                  <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+              </div>
+            </div>
+
+
+            <div style="background-color: rgb(255, 221, 176);" class="mx-2 my-4">
+
+              <div class="my-5 slip-page" size="A4">
+                <div class="row" style="margin-top: 20%; " id="printslip">
+                  <div class="col-md-3"></div>
+                  <div class="col-md-7">
+                    <div class="card bg-white" style="border: 1px dotted black;padding: 20px;">
+                      <div class="mt-2" style="text-align: center;padding: 15px;">
+                        <div class="text-center" style="font-size: 3vh; color: black;">
+                          <b>{{company.company_name}} </b>
+                        </div>
+                        <span style="font-size: x-small; color: black;">{{company.address}} <br>
+                          {{company.city}},
+                          {{company.state}}
+                          {{company.pincode}} <br>
+                          {{ company.contact_number }} <br>{{ company.company_email }}
+                        </span>
+                      </div>
+                      <div class="ml-4 mt-2" style="color: black;">
+                        <div class="row">
+                          <div class="col-md-6 text-left">Date</div>
+                          <div class="col-md-5 text-right">:{{jo.journal.date}}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6 text-left">Notes</div>
+                          <div class="col-md-5 text-right">:{{jo.journal.notes}}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6 text-left">Reference No</div>
+                          <div class="col-md-5 text-right">:{{jo.journal.reference_no}}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6 text-left">Journal No</div>
+                          <div class="col-md-5 text-right">:{{jo.journal.journal_no}}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6 text-left">Amount</div>
+                          <div class="col-md-5 text-right">:{{jo.journal.total_debit}}</div>
+                        </div>
+                      </div>
+                      <div><br>
+                        <div class="equal-length-container" style="color: black; font-weight: bold;">
+                          <div class="equal-length-item" style=" text-align: center;">
+                            Account Name
+                            <hr style="border-bottom: 1px solid black; margin-top:1vh; width:95%">
+                          </div>
+                          <div class="equal-length-item ml-2" style=" text-align:center;">
+                            Description
+                            <hr style="border-bottom: 1px solid black; margin-top:1vh; width:60%;">
+                          </div>
+                          <div class="equal-length-item" style=" text-align: center; ">
+                            Contact
+                            <hr style="border-bottom: 1px solid black; margin-top:1vh; width:60%">
+                          </div>
+                          <div class="equal-length-item" style=" text-align: center; ">
+                            Debits
+                            <hr style="border-bottom: 1px solid black; margin-top:1vh; width:60%">
+                          </div>
+                          <div class="equal-length-item" style=" text-align: center; ">
+                            Credits
+                            <hr style="border-bottom: 1px solid black; margin-top:1vh; width:60%">
+                          </div>
+                          
+                        </div>
+                      </div>
+                      <div>
+                        
+                        <div class="equal-length-container"
+                          style="color: black; font-size: small; word-wrap: break-word; margin-bottom: 1vh;">
+                          <div class="equal-length-item" style="text-align: center; margin-left: 2px;">
+                            {{jo.account}}
+                          </div>
+                          <div class="equal-length-item" style="text-align: right;">
+                            {{jo.description}}
+                          </div>
+                          <div class="equal-length-item" style="text-align: center; ">
+                            {{jo.contact}}
+                          </div>
+                          <div class="equal-length-item" style="text-align: center; ">
+                            {{jo.debits}}
+                          </div>
+                          <div class="equal-length-item" style="text-align: center; ">
+                            {{jo.credits}}
+                          </div>
+                          
+                        </div>
+                        
+                      </div>
+
+                      <div><br>
+                        <div class="row ">
+                          <div class="col-md-5 text-left" style=" color: black;">
+                           Total Credit
+                          </div>
+                          <div class="col-md-6 " style="color: black;text-align: end;">
+                            {{ jo.journal.total_credit }}
+                          </div>
+                        </div>
+                       
+                        <div class="row">
+                          <div class="col-md-5 text-left" style=" color: black;">
+                            Total Debit
+                          </div>
+                          <div class="col-md-6 " style="color: black;text-align: end;">
+                            {{ jo.journal.total_debit }}
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-5 text-left" style=" color: black;">
+                            Difference
+                          </div>
+                          <div class="col-md-6 " style="color: black;text-align: end;">
+                            {{ jo.journal.difference }}
+                          </div>
+                        </div>
+                       
+                        <hr class="ml-2 mr-2" style="color: black; border-bottom: 1px solid black; ">
+                      </div>
+
+
+                     
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-9" id="templatediv" style="display: none;">
+            <div class="row">
+              <div class="col-md-7">
+                <a class="text-white" style="font-size: 1.5rem;">
+                  
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate; "><i
+                    class="fas fa-eye"></i> Overview</a>
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                  aria-haspopup="true" aria-expanded="false"
+                  style="background-color: white; color: black; margin-left: 2vh;"> Templates
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                  <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
+
+                  <a class="dropdown-item" onclick="totemplate2()"><i class="fa fa-file-alt"></i>
+                    Template 2</a>
+
+                  <a class="dropdown-item" onclick="totemplate3()"><i class="fa fa-file-alt"></i>
+                    Template 3</a>
+
+
+                </div>
+
+              </div>
+
+              <div class="col-md-6" style="text-align: center;">
+                {% if jo.journal.status == "draft" %}
+                <a href="{% url 'update_journal_status' jo.journal.id %}" class="btn btn-outline-warning" title="Save">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'edit_journal' jo.journal.id %}" class=" text-dark">
+                  <button class="btn btn-outline-warning" title="Edit"><i class="fas fa-edit"></i></button>
+                </a>
+                <a href="mailto:example@example.com" class="text-dark">
+                  <button class="btn btn-outline-warning" title="Email"><i class="mdi mdi-email"></i></button>
+              </a>
+              
+                  <a href="#" class="text-dark" onclick="confirmDelete()">
+                    <button class="btn btn-outline-warning" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                  </a>
+                <a class="  text-dark" onclick="exportToPDF()">
+                  <button class="btn btn-outline-warning" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+                </a>
+                <a class=" text-dark" onclick="printSelectedArea()">
+                  <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
+                  </button>
+                </a>
+                <a class="text-dark" onclick="show_slip()">
+                  <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+              </div>
+            </div>
+
+
+
+
+
+            <div class="mt-3 template2 whatToPrint2" style="height: auto;width: 100%; margin-left: -1vh">
+
+              <section id="selected-area" style="background-color: rgb(255, 221, 176);height: auto;" class=" p-2 m-2">
+                <header style="	background-color: #8b3131;border-radius: 1rem;">
+                  <div class="logo ">
+                    <img class="ml-2" width="100rem" style="border-radius: 50%;" src="{% static 'images/zlogo.png' %}"
+                      alt="Company Logo">
+                  </div>
+                  <div style="background: #8b3131;color: white;" class="company-info">
+                    <h2 class="text-white">{{company.company_name}}</h2>
+                    <p class="text-white"> {{company.address}}<br>{{company.city}}</p>
+                    <p> {{company.contact_number}}</p>
+                    <p>{{company.company_email}}</p>
+                  </div>
+                </header>
+                <div class="invoice-box">
+                  <h1 class="text-dark">Manual Journal</h1>
+                  <div class="invoice-header">
+                    <div class="invoice-details text-dark">
+                      <table>
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">Notes</td>
+                          <td class="table-cell text-black" style="border: none;">:</td>
+                          <td class="table-cell text-black" style="border: none;">{{jo.journal.notes}}</td>
+                        </tr>
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">Reference No</td>
+                          <td class="table-cell text-black" style="border: none;">:</td>
+                          <td class="table-cell text-black" style="border: none;">{{jo.journal.reference_no}}</td>
+                        </tr>
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">JournalNo</td>
+                          <td class="table-cell text-black" style="border: none;">:</td>
+                          <td class="table-cell text-black" style="border: none;">{{jo.journal.journal_no}}</td>
+                        </tr>
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">Date</td>
+                          <td class="table-cell text-black" style="border: none;">:</td>
+                          <td class="table-cell text-black" style="border: none;">{{jo.journal.date}}</td>
+                        </tr>
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">Amount</td>
+                          <td class="table-cell text-black" style="border: none;">:</td>
+                          <td class="table-cell text-black" style="border: none;">{{jo.journal.total_debit}}</td>
+                        </tr>
+                      </table>
+                    </div>
+                    <!--<div class="client-details" style="width: 50vh;">
+                      <table>
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;"><b>{{sale.customer.customerName}}</b>
+                          </td>
+                        </tr>
+                        {% if sale.customer.Address1 %}
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">{{sale.customer.Address1}}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">{{sale.customer.GSTTreatment}}</td>
+                        </tr>
+                        {% if sale.customer.GSTIN %}
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">{{sale.customer.GSTIN}}</td>
+                        </tr>
+                        {% endif %}
+                      </table>
+                    </div>-->
+                  </div>
+
+                  <table>
+                    <thead>
+                      <tr>
+
+                        <th id="th" style="text-align: center;">Account Name</th>
+                        <th id="th" style="text-align: center;">Description</th>
+                        <th id="th" style="text-align: center;">Contact</th>
+                        <th id="th" style="text-align: center;">Debit</th>
+                        <th id="th" style="text-align: center;">Credit</th>
+                       
+                      </tr>
+                    </thead>
+                    <tbody>
+                      
+                      <tr style="color: black;">
+                        <td style="text-align: center;">{{jo.account}}</td>
+                        <td style="text-align: center;">{{jo.description}}</td>
+                        <td style="text-align: center;">{{jo.contact}}</td>
+                        <td style="text-align: center;">{{jo.debits}}</td>
+                        <td style="text-align: center;">{{jo.credits}}</td>
+                       
+                      </tr>
+                      
+
+                    </tbody>
+                  </table><br>
+
+                  <div class="invoice-total">
+                    <div class="row">
+                      <div class="col-6"></div>
+
+
+                      <div class="col-4">
+                        <table style="margin-left: 10vh;">
+                          <tr>
+                            <td class="table-cell text-black" style="border: none;">Total Credit</td>
+                            <td class="table-cell text-black" style="border: none;">:</td>
+                            <td class="table-cell text-black" style="border: none;"><b>{{jo.journal.total_credit}}</b></td>
+                          </tr>
+                         
+                          <tr>
+                            <td class="table-cell text-black" style="border: none;">Total Debit</td>
+                            <td class="table-cell text-black" style="border: none;">:</td>
+                            <td class="table-cell text-black" style="border: none;">{{jo.journal.total_debit}}</td>
+                          </tr>
+                          <tr>
+                            <td class="table-cell text-black" style="border: none;">Difference</td>
+                            <td class="table-cell text-black" style="border: none;">:</td>
+                            <td class="table-cell text-black" style="border: none;">{{jo.journal.difference}}</td>
+                          </tr>
+                         
+                         
+                        </table>
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <footer class="mb-5">
+                  <p class="text-dark">&copy; Zho Books 2023 | Info park kakkanad kochi, Ernamkulam, kerala India 12345
+                    | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+                </footer>
+              </section>
+            </div>
+          </div>
+
+          <div class="col-md-9" id="templatediv2" style="display: none;">
+            <div class="row">
+              <div class="col-md-7">
+                <a class="text-white" style="font-size: 1.5rem;">
+                 
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate; "><i
+                    class="fas fa-eye"></i> Overview</a>
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                  aria-haspopup="true" aria-expanded="false"
+                  style="background-color: white; color: black; margin-left: 2vh;"> Templates
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                  <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
+
+                  <a class="dropdown-item" onclick="totemplate2()"><i class="fa fa-file-alt"></i>
+                    Template 2</a>
+
+                  <a class="dropdown-item" onclick="totemplate3()"><i class="fa fa-file-alt"></i>
+                    Template 3</a>
+
+
+                </div>
+
+              </div>
+
+              <div class="col-md-6" style="text-align: center;">
+                {% if jo.journal.status == "draft" %}
+                <a href="{% url 'update_journal_status' jo.journal.id %}" class="btn btn-outline-warning" title="Save">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'edit_journal' jo.journal.id %}" class=" text-dark">
+                  <button class="btn btn-outline-warning" title="Edit"><i class="fas fa-edit"></i></button>
+                  <a href="mailto:example@example.com" class="text-dark">
+                    <button class="btn btn-outline-warning" title="Email"><i class="mdi mdi-email"></i></button>
+                </a>
+                
+                    <a href="#" class="text-dark" onclick="confirmDelete()">
+                      <button class="btn btn-outline-warning" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                    </a>
+                <a class="  text-dark" onclick="exportToPDF2()">
+                  <button class="btn btn-outline-warning" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+                </a>
+                <a class=" text-dark" onclick="printSelectedArea2()">
+                  <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
+                  </button>
+                </a>
+                <a class="text-dark" onclick="show_slip()">
+                  <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+              </div>
+            </div>
+
+
+
+
+
+            <div id="template1" class="printTemplates template1">
+              <div class="my-3 page" style="background-color: rgb(255, 221, 176);" id="selected-area2">
+                <div class="p-5">
+                  <div style="background-color: #8b3131;border-radius: 1rem;padding: 20px;">
+                    <center class="h3"><b>MANUAL Journal</b></center>
+                  </div>
+                  <div class="row mt-5">
+                    <div class="col-md-8">
+                      <h4 class="text-secondary" style="font-weight: bold;">{{company.company_name }}</h4>
+                      <p class="address" style="font-weight: bold;color: #000;">
+                        {{company.address}}<br>
+                        {{company.city}},
+                        {{company.state}}<br>
+                        {{company.pincode}}<br>
+                        {{company.company_email}}<br>
+                        {{company.contact_number}}<br>
+                      </p>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="top-left">
+                        <div class="mt-2">
+                          <p style="color: #000;">Notes
+                            <b>:{{ jo.journal.notes}}</b>
+                          </p>
+                          <p style="color: #000;">Date
+                            <b>:{{ jo.journal.date}}</b>
+                          </p>
+                          <p style="color: #000;">Journal no
+                            <b>:{{ jo.journal.journal_no}}</b>
+                          </p>
+                          <p style="color: #000;">Reference no
+                            <b>:{{ jo.journal.reference_no}}</b>
+                          </p>
+                          <p style="color: #000;">Amount
+                            <b>:{{ jo.journal.total_debit}}</b>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <section class="top-content bb d-flex justify-content-between">
+                    <div class="logo">
+
+                    </div>
+
+                  </section>
+
+                  
+
+                  <section class="product-area mt-2">
+                    <table class="table table-hover table-bordered table-secondary">
+                      <thead>
+                        <tr class="">
+                          <th class="text-center" style="color:#8b3131;">Account Name</th>
+                          <th class="text-center" style="color:#8b3131;">Description</th>
+                          <th class="text-center" style="color:#8b3131;">Contact</th>
+                          <th class="text-center" style="color:#8b3131;">Debits</th>
+                          <th class="text-center" style="color:#8b3131;">Credits</th>
+                          
+                        </tr>
+                      </thead>
+                      <tbody>
+                        
+                        <tr>
+                          <td class="text-center" style="color:#000">{{ jo.account }}</td>
+                          <td class="text-center" style="color:#000">{{ jo.description}}</td>
+                          <td class="text-center" style="color:#000">{{ jo.contact }}</td>
+                          <td class="text-center" style="color:#000">{{ jo.debits }}</td>
+                          <td class="text-center" style="color:#000">{{ jo.credits }}</td>
+                         
+                        </tr>
+                        
+                      </tbody>
+                    </table>
+                  </section>
+
+                  <section class="balance-info">
+                    <div class="row mt-3">
+                      <div class="col-4">
+                        <table class="table table-borderless">
+                          <tbody>
+
+                            <!-- <tr >
+                                              <td style="color: #000;text-align: left;">Payment Type</td>
+                                              <td style="color: #000;text-align: left;">:</td>
+                                              {% if bank %}
+                                              <th style="color: #000;text-align: center;">{{bank.bankname}}</th>
+                                              {% else %}
+                                              <th style="color: #000;text-align: center;">{{pbill.payment_type}}</th>
+                                              {% endif %}
+                                          </tr>
+                                          <tr>
+                                              <td></td>
+                                              <td></td>
+                                              <td></td>
+                                              
+                                          </tr> -->
+                            
+
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="col-4"></div>
+                      <div class="col-4">
+                        <table class="table table-borderless">
+                          <tbody>
+                            <tr>
+                              <td style="color: #000;">Total Credit</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-center" style="color: #000;">
+                                {{jo.journal.total_credit}}</td>
+                            </tr>
+                           
+                            <tr>
+                              <td style="color: #000;">Total Debit</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-center" style="color: #000;">
+                                {{jo.journal.total_debit}}</td>
+                            </tr>
+                            <tr>
+                              <td style="color: #000;">difference</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-center" style="color: #000;">
+                                {{jo.journal.difference}}</td>
+                            </tr>
+                            
+
+                          </tbody>
+
+                        </table>
+
+                      </div>
+                    </div>
+                    <footer class="mb-5">
+                      <p class="text-dark">&copy; Zho Books 2023 | Info park kakkanad kochi,
+                        Ernamkulam,
+                        kerala India 12345
+                        | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+                    </footer>
+                  </section>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="col-md-9" id="templatediv3" style="display: none;">
+            <div class="row">
+              <div class="col-md-7">
+                <a class="text-white" style="font-size: 1.5rem;">
+                  
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate;"><i
+                    class="fas fa-eye"></i> Overview</a>
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                  aria-haspopup="true" aria-expanded="false"
+                  style="background-color: white; color: black; margin-left: 2vh;"> Templates
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                  <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
+
+                  <a class="dropdown-item" onclick="totemplate2()"><i class="fa fa-file-alt"></i>
+                    Template 2</a>
+
+                  <a class="dropdown-item" onclick="totemplate3()"><i class="fa fa-file-alt"></i>
+                    Template 3</a>
+
+
+                </div>
+
+              </div>
+
+              <div class="col-md-6" style="text-align: center;">
+                {% if jo.journal.status == "draft" %}
+                <a href="{% url 'update_journal_status' jo.journal.id %}" class="btn btn-outline-warning" title="Save">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'edit_journal' jo.journal.id %}" class=" text-dark">
+                  <button class="btn btn-outline-warning" title="Edit"><i class="fas fa-edit"></i></button>
+                </a>
+                <a href="mailto:example@example.com" class="text-dark">
+                  <button class="btn btn-outline-warning" title="Email"><i class="mdi mdi-email"></i></button>
+              </a>
+              
+                  <a href="#" class="text-dark" onclick="confirmDelete()">
+                    <button class="btn btn-outline-warning" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                  </a>
+                <a class="  text-dark" onclick="exportToPDF3()">
+                  <button class="btn btn-outline-warning" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+                </a>
+                <a class=" text-dark" onclick="printSelectedArea3()">
+                  <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
+                  </button>
+                </a>
+                <a class="text-dark" onclick="show_slip()">
+                  <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+              </div>
+            </div>
+
+
+
+
+
+            <div id="template3" class="template3">
+              <div class="my-5 page" size="A4" style="background-color: rgb(255, 221, 176);">
+                <div class="p-5" id="selected-area3">
+                  <section class="top-content bb d-flex justify-content-between" style="background-color: #8b3131;">
+                    <div class="logo">
+                      <!-- <img src="logo.png" alt="" class="img-fluid"> -->
+                    </div>
+                    <div class="top-left">
+                      <div >
+                        <p style="font-size:15px;color:white;">Manual Journal</p>
+                      </div>
+                      
+                    </div>
+                  </section>
+
+                  <section class="store-user mt-5">
+                    <div class="col-12">
+                      <div class="row bb pb-3">
+                        <div class="col-7">
+                          <p>FROM,</p>
+                          <h5>{{company.company_name }}</h5>
+                          <p class="address "> {{company.address}}<br>
+                            {{company.city}},
+                            {{company.state}}<br>
+                            {{company.pincode}}<br>
+                          </p>
+
+                        </div>
+                        <!--<div class="col-5">
+                          <p>TO,</p>
+                          <h5>{{sale.customer.customerName}}</h5>
+                          <p class="address col-9" style="margin-left: 0px;">
+                            {{sale.customer.Address1}} </p><br>
+                          <p class="address col-9">{{sale.customer.GSTTreatment}}</p><br>
+                          <p class="address col-9">{{sale.customer.GSTIN}}</p>
+
+
+                        </div>-->
+                      </div>
+                      <div class="row extra-info pt-3">
+                        <div class="col-7">
+                          <p>Notes
+                            <span>:{{jo.journal.notes}}</span>
+                          </p>
+                          <p>Date
+                            <span>:{{jo.journal.date}}</span>
+                          </p>
+                          <p>Journal No
+                            <span>:{{jo.journal.journal_no}}</span>
+                          </p>
+                          <p>Reference No
+                            <span>:{{jo.journal.reference_no}}</span>
+                          </p>
+                          <p>Amount
+                            <span>:{{jo.journal.total_debit}}</span>
+                          </p>
+                        </div>
+
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="product-area mt-4">
+                    <table class=" table table-hover table-bordered " id="table1">
+                      <thead>
+                        <tr>
+                          <td style="text-align: center; font-weight:bold; color:black ">Account name</td>
+                          <td style="font-weight:bold; color:black">Description</td>
+                          <td style="font-weight:bold; color:black">Contact</td>
+                          <td style="font-weight:bold; color:black">Debits</td>
+                          <td style="font-weight:bold; color:black">Credits</td>
+                         
+                        </tr>
+                      </thead>
+                      <tbody>
+
+                        <tr>
+                          <td style="color:black; text-align: center;">{{jo.account}}</td>
+                          <td style="color:black">{{jo.description}}</td>
+                          <td style="color:black">{{jo.contact}}</td>
+                          <td style="color:black">{{jo.debits}} </td>
+                          <td style="color:black">{{jo.credits}} </td>
+                         
+
+                        </tr>
+                        
+                      </tbody>
+                    </table><br><br>
+                  </section>
+
+                  <section class="balance-info">
+                    <div class="row">
+                      <div class="col-4"></div>
+                      <div class="col-4"></div>
+                      <div class="col-4">
+                        <table class="table table-borderless">
+                          <tbody>
+                            <tr>
+                              <td style="color: #000;">Total Debit</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-right" style="color: #000;">
+                                {{jo.journal.total_debit}}</td>
+                            </tr>
+                            
+                            <tr>
+                              <td style="color: #000;">Total Credit</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-right" style="color: #000;">
+                                {{jo.journal.total_credit}}</td>
+                            </tr>
+                            <tr>
+                              <td style="color: #000;">Difference</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-right" style="color: #000;">{{jo.journal.difference}}</td>
+                            </tr>
+                            
+
+                          </tbody>
+
+                        </table>
+
+                      </div>
+
+                      <footer class="mb-5">
+                        <p class="text-dark">&copy; Zho Books 2023 | Info park kakkanad kochi,
+                          Ernamkulam,
+                          kerala India 12345
+                          | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+                      </footer>
+                    </div>
+                  </section>
+
+                  <!-- Cart BG -->
+                  <img src="cart.jpg" class="img-fluid cart-bg" alt="">
+
+                  <!-- <footer>
+                                  <hr>
+                                  <p class="m-0 text-center">
+                                      View THis Invoice Online At - <a href="#!"> invoice/saburbd.com/#868 </a>
+                                  </p>
+                                  <div class="social pt-3">
+                                      <span class="pr-2">
+                                          <i class="fas fa fa-mobile-alt"></i>
+                                          <span>0123456789</span>
+                                      </span>
+                                      <span class="pr-2">
+                                          <i class="fas fa fa-envelope"></i>
+                                          <span>me@saburali.com</span>
+                                      </span>
+                                      <span class="pr-2">
+                                          <i class="fab fa-facebook-f"></i>
+                                          <span>/sabur.7264</span>
+                                      </span>
+                                      <span class="pr-2">
+                                          <i class="fab fa-youtube"></i>
+                                          <span>/abdussabur</span>
+                                      </span>
+                                      <span class="pr-2">
+                                          <i class="fab fa-github"></i>
+                                          <span>/example</span>
+                                      </span>
+                                  </div>
+                              </footer> -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- Share bill Modal -->
+          <div class="modal fade" id="shareBillEmail">
+            <div class="modal-dialog modal-xl">
+              <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+                <div class="modal-header" style="background: rgb(32, 35, 37);">
+                  <h5 class="m-3 text-uppercase" id="shareBillEmailLabel">Share Manual Journal Via Email</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                      aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body" style="background: rgb(32, 35, 37);">
+                  <div class="card p-3 m-3">
+                    <form action="" method="post" class="needs-validation"
+                      id="share_to_email_form" autocomplete="off">
+                      {% csrf_token %}
+                      <div class="form-group">
+                        <label for="emailIds">Email IDs</label>
+                        <textarea class="form-control text-dark" name="email_ids" id="emailIds" rows="5"
+                          placeholder="Multiple emails can be added by separating with a comma(,)." required></textarea>
+                      </div>
+                      <div class="form-group mt-2">
+                        <label for="item_unitname">Message(optional)</label>
+                        <textarea name="email_message" id="email_message" class="text-dark form-control" cols=""
+                          rows="4" placeholder="This message will be sent along with Bill details."></textarea>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="modal-footer d-flex justify-content-center" style="border-top: 1px solid #ffff;">
+                    <input type="submit" id="share_with_email"
+                      class="submitShareEmailBtn rounded-pill text-grey w-50 my-4 mx-3" value="SEND MAIL">
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+<script>
+  $(document).ready(function () {
+    $('#shareBillEmail').modal();
+  });
+</script>
+
+
+      <script src="https://code.jquery.com/jquery-3.x.x.min.js"></script>
+      <script src="path/to/jquery.min.js"></script>
+      <script src="path/to/bootstrap.min.js"></script>
+
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+</section>
+{% for message in messages %}
+
+<script>
+  let msg = '{{message}}';
+  alert(msg);
+</script>
+{% endfor %}
+
+
+
+
+<script>
+  
+  $(document).ready(function () {
+    $('#share_with_email').on('click', function () {
+      var emailsInput = document.getElementById('emailIds');
+      var emailsString = emailsInput.value.trim();
+
+      var emails = emailsString.split(',').map(function (email) {
+        return email.trim();
+      });
+
+      var emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+
+      var invalidEmails = []
+      if (emailsString == "") {
+        alert('Enter valid email addresses..')
+      }
+      else {
+        for (var i = 0; i < emails.length; i++) {
+          var currentEmail = emails[i];
+
+          if (currentEmail != "" && !emailRegex.test(currentEmail)) {
+            console.log(currentEmail + ' is invalid!');
+            invalidEmails.push(currentEmail)
+          }
+        }
+
+        if (invalidEmails.length > 0) {
+          alert('Invalid emails..Please check!\n' + invalidEmails)
+          // alert(invalidEmails)
+        } else {
+          $('#share_to_email_form').submit();
+        }
+      }
+    })
+  });
+
+
+  function shareOnWhatsApp() {
+    var url = window.location.href;
+    var text = url;
+    text = encodeURIComponent(text);
+    var whatsappUrl = "whatsapp://send?text=" + text;
+    window.location.href = whatsappUrl;
+  }
+
+  function exportToPDF() {
+    var content = document.getElementById('selected-area');
+    html2pdf()
+      .from(content)
+      .save('{{sale.sales_no}}' + '.pdf')
+  }
+  function exportToPDF2() {
+    var content = document.getElementById('selected-area2');
+    html2pdf()
+      .from(content)
+      .save('{{sale.sales_no}}' + '.pdf')
+  }
+  function exportToPDF3() {
+    var content = document.getElementById('selected-area3');
+    html2pdf()
+      .from(content)
+      .save('{{sale.sales_no}}' + '.pdf')
+  }
+  function exportToPDF4() {
+    var content = document.getElementById('printslip');
+    html2pdf()
+      .from(content)
+      .save('{{sale.sales_no}}' + '.pdf')
+  }
+
+</script>
+
+<script>
+  // Get the div element by its ID
+  var divElement = document.getElementById("orderinfo");
+
+  // Get the height of the div using offsetHeight
+  var divHeight = divElement.offsetHeight;
+
+  var divElement = document.getElementById("productinfo");
+
+  // Set the height of the div
+  divElement.style.height = `${divHeight}px`;
+
+  // Log the height to the console
+</script>
+
+<script>
+  function printSelectedArea(area) {
+
+    var printContents = document.getElementById("selected-area").innerHTML;
+    document.getElementById("selected-area").style.backgroundColor = "white"
+    var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
+    $printerDiv.html(printContents); // add the content to be printed
+    $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+    window.print(); // call print
+    $printerDiv.remove(); // remove the div
+    $('body').removeClass("printingContent");
+
+  }
+
+  function printSelectedArea2(area) {
+
+    var printContents = document.getElementById("selected-area2").innerHTML;
+    document.getElementById("selected-area2").style.backgroundColor = "white"
+    var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
+    $printerDiv.html(printContents); // add the content to be printed
+    $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+    window.print(); // call print
+    $printerDiv.remove(); // remove the div
+    $('body').removeClass("printingContent");
+
+  }
+  function printSelectedArea3(area) {
+
+    var printContents = document.getElementById("selected-area3").innerHTML;
+    document.getElementById("selected-area3").style.backgroundColor = "white"
+    var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
+    $printerDiv.html(printContents); // add the content to be printed
+    $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+    window.print(); // call print
+    $printerDiv.remove(); // remove the div
+    $('body').removeClass("printingContent");
+
+  }
+  function printSelectedArea4(area) {
+
+    var printContents = document.getElementById("printslip").innerHTML;
+    document.getElementById("printslip").style.backgroundColor = "white"
+    var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
+    $printerDiv.html(printContents); // add the content to be printed
+    $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+    window.print(); // call print
+    $printerDiv.remove(); // remove the div
+    $('body').removeClass("printingContent");
+
+  }
+</script>
+
+<script>
+
+  const rows = document.querySelectorAll('.clickable');
+
+  rows.forEach(row => {
+    row.addEventListener('click', () => {
+      var currentURL = window.location.href
+      const rowId = row.id;
+      var newURL = currentURL.replace(/\d+$/, rowId);
+      window.location.href = newURL;
+    });
+  });
+
+
+
+
+
+</script>
+
+<script>
+
+
+  function totemplate() {
+    document.getElementById('templatediv').style.display = 'block'
+    document.getElementById('overviewdiv').style.display = 'none'
+    document.getElementById('templatediv2').style.display = 'none'
+    document.getElementById('templatediv3').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'none'
+
+  }
+  function totemplate2() {
+    document.getElementById('templatediv').style.display = 'none'
+    document.getElementById('templatediv2').style.display = 'block'
+    document.getElementById('templatediv3').style.display = 'none'
+    document.getElementById('overviewdiv').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'none'
+
+  }
+  function totemplate3() {
+    document.getElementById('templatediv').style.display = 'none'
+    document.getElementById('templatediv2').style.display = 'none'
+    document.getElementById('templatediv3').style.display = 'block'
+    document.getElementById('overviewdiv').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'none'
+  }
+  function tooverview() {
+    document.getElementById('templatediv').style.display = 'none'
+    document.getElementById('overviewdiv').style.display = 'block'
+    document.getElementById('templatediv2').style.display = 'none'
+    document.getElementById('templatediv3').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'none'
+  }
+  function show_slip() {
+    document.getElementById('templatediv').style.display = 'none'
+    document.getElementById('overviewdiv').style.display = 'none'
+    document.getElementById('templatediv2').style.display = 'none'
+    document.getElementById('templatediv3').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'block'
+  }
+</script>
+
+<script>
+  var $rows = $('#myTable tbody tr');
+  $('#search').keyup(function () {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+    $rows.hide().filter(function () {
+      var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+      return ~text.indexOf(val);
+    }).show();
+  });
+
+</script>
+
+<script>
+  // Function to sort the table by the selected column
+  function sortTable() {
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementById("myTable");
+    switching = true;
+
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+
+      for (i = 0; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("label")[0];
+        y = rows[i + 1].getElementsByTagName("label")[0];
+
+        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          shouldSwitch = true;
+          break;
+        }
+      }
+
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+      }
+    }
+  }
+
+
+  function sortTablebybillno() {
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementById("myTable");
+    switching = true;
+
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+
+      for (i = 0; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("p")[0];
+        y = rows[i + 1].getElementsByTagName("p")[0];
+
+        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          shouldSwitch = true;
+          break;
+        }
+      }
+
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+      }
+    }
+  }
+
+</script>
+
+<script>
+  function confirmDelete() {
+    var result = confirm("Are you sure you want to delete?");
+    if (result) {
+      // User clicked "OK," perform delete action or redirect to delete endpoint
+      // You can add your delete logic or redirect here
+      alert("Deleted!"); // Placeholder for your delete action
+    } else {
+      // User clicked "Cancel" or closed the dialog
+      // Do nothing or provide feedback to the user
+      alert("Cancel Delete!"); // Placeholder for feedback
+    }
+  }
+</script>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+
+
+{% endblock %}

@@ -1,0 +1,393 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<style>
+
+  .modal {
+    margin-top: 5rem;
+    z-index: 1;
+    overflow: scroll;
+  }
+
+  .modal-backdrop {
+    display: none;
+    z-index: 1 !important;
+  }
+
+  .modal-content {
+    margin: 2px auto;
+    z-index: 999 !important;
+  }
+
+
+
+  #over:hover {
+    background-color: rgba(110, 110, 110, 0.616);
+  }
+
+  .dropdown-item:hover {
+    color: chocolate;
+  }
+
+  #myTable tbody {
+    cursor: pointer;
+  }
+
+  .table-btn:hover {
+    color: black;
+  }
+
+  /* width */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: rgb(252, 236, 217);
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  
+</style>
+
+<div class="container-fluid">
+  <div class="fixed-top" style="top: 7rem; margin-left: 18rem;">
+    <div style="height: 600px;overflow-y: scroll;">
+
+      <div class="row container-fluid">
+        <div class="col-md-3"><a class="text-white" style="font-size: 2rem;">All Invoices</a></div>
+      </div>
+      <br><br><br>
+
+      <div class="row container-fluid mb-3">
+        <div class="col-md-3">
+          <input type="text" id="search" class="form-control bg-light text-dark" placeholder="Search.."
+            autocomplete="off">
+        </div>
+        <div class="col-md-2">
+          <div class="dropdown">
+            <a class="btn text-center px-4 pt-2 btn-outline-warning" id="sortbutton" data-bs-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false" role="button">
+              <i class="fas fa-sort m-1"></i>
+            </a>
+            <div class="dropdown-menu m-1">
+              <a class="dropdown-item" href="# " id="all-challan">All</a>
+              <a class="dropdown-item" id="sort-challan">Invoice Number</a>
+              <a class="dropdown-item" id="sort-customer">Customer Name</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2"></div>
+        <div class="col-md-3">
+          <div class="dropdown d-flex">
+            <a class="btn text-center px-4 pt-2 btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false" role="button">
+              <i class="fa fa-filter mt-1"></i>
+            </a>
+            <div class="dropdown-menu m-1">
+              <a class="dropdown-item" href="{% url 'invoiceview' %}">All</a>
+              <a class="dropdown-item" href="{% url 'filter_invoice_draft' %}">Draft</a>
+              <a class="dropdown-item"  href="{% url 'filter_invoice_sent' %}">Save</a>
+            </div>
+            <a style="border: 1px solid; border-radius: 5px; height: 5vh; margin-left: 2vh; display: flex; align-items: center;" onclick="reduce_dash()" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-outline-warning"  href="">
+              <i class="fa fa-file-excel-o p-1" style="font-size: large;"></i>
+              <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Import</span>
+          </a>
+          <a style="border: 1px solid; border-radius: 5px; height: 5vh; margin-left: 2vh; display: flex; align-items: center;" onclick="exportToExcel()"0 class="btn btn-outline-warning" >
+            <i class="fa fa-file-excel-o p-1" style="font-size: large;"></i>
+            <span style="font-size: 2vh; margin-left: 0.5rem;" class="text-center">Export</span>
+        </a>
+            <a style="height: 5vh; margin-left: 2vh;" class="btn btn-outline-warning text-right px-3 py-2" role="button"
+              style="margin-left: 5px;" href="{% url 'add_prod' %}">
+              <i class="fa fa-plus" style="font-size: large;"></i><span style="font-size: 3vh;"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row container-fluid">
+        <div class="col-sm-12 col-md-11 col-lg-11">
+          <table class="table  text-white" id="table-id">
+            <thead>
+              <tr>
+                <th>DATE</th>
+                  <th>INVOICE NO.</th>
+                  
+                 
+                  <th>CUSTOMER NAME</th>
+                  <th>MAIL ID</th>
+                  <th>AMOUNT</th>
+                  <th>STATUS</th>
+                  <th>BALANCE</th>
+                  
+              </tr>
+          </thead>
+          <tbody id="table">
+              {% for v in invoice %}
+  
+              <tr id="tr_data" style="cursor: pointer;" class="clickable-row" data-href="{% url 'invoice_overview' v.id %}">
+                  <!-- onclick="location.href ='{% url 'detailedview' v.id %}' " -->
+                  <td > {{v.inv_date}}</td>
+                  <td >{{v.invoice_no}}</td>
+                  
+                 
+                  <td>{{v.customer.customerName}}</td>
+                  <td>{{v.customer.customerEmail}}</td>
+                  <td>{{v.grandtotal}}</td>
+                 <td>{{v.status}}</td>
+                 <td>{{v.balance}}</td>
+                 
+                 <!-- <td><a style="border-radius: 50%;" class="btn btn-danger" href="{% url 'dele' v.id %}">delet</a></td> -->
+              </tr>
+  
+              {% endfor %}
+          </tbody>
+            </tbody>
+          </table>
+        </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="0" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index: 10;">
+      <div class="modal-dialog">
+        <div style="background-color: rgb(63, 63, 63);width: 40rem;" class="modal-content">
+          <!-- <div class="modal-header">
+            
+          </div> -->
+          <div class="modal-body">
+            <div class="d-flex justify-content-between">
+              <h1 class="modal-title fs-5 " id="exampleModalLabel">Import From Excel</h1>
+              <button type="button" class="btn-close text-light" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <hr class="mb-3">
+            <label class="text-danger fw-bold pb-2" for="">Fields needed to be filled are</label>
+            <div style="overflow-x: auto;">
+              <table class="table table-bordered border-secondary">
+                <thead>
+                  <th class="text-light">CUSTOMER NAME</th>
+                  <th class="text-light">CUSTOMER MAIL ID</th>
+                  <th class="text-light">PAYMENT RECIEVED DATE</th>
+                  <th class="text-light">PAYMENT RECIEVED MAETHOD</th>
+                  <th class="text-light">CHEQUE ID</th>
+                  <th class="text-light">UPI ID</th>
+                  <th class="text-light">BANK NAME</th>
+                  <th class="text-light">ACCOUNT NUMBER</th>
+                  <th class="text-light">PAYMENT RECIEVED AMOUNT</th>
+                  <th class="text-light">PAYMENT RECIEVED PAID</th>
+                  <th class="text-light">PAYMENT RECIEVED BALANCE</th>
+                </thead>
+              </table>
+              <p></p>
+            </div>
+            <hr>
+            <form action="{% url 'import_payment_recieved' %}" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <label style="color: rgb(152, 152, 255);" class=" fw-bolder" for="">Download Sample Excel File</label>
+                  <a class="btn btn-outline-warning ms-5" href="{% url 'download_pay_rec_sampleImportFile' %}">Download</a>
+                 <hr>
+                  <input class="form-control bg-dark" type="file" name="excel_file">
+                  <hr>
+                  <div class="d-flex justify-content-end">
+                    <button type="button" class="btn bt-lg btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn bt-lg btn-primary">Import</button>
+                  </div>
+              </div>
+              <br
+</div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--<script>
+  // Function to sort the table by the selected column
+  function sortTableName() {
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementById("myTable");
+    switching = true;
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+      for (i = 1; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("td")[2];
+        y = rows[i + 1].getElementsByTagName("td")[2];
+        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          shouldSwitch = true;
+          break;
+        }
+      }
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+      }
+    }
+  }
+
+  function sortTableTotal() {
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementById("myTable");
+    switching = true;
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+      for (i = 1; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("td")[1];
+        y = rows[i + 1].getElementsByTagName("td")[1];
+        if (x.innerHTML > y.innerHTML) {
+          shouldSwitch = true;
+          break;
+        }
+      }
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+      }
+    }
+  }
+</script>
+
+<script>
+  jQuery(document).ready(function ($) {
+    $(".clickable-row td").click(function () {
+      window.location = $(this).data("href");
+    });
+  });
+</script>
+
+
+<script>
+  var $rows = $('table tbody tr');
+  $('#search').keyup(function () {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    $rows.hide().filter(function () {
+      var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+      return ~text.indexOf(val);
+    }).show();
+  });
+</script>-->
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+  </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+  </script>
+
+
+  <script>
+    // Add click event listener to all rows with class "clickable-row"
+    const rows = document.querySelectorAll('.clickable-row');
+    rows.forEach(row => {
+      row.addEventListener('click', () => {
+        // Get the URL from the "data-href" attribute
+        const url = row.getAttribute('data-href');
+        // Navigate to the URL
+        window.location.href = url;
+      });
+    });
+  </script>
+  <script>
+    var $rows = $('#table tr');
+    $('#search').keyup(function() {
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+        
+        $rows.hide().filter(function() {
+            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return ~text.indexOf(val);
+        }).show();
+    });
+  
+    
+  </script>
+
+  
+<script>
+  $(document).ready(function () {
+    var $rows = $('#table-id tbody tr');
+    var originalOrder = $rows.toArray(); // Keep a reference to the original order of rows
+
+    $('#search').keyup(function () {
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+        $rows.hide().filter(function () {
+            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return ~text.indexOf(val);
+        }).show();
+    });
+
+    $('#sort-challan').on('click', function () {
+        sortTable(1); // Sort by Challan Number (2nd column)
+    });
+
+    $('#sort-customer').on('click', function () {
+        sortTable(2); // Sort by Customer Name (3rd column)
+    });
+
+    $('#all-challan').on('click', function () {
+        // Reset to the original order of rows
+        $('#table-id tbody').empty().append(originalOrder);
+    });
+
+    function sortTable(column) {
+        $rows.sort(function (a, b) {
+            var aVal = $(a).find('td').eq(column).text();
+            var bVal = $(b).find('td').eq(column).text();
+            return aVal.localeCompare(bVal);
+        });
+        $('#table-id tbody').html($rows);
+    }
+});
+
+
+function exportToExcel() {
+  $('.export_hide').remove()
+  var table = document.querySelector('table');
+  var ws = XLSX.utils.table_to_sheet(table);
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+  XLSX.writeFile(wb, 'report.xlsx');
+  window.location.href=""
+}
+function call_import()
+{
+$('#call_input').click()
+}
+$(document).ready(function(){
+$('#call_input').on('change',function(){
+  $('#click_sbmt').click()
+  // window.location.url="{% url 'import_payment_recieved' %}"
+})
+})
+// function reduce_dash(){
+//   alert($('.form-inline .form-check').Width())
+//   if($('.form-inline .form-check').css('width')=== '100%')
+//   {
+//     $('.mdi-menu').click()
+//   }
+// }
+
+</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script>
+  
+  
+{% endblock %}

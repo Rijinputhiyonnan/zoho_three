@@ -1,0 +1,552 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load social_share %}
+{% block content %}
+
+<style>
+
+
+
+
+  .daterangepicker{
+    color: black;
+  }
+
+  .daterangepicker td.available, .daterangepicker th {
+    color: black;
+  }
+
+  @media print {
+    body{
+            visibility: hidden !important; /* hide everything in body when in print mode*/
+        }
+
+        .printContainer {
+            visibility: visible !important; /* Override the rule above to only show the printables*/
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            margin-left: 1vh;
+        } 
+
+        table{
+          width:50%;
+          background-color: white;
+        }
+
+        table tbody td{
+          color: black;
+
+        }
+
+        #company{
+          margin-left: 10vh;
+        }
+        #company a, /* Target links within company */
+        #selectedEndDate,
+        #totalDisplay /* Target Sale Order Details */
+         {
+          color: black !important; /* Set text color to black */
+         }
+  }
+
+  #reportrange span, #selectedEndDate, .daterangepicker .ranges ul li {
+    font-size: 14px; /* Adjust the font size as needed */
+  }
+
+  .dropdown-item:hover{
+    color: chocolate;
+  }
+
+          /* Style for the tooltip-like list */
+          #nameTooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            padding: 10px;
+            z-index: 1;
+            width: 26%; /* Adjust the width as needed */
+            color: black;
+            margin-top: 1vh;
+  border-radius: 1vh;
+
+        }
+
+        /* Style for the list items in the tooltip */
+        .tooltip-item {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .tooltip-item:hover {
+          background-color: #555;
+          color: white;
+        }
+
+        #nameTooltip .scrollable-tooltip {
+  max-height: 130px; /* Maximum height for the tooltip */
+  overflow-y: auto; /* Add vertical scrollbar when content overflows */
+        }
+        @media (max-width: 768px) {
+  .share-dropdown {
+    display: inline-block;
+  }
+}
+        
+
+</style>
+<div class="container-fluid">
+  <div class="row align-items-center">
+      <div class="col-md-6">
+          <form class="form-inline">
+              <label class="mr-2" for="fromdate">From:</label>&nbsp;
+              <input type="date" class="form-control" id="fromdate" style="color: black !important;">
+              <label class="mx-2" for="todate">To:</label>
+              <input type="date" class="form-control" id="todate" style="color: black !important;">
+          </form>
+      </div>
+      <div class="col-md-6 d-flex justify-content-end align-items-center position-relative">
+        <a class="btn btn-outline-warning p-2 mr-2" onclick="exportAsPDF()"><i class="fa fa-file-pdf-o" aria-hidden="true"></i>PDF</a>&nbsp;
+        <a class="btn btn-outline-warning p-2 mr-2" href="#" onclick="printPageContent()"><i class="fa fa-print" aria-hidden="true"></i>Print</a>&nbsp;
+        <a class="btn btn-outline-warning p-2 mr-2" onclick="exportAsXLS()"><i class="fa fa-file-excel-o" aria-hidden="true"></i>EXCEL</a>&nbsp;
+        <div class="share-dropdown ">
+            <button class="btn btn-outline-warning p-2 mr-2" title="SHARE"><i class="fa fa-share" aria-hidden="true"></i>Share </button>&nbsp;
+            <ul class="share-dropdown-menu position-absolute" aria-labelledby="navbarDropdown">
+                <li>{% post_to_whatsapp object_or_url "WhatsApp" %}</li>
+                <li>{% send_email object.title "New: {{object.title}}. Check it out!" object_or_url "Email" %}</li>
+            </ul>
+        </div>
+        <a class="btn btn-outline-warning p-2" href="{% url 'report_inventory_view' %}">&times;</a>
+    </div>
+
+
+
+<div class="row">
+  <div class="col-md-4" style="margin-left: 5vh;"><br><br>
+    <input class="form-control text-black" type="text" id="searchInput" placeholder="Search ">
+    
+    <div id="nameTooltip" >
+      <div class="scrollable-tooltip">
+      {% for name in name_list %}
+        <div class="tooltip-item">{{name}}</div>
+        {% endfor %}
+    </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid" id="container-to-print"> 
+  <div class="row pt-5">
+    <center>
+      <div class="col-md-4" id="company">
+        {% if company.company_name != None %}
+          <a class="text" style="font-size: 1rem; color: white;">{{ company.company_name }}</a><br>
+        {% else %}
+          <a class="text" style="font-size: 1rem; color: white;">Add Company</a><br>
+        {% endif %}
+        <a class="text" style="font-size: 1.5rem; color: white;">Estimate Details</a><br>
+        <h5 class="text" id="selectedEndDate"></h5><br>
+      </div>
+    </center>   
+  </div> 
+
+  <div>
+    <table class="table text-white" id="myTable">
+      <thead >
+        <tr style="text-align: center;">
+          <th>DATE </th>
+          <th>ESTIMATE NUMBER</th>
+          <th>EXPIRY DATE</th>
+          <th>CUSTOMER NAME</th>
+          <th>AMOUNT</th>
+          <th>STATUS</th>
+          <th>ACTION</th>
+          
+        
+        </tr>
+      </thead>
+
+      <tbody style="text-align: center;">
+        {% for e in estimates %}
+        <tr>
+          <td>{{ e.estimate_date }}</td>
+          <td>{{e.estimate_no}}</td>
+          <td>{{e.expiry_date}}</td>
+          <td>{{e.customer_name}}</td>
+          <td>₹{{e.total}}</td>
+          <td>{{e.status}}</td>
+          <td>
+            {% if e.convert_sales == 'converted' %}
+              <span style="color: rgb(17, 191, 69);;">Converted to sales</span>
+            {% elif e.convert_invoice == 'converted' %}
+              <span style="color: rgb(17, 191, 69);">Converted to Invoice</span>
+            {% else %}
+             <span style="color: chocolate;"> Not Converted </span>
+            {% endif %}
+          </td>
+          <!-- {% if estimate.convert_sales == 'converted' %}
+          <td style="color: rgb(3, 82, 3);">Done</td>
+          {% else %}
+          <td style="color: rgb(158, 2, 2);">Not Done</td>
+          {% endif %}
+
+          {% if estimate.convert_invoice == 'converted' %}
+          <td style="color: rgb(3, 82, 3);">Done</td>
+          {% else %}
+          <td style="color: rgb(158, 2, 2);">Not Done</td>
+          {% endif %} -->
+          
+        </tr>
+        
+        {% endfor %}
+      </tbody>
+    </table>
+    <div id="totalDisplay" class="mt-3" style="font-size: 20px;">
+      Total Amount:<span id="totalEstimateAmount"></span>
+      <br>Total Estimates: <span id="orderCountDisplay"></span>
+     
+  </div>
+
+  </div>
+
+
+</div>  
+
+<script>
+  function updateEndDateMin() {
+      const startDateInput = document.getElementById('fromdate');
+      const endDateInput = document.getElementById('todate');
+      
+      // Set the minimum allowed date for the end date input
+      endDateInput.min = startDateInput.value;
+      
+  }
+</script>
+
+
+<script>
+
+function calculateTotalDisplayedAmount() {
+    const displayedRows = document.querySelectorAll('#myTable tbody tr[style=""]'); // Select visible rows
+
+    let totalAmount = 0;
+
+    displayedRows.forEach(row => {
+        const amountCell = row.querySelector('td:nth-child(5)'); // Assuming 'Amount' column is the fifth column
+        if (amountCell) {
+            const amountText = amountCell.textContent.trim().replace('₹', ''); // Extract text and remove currency symbol
+            const amountValue = parseFloat(amountText);
+
+            if (!isNaN(amountValue)) {
+                totalAmount += amountValue;
+            }
+        }
+    });
+
+    return totalAmount;
+}
+
+function displayTotalAmount() {
+    const totalDisplayedAmount = calculateTotalDisplayedAmount();
+    document.getElementById('totalEstimateAmount').textContent = '₹' + totalDisplayedAmount.toFixed(2);
+}
+
+        function displayInvoiceOrderCount() {
+        const allRows = document.querySelectorAll('#myTable tbody tr');
+        let count = 0;
+
+        allRows.forEach(row => {
+            // Check if the row is visible (displayed)
+            if (getComputedStyle(row).display !== 'none') {
+                count++;
+            }
+        });
+
+        const countDisplay = document.getElementById('orderCountDisplay');
+        if (countDisplay) {
+            countDisplay.textContent = count;
+        }
+        displayTotalAmount();
+    
+}
+
+
+function initializePageContent() {
+  // Call function to display count of all orders initially
+  displayInvoiceOrderCount();
+  displayTotalAmount();
+}
+
+document.addEventListener('DOMContentLoaded', initializePageContent);
+
+// Rest of your existing code...
+
+
+
+
+function updateEndDateMin() {
+    const startDateInput = document.getElementById('fromdate');
+    const endDateInput = document.getElementById('todate');
+    
+    // Set the minimum allowed date for the end date input
+    endDateInput.min = startDateInput.value;
+}
+
+function updateEndDateMin() {
+    const startDateInput = document.getElementById('fromdate');
+    const endDateInput = document.getElementById('todate');
+    
+    // Set the minimum allowed date for the end date input
+    endDateInput.min = startDateInput.value;
+}
+
+
+
+function ApplyDateFilter() {
+    updateEndDateMin()
+    var fromDate = new Date(document.getElementById('fromdate').value);
+    var toDate = new Date(document.getElementById('todate').value);
+
+    // Set the time part to the beginning and end of the day
+    fromDate.setHours(0, 0, 0, 0);
+    toDate.setHours(23, 59, 59, 999);
+
+    var table = document.getElementById("myTable");
+    var tr = table.getElementsByTagName("tr");
+
+    for (var i = 1; i < tr.length; i++) {
+      var row = tr[i];
+      var td = row.getElementsByTagName("td")[0]; // Assuming the date is in the first column.
+
+      if (td) {
+        var txtValue = td.textContent || td.innerText;
+        var check = new Date(txtValue);
+
+        // Set the time part of check to match the format of fromDate and toDate
+        check.setHours(0, 0, 0, 0);
+
+        if (check >= fromDate && check <= toDate) {
+          row.style.display = "";
+        } else {
+          row.style.display = "none";
+        }
+      }
+    }
+    // Update the selectedEndDate div
+    var start = fromDate;
+    var end = toDate;
+    document.getElementById('selectedEndDate').textContent = 'From ' + start.toDateString() + ' to ' + end.toDateString();
+    displayTotalAmount();
+    displayInvoiceOrderCount()
+  }
+
+  // Add event listeners to the date inputs to trigger ApplyDateFilter on change
+  document.getElementById('fromdate').addEventListener('change', ApplyDateFilter);
+  document.getElementById('todate').addEventListener('change', ApplyDateFilter);
+
+  // Initialize the filter when the page loads (optional)
+  ApplyDateFilter();
+
+  // Function to show full table when no dates are selected
+  function ShowFullTable() {
+    var table = document.getElementById("myTable");
+    var tr = table.getElementsByTagName("tr");
+
+    for (var i = 1; i < tr.length; i++) {
+      tr[i].style.display = "";
+    }
+
+    // Reset the selectedEndDate div
+    document.getElementById('selectedEndDate').textContent = '';
+  }
+
+  // Call the function to show full table initially
+  ShowFullTable();
+
+</script>
+
+<script>
+  function printPageContent(){
+
+      var printContents = document.getElementById("container-to-print").innerHTML;
+
+var $printerDiv = $('<div class="printContainer"></div>'); // create the div that will contain the stuff to be printed
+$printerDiv.html(printContents); // add the content to be printed
+$('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+window.print(); // call print
+$printerDiv.remove(); // remove the div
+$('body').removeClass("printingContent");
+
+  }
+</script>
+
+
+
+
+  <script>
+    function exportAsXLS() {
+            // Assuming you have data in a table format, you can export it to Excel using SheetJS
+            const table = document.querySelector('table');
+            const ws = XLSX.utils.table_to_sheet(table);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+            XLSX.writeFile(wb, 'sales_order.xlsx');
+    }
+    
+    function exportAsPDF() {
+      const container = document.getElementById('container-to-print');
+    
+      // change colour 
+      container.style.backgroundColor = 'white';
+    
+      const textWhiteElements = container.querySelectorAll('.text');
+      textWhiteElements.forEach(element => {
+        element.style.color = '#000000';
+      });
+
+      const table_rows = document.querySelectorAll('#myTable tbody tr');
+
+      table_rows.forEach(row => {
+            row.style.backgroundColor = 'white'; 
+            row.style.color = 'black'; 
+        });
+    
+      const pdfOptions = {
+        margin: 0,
+        filename: 'Sales_order.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a3', orientation: 'landscape' },
+      };
+    
+      // Generate PDF from the container
+      html2pdf().from(container).set(pdfOptions).save().then(() => {
+
+
+        container.style.backgroundColor = 'transparent';
+
+        // Restore the original background color'
+      textWhiteElements.forEach(element => {
+        element.style.color = 'white'; 
+      });
+
+      table_rows.forEach(row => {
+            row.style.backgroundColor = 'transparent'; 
+            row.style.color = 'white'; 
+        });
+    
+
+      });
+    }
+    
+  </script>
+
+<script>
+  
+  const searchInput = document.getElementById('searchInput');
+    const tableRows = document.querySelectorAll('#myTable tbody tr');
+
+    searchInput.addEventListener('input', function () {
+        const searchText = searchInput.value.toLowerCase();
+
+        let totalAmount = 0;
+
+        tableRows.forEach(row => {
+            let rowContainsSearchText = false;
+
+            row.querySelectorAll('td').forEach(cell => {
+                if (cell.textContent.toLowerCase().includes(searchText)) {
+                    rowContainsSearchText = true;
+                }
+            });
+
+            if (rowContainsSearchText) {
+                row.style.display = '';
+                const totalValue = parseFloat(row.querySelector('td:nth-child(6)').innerText);
+                if (!isNaN(totalValue)) {
+                    totalAmount += totalValue;
+                }
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Display the updated total sales amount
+        
+        
+        displayInvoiceOrderCount();
+    });
+
+  
+
+  function filterTable(event) {
+      if (event.target.classList.contains('tooltip-item')) {
+        searchInput.value = event.target.textContent
+        const selectedName = event.target.textContent.toLowerCase();
+
+          const rows = tableBody.getElementsByTagName('tr');
+
+          // Loop through table rows and hide/show based on selected name
+          for (let i = 0; i < rows.length; i++) {
+              const row = rows[i];
+              const cell = row.getElementsByTagName('td')[2];
+              if (cell.textContent.slice(3,).toLowerCase() === selectedName) {
+                  row.style.display = 'table-row';
+              } else {
+                  row.style.display = 'none';
+              }
+          }
+
+          // Hide the tooltip after selecting
+          nameTooltip.style.display = 'none';
+      }
+     
+  }
+
+  function restoreInitialTable() {
+      // Restore all rows to the initial state
+      initialTableData.forEach((row) => {
+          row.style.display = 'table-row';
+      });
+  }
+
+  // Close the tooltip when clicking outside of it
+document.addEventListener("click", function(event) {
+  const tooltip = document.getElementById("nameTooltip");
+  if (event.target != tooltip) {
+    if(event.target != document.getElementById("searchInput")){
+
+      tooltip.style.display ="none";
+    }
+  }
+});
+
+//share
+$(document).ready(function() {
+    $(".share-dropdown-menu").hide(); // Hide the dropdown menu initially
+
+    $(".share-dropdown button").click(function(e) {
+        e.stopPropagation();
+        $(this).next(".share-dropdown-menu").slideToggle("fast");
+    });
+
+    $(document).on("click", function(event) {
+        if (!$(event.target).closest(".share-dropdown").length) {
+            $(".share-dropdown-menu").slideUp("fast");
+        }
+    });
+});
+
+
+
+</script>
+
+
+
+{% endblock content %}
+

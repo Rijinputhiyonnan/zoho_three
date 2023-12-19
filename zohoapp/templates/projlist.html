@@ -1,0 +1,391 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+  .modal{
+      z-index: 9999;
+      overflow: scroll;
+    }
+    
+    @media (max-width: 768px) {
+        .flowchart {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .flowchart-item {
+            width: 120px;
+        }
+        .flowchart-connector {
+            height: 50px;
+            width: 2px; 
+            margin-left: 0%; 
+            transform: translateX(-50%);
+        }
+    }
+  #over:hover{
+        background-color: rgba(110, 110, 110, 0.616);
+        
+    }
+    .description-icon {
+    cursor: pointer;
+  }
+  
+  .description-icon::before {
+    content: attr(title);
+    display: none;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 5px;
+    border-radius: 4px;
+    z-index: 1;
+    white-space: nowrap;
+  }
+  
+  .description-icon:hover::before {
+    display: block;
+  }
+  @media (max-width: 768px) {
+        .flowchart {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .flowchart-item {
+            width: 120px;
+        }
+        .flowchart-connector {
+            height: 50px;
+            width: 2px; 
+            margin-left: 0%; 
+            transform: translateX(-50%);
+        }
+    }
+    .btn{
+        color: rgb(218, 164, 48);
+        outline-color: azure;
+        border: 2px solid rgb(25, 91, 145);
+    }
+    .btn:hover{
+        color: darkslategray;
+        background-color: lightblue;
+        outline: none;
+        
+    }
+    a{
+        list-style: none;
+        color: azure;
+    }
+     a:hover{
+        color: rgb(218, 164, 48);
+     }
+
+     .searchbar {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        /* padding: 1rem .8rem; */
+    }
+
+    .searchbar .left input[text] {
+
+        width: 15vw;
+    }
+  
+    
+</style>
+
+<div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3"><a class="text-white" style="font-size: 2rem;">All Projects</a>
+              
+             
+        </div>
+      </div>
+      <div class="searchbar pt-5 pb-4">
+        <div class="left" style="display: grid;grid-template-columns: 1fr 1fr;">
+          <input type="text" id="search" class="form-control bg-light text-dark" placeholder="Search Projects..." onkeyup="searchFunction()">
+          <a class="btn btn-outline-primary mx-2" href="" data-bs-toggle="dropdown" aria-haspopup="true"
+          aria-expanded="false" role="button" style="width: 8vw;">
+          <i class="fa fa-sort"></i> Sort
+      </a>
+      <div class="dropdown-menu ">
+        <a class="dropdown-item" href="">All</a>
+        <a class="dropdown-item" href="javascript:sortTable(0)">Date </a>
+        <a class="dropdown-item" href="javascript:sortTable(3)">Project Name </a>
+   
+      </div>
+        </div>
+        <div class="right">
+        
+                <!-- <a class="btn text-center px-3" href="" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                role="button"><i class="fa fa-filter mx-3"></i>
+                </a> -->
+                <select class="btn text-center px-3" id="actionFilter"> 
+
+                    <option value="all">Filter</option>
+                    <option value="Billable">Billable</option>
+                    <option value="Non Billable">Non-Billable</option>
+                </select>
+            
+
+          <button  id="export" class="btn btn-outline-warning  px-3 py-2" onclick="export_excel2()">Export</button>
+          <a  style="color: white; height:35px;" id="importBtn" data-toggle="modal" data-target="#import_modal" class="btn btn-outline-warning text-warning mr-1 pt-2" >Import</a>
+
+          <a class="btn btn-outline-primary" href="{% url 'proj' %}"><i class="fa fa-plus"></i>NEW</a>
+        </div>
+
+    </div>
+
+      <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+      
+      <script>
+          $(document).ready(function () {
+              // Add change event listener to the filter dropdown
+              $('#actionFilter').change(function () {
+                  var selectedAction = $(this).val();
+      
+                  // Show all rows initially
+                  $('#mytable tbody tr').show();
+      
+                  // Hide rows that do not match the selected action
+                  if (selectedAction !== 'all') {
+                      $('#mytable tbody tr').filter(function () {
+                          return $(this).find('td:last-child').text() !== selectedAction;
+                      }).hide();
+                  }
+              });
+          });
+      </script>
+
+              <table class="table text-white" id="mytable">
+                <thead>
+                  <tr>
+                    <th>DATE</th>
+                    <th>DUE DATE</th>
+                    <th>CUSTOMER NAME</th>
+                    <th>PROJECT NAME</th>
+                    <th>BILLING METHOD</th>
+                    <th>ACTION</th>
+                    
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for v in proj %}
+                  <tr id="over" class='clickable-row' data-href="{% url 'overview' v.id %}">
+                    <td>{{v.start}}</td>
+                    <!--<td onclick="location.href ='{% url 'detail' v.id %}' " > {{v.name}}</td> -->
+                    <td>  {{v.end}} </td>
+                    <td>{{v.c_name.Fname}}&nbsp;    {{v.c_name.Lname}}</td>
+                    <td>{{v.name}}</td>
+                    <td>{{v.billing}}</td>
+                    <!-- <td>{{v.rate}}<td> -->
+                    <td>{{v.action}}</td>
+                   
+                    <!-- <td>
+                      <a style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;" class="toggleButton btn btn-warning mr-2" href="#" id="actselect" data-project-id="{{ v.id }}">{{ v.active|yesno:"Active,Inactive" }}</a>
+                      
+                      
+                    </td> -->
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              
+        
+<div class="modal fade" id="import_modal">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+        <div class="modal-header " style="background: rgb(32, 35, 37);">
+          <h1 class="text-light">Import Project</h1>
+        </div>
+        <div class="modal-body" style="background: rgb(32, 35, 37);">
+          <div class="card p-3 m-3">        
+            <div class="row">
+              <div class="col-md-12 col-lg-12 col-sm-12">
+                <h5 class="text-danger">IMPORTANT:</h5>
+                <p class="text-light">File should have  sheet named 'Sheet1' and column name & order should be in the given format(Uppercase)</p><br>
+      
+                <p class="text-light">Billing method should be <br>
+                    Based on project hours<br>
+                    Fixed cost for project<br>
+
+                </p><br>
+                <p class="text-light">Action should be given in one of the following format <br>
+                    Billable  <br>
+                    Non Billable
+                </p><br>
+               
+
+              </div>
+            </div>
+          </div>
+          <a href="{% url 'downloadProjectSampleImportFile' %}" class="text-primary" style="font-size:medium;">Download Sample File here</a> <br>
+  
+          <form action="{% url 'import_project' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <h6 class="text-light">File</h6>
+            <input type="file" name="excel_file" class="form-control text-dark" style="width: 50%;"><br>
+            <button class="btn btn-outline-warning mt-3">IMPORT</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+      
+      
+
+        
+
+</div>
+
+
+<script>
+   const filterMenuLinks = document.querySelectorAll('#filterMenu a');
+        const table = document.getElementById('mytable').getElementsByTagName('tr');
+
+        for (const link of filterMenuLinks) {
+            link.addEventListener('click', filterTable);
+        }
+
+        function filterTable(event) {
+            event.preventDefault(); // Prevent the link's default behavior (page navigation).
+
+            const selectedValue = this.getAttribute('data-value');
+            // console.log(selectedValue);
+
+            for (let i = 1; i < table.length; i++) {
+                const row = table[i];
+                const status = row.getElementsByTagName('td')[7].innerText;
+
+                if (selectedValue === 'All' || status.toLowerCase() === selectedValue.toLowerCase()) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+        function exportAsExcel() {
+        const table = document.getElementById('mytable'); // Replace 'myTable' with your table's ID
+        const wb = XLSX.utils.table_to_book(table);
+
+        XLSX.writeFile(wb, 'project summary.xlsx');
+    }
+    function searchFunction() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("search");
+        filter = input.value.toLowerCase();
+        table = document.getElementById("mytable");
+        tr = table.getElementsByTagName("tr");
+        // input.style.borderColor = "green";
+        for (i = 1; i < tr.length; i++) {
+            let rowVisible = false;
+            td = tr[i].getElementsByTagName("td");
+            for (j = 0; j < td.length; j++) {
+                if (td[j]) {
+                    txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                        rowVisible = true;
+                        break;
+                    }
+                }
+            }
+
+            // Show/hide the row based on the search results
+            tr[i].style.display = rowVisible ? "" : "none";
+        }
+    }
+</script>
+<script>
+  function sortTable(columnIndex) {
+        let sortAscending = false
+        const table = document.getElementById("mytable");
+        const rows = Array.from(table.rows).slice(1); // Exclude the header row
+
+        rows.sort((row1, row2) => {
+            const cellValue1 = row1.cells[columnIndex].textContent.toLowerCase();
+            const cellValue2 = row2.cells[columnIndex].textContent.toLowerCase();
+
+            if (cellValue1 < cellValue2) {
+                return -1;
+            } else if (cellValue1 > cellValue2) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+
+        // Clear the table body
+        while (table.rows.length > 1) {
+            table.deleteRow(1);
+        }
+
+        // Append the sorted rows back to the table
+        rows.forEach(row => table.appendChild(row));
+        sortAscending = !sortAscending;
+    }
+
+    function rsortTable(columnIndex) {
+        let sortAscending = false
+        const table = document.getElementById("mytable");
+        const rows = Array.from(table.rows).slice(1); // Exclude the header row
+
+        rows.sort((row1, row2) => {
+            const cellValue1 = row1.cells[columnIndex].textContent.toLowerCase();
+            const cellValue2 = row2.cells[columnIndex].textContent.toLowerCase();
+
+            if (sortAscending) {
+                if (cellValue1 < cellValue2) {
+                    return -1;
+                } else if (cellValue1 > cellValue2) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            } else {
+                if (cellValue1 > cellValue2) {
+                    return -1;
+                } else if (cellValue1 < cellValue2) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        });
+
+        // Clear the table body
+        while (table.rows.length > 1) {
+            table.deleteRow(1);
+        }
+
+        // Append the sorted rows back to the table
+        rows.forEach(row => table.appendChild(row));
+
+        // Toggle the sorting order for the next click
+        sortAscending = !sortAscending;
+    }
+  jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});
+</script>
+
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+
+<script>
+    function export_excel2()
+    {
+        const Table = document.getElementById("mytable");
+  const ws = XLSX.utils.table_to_sheet(Table);
+  ws['!cols'] = [{ wch: 15 },{ wch: 15 },{ wch: 15 },{ wch: 15 },{ wch: 15 },{ wch: 15 }];
+  ws['!rows'] = [{ hpt: 30 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+  XLSX.writeFile(wb, "project_list.xlsx"); 
+    }
+</script>
+{% endblock %}
