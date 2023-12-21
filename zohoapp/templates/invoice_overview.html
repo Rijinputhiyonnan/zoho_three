@@ -1,923 +1,2326 @@
 {% extends 'base.html' %}
-{% block content %}
 {% load static %}
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
-
+{% block content %}
 
 <style>
-    * {
+  .modal {
+    z-index: 9999;
+    overflow: scroll;
+  }
 
-        font-family: "Gill Sans", sans-serif;
-        color: white;
-    }
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+  }
 
-    .list {
-        background-color: rgb(29, 29, 29);
-    }
+  .slip-page {
+    background: #ffffff;
+    display: block;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+  }
 
-    .overview {
-        background-color: black;
-    }
-
-    .searchbar,
-    .overview .bar {
-        align-items: center;
-        display: flex;
-        justify-content: space-between;
-        /* margin: 0 1rem; */
-    }
-
-    .searchbar .btn {
-        width: 5vw;
-        background-color: rgb(28, 117, 233);
-        font-size: 1vw;
-        color: rgb(255, 255, 255);
-    }
-
-    .table .bold {
-        font-size: 1rem;
-        font-weight: 600;
-    }
-
-    .table tr:hover {
-        background-color: #d3f3f2;
-    }
-
-    .overview .bar .btn {
-        background-color: rgb(238, 164, 27);
-        color: #ffff;
-        padding: .3rem .3rem;
-        align-items: center;
-    }
-
-    .overview .bar .btn:hover,
-    .overview .bar .btn i:hover {
-        background-color: rgb(182, 180, 178);
-        color: #000000; 
-    }
-
-    .p-name {
-        height: 2.5vw;
-    }
-
-    #div-to-pdf label,
-    #div-to-pdf .bank-div label {
-        color: #ffffff;
-        font-size: .8rem;
-    }
-
-    #div-to-pdf .gen-info label {
-        color: #000000;
-        font-size: .8rem;
-    }
-
-    #div-to-pdf .gen-info .bold {
-        color: #000000;
-        font-size: 1rem;
-    }
-
-    .div-to-pdf div {
-        color: #000000;
-    }
-
-
-    #div-to-pdf  .bold,
-    #div-to-pdf .bank-div .bold {
-        font-size: 1rem;
-        color: #ffffff;
-        /* font-weight: bold; */
-    }
-
-
-   .p-info
-    {
-        font-size: 1rem;
-        color: #000000;
-        /* font-weight: bold; */
-    }
-
-
-
-
-
-    .modal {
-        z-index: 9999;
-        overflow: scroll;
-    }
-
-    .right .dropdown-menu {
-        width: 30vw;
-    }
-
-    .modal-backdrop {
-        background-color: rgb(0, 0, 0);
-    }
-
-    .modal .table th {
-        color: #ffffff;
-    }
-
-    .modal-content {
-        padding: 1.5rem;
-        width: 50vw;
-        height: auto !important;
-        margin: auto;
-    }
-
-
-    
-.table-container {
-    display: inline-block;
-    overflow-x: auto; 
-    max-width: 100%; 
-}
-
-
-.truncate-text {
-    max-width: 350px; 
-    white-space: nowrap;
+  .slip-page[size="A4"] {
+    width: 21cm;
+    height: 29.7cm;
     overflow: hidden;
-    text-overflow: ellipsis;
-    display: inline-block;
-}
-#mytable tr {
-    display: table-row;
-}
+  }
+
+  .equal-length-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    /* Make the container fill the height of the column */
+    margin-left: 2vh;
+    margin-right: 2vh;
+  }
+
+  .equal-length-item {
+    flex: 1;
+    text-align: center;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #030303;
+    padding: 1px;
+    margin: 0;
+  }
+
+  .store-user {
+    padding-bottom: 25px;
+  }
+
+  .store-user p {
+    margin: 0;
+    font-weight: 600;
+    color: #000000;
+  }
+
+  .store-user .address {
+    font-weight: 400;
+  }
+
+  .store-user h5 {
+    color: #22b8d1;
+    font-family: 'Rajdhani', sans-serif;
+  }
+
+  .bb {
+    border-bottom: 3px solid #ccc;
+  }
+
+  .top-content {
+    padding-bottom: 15px;
+  }
+
+  .ribbon .ribbon-inner {
+    text-align: center;
+    color: #fff;
+    top: -20px;
+    left: -90px;
+    width: 120px;
+    padding: 3px;
+
+  }
+
+  .ribbon .ribbon-open {
+    background-color: #268ddd;
+    border-color: #1c72b4;
+  }
+
+  .template .ribbon .ribbon-open {
+    background-color: #616263;
+    border-color: #616263;
+  }
+
+  .top-left p {
+    margin: 0;
+    color: #000000;
+  }
+
+  .top-left .graphic-path {
+    height: 40px;
+    position: relative;
+  }
+
+  .top-left .graphic-path::before {
+    content: "";
+    height: 20px;
+    background-color: #615c60;
+    position: absolute;
+    left: 15px;
+    right: 0;
+    top: -15px;
+    z-index: 2;
+  }
+
+  .top-left .graphic-path::after {
+    content: "";
+    height: 22px;
+    width: 17px;
+    background: #000000;
+    position: absolute;
+    top: -13px;
+    left: 6px;
+    transform: rotate(45deg);
+  }
+
+  .template3 .top-left .graphic-path::before {
+    background-color: #bbbbbb;
+  }
+
+  .template3 .top-left .graphic-path::after {
+    background: #616263b3;
+  }
+
+  .top-left .graphic-path p {
+    height: 40px;
+    left: 0;
+    right: 0;
+    text-transform: uppercase;
+    background-color: #22b8d1;
+    font: 26px;
+    z-index: 3;
+    position: absolute;
+    padding-left: 10px;
+  }
+
+  .template3 .top-left .graphic-path p {
+    background-color: #616263;
+    color: white;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+  }
+
+  .logo img {
+    max-height: 100px;
+  }
+
+  .company-info h2 {
+    margin: 0;
+    font-size: 2em;
+  }
+
+  .company-info p {
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .i.invoice-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .invoice-box h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+
+  .invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .invoice-details p,
+  .client-details p {
+    margin: 5px 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  #th {
+    background-color: #f2f2f2;
+    color: black;
+  }
+
+  .invoice-total {
+    margin-top: 20px;
+    text-align: right;
+  }
+
+  .invoice-total p {
+    margin: 5px 0;
+  }
+
+  footer {
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 20px;
+  }
+
+  footer p {
+    margin: 5px 0;
+  }
+
+  .dropdown-item:hover {
+    color: chocolate;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  .saleordertable {
+    border-collapse: collapse;
+    /* Collapse table borders */
+    border: none;
+    /* Remove table border */
+  }
+
+  .saleordertable td {
+    border: none;
+    /* Remove cell borders */
+    padding: 8px;
+    /* Add padding for cell content */
+    text-align: left;
+    /* Optional: Adjust text alignment */
+  }
+
+  #producttable {
+    border-collapse: collapse;
+    /* Collapse table borders */
+    border: none;
+    /* Remove table border */
+    color: white;
+  }
+
+  #producttable td {
+    border: none;
+    /* Remove cell borders */
+    padding: 8px;
+    /* Add padding for cell content */
+    text-align: left;
+    /* Optional: Adjust text alignment */
+  }
+
+  tr.clickable {
+    cursor: pointer;
+  }
 
 
-.actoinacto .dropdown-item:hover {
-    background-color: #0baef4;
-}
-</style>
-<section>
-    <div class="row p-3 ">
-        <div class="list col-4 col-lg-4 col-md-3  col-sm-2 py-3">
-            <div class="header">
-                <h5>ALL INVOICE LIST</h5>
-            </div>
-            <div class="searchbar">
-                
-                <input class="form-control" type="text" placeholder="Search by Name" name="search" id="search"
-                    
-                    style="color: rgb(255, 255, 255);background: transparent;margin-right: 5px;">
-                <a class="btn btn-outline mx-1" style="color: #ccc;background-color: rgb(210, 132, 30);"  href="" data-bs-toggle="dropdown" aria-haspopup="true"
-                    aria-expanded="false" role="button">
-                    <i class="fa fa-filter"></i>
-                </a>
-               
-                <div class="dropdown-menu actoinacto" >
-                    <a class="dropdown-item" href="{% url 'invoice_overview' invoice.id %}">All</a>
-  
-                    <a class="dropdown-item" href="{% url 'filter_invoice_overview_draft' invoice.id %}">Draft</a>
-                    <a class="dropdown-item" href="{% url 'filter_invoice_overview_send' invoice.id %}">Send</a>
-                </div>
-                
-                <a class="btn btn-outline mr-1" style="color: #ccc;background-color: rgb(210, 132, 30);" href="{% url 'add_prod' %}"><i class="fa fa-plus"></i></a>
-            </div>
-            <hr>
-            <table class="text-white" style="width: 100%;">
-                {% for v in inv_dat %}
-                <tbody id="table">
-                    <tr id="tr_data" class="border-bottom clickable-row" style="cursor: pointer;">
-                        <td>
-                            <a href="{% url 'invoice_overview' v.id %}" style="text-decoration: none; color: black;">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h5 style="color: rgb(218, 143, 5);">{{ v.customer.customerName }}</h5>
-                                    </div>
-                                    <div class="col-md-6 text-right"  style="color: rgb(218, 143, 5);">&#x20B9;{{ v.grandtotal }}</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <p>{{ v.invoice_no }}</p>
-                                    </div>
-                                    <div class="col-md-3 text-left"></div>
-                                    <div class="col-md-6 text-right">
-                                        <p>{{ v.status }}</p>
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-            
-                                </div>
-                            </a>
-                        </td>
-                    </tr>
-                </tbody>
-                {% endfor %}
-            </table>
-            
+  @media print {
 
-
-            
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const filterLinks = document.querySelectorAll(".filter-link");
-        const tableRows = document.querySelectorAll(".clickable-row");
-
-        filterLinks.forEach(function (link) {
-            link.addEventListener("click", function (event) {
-                event.preventDefault();
-
-                const status = link.getAttribute("data-status");
-
-                tableRows.forEach(function (row) {
-                    if (status === "all" || (status === "active" && row.getAttribute("data-status") === "True") || (status === "inactive" && row.getAttribute("data-status") === "False")) {
-                        row.style.display = "table-row";
-                    } else {
-                        row.style.display = "none";
-                    }
-                });
-            });
-        });
-    });
-</script>
-
-
-<script>
-    function printForm() {
-        var selectedArea = document.getElementById("selected-area");
-
-        var printWindow = window.open('', 'PrintWindow', 'height=800,width=800');
-
-        // Check if selectedArea exists
-        if (selectedArea) {
-            printWindow.document.write('<html><head><title>Print Selected Area</title></head><body>' + selectedArea.innerHTML + '</body></html>');
-            printWindow.print();
-            printWindow.close();
-        } else {
-            alert("No content to print!");
-        }
+    .unwanted,
+    .sidebar,
+    .sectionhtml {
+      display: none !important;
     }
-    
 
-</script>
-            
-        </div>
-        <div class="overview col-8 col-lg-8 col-md-9  col-sm-10 py-3">
-            <div id="overview">
-                <div class="p-name">
-                    <h3 class="px-2 pb-2" id="id1"> {{invoice.invoice_no}}</h3>
+    body {
+      visibility: hidden !important;
+    }
+
+    html {
+      overflow: hidden ! important;
+      visibility: hidden !important;
+    }
+
+
+    .printContainer {
+      visibility: visible !important;
+      /* Override the rule above to only show the printables*/
+      z-index: 99999;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: auto;
+    }
+
+
+
+  }
+
+  .scrollable-table {
+    max-height: 80%;
+    /* Maximum height for the tooltip */
+    overflow-y: auto;
+    /* Add vertical scrollbar when content overflows */
+  }
+
+  /* Style for the container */
+
+
+  /* Style for table cell */
+  .table-cell {
+    padding: 5px;
+  }
+</style>
+
+<section>
+  <div class="row " style="top: 7rem; ">
+
+    <div>
+      <div class="col-md-12" style="width: auto;">
+        <div class="row">
+          <div class="col-md-3" style="border-right: 1px solid white; overflow-y: scroll; height: 84vh;">
+            <div class="row">
+              <a class="text-white" style="font-size: 1.5rem;">ALL INVOICE LIST</a>
+              <div class="col-md-9">
+                <input type="text" id="search" class="form-control bg-light text-dark mt-2 " placeholder="Search.."
+                  autocomplete="off">
+              </div>
+              <div class="col-md-3 ">
+                <a class="btn btn btn-outline-warning text-right mt-2"
+                  style="height: 38px; padding-top: 12px; padding-left: 17px;" href="{% url 'add_prod' %}"><i
+                    class="fa fa-plus "></i></a>
+              </div>
+              <div class="col-md-2">
+                <div class="dropdown">
+                  <a class="btn text-center  mt-2 btn-outline-warning" id="sortbutton" data-bs-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false" role="button" style="margin-left: 0px; height: 38px;">
+                    <i class="fas fa-sort m-1"></i>
+                  </a>
+                  <div class="dropdown-menu m-1">
+                    <a class="dropdown-item" href="{% url 'invoice_overview' invoice.id %}">All</a>
+                    <a class="dropdown-item" onclick="sortTable()">Customer Name</a>
+                    <a class="dropdown-item" onclick="sortTablebybillno()">Invoice Number</a>
+                  </div>
                 </div>
+              </div>
+              <div class="col-md-4">
+                <div class="dropdown">
+                  <a class="btn text-center mt-2 btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false" role="button" style="margin-left: 0px; height: 38px;">
+                    <i class="fa fa-filter mt-1"></i>
+                  </a>
+                  <div class="dropdown-menu m-1">
+                    <a class="dropdown-item" href="{% url 'invoice_overview' invoice.id %}">All</a>
+                    <a class="dropdown-item" href="{% url 'filter_invoice_overview_draft' invoice.id  %}">Draft</a>
+                    <a class="dropdown-item" href="{% url 'filter_invoice_overview_send' invoice.id  %}">Save</a>
+                  </div>
 
-                <div class="bar pt-3">
-                    <div class="left">
-                       
-                        <a class="btn mx-1 fa fa-file-word" href="{% url 'detailedview' id=invoice.id %}">Template</a>
+                </div>
+              </div>
+              <div class="col-md-6"></div>
 
+            </div>
 
-                    
-                        <a class="btn mx-1, fa fa-eye"  href="#home">Overview</a>
-                        <a class="btn mx-1, fas fa-file-invoice"  href="{% url 'invoice_slip' id=invoice.id %}">Slip</a>
-                    </div>
+            <div class="scrollable-table">
+              <table class="table  text-white" id="myTable">
+
+                <tbody>
+                  {% for i in inv_dat %}
+
+                  <tr class="clickable" id="{{i.id}}">
+
+                    <td class="justify-content-between align-items-center ">
+                      <p><b>{{i.order_no}}</b></p>
+                      <label>{{i.customer.customerName}} </label>
+                    </td>
+                    <td>
+                      <label class="text-end d-block">{% if i.status == 'Send' %}
+                        Save
                    
-                    <div class="right">
-                        
-                        <a class="btn ml-1" href="{% url 'edited_prod' id=invoice.id %}" data-toggle="tooltip" title="Edit"><i
-                                class="fas fa-edit"></i></a>
-
-                                <a href="" onclick="printForm()" style="border-radius: 5px;height: 1.7rem;" class="btn btn-sm m-1 text-white btn_print" 
-                                data-toggle="tooltip" title="Print">
-                                <i class="mdi mdi-printer"></i></a>
-        
-                                        {% if invoice.status == 'Draft'%}
-                                        <a href="{% url 'change_status_invoice' id=invoice.id  %}" style="border-radius: 5px;height: 1.7rem;" class="btn btn-sm m-1 text-white"
-                                        data-toggle="tooltip" title="Change Status">
-                                       <i class="fas fa-exchange-alt"></i></a>
-                                       
-                                        {% endif %}
-                                        
-                                   
-                                    <a href="{% url 'emailattachment' %}" class="btn btn-sm text-white ms-1"
-                                    style="border-radius: 5px;height: 1.7rem;" data-toggle="tooltip" title="Email">
-                                        <i class="fas fa-envelope"></i></a>
-                                  
-                                        
-                                          
-                                        <div class="dropdown btn ml-1 " title="comments" style="height: 1.7rem;">
-                                            <a href=" " class=" fas fa-comment-dots  btn-sm text-white ms-1"  
-                                                data-bs-toggle="dropdown" id="attachmentDropdown" aria-haspopup="true" aria-expanded="false"> 
-                                            </a>
-                          
-                                            <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
-                                                <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
-                                                 data-target="#cmnts"><i class="fa-solid fa fa-plus"></i>Add</a>
-                                                <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
-                                                data-target="#cmt_list"><i class="fas fa-list"></i>&nbsp;View List</a>
-                                                        
-                                            </div>
-                                        </div>
-                               
-                        <a class="btn btn_print ml-1" href="" id="convertToPDFButton" data-toggle="tooltip"
-                            title="Pdf"><i class="mdi mdi-file-pdf"></i></a>
-                        <!-- onclick="generatePDF()" -->
-                        
-                        <script type="text/javascript">
-                            $(document).ready(function ($) {
-                                console.log('print');
-
-                                $(document).on('click', '.btn_print', function (event) {
-                                    console.log('print1');
-                                    event.preventDefault();
-                                    var customerName = "{{invoice.invoice_no }}";
-                                    var element = document.getElementById('div-to-pdf');
-                                    var opt =
-                                    {
-                                        margin: 1,
-                                        filename: 'invoice_'+ customerName + '.pdf',
-                                        image: { type: 'jpeg', quality: 0.98 },
-                                        html2canvas: { scale: 2 },
-                                        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-                                    };
-                                    html2pdf().set(opt).from(element).save();
-
-                                });
-
-                            });
-                        </script>
-                        
-                        {% if invoice.file != "" %}
-                    <a href="{{invoice.file.url}}"  style="background-color:  rgb(212, 139, 3);border-radius: 5px;height: 1.7rem;" class="btn ms-1 text-white"
-                        data-toggle="tooltip" title="Download Attached File">
-                        <span class="mdi mdi-download"></span></a>
+                  {% elif i.status == 'draft' %}
+                        Draft
                     {% endif %}
-                        <a href="{% url 'dele' invoice.id %}" class="btn btn-sm text-white" title="Delete" style="border-radius: 5px;height: 1.7rem;" 
-          onclick="return confirm('Do you want to Delete this Invoice?');"><i class="fas fa-trash-alt"></i></a>
-                        
-                        <div class="dropdown-menu">
-                            {% if attach %}
-                            <div class="table-container">
-                            <table class="table table-borderless">
-                                {% for a in attach %}
-                                {% for loan in loans %}
-                                <tr>
-                                    <td>{{forloop.counter}}.</td>
-                                    <td>
-                                        
-                                        <a href="{% url 'download_loan_attach' payroll_id=loan.payroll.id attachment_id=a.id %}">
-                                            <div class="truncate-text">{{ a.attach.name }}</div>
-                                        </a>
-                                    </td>
-                                    <td><a href="{% url 'delete_loan_attach' a.id %}"><i class="fas fa-trash"></i></a></td>
-                                </tr>
-                                {% endfor %}
-                                {% endfor %}
-                            </table>
-                        </div>
-                            {% else %}
-                            <div class="text-center">No Attachment found</div>
-                            {% endif %}
-                        </div>
-                        {% for loan in loans %}
-                        <a class="btn ml-1" href="{% url 'delete_loan' loan.id %}" data-toggle="tooltip" data-placement="top" title="Delete Loan"
+                  </label>
+                      <label class="text-end d-block">₹{{i.grandtotal}}</label>
 
-                            title="Delete" onclick="return confirm('Do you want to Delete this Employee loan details?');"><i class="fa fa-trash"></i></a>
-                            
-                        <a class="btn ml-1" href="" data-toggle="modal" data-target="#commentModal"
-                            data-toggle="tooltip" title="comment"><i class="far fa-comment"></i></a>
-                            <form  class="btn ml-1" method="post" action="{% url 'add_loan_attach' payroll_id=loan.payroll.id %}" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <label for="file-input"  data-toggle="tooltip" title="Upload Attachments">
-                                    <i class="fas fa-paperclip"></i>
-                                </label>
-                                <input id="file-input" type="file" name="file" style="display: none;" onchange="uploadFile()">
-                                <input type="hidden" id="payroll-id" value="{{ loan.payroll.id }}">
-                            </form>
-                            {% endfor %}
-                            
+                    </td>
+                  </tr>
 
-                    <script>    
-                        function uploadFile() {
-                            const fileInput = document.getElementById("file-input");
-                            const file = fileInput.files[0];
-                            const csrfToken = getCookie('csrftoken');
-                            const payrollId = document.getElementById("payroll-id").value;
-                            
-                            const formData = new FormData();
-                            formData.append("file", file);
-                            
-                            fetch(`/add_loan_attach/${payrollId}/`, {
-                                method: "POST",
-                                headers: { 'X-CSRFToken': csrfToken },
-                                body: formData
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                // Handle the response from the server (if needed)
-                                const messageDiv = document.getElementById("upload-message");
-        if (data.message) {
-            // Display the success message
-            messageDiv.textContent = data.message;
-            messageDiv.style.color = "green";
-        }
-        messageDiv.style.display = "block";
-    })
-    .catch(error => {
-        console.error("Error:", error);
-    });
-}
-                        
-                    </script>                    
-{%for loan in loans%}
-{% if loan.active %}
-                    <a class="btn ml-1" href="{% url 'loan_deactive' loan.id %}" id="sts">Active</a>
-                    {%else%}
-                    <a class="btn ml-1" href="{% url 'loan_active' loan.id %}" id="sts">Deactive</a>
-                    {%endif%}
-                    {%endfor%}
-                        
-                    </div>
+                  {% endfor %}
+
+                </tbody>
+              </table>
+            </div>
+
+
+          </div>
+
+          <div class="col-md-9 ml-1  mb-5 " id="overviewdiv">
+            <div class="row">
+              <div class="col-md-7">
+                <a class="text-white" style="font-size: 1.5rem;">
+                  <h2>{{sale.sales_no}}</h2>
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <a class="btn" style="background-color: chocolate; margin-right: 2vh;"><i class="fas fa-eye"></i>
+                  Overview</a>
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                  aria-haspopup="true" aria-expanded="false"
+                  style="background-color: white; color: black; margin-right: 2vh;"> Templates
+                </a>
+                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                  <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
+
+                  <a class="dropdown-item" onclick="totemplate2()"><i class="fa fa-file-alt"></i>
+                    Template 2</a>
+
+                  <a class="dropdown-item" onclick="totemplate3()"><i class="fa fa-file-alt"></i>
+                    Template 3</a>
+
+
                 </div>
-                <div id="upload-message" style="display:none;"></div>
-                <hr>
-                
-                <div id="selected-area">
-                <div class="div-to-pdf row" id="div-to-pdf" style="height: auto;background-color: burlywood">
-                    
-                    <div class="row justify-content-between">
-                        <div class="col-md-6">
-                            <h2 class="text-dark" style="text-transform: uppercase; color: rgb(0, 0, 0); font-weight: bold">{{ company.company_name }}</h2>
-                            <h6 class="text-dark">{{ company.address }}</h6>
-                            <h6 class="text-dark">{{ company.city }},{{ company.state }}</h6>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="right" style="font-size: 1rem;font-weight: 600;">Order No &nbsp;&nbsp;&nbsp;&nbsp; : {{ invoice.order_no }} <br> Invoice Date&nbsp;: {{invoice.inv_date}}  </div>
-                        </div>
+
+              </div>
+
+              <div class="col-md-6" style="text-align: center;">
+                {% if invoice.status == "Draft" %}
+                <a href="{% url 'change_status_invoice' id=invoice.id  %}" class="btn btn-outline-warning" title="Save">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'edited_prod' id=invoice.id %}" class=" text-dark">
+                  <button class="btn btn-outline-warning" title="Edit"><i class="fas fa-edit"></i></button>
+                </a>
+                <a class="text-dark" data-toggle="dropdown">
+                  <button class="btn btn-outline-warning " title="Share"><i class="fas fa-share"></i></button>
+                </a>
+                <div class="dropdown-menu ">
+                  <a class="dropdown-item" data-target="#shareBillEmail" data-toggle="modal">GMAIL</a>
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
+                </div>
+                <a href="{% url 'dele' invoice.id %}" class="  text-dark">
+                  <button class="btn btn-outline-warning" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                </a>
+                <a class="  text-dark" onclick="exportToPDF()">
+                  <button class="btn btn-outline-warning" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+                </a>
+                <a class=" text-dark" onclick="printSelectedArea()">
+                  <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
+                  </button>
+                </a>
+                <a class="text-dark" onclick="show_slip()">
+                  <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+              </div>
+            </div><br>
+
+            <div class="row" id="div-to-pdf"
+              style="background-color: #ffddb0;  height: auto; margin-left:1px; margin-right: 1rem; ">
+
+              <div class="row text-center">
+                <h2 style="color: #000000;"><br>INVOICE
+                  <hr>
+                </h2>
+              </div>
+              <div class="gen-info col-6 " style="padding-left: 3rem; overflow-y: scroll; ">
+                <div class="row mt-1">
+                  <div class="col-5"><label class="text-dark" for="">Invoice No :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{invoice.order_no}}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Reference :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{invoice.reference}}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Customer Name :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">
+                      {{invoice.customer.customerName}}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Customer Mail :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">
+                      {{invoice.customer.customerEmail}}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">GST Treatment :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">
+                      {{invoice.customer.GSTTreatment}}</p>
+                  </div>
+                </div>
+                {% if invoice.customer.GSTIN %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">GST Number :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{invoice.customer.GSTIN}}
+                    </p>
+                  </div>
+                </div>
+                {% endif %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Source of Supply :</label></div>
+                  <div class="col-7">
+                    {% for customer in customers %}
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{customer.placeofsupply}}</p>
+                    {% endfor%}
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Invoice Date :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{invoice.inv_date|date:"d/m/Y" }}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Expiry Date :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{ invoice.due_date|date:"d/m/Y" }}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Payment Term :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{invoice.terms.Terms}}</p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Payment Method :</label></div>
+                  <div class="col-7">
+                    {% for payment in payment %}
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{payment.payment_method}}</p>
+                  </div>
+                </div>
+                {% if payment.payment_method|lower == 'upi' %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">UPI ID :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{payment.upi_id}}</p>
+                  </div>
+                </div>
+                {% elif payment.payment_method|lower == 'cheque' %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Cheque ID :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{ payment.cheque_number}}</p>
+                  </div>
+                </div>
+                {% elif payment.payment_method|lower != 'cash' %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Bank Account Number :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{payment.banking.ac_no}}</p>
+                  </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Subtotal :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{invoice.subtotal|floatformat:1}}</p>
+                  </div>
+                </div>
+                {% if invoice.igst|floatformat:1 != 0|floatformat:1 %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">IGST :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{invoice.igst}}</p>
+                  </div>
+                </div>
+                {% endif %}
+                {% if invoice.cgst|floatformat:1 != 0|floatformat:1 %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">CGST :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{invoice.cgst}}</p>
+                  </div>
+                </div>
+                {% endif %}
+                {% if invoice.sgst|floatformat:1 != 0|floatformat:1 %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">SGST :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{invoice.sgst}}</p>
+                  </div>
+                </div>
+                {% endif %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Tax Amount :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{invoice.t_tax}}</p>
+                  </div>
+                </div>
+                {% if invoice.shipping_charge != 0 %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Shipping Charge :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{invoice.shipping_charge}}</p>
+                  </div>
+                </div>
+                {% endif %}
+                                    {% if invoice.adjustment != 0 %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Adjustment :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{invoice.adjustment|floatformat:1}}</p>
+                  </div>
+                </div>
+                {% endif %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Total Amount :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{ invoice.grandtotal|floatformat:1}}</p>
+                  </div>
+                </div>
+                {% if invoice.paid_amount != 0 %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Advance :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{invoice.paid_amount|floatformat:1}}</p>
+                  </div>
+                </div>
+                {% endif %}
+                {% if invoice.balance != 0 %}
+                <div class="row mt-3">
+                  <div class="col-5"><label class="text-dark" for="">Balance Amount :</label></div>
+                  <div class="col-7">
+                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{invoice.balance|floatformat:1}}</p>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+              <div class="p-info col-6" style="height: 100%; margin-bottom: 1vh;">
+                <div class="card" style="background-color: rgb(110, 61, 46); padding-left: 1rem; padding-top: 1rem;">
+                  <div class="row text-center">
+                    <h2>PRODUCT INFORMATION
+                      <hr>
+                    </h2>
+                  </div>
+                  {% for i in invoiceitem %}
+
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Product Name :</label></div>
+                    <div class="col-7">
+                      <p class="bold">{{i.product}}</p>
                     </div>
-                    
-                    
-                        <div class="bar pt-2 pb-4">
-                        <div class="left" style="font-size: 1rem;font-weight: 600;"> {{p.designation}}
-                            <h6 class="text-dark">Client :</h6>
-                            <h6  style="color: rgb(0, 0, 0);font-weight: bold"><div class="text-uppercase">{{ invoice.customer.customerName }} </div><span class="text-dark" style="color: rgb(0, 0, 0);font-weight: bold">{{ invoice.customer.customerEmail }}</span>  <br><span class="text-dark">{{ invoice.customer.customerMobile }}</span></h6>
-                        </div>
-                       
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">HSN Number :</label></div>
+                    <div class="col-7">
+                      <p class="bold">{{i.hsn}}</p>
                     </div>
-                   
-                    <div class="row text-center">
-                        <h3 style="color: #000000;">INVOICE
-                           
-                        </h3>
-                        <h6 class="text-dark" style="font-weight: bold;">Invoice Number : {{invoice.invoice_no}}</h6>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Product Quantity :</label></div>
+                    <div class="col-7">
+                      <p class="bold">{{i.quantity}}</p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Product Rate :</label></div>
+                    <div class="col-7">
+                      <p class="bold">{{i.rate}}</p>
+                    </div>
+                  </div>
+
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Product Discount :</label></div>
+                    <div class="col-7">
+                      <p class="bold">{{i.discount}}</p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Product Tax :</label></div>
+                    <div class="col-7">
+                      <p class="bold">{{i.tax}}</p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Product Total :</label></div>
+                    <div class="col-7">
+                      <p class="bold">{{i.total}}</p>
                     </div>
                     <hr>
-                    
-                   
-                        <table class="table  " style="border-color: black;">
-                            <thead >
-                                <tr>
-                                    <th style="color: black;font-weight: bold; text-align: center;">#</th>
-                                    <th style="color: black;font-weight: bold; text-align: center;">Product</th>
-                                    <!-- <th class="text-right;" style="color: black;font-weight: bold;">Hsn</th> -->
-                                    <!-- <th class="text-right;" style="color: black;font-weight: bold;">Description</th> -->
-                                    <th class="text-right;" style="color: black;font-weight: bold;text-align: center;">HSN</th>
-                                    <th class="text-right;" style="color: black;font-weight: bold;text-align: center;">Quantity</th>
-                                    <th class="text-right;" style="color: black;font-weight: bold;text-align: center;">Price</th>
-                                    <th class="text-right;" style="color: black;font-weight: bold;text-align: center;">Discount</th>
-                    
-                                    <th class="text-right;" style="color: black;font-weight: bold;text-align: center;">Tax%</th>
-                                    <th class="text-right;" style="color: black;font-weight: bold;text-align: center;">Total</th>
-                                </tr>
-                                
-                            </thead>
-                            <tbody>
-                                {% for item in invoiceitem %}
-                                <tr>
-                                    <td style="color: black;font-weight: bold;text-align: center;">{{ forloop.counter }}</td>
-                                    <td style="color: black;font-weight: bold;text-align: center;">{{ item.product }}</td>
-                                    <!-- <td class="text-right">{{ item.hsn }}</td> -->
-                                    <!-- <td class="text-right">{{ item.desc }}</td> -->
-
-
-                                    <td class="text-right" style="color: black;font-weight: bold;text-align: center;">{{ item.hsn }}</td>
-                                    <td class="text-right" style="color: black;font-weight: bold;text-align: center;">{{ item.quantity }}</td>
-                                    <td class="text-right" style="color: black;font-weight: bold;text-align: center;">{{ item.rate|floatformat:1 }}</td>
-                                    <td class="text-right" style="color: black;font-weight: bold;text-align: center;">{{ item.discount|floatformat:1 }}</td>
-                    
-                                    <td class="text-right" style="color: black;font-weight: bold;text-align: center;">{{ item.tax }}</td>
-                                    <td class="text-right" style="color: black;font-weight: bold;text-align: center;">{{ item.total|floatformat:1 }}</td>
-                                </tr>
-                                {% endfor %}
-                                
-                            </tbody>
-                        </table>
-                        <div class="gen-info col-8 " style="padding-left: 3rem;">
-                                <table class="table ">
-                                    <tr>
-                                        <td class="text-dark" style="font-weight: bold;">Sub-Total:</td>
-                                        <td class="text-right" style="color: black;font-weight: bold; text-align: end;" style="">{{ invoice.subtotal|floatformat:1 }}</td>
-                                    </tr>
-                                    {% if invoice.cgst|floatformat:1 != 0|floatformat:1 %}
-                                    <tr>
-                                        <td class=" text-dark"  style="color: black;font-weight: bold;" >CGST:</td>
-                                        <td class="text-right" style="color: black;font-weight: bold; text-align: end;" >{{ invoice.cgst|floatformat:1 }}</td>
-                                    </tr>
-                                    {% endif %}
-                    
-                                    {% if invoice.sgst|floatformat:1 != 0|floatformat:1 %}
-                                    <tr>
-                                        <td class="text-dark"  style="color: black;font-weight: bold;" >SGST:</td>
-                                        <td class="text-right"  style="color: black;font-weight: bold; text-align: end;" >{{ invoice.sgst|floatformat:1 }}</td>
-                                    </tr>
-                                    {% endif %}
-                    
-                                    {% if invoice.igst|floatformat:1 != 0|floatformat:1 %}
-                                    <tr>
-                                        <td class="text-dark" style="color: black;font-weight: bold;" >IGST:</td>
-                                        <td class="text-right" style="color: black;font-weight: bold; text-align: end;" >{{ invoice.igst|floatformat:1 }}</td>
-                                    </tr>
-                                    {% endif %}
-                                    <tr>
-                                      <td class="text-dark"  style="color: black;font-weight: bold;" >TAX:</td>
-                                      <td class="text-right" style="color: black;font-weight: bold; text-align: end;" >{{ invoice.t_tax}}</td>
-                                  </tr>
-                                  {% if invoice.shipping_charge != 0 %}
-                                    <tr>
-                                        <td class="text-dark"  style="color: black;font-weight: bold;" >Shipping Charge:</td>
-                                        <td class="text-right"  style="color: black;font-weight: bold; text-align: end;" >{{ invoice.shipping_charge }}</td>
-                                    </tr>
-                                    {% endif %}
-                                    {% if invoice.adjustment != 0 %}
-                                    <tr>
-                                        <td class="text-dark"  style="color: black;font-weight: bold;" >Adjustment Charge:</td>
-                                        <td class="text-right" style="color: black;font-weight: bold; text-align: end;" >{{ invoice.adjustment|floatformat:1}}</td>
-                                    </tr>
-                                    {% endif %}
-                                    
-                                    
-                                    <tr>
-                    
-                                        <td class="text-right"  style="color: black;font-weight: bold;" >Total:</td>
-                                        
-                                        <td class="text-right " style="color: black;font-weight: bold; text-align: end;" >{{ invoice.grandtotal|floatformat:1}}</td>
-                                    </tr>
-                                   
-                                    {% if invoice.paid_amount != 0 %}
-                                    <tr>
-                    
-                                        <td class="text-right"  style="color: black;font-weight: bold;" >Paid Amount:</td>
-                                        
-                                        <td class="text-right " style="color: black;font-weight: bold; text-align: end;" >{{ invoice.paid_amount|floatformat:1}}</td>
-                                    </tr>
-                                    {% endif %}
-                                    {% if invoice.balance != 0 %}
-                                    <tr>
-                    
-                                        <td class="text-right"  style="color: black;font-weight: bold;" >Balance:</td>
-                                        
-                                        <td class="text-right " style="color: black;font-weight: bold; text-align: end;" >{{ invoice.balance|floatformat:1}}</td>
-                                    </tr>
-                                    {% endif %}
-
-                                   
-                                </table>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <p class="m-0 font-weight-bold" style="color:black">Customer Note: {{invoice.cxnote}}</p>
-                                        <div class="col-6">
-                                        <label> <p class="m-0 font-weight-bold" style="color:black "> </p></label>
-                                    </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <p class="m-0 font-weight-bold" style="color:black">Terms & Conditions: {{invoice.terms_condition}}</p>
-                                        <p style="color:black"></p>
-                                    </div>
-                                </div>
-                    
-                            </div>    <div class="p-info col-4 my-2" style="">
-                                <div class="card" style="height: 50vh;  padding:0.9rem;">       
-                                    
-                                    <div class="row">
-                                        {% for customer in customers %}
-                                        <div class="col-4" ><label >Place of Supply:</label></div>
-                                        <div class="col-8" >
-                                            <p>{{ customer.placeofsupply }}</p>
-                                            {% endfor%}
-                                            <hr>
-
-                                            <div class="row my-4" > <label  style="display: inline-block;" ><h4>Invoice Details</h4></label>
-                                           <hr>
-                                            
-                                           
-                                                
-                                                <div class="col-6"><label for="">Invoice Date:</label></div>
-                                                <div class="col-6">
-                                                <label>  <p>{{ invoice.inv_date|date:"d/m/Y" }}</p><label>
-                                            </div>
-        
-        
-                                            
-                                                
-                                                <div class="col-6"><label for="">Due Date:</label></div>
-                                                <div class="col-6">
-                                                <label>  <p>{{ invoice.due_date|date:"d/m/Y" }}</p></label>
-                                                </div>
-                                            </div>
-                                            <div class="row my-2" ><label   style="display: inline-block;"><h4>Payment Details</h4></label></div>
-                                            
-                                            <div class="row">
-                                                
-                                                <div class="col-6"><label for="">Payment Method:</label></div>
-        
-                                                <div class="col-6 text-uppercase" >
-                                                    {% for payment in payment %}
-                                                <label>  <p>{{ payment.payment_method }}</p></label>
-                                                   
-                                            </div>
-                                           
-        {% if payment.payment_method|lower == 'cash' %}
-        <div></div>
-        {% elif payment.payment_method|lower == 'upi' %}
-                                            <div class="row">
-                                                
-                                                <div class="col-6"><label for="">UPI ID:</label></div>
-                                                <div class="col-6 " >
-                                                <label>  <p >{{ payment.upi_id }}</p></label>
-        
-                                                </div>
-                                            </div>
-        
-                                            {% elif payment.payment_method|lower == 'cheque' %}
-                                            
-                                            <div class="row">
-                                                
-                                                <div class="col-3"><label for="">Cheque No:</label></div>
-                                                <div class="col-9">
-                                                <label>  <p>{{ payment.cheque_number }}</p></label>
-                                                </div>
-                                            </div>
-        
-                                            
-                                            {% elif payment.payment_method|lower == 'bank' %}
-                                            
-                                            <div class="row">
-                                                
-                                                <div class="col-6"><label for="">Bank Name:</label></div>
-                                                <div class="col-6">
-                                                   
-                                                    <label for="">  <p>{{ payment.bank.name }}</p></label>
-                                                   
-                                                </div>
-                                            </div>
-                                            {% endif %}
-                                            {% endfor%}
-                                          
-                                        
-                                                   
-        
-                                        </div>     
-                                    </div>
-                                   
-                            </div>
-                        </div>     
-                                </div>
-                    
-                            </div>  
-                           
-                </div>
-
-                
+                  </div>
+                  {% endfor %}
+                </div><br>
+              </div>
             </div>
-            
-        </div>
 
-    </div>
-
-
-
-
-    <!-- Modal -->
-    <!-- Add Comments Modal -->
-    <div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content" style="background-color: #3b3b3b;">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="exampleModalLabel">Add Comments</h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                            <path d="M.646 1.646a.5.5 0 0 1 .708 0L8 7.293 15.646.646a.5.5 0 1 1 .708.708L8.707 8l7.647 7.646a.5.5 0 0 1-.708.708L8 8.707l-7.646 7.647a.5.5 0 0 1-.708-.708L7.293 8 .646 1.646a.5.5 0 0 1 0-.708z"/>
-                          </svg>
-                    </button>
-                </div>
-               
-
-    
- {%for loan in loans%}
-                
-                <form method="post" action="{% url 'add_loan_comment' payroll_id=loan.payroll.id %}">
-                  
-{%endfor%}
-
-                    
-                    {% csrf_token %}
-                    <div class="modal-body">
-                        <textarea type="text" class="form-control text-dark" name="comment"></textarea>
-                        <input type="hidden" value="{{loans.id}}" name="loans_id" >
-                        <div class="container-fluid">
-
-                            <table class="table  mt-4">
-                                <thead>
-                                    <tr>
-                                        <th>sl no.</th>
-                                        <th>Comments</th>
-                                        <th>Delete</th>
-                                    </tr>
-                                </thead>
+            <!-- <div class="row">
+            <div class="tab-content" style="background-color: rgba(252, 236, 217, 0.8); ">
+              <div class="tab-pane fade active show" id="overview" role="tabpanel" aria-labelledby="home-tab">
+                  <div class="row">
+                      <div class="col-md-6" id="orderinfo" 
+                      style="box-shadow: 5px 5px 10px rgb(45, 45, 45); background-color: #ffddb0; 
+                      border-radius: 1vh; overflow-y: scroll;height: 500px; margin-top: -2vh; " >
+                          <div class="overview text-dark" style="background-color: #ffddb0;" ><br>
+                              <h2 class="text-dark" style="text-transform: uppercase; font-size: x-large;"><b>Sales Order</b></h2>
+                              
+                              <table class="table-responsive saleordertable" cellspacing="0" cellpadding="0">
                                 <tbody>
-                                    {% for c in comments %}
-                                    <tr class="table-row">
-                                        <td>{{forloop.counter }}</td>
-                                        <td>{{c.comment}}</td>
-                                        
-                                        <td><a class="text-danger"
-                                            href="{% url 'delete_loan_comment' c.id %}">Delete</a></td>
-                                    </tr>
-                                    {% endfor %}
+                                  <tr>
+                                    <td>Sale Order No</td>
+                                    <td>:</td>
+                                    <td>{{sale.sales_no}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Reference</td>
+                                    <td>:</td>
+                                    <td>{{sale.reference}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Customer Name</td>
+                                    <td>:</td>
+                                    <td>{{sale.customer.customerName}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Customer Mail</td>
+                                    <td>:</td>
+                                    <td>{{sale.customer.customerEmail}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>GST Treatment</td>
+                                    <td>:</td>
+                                    <td>{{sale.customer.GSTTreatment}}</td>
+                                  </tr>
+                                  {% if sale.customer.GSTIN %}
+                                  <tr>
+                                    <td>GST Number</td>
+                                    <td>:</td>
+                                    <td>{{sale.customer.GSTIN}}</td>
+                                  </tr>
+                                  {% endif %}
+                                  <tr>
+                                    <td>Source of Supply</td>
+                                    <td>:</td>
+                                    <td>{{sale.sos}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Sale Order Date</td>
+                                    <td>:</td>
+                                    <td>{{sale.sales_date}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Expiry Date</td>
+                                    <td>:</td>
+                                    <td>{{sale.ship_date}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Payment Term</td>
+                                    <td>:</td>
+                                    <td>{{sale.terms.Terms}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Payment Method</td>
+                                    <td>:</td>
+                                    <td>{{sale.pay_method}}</td>
+                                  </tr>
+                                  {% if sale.pay_method == 'upi' %}
+                                  <tr>
+                                    <td>UPI ID</td>
+                                    <td>:</td>
+                                    <td>{{sale.upi_id}}</td>
+                                  </tr>
+                                  {% elif sale.pay_method == 'cheque' %}
+                                  <tr>
+                                    <td>Cheque ID</td>
+                                    <td>:</td>
+                                    <td>{{sale.cheque_id}}</td>
+                                  </tr>
+                                  {% elif sale.pay_method != 'cash' %}
+                                  <tr>
+                                    <td>Bank Account</td>
+                                    <td>:</td>
+                                    <td>{{bank.ac_no}}</td>
+                                  </tr>
+                                  {% endif %}
+                                  <tr>
+                                    <td>Subtotal</td>
+                                    <td>:</td>
+                                    <td>{{sale.subtotal}}</td>
+                                  </tr>
+                                  {% if sale.igst != '0.00' %}
+                                  <tr>
+                                    <td>IGST</td>
+                                    <td>:</td>
+                                    <td>{{sale.igst}}</td>
+                                  </tr>
+                                  {% endif %}
+                                  {% if sale.cgst != '0.00' %}
+                                  <tr>
+                                    <td>CGST</td>
+                                    <td>:</td>
+                                    <td>{{sale.cgst}}</td>
+                                  </tr>
+                                  {% endif %}
+                                  {% if sale.sgst != '0.00' %}
+                                  <tr>
+                                    <td>SGST</td>
+                                    <td>:</td>
+                                    <td>{{sale.sgst}}</td>
+                                  </tr>
+                                  {% endif %}
+                                  <tr>
+                                    <td>Tax Amount</td>
+                                    <td>:</td>
+                                    <td>{{sale.t_tax}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Shipping Charge</td>
+                                    <td>:</td>
+                                    <td>{{sale.sh_charge}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Adjustment</td>
+                                    <td>:</td>
+                                    <td>{{sale.adjust}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Total Amount</td>
+                                    <td>:</td>
+                                    <td>{{sale.grandtotal}}</td>
+                                  </tr>
+                                  {% if sale.advance != 0.0 %}
+                                  <tr>
+                                    <td>Advance</td>
+                                    <td>:</td>
+                                    <td>{{sale.advance}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Balance Amount</td>
+                                    <td>:</td>
+                                    <td>{{sale.balance}}</td>
+                                  </tr>
+                                  {% endif %}
                                 </tbody>
-                            </table>
-                        </div>
-                    </div>
+                              </table> 
+                          </div>
+                      </div>
+                      <div class="col-md-6" >
+                          <div class="card" id="productinfo" style="background-color:#8b3131; padding:1rem; margin-top: -2vh;" >
+                              <div class="row" style="overflow-y: scroll;height: 500px; margin-top: -2vh; " >
+                                  <div class="card-title mb-4 mt-3" style="font-size: x-large;"><b>PRODUCT INFORMATION</b>
+                                  </div>
+                                      <table class="table table-responsive" id="producttable">
+                                        <tbody id="productbody">
+                                          {% for i in saleitem %}
+                                          <tr>
+                                            <td>Product Name</td>
+                                            <td>:</td>
+                                            <td>{{i.product}}</td>
+                                          </tr>
+                                          <tr>
+                                            <td>HSN Number</td>
+                                            <td>:</td>
+                                            <td>{{i.hsn}}</td>
+                                          </tr>
+                                          <tr>
+                                            <td>Product Quantity</td>
+                                            <td>:</td>
+                                            <td>{{i.quantity}}</td>
+                                          </tr>
+                                          <tr>
+                                            <td>Product Rate</td>
+                                            <td>:</td>
+                                            <td>{{i.rate}}</td>
+                                          </tr>
+                                          <tr>
+                                            <td>Product Discount</td>
+                                            <td>:</td>
+                                            <td>{{i.desc}}</td>
+                                          </tr>
+                                          <tr>
+                                            <td>Product Tax</td>
+                                            <td>:</td>
+                                            <td>{{i.tax}}</td>
+                                          </tr>
+                                          <tr >
+                                            <td>Product Total</td>
+                                            <td>:</td>
+                                            <td>{{i.total}}
+                                            </td>
+                                          </tr>
+                                          <tr style="border-bottom: solid; border-bottom-width: thin; ">
+                                            <td></td>
+                                          </tr>
+                                          {% endfor %}
+                                        </tbody>
+                                      </table>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  
+              </div>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 
-                        <button type="submit" class="btn btn-primary" id="save">Save</button>
-                    </div>
-                </form>
+             
+          </div>
+          </div> -->
+
+          </div>
+
+          <div class="col-md-9" id="slipdiv" style="display: none;">
+            <div class="row">
+              <div class="col-md-7">
+                <a class="text-white" style="font-size: 1.5rem;">
+                  <h2>{{invoice.invoice_no}}</h2>
+                </a>
+              </div>
             </div>
+            <div class="row">
+              <div class="col-md-6">
+                <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate; "><i
+                    class="fas fa-eye"></i> Overview</a>
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                  aria-haspopup="true" aria-expanded="false"
+                  style="background-color: white; color: black; margin-left: 2vh;"> Templates
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                  <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
+
+                  <a class="dropdown-item" onclick="totemplate2()"><i class="fa fa-file-alt"></i>
+                    Template 2</a>
+
+                  <a class="dropdown-item" onclick="totemplate3()"><i class="fa fa-file-alt"></i>
+                    Template 3</a>
+
+
+                </div>
+
+              </div>
+
+              <div class="col-md-6" style="text-align: center;">
+                {% if invoice.status == 'Draft'%}
+                <a href="{% url 'change_status_invoice' id=invoice.id  %}" class="btn btn-outline-warning" title="Save">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'edited_prod' id=invoice.id  %}" class=" text-dark">
+                  <button class="btn btn-outline-warning" title="Edit"><i class="fas fa-edit"></i></button>
+                </a>
+                <a class="text-dark" data-toggle="dropdown">
+                  <button class="btn btn-outline-warning " title="Share"><i class="fas fa-share"></i></button>
+                </a>
+                <div class="dropdown-menu ">
+                  <a class="dropdown-item" data-target="#shareBillEmail" data-toggle="modal">GMAIL</a>
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
+                </div>
+
+                <a href="{% url 'dele' invoice.id %}" class="  text-dark">
+                  <button class="btn btn-outline-warning" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                </a>
+                <a class="  text-dark" onclick="exportToPDF4()">
+                  <button class="btn btn-outline-warning" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+                </a>
+                <a class=" text-dark" onclick="printSelectedArea4()">
+                  <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
+                  </button>
+                </a>
+                <a class="text-dark" onclick="show_slip()">
+                  <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+              </div>
+            </div>
+
+
+            <div style="background-color: rgb(255, 221, 176);" class="mx-2 my-4">
+
+              <div class="my-5 slip-page" size="A4">
+                <div class="row" style="margin-top: 20%; " id="printslip">
+                  <div class="col-md-3"></div>
+                  <div class="col-md-7">
+                    <div class="card bg-white" style="border: 1px dotted black;padding: 20px;">
+                      <div class="mt-2" style="text-align: center;padding: 15px;">
+                        <div class="text-center" style="font-size: 3vh; color: black;">
+                          <b>{{company.company_name}} </b>
+                        </div>
+                        <span style="font-size: x-small; color: black;">{{company.address}} <br>
+                          {{company.city}},
+                          {{company.state}}
+                          {{company.pincode}} <br>
+                          {{ company.contact_number }} <br>{{ company.company_email }}
+                        </span>
+                      </div>
+                      <div class="ml-4 mt-2" style="color: black;">
+                        <div class="row">
+                          <div class="col-md-6 text-left">Order No:</div>
+                          <div class="col-md-5 text-right">{{invoice.order_no}}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6 text-left">Customer Name:</div>
+                          <div class="col-md-5 text-right">{{invoice.customer.customerName}}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6 text-left">Order Date :</div>
+                          <div class="col-md-5 text-right">{{sale.sales_date | date:'d-m-Y'}}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6 text-left">Shipment Date:</div>
+                          <div class="col-md-5 text-right">{{sale.ship_date | date:'d-m-Y'}}</div>
+                        </div>
+                      </div>
+                      <div><br>
+                        <div class="equal-length-container" style="color: black; font-weight: bold;">
+                          <div class="equal-length-item" style=" text-align: center;">
+                            Product
+                            <hr style="border-bottom: 1px solid black; margin-top:1vh; width:95%">
+                          </div>
+                          <div class="equal-length-item ml-2" style=" text-align:center;">
+                            HSN
+                            <hr style="border-bottom: 1px solid black; margin-top:1vh; width:60%;">
+                          </div>
+                          <div class="equal-length-item" style=" text-align: center; ">
+                            Qty
+                            <hr style="border-bottom: 1px solid black; margin-top:1vh; width:60%">
+                          </div>
+                          <div class="equal-length-item" style=" text-align: center; ">
+                            Price
+                            <hr style="border-bottom: 1px solid black; margin-top:1vh; width:60%">
+                          </div>
+                          <div class="equal-length-item" style=" text-align: center; ">
+                            Discount
+                            <hr style="border-bottom: 1px solid black; margin-top:1vh; width:60%">
+                          </div>
+                          <div class="equal-length-item" style=" text-align: center; ">
+                            Tax
+                            <hr style="border-bottom: 1px solid black; margin-top:1vh; width:60%">
+                          </div>
+                          <div class="equal-length-item" style=" text-align: center; ">
+                            Total
+                            <hr style="border-bottom: 1px solid black; margin-top:1vh; width:60%">
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        {% for j in invoiceitem %}
+                        <div class="equal-length-container"
+                          style="color: black; font-size: small; word-wrap: break-word; margin-bottom: 1vh;">
+                          <div class="equal-length-item" style="text-align: center; margin-left: 2px;">
+                            {{j.product}}
+                          </div>
+                          <div class="equal-length-item" style="text-align: right;">
+                            {{j.hsn}}
+                          </div>
+                          <div class="equal-length-item" style="text-align: center; ">
+                            {{j.quantity}}
+                          </div>
+                          <div class="equal-length-item" style="text-align: center; ">
+                            {{j.rate}}
+                          </div>
+                          <div class="equal-length-item" style="text-align: center; ">
+                            {{j.desc}}
+                          </div>
+                          <div class="equal-length-item" style="text-align: center; ">
+                            {{j.tax}}
+                          </div>
+                          <div class="equal-length-item" style="text-align: center; ">
+                            {{j.total}}
+                          </div>
+                        </div>
+                        {% endfor %}
+                      </div>
+
+                      <div><br>
+                        <div class="row ">
+                          <div class="col-md-5 text-left" style=" color: black;">
+                            Subtotal
+                          </div>
+                          <div class="col-md-6 " style="color: black;text-align: end;">
+                            {{ invoice.subtotal }}
+                          </div>
+                        </div>
+                        {% if invoice.igst != '0.00' %}
+                        <div class="row ">
+                          <div class="col-md-5 text-left " style=" color: black;">
+                            IGST
+                          </div>
+                          <div class="col-md-6" style="color: black;text-align: end;">
+                            {{ invoice.igst }}
+                          </div>
+                        </div>
+                        {% else %}
+                        <div class="row">
+                          <div class="col-md-5 text-left" style=" color: black;">
+                            CGST
+                          </div>
+                          <div class="col-md-6 " style="color: black;text-align: end;">
+                            {{ invoice.cgst }}
+                          </div>
+                        </div>
+                        <div class="row ">
+                          <div class="col-md-5 text-left" style=" color: black;">
+                            SGST
+                          </div>
+                          <div class="col-md-6 " style="color: black;text-align: end;">
+                            {{ invoice.sgst }}
+                          </div>
+                        </div>
+                        {% endif %}
+                        <div class="row">
+                          <div class="col-md-5 text-left" style=" color: black;">
+                            Tax Amount
+                          </div>
+                          <div class="col-md-6 " style="color: black;text-align: end;">
+                            {{ invoice.t_tax }}
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-5 text-left" style=" color: black;">
+                            Shipping Charge
+                          </div>
+                          <div class="col-md-6 " style="color: black;text-align: end;">
+                            {{ invoice.sh_charge }}
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-5 text-left" style=" color: black;">
+                            Adjustment
+                          </div>
+                          <div class="col-md-6" style="color: black;text-align: end;">
+                            {{ invoice.adjustment }}
+                          </div>
+                        </div>
+                        {% if invoice.paid_amount != 0 %}
+                        <div class="row">
+                          <div class="col-md-5 text-left" style="color: black;">Advance </div>
+                          <div class="col-md-6" style="color: black;text-align: end;">
+                            {{invoice.paid_amount }}
+                          </div>
+                        </div>
+                        {% endif %}
+                        <hr class="ml-2 mr-2" style="color: black; border-bottom: 1px solid black; ">
+                      </div>
+
+
+                      <div class="mb-2">
+                        <div class="row">
+                          <div class="col-md-5 text-left ml-2"
+                            style=" font-size: large; color: black; font-weight: bold;">
+                            Total
+                          </div>
+                          <div class="col-md-6"
+                            style="font-size: large; color: black; font-weight: bold;text-align: end;">
+                            {{ invoice.grandtotal }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-9" id="templatediv" style="display: none;">
+            <div class="row">
+              <div class="col-md-7">
+                <a class="text-white" style="font-size: 1.5rem;">
+                  <h2>{{sale.sales_no}}</h2>
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate; "><i
+                    class="fas fa-eye"></i> Overview</a>
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                  aria-haspopup="true" aria-expanded="false"
+                  style="background-color: white; color: black; margin-left: 2vh;"> Templates
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                  <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
+
+                  <a class="dropdown-item" onclick="totemplate2()"><i class="fa fa-file-alt"></i>
+                    Template 2</a>
+
+                  <a class="dropdown-item" onclick="totemplate3()"><i class="fa fa-file-alt"></i>
+                    Template 3</a>
+
+
+                </div>
+
+              </div>
+
+              <div class="col-md-6" style="text-align: center;">
+                {% if invoice.status == 'Draft'%}
+                <a href="{% url 'change_status_invoice' id=invoice.id  %}" class="btn btn-outline-warning" title="Save">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'edited_prod' id=invoice.id  %}" class=" text-dark">
+                  <button class="btn btn-outline-warning" title="Edit"><i class="fas fa-edit"></i></button>
+                </a>
+                <a class="text-dark" data-toggle="dropdown">
+                  <button class="btn btn-outline-warning " title="Share"><i class="fas fa-share"></i></button>
+                </a>
+                <div class="dropdown-menu ">
+                  <a class="dropdown-item" data-target="#shareBillEmail" data-toggle="modal">GMAIL</a>
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
+                </div>
+
+                <a href="{% url 'dele' invoice.id %}" class="  text-dark">
+                  <button class="btn btn-outline-warning" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                </a>
+                <a class="  text-dark" onclick="exportToPDF()">
+                  <button class="btn btn-outline-warning" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+                </a>
+                <a class=" text-dark" onclick="printSelectedArea()">
+                  <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
+                  </button>
+                </a>
+                <a class="text-dark" onclick="show_slip()">
+                  <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+              </div>
+            </div>
+
+
+
+
+
+            <div class="mt-3 template2 whatToPrint2" style="height: auto;width: 100%; margin-left: -1vh">
+
+              <section id="selected-area" style="background-color: rgb(255, 221, 176);height: auto;" class=" p-2 m-2">
+                <header style="	background-color: #8b3131;border-radius: 1rem;">
+                  <div class="logo ">
+                    <img class="ml-2" width="100rem" style="border-radius: 50%;" src="{% static 'images/zlogo.png' %}"
+                      alt="Company Logo">
+                  </div>
+                  <div style="background: #8b3131;color: white;" class="company-info">
+                    <h2 class="text-white">{{company.company_name}}</h2>
+                    <p class="text-white"> {{company.address}}<br>{{company.city}}</p>
+                    <p> {{company.contact_number}}</p>
+                    <p>{{company.company_email}}</p>
+                  </div>
+                </header>
+                <div class="invoice-box">
+                  <h1 class="text-dark">INVOICE</h1>
+                  <div class="invoice-header">
+                    <div class="invoice-details text-dark">
+                      <table>
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">Invoice No#</td>
+                          <td class="table-cell text-black" style="border: none;">:</td>
+                          <td class="table-cell text-black" style="border: none;">{{invoice.invoice_no}}</td>
+                        </tr>
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">Invoice Date</td>
+                          <td class="table-cell text-black" style="border: none;">:</td>
+                          <td class="table-cell text-black" style="border: none;">{{invoice.inv_date}}</td>
+                        </tr>
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">Expiry Date</td>
+                          <td class="table-cell text-black" style="border: none;">:</td>
+                          <td class="table-cell text-black" style="border: none;">{{invoice.due_date}}</td>
+                        </tr>
+                      </table>
+                    </div>
+                    <div class="client-details" style="width: 50vh;">
+                      <table>
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;"><b>{{invoice.customer.customerName}}</b>
+                          </td>
+                        </tr>
+                        {% if invoice.customer.Address1 %}
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">{{invoice.customer.Address1}}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">{{invoice.customer.GSTTreatment}}</td>
+                        </tr>
+                        {% if invoice.customer.GSTIN %}
+                        <tr>
+                          <td class="table-cell text-black" style="border: none;">{{invoice.customer.GSTIN}}</td>
+                        </tr>
+                        {% endif %}
+                      </table>
+                    </div>
+                  </div>
+
+                  <table>
+                    <thead>
+                      <tr>
+
+                        <th id="th" style="text-align: center;">Product</th>
+                        <th id="th" style="text-align: center;">HSN</th>
+                        <th id="th" style="text-align: center;">Quantity</th>
+                        <th id="th" style="text-align: center;">Price</th>
+                        <th id="th" style="text-align: center;">Discount</th>
+                        <th id="th" style="text-align: center;">Tax %</th>
+                        <th id="th" style="text-align: center;"> Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for i in invoiceitem %}
+                      <tr style="color: black;">
+                        <td style="text-align: center;">{{i.product}}</td>
+                        <td style="text-align: center;">{{i.hsn}}</td>
+                        <td style="text-align: center;">{{i.quantity}}</td>
+                        <td style="text-align: center;">{{i.rate}}</td>
+                        <td style="text-align: center;">{{i.desc}}</td>
+                        <td style="text-align: center;">{{i.tax}}</td>
+                        <td style="text-align: center;">{{i.total}}</td>
+                      </tr>
+                      {% endfor %}
+
+                    </tbody>
+                  </table><br>
+
+                  <div class="invoice-total">
+                    <div class="row">
+                      <div class="col-6"></div>
+
+
+                      <div class="col-4">
+                        <table style="margin-left: 10vh;">
+                          <tr>
+                            <td class="table-cell text-black" style="border: none;">Subtotal</td>
+                            <td class="table-cell text-black" style="border: none;">:</td>
+                            <td class="table-cell text-black" style="border: none;"><b>{{invoice.subtotal}}</b></td>
+                          </tr>
+                          {% if invoice.igst != '0.00' %}
+                          <tr>
+                            <td class="table-cell text-black" style="border: none;">IGST</td>
+                            <td class="table-cell text-black" style="border: none;">:</td>
+                            <td class="table-cell text-black" style="border: none;">{{invoice.igst}}</td>
+                          </tr>
+                          {% else %}
+                          <tr>
+                            <td class="table-cell text-black" style="border: none;">SGST</td>
+                            <td class="table-cell text-black" style="border: none;">:</td>
+                            <td class="table-cell text-black" style="border: none;">{{invoice.sgst}}</td>
+                          </tr>
+                          <tr>
+                            <td class="table-cell text-black" style="border: none;">CGST</td>
+                            <td class="table-cell text-black" style="border: none;">:</td>
+                            <td class="table-cell text-black" style="border: none;">{{invoice.cgst}}</td>
+                          </tr>
+                          {% endif %}
+                          <tr>
+                            <td class="table-cell text-black" style="border: none;">Tax Amount</td>
+                            <td class="table-cell text-black" style="border: none;">:</td>
+                            <td class="table-cell text-black" style="border: none;">{{invoice.t_tax}}</td>
+                          </tr>
+                          <tr>
+                            <td class="table-cell text-black" style="border: none;">Shipping Charge</td>
+                            <td class="table-cell text-black" style="border: none;">:</td>
+                            <td class="table-cell text-black" style="border: none;">{{invoice.shipping_charge}}</td>
+                          </tr>
+                          <tr>
+                            <td class="table-cell text-black" style="border: none;">Adjustment</td>
+                            <td class="table-cell text-black" style="border: none;">:</td>
+                            <td class="table-cell text-black" style="border: none;">{{invoice.adjustment}}</td>
+                          </tr>
+                          {% if invoice.paid_amount != 0 %}
+                          <tr>
+                            <td class="table-cell text-black" style="border: none;">Advance</td>
+                            <td class="table-cell text-black" style="border: none;">:</td>
+                            <td class="table-cell text-black" style="border: none;">{{invoice.paid_amount}}</td>
+                          </tr>
+
+                          {% endif %}
+                          <tr>
+                            <td class="table-cell text-black" style="border: none;">Total</td>
+                            <td class="table-cell text-black" style="border: none;">:</td>
+                            <td class="table-cell text-black" style="border: none;">{{invoice.grandtotal}}</td>
+                          </tr>
+                        </table>
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <footer class="mb-5">
+                  <p class="text-dark">&copy; Zho Books 2023 | Info park kakkanad kochi, Ernamkulam, kerala India 12345
+                    | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+                </footer>
+              </section>
+            </div>
+          </div>
+
+          <div class="col-md-9" id="templatediv2" style="display: none;">
+            <div class="row">
+              <div class="col-md-7">
+                <a class="text-white" style="font-size: 1.5rem;">
+                  <h2>{{sale.sales_no}}</h2>
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate; "><i
+                    class="fas fa-eye"></i> Overview</a>
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                  aria-haspopup="true" aria-expanded="false"
+                  style="background-color: white; color: black; margin-left: 2vh;"> Templates
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                  <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
+
+                  <a class="dropdown-item" onclick="totemplate2()"><i class="fa fa-file-alt"></i>
+                    Template 2</a>
+
+                  <a class="dropdown-item" onclick="totemplate3()"><i class="fa fa-file-alt"></i>
+                    Template 3</a>
+
+
+                </div>
+
+              </div>
+
+              <div class="col-md-6" style="text-align: center;">
+                {% if invoice.status == 'Draft'%}
+                <a href="{% url 'change_status_invoice' id=invoice.id  %}" class="btn btn-outline-warning" title="Save">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'edited_prod' id=invoice.id  %}" class=" text-dark">
+                  <button class="btn btn-outline-warning" title="Edit"><i class="fas fa-edit"></i></button>
+                </a>
+                <a class="text-dark" data-toggle="dropdown">
+                  <button class="btn btn-outline-warning " title="Share"><i class="fas fa-share"></i></button>
+                </a>
+                <div class="dropdown-menu ">
+                  <a class="dropdown-item" data-target="#shareBillEmail" data-toggle="modal">GMAIL</a>
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
+                </div>
+
+                <a href="{% url 'dele' invoice.id %}" class="  text-dark">
+                  <button class="btn btn-outline-warning" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                </a>
+                <a class="  text-dark" onclick="exportToPDF2()">
+                  <button class="btn btn-outline-warning" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+                </a>
+                <a class=" text-dark" onclick="printSelectedArea2()">
+                  <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
+                  </button>
+                </a>
+                <a class="text-dark" onclick="show_slip()">
+                  <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+              </div>
+            </div>
+
+
+
+
+
+            <div id="template1" class="printTemplates template1">
+              <div class="my-3 page" style="background-color: rgb(255, 221, 176);" id="selected-area2">
+                <div class="p-5">
+                  <div style="background-color: #8b3131;border-radius: 1rem;padding: 20px;">
+                    <center class="h3"><b>INVOICE</b></center>
+                  </div>
+                  <div class="row mt-5">
+                    <div class="col-md-8">
+                      <h4 class="text-secondary" style="font-weight: bold;">{{company.company_name }}</h4>
+                      <p class="address" style="font-weight: bold;color: #000;">
+                        {{company.address}}<br>
+                        {{company.city}},
+                        {{company.state}}<br>
+                        {{company.pincode}}<br>
+                        {{company.company_email}}<br>
+                        {{company.contact_number}}<br>
+                      </p>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="top-left">
+                        <div class="graphic-path">
+                          <p>Invoice No. #:<b>{{invoice.invoice_no}}</b></p>
+                        </div>
+                        <div class="mt-2">
+
+                          <p style="color: #000;">Invoice Date:
+                            <b>{{ invoice.inv_date | date:'d-m-Y'}}</b>
+                          </p>
+                          <p style="color: #000;">Expiry Date:
+                            <b>{{ invoice.due_date | date:'d-m-Y'}}</b>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <section class="top-content bb d-flex justify-content-between">
+                    <div class="logo">
+
+                    </div>
+
+                  </section>
+
+                  <section class="store-user">
+                    <div class="col-12">
+                      <div class="row bb pb-2 mt-3">
+                        <div class="col-4 pl-0">
+                          <label class="text-white bg-secondary w-100 p-1"><b>BILL
+                              TO</b></label>
+                          <h5 class="" style="font-weight: bold; color: #8b3131;">
+                            {{invoice.customer.customerName}}</h5>
+                          <p class="address" style="font-weight: bold;color: #000;">
+                            {{invoice.customer.customerEmail}}
+                            <br>
+                            {{invoice.customer.Address1}}
+                            <br>
+
+                            <span>Mob: </span><b>{{invoice.customer.phone1}}</b>
+                          </p>
+                        </div>
+                        <div class="col-4"></div>
+                        <div class="col-4 pr-0">
+                          <label class="text-white bg-secondary w-100 p-1"><b>GST Details</b></label>
+                          <h5 class="" style="font-weight: bold; color: #8b3131;">
+                            {{invoice.customer.GSTTreatment}}</h5>
+                          <p class="address" style="font-weight: bold;color: #000;">
+                            {{ invoice.customer.GSTIN}}
+                          </p>
+                        </div>
+                      </div>
+
+                    </div>
+                  </section>
+
+                  <section class="product-area mt-2">
+                    <table class="table table-hover table-bordered table-secondary">
+                      <thead>
+                        <tr class="">
+                          <th class="text-center" style="color:#8b3131;">Product</th>
+                          <th class="text-center" style="color:#8b3131;">HSN</th>
+                          <th class="text-center" style="color:#8b3131;">Quantity</th>
+                          <th class="text-center" style="color:#8b3131;">Price</th>
+                          <th class="text-center" style="color:#8b3131;">Discount</th>
+                          <th class="text-center" style="color:#8b3131;">Tax %</th>
+                          <th class="text-center" style="color:#8b3131;">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for itm in invoiceitem %}
+                        <tr>
+                          <td class="text-center" style="color:#000">{{ itm.product }}</td>
+                          <td class="text-center" style="color:#000">{{ itm.hsn }}</td>
+                          <td class="text-center" style="color:#000">{{ itm.quantity }}</td>
+                          <td class="text-center" style="color:#000">{{ itm.rate }}</td>
+                          <td class="text-center" style="color:#000">{{ itm.desc }}</td>
+                          <td class="text-center" style="color:#000">{{ itm.tax }}</td>
+                          <td class="text-center" style="color:#000">{{ itm.total }}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </section>
+
+                  <section class="balance-info">
+                    <div class="row mt-3">
+                      <div class="col-4">
+                        <table class="table table-borderless">
+                          <tbody>
+
+                            <!-- <tr >
+                                              <td style="color: #000;text-align: left;">Payment Type</td>
+                                              <td style="color: #000;text-align: left;">:</td>
+                                              {% if bank %}
+                                              <th style="color: #000;text-align: center;">{{bank.bankname}}</th>
+                                              {% else %}
+                                              <th style="color: #000;text-align: center;">{{pbill.payment_type}}</th>
+                                              {% endif %}
+                                          </tr>
+                                          <tr>
+                                              <td></td>
+                                              <td></td>
+                                              <td></td>
+                                              
+                                          </tr> -->
+                            {% if ewbill.note %}
+                            <tr>
+                              <td style="color: #000;text-align: left;">Note</td>
+                              <td style="color: #000;text-align: left;">:</td>
+                              <th style="color: #000;text-align: center;">{{ewbill.note}}
+                              </th>
+                            </tr>
+                            {% endif %}
+
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="col-4"></div>
+                      <div class="col-4">
+                        <table class="table table-borderless">
+                          <tbody>
+                            <tr>
+                              <td style="color: #000;">Sub Total</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-center" style="color: #000;">
+                                {{invoice.subtotal}}</td>
+                            </tr>
+                            {% if invoice.igst != '0.00' %}
+                            <tr>
+                              <td style="color: #000;">IGST</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-center" style="color: #000;">
+                                {{invoice.igst}}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                              <td style="color: #000;">SGST</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-center" style="color: #000;">
+                                {{invoice.sgst}}</td>
+                            </tr>
+                            <tr>
+                              <td style="color: #000;">CGST</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-center" style="color: #000;">
+                                {{invoice.cgst}}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                              <td style="color: #000;">Tax Amount</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-center" style="color: #000;">
+                                {{invoice.t_tax}}</td>
+                            </tr>
+                            <tr>
+                              <td style="color: #000;">Shipping Charge</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-center" style="color: #000;">
+                                {{invoice.shipping_charge}}</td>
+                            </tr>
+                            <tr>
+                              <td style="color: #000;">Adjustment</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-center" style="color: #000;">
+                                {{invoice.adjustment}}</td>
+                            </tr>
+                            {% if invoice.paid_amount != 0 %}
+                            <tr>
+                              <td style="color: #000;">Advance</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-center" style="color: #000;">
+                                {{invoice.paid_amount}}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                              <td style="color: #000;">Total</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-center" style="color: #000;">
+                                <b>{{invoice.grandtotal}}</b>
+                              </td>
+                            </tr>
+
+                          </tbody>
+
+                        </table>
+
+                      </div>
+                    </div>
+                    <footer class="mb-5">
+                      <p class="text-dark">&copy; Zho Books 2023 | Info park kakkanad kochi,
+                        Ernamkulam,
+                        kerala India 12345
+                        | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+                    </footer>
+                  </section>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="col-md-9" id="templatediv3" style="display: none;">
+            <div class="row">
+              <div class="col-md-7">
+                <a class="text-white" style="font-size: 1.5rem;">
+                  <h2>{{invoice.invoice_no}}</h2>
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate;"><i
+                    class="fas fa-eye"></i> Overview</a>
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                  aria-haspopup="true" aria-expanded="false"
+                  style="background-color: white; color: black; margin-left: 2vh;"> Templates
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
+                  <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
+
+                  <a class="dropdown-item" onclick="totemplate2()"><i class="fa fa-file-alt"></i>
+                    Template 2</a>
+
+                  <a class="dropdown-item" onclick="totemplate3()"><i class="fa fa-file-alt"></i>
+                    Template 3</a>
+
+
+                </div>
+
+              </div>
+
+              <div class="col-md-6" style="text-align: center;">
+                {% if invoice.status == 'Draft'%}
+                <a href="{% url 'change_status_invoice' id=invoice.id  %}" class="btn btn-outline-warning" title="Save">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'edited_prod' id=invoice.id  %}" class=" text-dark">
+                  <button class="btn btn-outline-warning" title="Edit"><i class="fas fa-edit"></i></button>
+                </a>
+                <a class="text-dark" data-toggle="dropdown">
+                  <button class="btn btn-outline-warning " title="Share"><i class="fas fa-share"></i></button>
+                </a>
+                <div class="dropdown-menu ">
+                  <a class="dropdown-item" data-target="#shareBillEmail" data-toggle="modal">GMAIL</a>
+                  <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
+                </div>
+
+                <a href="{% url 'dele' invoice.id %}" class="  text-dark">
+                  <button class="btn btn-outline-warning" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                </a>
+                <a class="  text-dark" onclick="exportToPDF3()">
+                  <button class="btn btn-outline-warning" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+                </a>
+                <a class=" text-dark" onclick="printSelectedArea3()">
+                  <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
+                  </button>
+                </a>
+                <a class="text-dark" onclick="show_slip()">
+                  <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+              </div>
+            </div>
+
+
+
+
+
+            <div id="template3" class="template3">
+              <div class="my-5 page" size="A4" style="background-color: rgb(255, 221, 176);">
+                <div class="p-5" id="selected-area3">
+                  <section class="top-content bb d-flex justify-content-between" style="background-color: #8b3131;">
+                    <div class="logo">
+                      <!-- <img src="logo.png" alt="" class="img-fluid"> -->
+                    </div>
+                    <div class="top-left">
+                      <div class="graphic-path">
+                        <p>Invoice</p>
+                      </div>
+                      <div class="position-relative" style="margin-right: 5px;">
+                        <p>Invoice No.
+                          <span>{{invoice.invoice_no}}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="store-user mt-5">
+                    <div class="col-12">
+                      <div class="row bb pb-3">
+                        <div class="col-7">
+                          <p>FROM,</p>
+                          <h5>{{company.company_name }}</h5>
+                          <p class="address "> {{company.address}}<br>
+                            {{company.city}},
+                            {{company.state}}<br>
+                            {{company.pincode}}<br>
+                          </p>
+
+                        </div>
+                        <div class="col-5">
+                          <p>TO,</p>
+                          <h5>{{invoice.customer.customerName}}</h5>
+                          <p class="address col-9" style="margin-left: 0px;">
+                            {{invoice.customer.Address1}} </p><br>
+                          <p class="address col-9">{{invoice.customer.GSTTreatment}}</p><br>
+                          <p class="address col-9">{{invoice.customer.GSTIN}}</p>
+
+
+                        </div>
+                      </div>
+                      <div class="row extra-info pt-3">
+                        <div class="col-7">
+                          <p>Invoice Date:
+                            <span>{{invoice.inv_date |date:'d-m-Y'}}</span>
+                          </p>
+                          <p>Expiry Date:
+                            <span>{{invoice.due_date |date:'d-m-Y'}}</span>
+                          </p>
+                        </div>
+
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="product-area mt-4">
+                    <table class=" table table-hover table-bordered " id="table1">
+                      <thead>
+                        <tr>
+                          <td style="text-align: center; font-weight:bold; color:black ">Items</td>
+                          <td style="font-weight:bold; color:black">HSN</td>
+                          <td style="font-weight:bold; color:black">Quantity</td>
+                          <td style="font-weight:bold; color:black">Price</td>
+                          <td style="font-weight:bold; color:black">Discount</td>
+                          <td style="font-weight:bold; color:black">Tax %</td>
+                          <td style="font-weight:bold; color:black">Total</td>
+
+                        </tr>
+                      </thead>
+                      <tbody>
+
+                        {% for j in invoiceitem %}
+                        <tr>
+                          <td style="color:black; text-align: center;">{{j.product}}</td>
+                          <td style="color:black">{{j.hsn}}</td>
+                          <td style="color:black">{{j.quantity}}</td>
+                          <td style="color:black">{{j.rate}} </td>
+                          <td style="color:black">{{j.desc}} </td>
+                          <td style="color:black">{{j.tax}} </td>
+                          <td style="color:black">{{j.total}} </td>
+
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table><br><br>
+                  </section>
+
+                  <section class="balance-info">
+                    <div class="row">
+                      <div class="col-4"></div>
+                      <div class="col-4"></div>
+                      <div class="col-4">
+                        <table class="table table-borderless">
+                          <tbody>
+                            <tr>
+                              <td style="color: #000;">Sub Total</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-right" style="color: #000;">
+                                {{invoice.subtotal}}</td>
+                            </tr>
+                            {% if invoice.igst != '0.00' %}
+                            <tr>
+                              <td style="color: #000;">IGST</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-right" style="color: #000;">
+                                {{invoice.igst}}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                              <td style="color: #000;">SGST</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-right" style="color: #000;">
+                                {{invoice.sgst}}</td>
+                            </tr>
+                            <tr>
+                              <td style="color: #000;">CGST</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-right" style="color: #000;">
+                                {{invoice.cgst}}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                              <td style="color: #000;">Tax Amount</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-right" style="color: #000;">
+                                {{invoice.t_tax}}</td>
+                            </tr>
+                            <tr>
+                              <td style="color: #000;">Shipping Charge</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-right" style="color: #000;">{{invoice.shipping_charge}}</td>
+                            </tr>
+                            <tr>
+                              <td style="color: #000;">Adjustment</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-right" style="color: #000;">{{invoice.adjustment}}</td>
+                            </tr>
+                            {% if invoice.paid_amount != 0 %}
+                            <tr>
+                              <td style="color: #000;">Advance</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-center" style="color: #000;">{{invoice.paid_amount}}</td>
+                            </tr>
+
+                            {% endif %}
+                            <tr>
+                              <td style="color: #000;">Total</td>
+                              <td style="color: #000;">:</td>
+                              <td class="text-right" style="color: #000;">
+                                <b>{{invoice.grandtotal}}</b>
+                              </td>
+                            </tr>
+
+                          </tbody>
+
+                        </table>
+
+                      </div>
+
+                      <footer class="mb-5">
+                        <p class="text-dark">&copy; Zho Books 2023 | Info park kakkanad kochi,
+                          Ernamkulam,
+                          kerala India 12345
+                          | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+                      </footer>
+                    </div>
+                  </section>
+
+                  <!-- Cart BG -->
+                  <img src="cart.jpg" class="img-fluid cart-bg" alt="">
+
+                  <!-- <footer>
+                                  <hr>
+                                  <p class="m-0 text-center">
+                                      View THis Invoice Online At - <a href="#!"> invoice/saburbd.com/#868 </a>
+                                  </p>
+                                  <div class="social pt-3">
+                                      <span class="pr-2">
+                                          <i class="fas fa fa-mobile-alt"></i>
+                                          <span>0123456789</span>
+                                      </span>
+                                      <span class="pr-2">
+                                          <i class="fas fa fa-envelope"></i>
+                                          <span>me@saburali.com</span>
+                                      </span>
+                                      <span class="pr-2">
+                                          <i class="fab fa-facebook-f"></i>
+                                          <span>/sabur.7264</span>
+                                      </span>
+                                      <span class="pr-2">
+                                          <i class="fab fa-youtube"></i>
+                                          <span>/abdussabur</span>
+                                      </span>
+                                      <span class="pr-2">
+                                          <i class="fab fa-github"></i>
+                                          <span>/example</span>
+                                      </span>
+                                  </div>
+                              </footer> -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- Share bill Modal -->
+          <div class="modal fade" id="shareBillEmail">
+            <div class="modal-dialog modal-xl">
+              <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
+                <div class="modal-header" style="background: rgb(32, 35, 37);">
+                  <h5 class="m-3 text-uppercase" id="shareBillEmailLabel">Share Inoice Via Email</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                      aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body" style="background: rgb(32, 35, 37);">
+                  <div class="card p-3 m-3">
+                    <form action="{% url 'shareInvoiceToEmail' invoice.id %}" method="post" class="needs-validation"
+                      id="share_to_email_form" autocomplete="off">
+                      {% csrf_token %}
+                      <div class="form-group">
+                        <label for="emailIds">Email IDs</label>
+                        <textarea class="form-control text-dark" name="email_ids" id="emailIds" rows="5"
+                          placeholder="Multiple emails can be added by separating with a comma(,)." required></textarea>
+                      </div>
+                      <div class="form-group mt-2">
+                        <label for="item_unitname">Message(optional)</label>
+                        <textarea name="email_message" id="email_message" class="text-dark form-control" cols=""
+                          rows="4" placeholder="This message will be sent along with Bill details."></textarea>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="modal-footer d-flex justify-content-center" style="border-top: 1px solid #ffff;">
+                    <input type="submit" id="share_with_email"
+                      class="submitShareEmailBtn rounded-pill text-grey w-50 my-4 mx-3" value="SEND MAIL">
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
         </div>
-    </div>
+
+      </div>
+
+
+
+
+      <script src="https://code.jquery.com/jquery-3.x.x.min.js"></script>
+
+
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
 </section>
-
+{% for message in messages %}
 
 <script>
-    function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = cookies[i].trim();
-                // Check if the cookie name matches the CSRF cookie name
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-   
-
-
+  let msg = '{{message}}';
+  alert(msg);
 </script>
+{% endfor %}
+
+
+
+
 <script>
-
-    jQuery(document).ready(function ($) {
-        $(".clickable-row").click(function () {
-            window.location = $(this).data("href");
-        });
-    });
-
-        
-    
-    
   
-    
-        var $rows = $('#table tr');
-        $('#search').keyup(function() {
-            var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
-            
-            $rows.hide().filter(function() {
-                var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
-                return ~text.indexOf(val);
-            }).show();
-        });
-      
-     
-   
-    
-    
-    
+  $(document).ready(function () {
+    $('#share_with_email').on('click', function () {
+      var emailsInput = document.getElementById('emailIds');
+      var emailsString = emailsInput.value.trim();
 
-        
+      var emails = emailsString.split(',').map(function (email) {
+        return email.trim();
+      });
+
+      var emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+
+      var invalidEmails = []
+      if (emailsString == "") {
+        alert('Enter valid email addresses..')
+      }
+      else {
+        for (var i = 0; i < emails.length; i++) {
+          var currentEmail = emails[i];
+
+          if (currentEmail != "" && !emailRegex.test(currentEmail)) {
+            console.log(currentEmail + ' is invalid!');
+            invalidEmails.push(currentEmail)
+          }
+        }
+
+        if (invalidEmails.length > 0) {
+          alert('Invalid emails..Please check!\n' + invalidEmails)
+          // alert(invalidEmails)
+        } else {
+          $('#share_to_email_form').submit();
+        }
+      }
+    })
+  });
+
+
+  function shareOnWhatsApp() {
+    var url = window.location.href;
+    var text = url;
+    text = encodeURIComponent(text);
+    var whatsappUrl = "whatsapp://send?text=" + text;
+    window.location.href = whatsappUrl;
+  }
+
+  function exportToPDF() {
+    var content = document.getElementById('selected-area');
+    html2pdf()
+      .from(content)
+      .save('{{invoice.invoice_no}}' + '.pdf')
+  }
+  function exportToPDF2() {
+    var content = document.getElementById('selected-area2');
+    html2pdf()
+      .from(content)
+      .save('{{invoice.invoice_no}}' + '.pdf')
+  }
+  function exportToPDF3() {
+    var content = document.getElementById('selected-area3');
+    html2pdf()
+      .from(content)
+      .save('{{invoice.invoice_no}}' + '.pdf')
+  }
+  function exportToPDF4() {
+    var content = document.getElementById('printslip');
+    html2pdf()
+      .from(content)
+      .save('{{invoice.invoice_no}}' + '.pdf')
+  }
+
 </script>
+
 <script>
-    function sortTable(columnIndex) {
-        let sortAscending = false
-        const table = document.getElementById("mytable");
-        const rows = Array.from(table.rows).slice(1); // Exclude the header row
+  // Get the div element by its ID
+  var divElement = document.getElementById("orderinfo");
 
-        rows.sort((row1, row2) => {
-            const cellValue1 = row1.cells[columnIndex].textContent.toLowerCase();
-            const cellValue2 = row2.cells[columnIndex].textContent.toLowerCase();
+  // Get the height of the div using offsetHeight
+  var divHeight = divElement.offsetHeight;
 
-            if (cellValue1 < cellValue2) {
-                return -1;
-            } else if (cellValue1 > cellValue2) {
-                return 1;
-            } else {
-                return 0;
-            }
-        });
+  var divElement = document.getElementById("productinfo");
 
-        // Clear the table body
-        while (table.rows.length > 1) {
-            table.deleteRow(1);
-        }
+  // Set the height of the div
+  divElement.style.height = `${divHeight}px`;
 
-        // Append the sorted rows back to the table
-        rows.forEach(row => table.appendChild(row));
-        sortAscending = !sortAscending;
-    }
-
-    function rsortTable(columnIndex) {
-        let sortAscending = false
-        const table = document.getElementById("mytable");
-        const rows = Array.from(table.rows).slice(1); // Exclude the header row
-
-        rows.sort((row1, row2) => {
-            const cellValue1 = row1.cells[columnIndex].textContent.toLowerCase();
-            const cellValue2 = row2.cells[columnIndex].textContent.toLowerCase();
-
-            if (sortAscending) {
-                if (cellValue1 < cellValue2) {
-                    return -1;
-                } else if (cellValue1 > cellValue2) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            } else {
-                if (cellValue1 > cellValue2) {
-                    return -1;
-                } else if (cellValue1 < cellValue2) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            }
-        });
-
-        // Clear the table body
-        while (table.rows.length > 1) {
-            table.deleteRow(1);
-        }
-
-        // Append the sorted rows back to the table
-        rows.forEach(row => table.appendChild(row));
-
-        // Toggle the sorting order for the next click
-        sortAscending = !sortAscending;
-    }
-
-
-
-
-
-    function toggleLoanActiveStatus(loanId) {
-        // Send an AJAX request to toggle the active status
-        $.ajax({
-            url: `/toggle_loan_active/${loanId}/`,
-            method: 'POST',
-            dataType: 'json',
-            success: function (data) {
-                // Update the button text and style based on the response
-                const activeButton = document.getElementById('active-button');
-                if (data.active) {
-                    activeButton.textContent = 'Deactivate';
-                    activeButton.classList.remove('btn-success');
-                    activeButton.classList.add('btn-danger');
-                } else {
-                    activeButton.textContent = 'Activate';
-                    activeButton.classList.remove('btn-danger');
-                    activeButton.classList.add('btn-success');
-                }
-            },
-            error: function (error) {
-                console.error('Error:', error);
-            }
-        });
-    }
-    
+  // Log the height to the console
 </script>
-<!-- <script>
-    function generatePDF() {
-        const container = document.getElementById('div-to-pdf');
-        const options = {
-            filename: 'employee.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            htmt2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().from(container).set(options).save();
-    };
+
+<script>
+  function printSelectedArea(area) {
+
+    var printContents = document.getElementById("selected-area").innerHTML;
+    document.getElementById("selected-area").style.backgroundColor = "white"
+    var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
+    $printerDiv.html(printContents); // add the content to be printed
+    $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+    window.print(); // call print
+    $printerDiv.remove(); // remove the div
+    $('body').removeClass("printingContent");
+
+  }
+
+  function printSelectedArea2(area) {
+
+    var printContents = document.getElementById("selected-area2").innerHTML;
+    document.getElementById("selected-area2").style.backgroundColor = "white"
+    var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
+    $printerDiv.html(printContents); // add the content to be printed
+    $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+    window.print(); // call print
+    $printerDiv.remove(); // remove the div
+    $('body').removeClass("printingContent");
+
+  }
+  function printSelectedArea3(area) {
+
+    var printContents = document.getElementById("selected-area3").innerHTML;
+    document.getElementById("selected-area3").style.backgroundColor = "white"
+    var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
+    $printerDiv.html(printContents); // add the content to be printed
+    $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+    window.print(); // call print
+    $printerDiv.remove(); // remove the div
+    $('body').removeClass("printingContent");
+
+  }
+  function printSelectedArea4(area) {
+
+    var printContents = document.getElementById("printslip").innerHTML;
+    document.getElementById("printslip").style.backgroundColor = "white"
+    var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
+    $printerDiv.html(printContents); // add the content to be printed
+    $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+    window.print(); // call print
+    $printerDiv.remove(); // remove the div
+    $('body').removeClass("printingContent");
+
+  }
+</script>
+
+<script>
+
+  const rows = document.querySelectorAll('.clickable');
+
+  rows.forEach(row => {
+    row.addEventListener('click', () => {
+      var currentURL = window.location.href
+      const rowId = row.id;
+      var newURL = currentURL.replace(/\d+$/, rowId);
+      window.location.href = newURL;
+    });
+  });
 
 
-</script> -->
+
+
+
+</script>
+
+<script>
+
+
+  function totemplate() {
+    document.getElementById('templatediv').style.display = 'block'
+    document.getElementById('overviewdiv').style.display = 'none'
+    document.getElementById('templatediv2').style.display = 'none'
+    document.getElementById('templatediv3').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'none'
+
+  }
+  function totemplate2() {
+    document.getElementById('templatediv').style.display = 'none'
+    document.getElementById('templatediv2').style.display = 'block'
+    document.getElementById('templatediv3').style.display = 'none'
+    document.getElementById('overviewdiv').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'none'
+
+  }
+  function totemplate3() {
+    document.getElementById('templatediv').style.display = 'none'
+    document.getElementById('templatediv2').style.display = 'none'
+    document.getElementById('templatediv3').style.display = 'block'
+    document.getElementById('overviewdiv').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'none'
+  }
+  function tooverview() {
+    document.getElementById('templatediv').style.display = 'none'
+    document.getElementById('overviewdiv').style.display = 'block'
+    document.getElementById('templatediv2').style.display = 'none'
+    document.getElementById('templatediv3').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'none'
+  }
+  function show_slip() {
+    document.getElementById('templatediv').style.display = 'none'
+    document.getElementById('overviewdiv').style.display = 'none'
+    document.getElementById('templatediv2').style.display = 'none'
+    document.getElementById('templatediv3').style.display = 'none'
+    document.getElementById('slipdiv').style.display = 'block'
+  }
+</script>
+
+<script>
+  var $rows = $('#myTable tbody tr');
+  $('#search').keyup(function () {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+    $rows.hide().filter(function () {
+      var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+      return ~text.indexOf(val);
+    }).show();
+  });
+
+</script>
+
+<script>
+  // Function to sort the table by the selected column
+  function sortTable() {
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementById("myTable");
+    switching = true;
+
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+
+      for (i = 0; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("label")[0];
+        y = rows[i + 1].getElementsByTagName("label")[0];
+
+        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          shouldSwitch = true;
+          break;
+        }
+      }
+
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+      }
+    }
+  }
+
+
+  function sortTablebybillno() {
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementById("myTable");
+    switching = true;
+
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+
+      for (i = 0; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("p")[0];
+        y = rows[i + 1].getElementsByTagName("p")[0];
+
+        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          shouldSwitch = true;
+          break;
+        }
+      }
+
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+      }
+    }
+  }
+
+</script>
+
+
 
 {% endblock %}
-
-<!-- edit com attach dele active/inactive -->

@@ -301,7 +301,6 @@
           <div class="col-md-3">
             <label for="date2">Payment Terms</label>
           </div>
-
           <div class="col-md-6">
             <div class="d-flex">
               <select class="form-control bg-light text-dark" id="pay_term" name="term" required>
@@ -391,7 +390,7 @@
                       id='item1' onchange="itemfunction(this.id)">
                       <option value="" selected hidden>Select Item</option>
                       {% for i in items %}
-                      <option class="text-black" value="{{i.id}}">{{ i.Name}} </option>
+                      <option class="text-black" value="{{i.Name}}">{{ i.Name}} </option>
                       {% endfor %}
                     </select>
                   </td>
@@ -912,7 +911,7 @@
                     <div class="col-md-6 mt-2">
                       <div class="d-flex">
                         <select class="form-control bg-light text-dark" id="c_terms" name="c_terms" required>
-                          {% for p in pay %}
+                          {% for p in payments %}
                           <option value="{{p.Terms}} {{p.id}}">{{p.Terms}}</option>
                           {% endfor %}
                         </select>

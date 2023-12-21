@@ -148,8 +148,9 @@
                   <td>
                     {% if v.status == 'Send' %}
                         Save
-                    {% else %}
-                        {{ v.status }}
+                    
+                    {% elif v.status == 'draft' %}
+                    Draft
                     {% endif %}
                 </td>
                 
