@@ -508,6 +508,29 @@ updateCurrentDate();
                 <span class="text-warning">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
                 <span class="stock_warning text-danger"></span>
               </td>
+              <script>
+                $(document).ready(function () {
+                  function qtychange(id_str) {
+                    var id = id_str.split("qty")[1];
+                    var qty = $(`#qty${id}`).val();
+                    
+                    // Assuming you have a way to uniquely identify the selected item, e.g., using a dropdown with id 'itemSelect'
+                    var selectedItem = $("#itemSelect option:selected").val();
+                    var avl = $(`#stock_data${id}`).text();
+              
+                    console.log('Qty:', qty);
+                    console.log('Available:', avl);
+              
+                    if (parseInt(qty) > parseInt(avl)) {
+                      $(".stock_warning").text("Entered quantity greater than available quantity");
+                      // Optionally, you can add a delay and then clear the warning message
+                      // setTimeout(function() { $(".stock_warning").text(""); }, 3000);
+                    } else {
+                      $(".stock_warning").text(""); // Clear the warning message if quantity is within limits
+                    }
+                  }
+                });
+              </script>
               
             <td style="width: 12%;" class='text-right text-dark'><input type='number' id='rate1'
                     class=' text-right discount bg-light text-dark form-control rate' name='rate[]'
@@ -3352,29 +3375,7 @@ function reloadAccount() {
 </script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
-<script>
-  $(document).ready(function () {
-    function qtychange(id_str) {
-      var id = id_str.split("qty")[1];
-      var qty = $(`#qty${id}`).val();
-      
-      // Assuming you have a way to uniquely identify the selected item, e.g., using a dropdown with id 'itemSelect'
-      var selectedItem = $("#itemSelect option:selected").val();
-      var avl = $(`#stock_data${id}`).text();
 
-      console.log('Qty:', qty);
-      console.log('Available:', avl);
-
-      if (parseInt(qty) > parseInt(avl)) {
-        $(".stock_warning").text("Entered quantity greater than available quantity");
-        // Optionally, you can add a delay and then clear the warning message
-        // setTimeout(function() { $(".stock_warning").text(""); }, 3000);
-      } else {
-        $(".stock_warning").text(""); // Clear the warning message if quantity is within limits
-      }
-    }
-  });
-</script>
 
 <script>
   $(document).ready(function () {

@@ -392,6 +392,7 @@
               <tbody id="item_table_body">
                 {% for i in est %}
                 <tr id="row{{forloop.counter}}">
+                  
                   <td>
                     <div><select class='form-control border-0 bg-transparent text-white border-0 item_select itm'
                         name='item[]' id='item{{forloop.counter}}' onchange="itemfunction(this.id)">
@@ -411,7 +412,130 @@
                   <td style="width: 17%;" class='text-right'><input type='number' id='qty{{forloop.counter}}'
                       class=' text-right qty form-control border-0 bg-transparent text-white' name='quantity[]'
                       value='{{i.quantity}}' style="margin-top: 4vh;" onchange="qtychange(this.id)"><br>
+                      <span class="text-warning">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
+                      <span class="stock_warning text-danger"></span>
                   </td>
+
+                  <script>
+                    $(document).ready(function () {
+                      function qtychange(id_str) {
+                        var id = id_str.split("qty")[1];
+                        var qty = $(`#qty${id}`).val();
+                        
+                        // Assuming you have a way to uniquely identify the selected item, e.g., using a dropdown with id 'itemSelect'
+                        var selectedItem = $("#itemSelect option:selected").val();
+                        var avl = $(`#stock_data${id}`).text();
+                  
+                        console.log('Qty:', qty);
+                        console.log('Available:', avl);
+                  
+                        if (parseInt(qty) > parseInt(avl)) {
+                          $(".stock_warning").text("Entered quantity greater than available quantity");
+                          // Optionally, you can add a delay and then clear the warning message
+                          // setTimeout(function() { $(".stock_warning").text(""); }, 3000);
+                        } else {
+                          $(".stock_warning").text(""); // Clear the warning message if quantity is within limits
+                        }
+                      }
+                    });
+                  </script>
+                  
+                  <script>
+                  function fetchItemData(selectedItem, row) {
+                    $.ajax({
+                        type: 'GET',
+                        url: "{% url 'get_invoice_item_details' %}",
+                        data: {
+                            id: selectedItem
+                        },
+                        dataType: 'json',
+                        success: function (response) {
+                            // Update the HSN and rate fields in the current row with the fetched data
+                            row.find(".hsn").val(response.hsn);
+                            row.find(".rate").val(response.rate);
+                            row.find(".stock_data").text(response.stock);  // Add this line to update available stock
+                        },
+                        error: function () {
+                            // Handle errors if the data cannot be fetched or the item doesn't exist
+                            console.log('Error fetching item data.');
+                            // You can display an error message to the user if needed.
+                        },
+                    });
+                }
+                
+                // Add event handler for changes in item selection
+                $(document).on('change', '.item_select', function () {
+                    var selectedItem = $(this).val();
+                    var row = $(this).closest('tr');
+                    fetchItemData(selectedItem, row);
+                });
+                
+                
+                // Add event handler for changes in item selection
+                $(document).on('change', '.item_select', function () {
+                  var selectedItem = $(this).val();
+                  var row = $(this).closest('tr');
+                  
+                  $.ajax({
+                    type: 'GET',
+                    url: "{% url 'get_invoice_item_details' %}",
+                    data: {
+                      id: selectedItem
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                      // Update the HSN and rate fields in the current row with the fetched data
+                      row.find(".hsn").val(response.hsn);
+                      row.find(".rate").val(response.rate);
+                
+                      // Trigger the updateAvailableStock function after fetching item details
+                      updateAvailableStock(row);
+                    },
+                    error: function () {
+                      // Handle errors if the data cannot be fetched or the item doesn't exist
+                      console.log('Error fetching item data.');
+                     
+                    },
+                  });
+                
+                })
+                
+                // Function to update Available Stock and display warning message if necessary
+                function updateAvailableStock(row) {
+                  var selectedItem = row.find(".item_select").val();
+                  var quantity = parseInt(row.find(".quantity").val());
+                  var availableStock = parseInt(row.find(".stock_data").text());
+                
+                  if (isNaN(quantity) || isNaN(availableStock)) {
+                    // Handle invalid input (non-numeric values)
+                    return;
+                  }
+                
+                  // Update Available Stock span
+                  row.find(".stock_data").text(availableStock - quantity);
+                
+                  // Display a warning message if the entered quantity is greater than available stock
+                  if (quantity > availableStock) {
+                    row.find(".stock_warning").text("Entered quantity greater than available quantity").css('color', 'red');
+                  } else {
+                    row.find(".stock_warning").text('').css('color', ''); // Reset the warning message
+                  }
+                }
+                
+                // Add event handler for changes in item selection
+                $(document).on('change', '.item_select', function () {
+                  var selectedItem = $(this).val();
+                  var row = $(this).closest('tr');
+                  fetchItemData(selectedItem, row);
+                });
+                
+                // Add event handler for changes in quantity
+                $(document).on('change', '.quantity', function () {
+                  var row = $(this).closest('tr');
+                  updateAvailableStock(row);
+                });
+                
+                  </script>
                   <td style="width: 15%;" class='text-right'><input type='number' id='rate{{forloop.counter}}'
                       class=' text-right rate form-control border-0 bg-transparent text-white' name='rate[]'
                       value='{{i.rate}}' readonly>
@@ -2461,7 +2585,7 @@
     $.ajax({
 
       type: 'POST',
-      url: "{% url 'purchase_item' %}",
+      url: "{% url 'invoice_item_in_modal' %}",
 
       data: {
         type: itemtype,
@@ -2477,6 +2601,7 @@
         cost_acc: $("#cost_acc").val(),
         sell_desc: $("#sell_desc").val(),
         cost_desc: $("#cost_desc").val(),
+        min_stock: $("#min_stock").val(),
         active_type: active_type,
         invasset: $("#invasset").val(),
         opening_stock: $("#opening_stock").val(),
@@ -2496,7 +2621,7 @@
 
   function reloadItem() {
     $.ajax({
-      url: "{% url 'purchase_item_dropdown' %}",
+      url: "{% url 'invoice_item_in_dropdown' %}",
       type: "GET",
       dataType: "json",
       data: $(this).serialize(),
@@ -2705,6 +2830,8 @@
         
         <td style="width: 17%;" class='text-right'>
           <input type='number' id='qty${rowCount}' class='text-right border-0 bg-transparent text-white qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange(this.id)'><br>
+          <span class="text-warning">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
+          <span class="stock_warning text-danger"></span>
         </td>
         
         <td style="width: 15%;" class='text-right'>

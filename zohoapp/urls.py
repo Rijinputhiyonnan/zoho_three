@@ -1212,7 +1212,9 @@ urlpatterns = [
     
     
     path('shareInvoiceToEmail/<int:id>',views.shareInvoiceToEmail,name='shareInvoiceToEmail'),
-    
+    path('get_invoice_item_details/', views.get_invoice_item_details, name='get_invoice_item_details'),
+    path('invoice_item_in_modal',views.invoice_item_in_modal,name='invoice_item_in_modal'),
+    path('invoice_item_in_dropdown',views.invoice_item_in_dropdown,name='invoice_item_in_dropdown'),
     
     
     

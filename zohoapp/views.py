@@ -27017,3 +27017,84 @@ def edited_prod(request, id):
     
     }
     return render(request, 'invoiceedit.html', context)
+
+
+def get_invoice_item_details(request):
+    id = request.GET.get('id')
+
+    try:
+        item = AddItem.objects.get(id=id)
+        hsn = item.hsn
+        rate = item.s_price 
+        stock = item.stock
+        interstate = item.interstate
+        intrastate = item.intrastate
+        tax = item.tax
+
+        data = {
+            'hsn': hsn,
+            'rate': rate,
+            'stock': stock,
+            'interstate': interstate,
+            'intrastate': intrastate,
+            'tax': tax,
+        }
+
+        return JsonResponse(data)
+    except AddItem.DoesNotExist:
+        return JsonResponse({'error': 'Item not found'}, status=404)
+    
+    
+    
+    
+    
+@login_required(login_url='login')
+def invoice_item_in_modal(request):
+    
+    if request.method=='POST':
+        type=request.POST.get('type')
+        name=request.POST['name']
+        ut=request.POST['unit']
+        hsn=request.POST['hsn']
+        inter=request.POST['inter']
+        intra=request.POST['intra']
+        sell_price=request.POST.get('sell_price')
+        sell_acc=request.POST.get('sell_acc')
+        sell_desc=request.POST.get('sell_desc')
+        cost_price=request.POST.get('cost_price')
+        cost_acc=request.POST.get('cost_acc')      
+        cost_desc=request.POST.get('cost_desc')
+        
+        min_stock=request.POST.get('minimum_stock')
+        
+
+        invasset=request.POST.get('invasset')
+        opening_stock=request.POST.get('opening_stock')
+        opening_stock_unit=request.POST.get('opening_stock_unit')
+        active_type=request.POST.get('active_type')
+        units=Unit.objects.get(id=ut)
+        sel=Sales.objects.get(id=sell_acc)
+        cost=Purchase.objects.get(id=cost_acc)
+
+        history="Created by " + str(request.user)
+        user = User.objects.get(id = request.user.id)
+
+        item=AddItem(type=type,hsn=hsn,unit=units,sales=sel,purchase=cost,Name=name,p_desc=cost_desc,s_desc=sell_desc,s_price=sell_price,
+                    p_price=cost_price,user=user,creat=history,interstate=inter,intrastate=intra,invacc=invasset,stock=opening_stock,
+                    rate=opening_stock_unit,satus=active_type,status_stock=active_type,minimum_stock=min_stock)
+
+        item.save()
+        return HttpResponse({"message": "success"})
+    
+    
+@login_required(login_url='login')        
+def invoice_item_in_dropdown(request):
+
+    usr = User.objects.get(id=request.user.id)
+
+    options = {}
+    option_objects = AddItem.objects.filter(user=request.user.id)
+    for option in option_objects:
+        options[option.id] = option.Name
+
+    return JsonResponse(options)
