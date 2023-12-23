@@ -182,26 +182,25 @@
             <div style="overflow-x: auto;">
               <table class="table table-bordered border-secondary">
                 <thead>
+                 
+                  <th class="text-light">DATE</th>
+                  <th class="text-light">INVOICE NO.</th>
+                  
+                 
                   <th class="text-light">CUSTOMER NAME</th>
-                  <th class="text-light">CUSTOMER MAIL ID</th>
-                  <th class="text-light">PAYMENT RECIEVED DATE</th>
-                  <th class="text-light">PAYMENT RECIEVED MAETHOD</th>
-                  <th class="text-light">CHEQUE ID</th>
-                  <th class="text-light">UPI ID</th>
-                  <th class="text-light">BANK NAME</th>
-                  <th class="text-light">ACCOUNT NUMBER</th>
-                  <th class="text-light">PAYMENT RECIEVED AMOUNT</th>
-                  <th class="text-light">PAYMENT RECIEVED PAID</th>
-                  <th class="text-light">PAYMENT RECIEVED BALANCE</th>
+                  <th class="text-light">MAIL ID</th>
+                  <th class="text-light">AMOUNT</th>
+                  <th class="text-light">STATUS</th>
+                  <th class="text-light">BALANCE</th>
                 </thead>
               </table>
               <p></p>
             </div>
             <hr>
-            <form action="{% url 'import_payment_recieved' %}" method="POST" enctype="multipart/form-data">
+            <form action="{% url 'import_invoice_listout_page' %}" method="POST" enctype="multipart/form-data">
               {% csrf_token %}
               <label style="color: rgb(152, 152, 255);" class=" fw-bolder" for="">Download Sample Excel File</label>
-                  <a class="btn btn-outline-warning ms-5" href="{% url 'download_pay_rec_sampleImportFile' %}">Download</a>
+                  <a class="btn btn-outline-warning ms-5" href="{% url 'download_invoice_sampleImportFile' %}">Download</a>
                  <hr>
                   <input class="form-control bg-dark" type="file" name="excel_file">
                   <hr>

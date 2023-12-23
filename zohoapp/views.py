@@ -27098,3 +27098,207 @@ def invoice_item_in_dropdown(request):
         options[option.id] = option.Name
 
     return JsonResponse(options)
+
+
+
+
+
+@login_required(login_url='login')
+def download_invoice_sampleImportFile(request):
+    
+    bank_table = [['DATE','INVOICE NO.','CUSTOMER NAME','MAIL ID','AMOUNT','STATUS','BALANCE'], 
+                  ['Nov. 11, 2023','INV 01','Mr. Jithin P', 'jithin@gmail.com', '999800', 'Save','1000' ], 
+                  ['Nov. 21, 2023','INV 02','Mr. Jithin P', 'jithin@gmail.com', '999800', 'Draft','1000'], 
+                  ['Nov. 22, 2023','INV 03','Mr. Jithin P', 'jithin@gmail.com', '999800', 'Save','1000'],
+                  ['Nov. 01, 2023','INV 04','Mr. Jithin P', 'jithin@gmail.com', '999800', 'Draft','1000']]
+
+    wb = Workbook()
+
+    sheet1 = wb.active
+    sheet1.title = 'Sheet1'
+
+    # Populate the sheets with data
+    for row in bank_table:
+        sheet1.append(row)
+
+    # Create a response with the Excel file
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=invoice_import_file_format.xlsx'
+
+    # Save the workbook to the response
+    wb.save(response)
+
+    return response
+
+
+
+@login_required(login_url='login')
+def import_invoice_listout_page(request):
+    # try:
+    if request.method == "POST" and 'excel_file' in request.FILES:
+        excel_file = request.FILES['excel_file']
+
+        wb = load_workbook(excel_file)
+        ws = wb.active
+        if 1 == 1 :
+        # try:
+            for row in ws.iter_rows(min_row=2, values_only=True):
+                name, mail, date,method,cheque_id,upi_id,bank,acc_no,amount,paid,balance = row
+
+                user = User.objects.get(id=request.user.id)
+                if customer.objects.filter(customerEmail=mail).exists():
+                    
+                    cust = customer.objects.get(customerEmail=mail)
+
+                    customer_name = cust.customerName
+                    customer_mail = mail
+                    customer_bill_address = cust.Address1
+                    customer_gst_treatment = cust.GSTTreatment
+                    if customer_gst_treatment == None:
+                        customer_gst_treatment = 'values'
+                    customer_gst_number = cust.GSTIN
+                    payments = PaymentRecievedIdModel.objects.filter(user=request.user.id)
+                    if payments.exists():
+                        last = payments.last()
+                        payments_recieved_number = last.pay_rec_number
+                        payments_reference_number = last.ref_number
+                    else:
+                        payments_recieved_number = 'PRN-01'
+                        payments_reference_number = '01'
+                    payments_recieved_date = date
+                    payments_recieved_method = method.lower()
+                    total_amount = amount
+                    total_balance = balance
+                    # print(payments_recieved_method)
+                    status = 'save'
+                    if payments_recieved_method == 'cheque':
+                        # print('cheque')
+                        cheque_id = request.POST.get('cheque_id')
+                        # print(cheque_id)
+                        payment = PaymentRecievedModel(user=user,
+                                                    customer=cust,
+                                                    customer_name=customer_name,
+                                                    customer_mail=customer_mail,
+                                                    customer_bill_address=customer_bill_address,
+                                                    customer_gst_treatment=customer_gst_treatment,
+                                                    customer_gst_number=customer_gst_number,
+                                                    payment_recieved_number=payments_recieved_number,
+                                                    reference_number=payments_reference_number,
+                                                    payment_recieved_date=payments_recieved_date,
+                                                    payment_recieved_method=payments_recieved_method,
+                                                    cheque_id=cheque_id,
+                                                    status=status,
+                                                    pay_rec_amount = total_amount,
+                                                    pay_rec_paid = float(total_amount)-float(total_balance),
+                                                    pay_rec_balance = total_balance)
+                        payment.save()
+                    elif payments_recieved_method == 'upi':
+                        # print('upi')
+                        upi_id = request.POST.get('upi_id')
+                        # print(upi_id)
+                        payment = PaymentRecievedModel(user=user,
+                                                    customer=cust,
+                                                    customer_name=customer_name,
+                                                    customer_mail=customer_mail,
+                                                    customer_bill_address=customer_bill_address,
+                                                    customer_gst_treatment=customer_gst_treatment,
+                                                    customer_gst_number=customer_gst_number,
+                                                    payment_recieved_number=payments_recieved_number,
+                                                    reference_number=payments_reference_number,
+                                                    payment_recieved_date=payments_recieved_date,
+                                                    payment_recieved_method=payments_recieved_method,
+                                                    upi_id=upi_id,
+                                                    status=status,
+                                                    pay_rec_amount = total_amount,
+                                                    pay_rec_paid = float(total_amount)-float(total_balance),
+                                                    pay_rec_balance = total_balance)
+                        payment.save()
+                    elif payments_recieved_method == 'cash':
+                        # print('cash')
+                        payment = PaymentRecievedModel(user=user,
+                                                        customer=cust,
+                                                        customer_name=customer_name,
+                                                        customer_mail=customer_mail,
+                                                        customer_bill_address=customer_bill_address,
+                                                        customer_gst_treatment=customer_gst_treatment,
+                                                        customer_gst_number=customer_gst_number,
+                                                        payment_recieved_number=payments_recieved_number,
+                                                        reference_number=payments_reference_number,
+                                                        payment_recieved_date=payments_recieved_date,
+                                                        payment_recieved_method=payments_recieved_method,
+                                                        status=status,
+                                                        pay_rec_amount = total_amount,
+                                                        pay_rec_paid = float(total_amount)-float(total_balance),
+                                                        pay_rec_balance = total_balance)
+                        payment.save()
+                    else:
+                        # print('bank')
+                        if not Bankcreation.objects.filter(name=bank,ac_no=acc_no).exists():
+                            messages.warning(request,f"{bank} Bank with Account number {acc_no}doesn't exists")
+                            return redirect('payment_reciedved_list_out')
+                        else:
+                            bank = Bankcreation.objects.get(name=bank,ac_no=acc_no)
+                            acc_num = acc_no
+                            payment = PaymentRecievedModel(user=user,
+                                                            customer=cust,
+                                                            customer_name=customer_name,
+                                                            customer_mail=customer_mail,
+                                                            customer_bill_address=customer_bill_address,
+                                                            customer_gst_treatment=customer_gst_treatment,
+                                                            customer_gst_number=customer_gst_number,
+                                                            payment_recieved_number=payments_recieved_number,
+                                                            reference_number=payments_reference_number,
+                                                            payment_recieved_date=payments_recieved_date,
+                                                            payment_recieved_method=bank.name,
+                                                            bank=bank,
+                                                            acc_num=acc_num,
+                                                            status=status,
+                                                            pay_rec_amount = total_amount,
+                                                            pay_rec_paid = float(total_amount)-float(total_balance),
+                                                            pay_rec_balance = total_balance)
+                            payment.save()
+
+
+                    if PaymentRecievedIdModel.objects.filter(user=request.user.id).exists():
+                        pay = PaymentRecievedIdModel.objects.filter(user=request.user.id)
+                        pay_id_last = pay.last()
+                        if pay.exclude(id=pay_id_last.id).last():
+                            pay_id_second_last = pay.exclude(id=pay_id_last.id).last()
+                            pattern = pay_id_second_last.pattern
+                            print('1')
+                        else:
+                            pay_id_second_last = pay.first()
+                            pattern = pay_id_second_last.pattern
+                            print('2')
+                        pay_id = PaymentRecievedIdModel(user=user)
+                        count_for_ref_no = PaymentRecievedIdModel.objects.filter(user=user.id).count()
+                        pay_id.pattern = pattern
+                        pay_id.save()
+                        ref_num = int(count_for_ref_no)+2
+                        pay_id.ref_number = f'{ref_num:02}'
+
+                        pay_rec_num = ''.join(i for i in pay_id_last.pay_rec_number if i.isdigit())
+                        print(f'---{pay_rec_num}---')
+                        pay_rec_num = int(pay_rec_num)+1
+                        print(f'---{pay_rec_num}---')
+                        pay_id.pay_rec_number = f'{pattern}{pay_rec_num:02}'
+                        pay_id.save()
+                        print('4')
+                    else:  
+                        pay_id = PaymentRecievedIdModel(user=user)
+                        pay_id.save()
+                        pay_id.ref_number = f'{2:02}'
+                        
+                        pattern = ''.join(i for i in payments_recieved_number if not i.isdigit())
+                        pay_id.pattern = pattern
+                        pay_id.pay_rec_number = f'{pattern}{2:02}'
+                        pay_id.save()
+                        print('5')
+                else:
+                    messages.info(request,f"Customer with mail id {mail} doen't exists")
+                    return redirect('payment_reciedved_list_out')
+            
+        # except:
+        #     messages.warning(request,"Table field is missing / you are importing the wrong File.")
+        return redirect('payment_reciedved_list_out')
+    return redirect('payment_reciedved_list_out')
