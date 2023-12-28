@@ -1,258 +1,457 @@
 {% extends 'base.html' %}
-{% load static %}
 {% block content %}
-
+{% load static %}
 
 <style>
 
-tr:hover{
-        cursor: pointer;
-        background-color: rgba(0, 0, 0, 0.1);
-    }
+  .modal {
+    margin-top: 5rem;
+    z-index: 1;
+    overflow: scroll;
+  }
 
-.tooltip-container {
-  position: relative;
-  cursor: pointer;
-}
+  .modal-backdrop {
+    display: none;
+    z-index: 1 !important;
+  }
 
-.tooltip-text {
-  visibility: hidden;
-  width: 200px;
-  background-color: #f8f8f8;
-  color: #0e0d0d;
-  text-align: center;
-  border-radius: 5px;
-  padding: 5px;
-  position: absolute;
-  z-index: 1;
-  top: 90%;
-  left: 50%;
-  transform: translateX(-50%);
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.tooltip-container:hover .tooltip-text {
-  visibility: visible;
-  opacity: 1;
-}
+  .modal-content {
+    margin: 2px auto;
+    z-index: 999 !important;
+  }
 
 
+
+  #over:hover {
+    background-color: rgba(110, 110, 110, 0.616);
+  }
+
+  .dropdown-item:hover {
+    color: chocolate;
+  }
+
+  #myTable tbody {
+    cursor: pointer;
+  }
+
+  .table-btn:hover {
+    color: black;
+  }
+
+  /* width */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: rgb(252, 236, 217);
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  .tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  
 </style>
 
-<section class="container"  > 
-  <div class="row mt-3 " style="margin-top: -3rem; margin-left:1rem;" >
-    <div class="col-md-10 form-inline ">
-      <div class="row">
-        <div class="col-md-9"><a class="text-white" style="font-size: 2rem;">Inventory Adjustments</a></div>
-        <input type="text"  id="searchInput" class="form-control bg-dark" placeholder="Search Items..." style="margin-top: 25px; width: 30%;margin-left: 20px;">
-        
-        <div class="btn-group" role="group"  style="margin-left: 1rem;margin-top:1.7rem;display:inline-flex;width:4rem;height:2rem;">
-          <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Sort
-          </button>
-          <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-            <a class="dropdown-item" href="#"  data-sort="all">All</a>
-            <a class="dropdown-item" href="#"  data-sort="reason" style="color: white!important;">Reason</a>
-            <a class="dropdown-item" href="#"  data-sort="referencenumber" style="color: white!important;">Reference Number</a>
-          </div>
-          
+
+<script>
+
+
+  // Function to filter items based on status
+  function filterItems(status) {
+    if (status === 'active' || status === 'Active') {
+      $('tbody tr').hide();
+      $('tbody tr.active, tbody tr.Active').show();
+    } else if (status === 'inactive' || status === 'Inactive') {
+      $('tbody tr').hide();
+      $('tbody tr.inactive, tbody tr.Inactive').show();
+    } else if (status === 'adjusted') {
+      $('tbody tr').hide();
+      $('tbody tr[data-status="Adjusted"]').show();
+    } else if (status === 'draft') {
+      $('tbody tr').hide();
+      $('tbody tr[data-status="Draft"]').show();
+    } else {
+      $('tbody tr').show(); // Show all items
+    }
+  }
+  
+  // Attach the filter function to the filter buttons
+  $('#filterActiveButton').on('click', function() {
+    filterItems('adjusted');
+  });
+  
+  $('#filterInactiveButton').on('click', function() {
+    filterItems('draft');
+  });
+  
+  $('#filterAllButton').on('click', function() {
+    filterItems('all');
+  });
+  
+  </script>
+  
+  
+<div class="container-fluid">
+  <div class="fixed-top" style="top: 7rem; margin-left: 18rem;">
+    <div style="height: 600px;overflow-y: scroll;">
+
+      <div class="row container-fluid">
+        <div class="col-md-3"><a class="text-white" style="font-size: 2rem;">Inventory Adjustments</a></div>
+      </div>
+      <br><br><br>
+
+      <div class="row container-fluid mb-3">
+        <div class="col-md-3">
+          <input type="text" id="search" class="form-control bg-light text-dark" placeholder="Search.."
+            autocomplete="off">
         </div>
-        <div class="btn-group" role="group"  style="margin-left: 58rem;margin-top:-1.9rem;display:inline-flex;width:4rem">
-          <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Filter
-          </button>
-          <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-            <a class="dropdown-item" href="#" id="filterAllButton" style="color: white!important;">All</a>
-            <a class="dropdown-item" href="#" id="filterActiveButton"style="color: white!important;">Adjusted</a>
-            <a class="dropdown-item" href="#" id="filterInactiveButton"style="color: white!important;">Draft</a>
+        <div class="col-md-2">
+          <div class="dropdown">
+            <a class="btn text-center px-4 pt-2 btn-outline-warning" id="sortbutton" data-bs-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false" role="button">
+              <i class="fas fa-sort m-1"></i>
+            </a>
+            <div class="dropdown-menu m-1">
+              <a class="dropdown-item" href="# " id="all-challan">All</a>
+              <a class="dropdown-item" id="sort-challan">Date</a>
+              <a class="dropdown-item" id="sort-customer">Reference Number</a>
+            </div>
           </div>
-          
         </div>
-        <div class="col-md-9 form-inline"  style="margin-top: -2rem; margin-left:64rem;"><a style="color: #000;" class="btn btn-secondary " href="{% url 'new_adjustment' %}">New</a>
-          <a style="color: #ccc;"href="#3"> </a>
-        </div> 
+        <div class="col-md-2"></div>
+        <div class="col-md-3">
+          <div class="dropdown d-flex">
+            <a class="btn text-center px-4 pt-2 btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false" role="button">
+              <i class="fa fa-filter mt-1"></i>
+            </a>
+            <div class="dropdown-menu m-1">
+              <a class="dropdown-item" href="{% url  'inventory_adjustment' %}" id="filterAllButton">All</a>
+              <a class="dropdown-item"  href="{% url  'inventory_adjustment_filter_draft' %}" id="filterActiveButton">Draft</a>
+              <a class="dropdown-item"   href="{% url  'inventory_adjustment_filter_save' %}" id="filterInactiveButton">Save</a>
+            </div>
+            <a style="border: 1px solid; border-radius: 5px; height: 5vh; margin-left: 2vh; display: flex; align-items: center;" onclick="reduce_dash()" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-outline-warning"  href="">
+              <i class="fa fa-file-excel-o p-1" style="font-size: large; font-size: 2vh;"></i>
+              <span style="font-size: 2vh; margin-left: 0.1vh;" class="text-center">Import</span>
+          </a>
+          <a style="border: 1px solid; border-radius: 5px; height: 5vh; margin-left: 2vh; display: flex; align-items: center;" onclick="exportToExcel()"0 class="btn btn-outline-warning" >
+            <i class="fa fa-file-excel-o p-1" style="font-size: large; font-size: 2vh;"></i>
+            <span style="font-size: 2vh; margin-left: 0.1vh;" class="text-center">Export</span>
+        </a>
+            <a style="height: 5vh; margin-left: 2vh;" class="btn btn-outline-warning text-right px-3 py-2" role="button"
+              style="margin-left: 5px;" href="{% url  'new_adjustment' %}">
+              <i class="fa fa-plus" style="font-size: large;"></i><span style="font-size: 3vh;"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row container-fluid">
+        <div class="col-sm-12 col-md-11 col-lg-11">
+          <table class="table  text-white" id="table-id">
+            <thead>
+              <tr>
+                <th class="text-center">Date</th>
+
+          <th class="text-center">Reason</th>
+          <th class="text-center">Description</th>
+          <th class="text-center">Reference Number</th>
+          <th class="text-center" >Type</th>
+          <th class="text-center">Status</th>
+          <th class="text-center">Adjusted by</th>
+                  
+              </tr>
+          </thead>
+          <tbody id="table">
+            {% for a in adjustment %}
+            <!-- <tr class="{% if v.satus == 'active' or v.satus == 'Active' %}active{% elif v.satus == 'inactive' or v.satus == 'Inactive' %}inactive{% endif %} text-center"  data-status="{{ a.status }}"></tr> -->
+            <tr class="text-center"  data-status="{{ a.status }}">
+              <td class="item-name-cell text-center" onclick="location.href ='#'"> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;">{{ a.date|date:"d-m-Y" }}
+              </a> </td>
+              <td> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;" >{{ a.reason }}</a></td>
+              <td class="tooltip-container text-center">
+                <span class="tooltip-trigger text-center"><i class="fas fa-comment-alt"></i></span>
+              <span class="tooltip-text text-center"> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;" class="text-dark">{{ a.description }}</a> </span>
+              </td>
+              
+              <td class="text-center"> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;">{{ a.reference_number }}</a> </td>
+              <td class="text-center"> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;">{{ a.adjustment_type }}</a> </td>
+              <td class="text-center"> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;">{% if a.status == 'Adjusted' %}
+                Save
+            {% else %}
+                {{ a.status }}
+            {% endif %}</a> </td>
+              <td class="text-center"> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;">{{ a.company.company_name }}</a> </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+            </tbody>
+          </table>
+        </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="0" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index: 10;">
+      <div class="modal-dialog">
+        <div style="background-color: rgb(63, 63, 63);width: 40rem;" class="modal-content">
+          <!-- <div class="modal-header">
+            
+          </div> -->
+          <div class="modal-body">
+            <div class="d-flex justify-content-between">
+              <h1 class="modal-title fs-5 " id="exampleModalLabel">Import From Excel</h1>
+              <button type="button" class="btn-close text-light" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <hr class="mb-3">
+            <label class="text-danger fw-bold pb-2" for="">Fields needed to be filled are</label>
+            <div style="overflow-x: auto;">
+              <table class="table table-bordered border-secondary">
+                <thead>
+                 
+                  <th class="text-light">DATE</th>
+                  <th class="text-light">INVOICE NO.</th>
+                  
+                 
+                  <th class="text-light">CUSTOMER NAME</th>
+                  <th class="text-light">MAIL ID</th>
+                  <th class="text-light">AMOUNT</th>
+                  <th class="text-light">STATUS</th>
+                  <th class="text-light">BALANCE</th>
+                </thead>
+              </table>
+              <p></p>
+            </div>
+            <hr>
+            <form action="{% url 'import_invoice_listout_page' %}" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <label style="color: rgb(152, 152, 255);" class=" fw-bolder" for="">Download Sample Excel File</label>
+                  <a class="btn btn-outline-warning ms-5" href="{% url 'download_invoice_sampleImportFile' %}">Download</a>
+                 <hr>
+                  <input class="form-control bg-dark" type="file" name="excel_file">
+                  <hr>
+                  <div class="d-flex justify-content-end">
+                    <button type="button" class="btn bt-lg btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn bt-lg btn-primary">Import</button>
+                  </div>
+              </div>
+              <br
+</div>
+
       </div>
     </div>
-  </div>  
-  <div id="tableContainer" style="max-height: 500px; ">
-    <table id="dataTable" class="table text-white mt-2 table-border border-1" style="width: 100%; margin-top: 40px;">
-      <thead>
-        <tr style="color: beige;" class="text-center">
-          <th class="col" style="color: beige;">Date</th> 
-          <th class="col"style="color: beige;">Reason</th>
-          <th class="col"style="color: beige;">Description</th>
-          <th class="col"style="color: beige;">Reference Number</th>
-          <th class="col"style="color: beige;" >Type</th>
-          <th class="col"style="color: beige;">Status</th>
-          <th class="col"style="color: beige;">Adjusted by</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for a in adjustment %}
-        <!-- <tr class="{% if v.satus == 'active' or v.satus == 'Active' %}active{% elif v.satus == 'inactive' or v.satus == 'Inactive' %}inactive{% endif %} text-center"  data-status="{{ a.status }}"></tr> -->
-        <tr class="text-center"  data-status="{{ a.status }}">
-          <td class="item-name-cell" onclick="location.href ='#'"> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;">{{ a.date }}</a> </td>
-          <td> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;" >{{ a.reason }}</a></td>
-          <td class="tooltip-container">
-            <span class="tooltip-trigger"><i class="fas fa-comment-alt"></i></span>
-          <span class="tooltip-text"> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;" class="text-dark">{{ a.description }}</a> </span>
-          </td>
-          
-          <td> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;">{{ a.reference_number }}</a> </td>
-          <td> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;">{{ a.adjustment_type }}</a> </td>
-          <td> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;">{{ a.status }}</a> </td>
-          <td> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;">{{ a.company.company_name }}</a> </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
   </div>
-</section>
+</div>
 
-
-
-
-
-
-
-<script>
-
-
-// Function to filter items based on status
-function filterItems(status) {
-  if (status === 'active' || status === 'Active') {
-    $('tbody tr').hide();
-    $('tbody tr.active, tbody tr.Active').show();
-  } else if (status === 'inactive' || status === 'Inactive') {
-    $('tbody tr').hide();
-    $('tbody tr.inactive, tbody tr.Inactive').show();
-  } else if (status === 'adjusted') {
-    $('tbody tr').hide();
-    $('tbody tr[data-status="Adjusted"]').show();
-  } else if (status === 'draft') {
-    $('tbody tr').hide();
-    $('tbody tr[data-status="Draft"]').show();
-  } else {
-    $('tbody tr').show(); // Show all items
-  }
-}
-
-// Attach the filter function to the filter buttons
-$('#filterActiveButton').on('click', function() {
-  filterItems('adjusted');
-});
-
-$('#filterInactiveButton').on('click', function() {
-  filterItems('draft');
-});
-
-$('#filterAllButton').on('click', function() {
-  filterItems('all');
-});
-
-</script>
-
-
-<script>
-
-$(document).ready(function() {
-      var originalTable = $('#dataTable').clone(); // Clone the original table on page load
-
-
-function sortByReason() {
-  var rows = $('#dataTable tbody tr').get();
-  rows.sort(function(a, b) {
-    var keyA = $(a).children('td').eq(1).text().toUpperCase(); // Column index 1 for Reason
-    var keyB = $(b).children('td').eq(1).text().toUpperCase();
-    if (keyA < keyB) return -1;
-    if (keyA > keyB) return 1;
-    return 0;
-  });
-  $.each(rows, function(index, row) {
-    $('#dataTable').children('tbody').append(row);
-  });
-}
-
-// Function to sort items by reference number
-function sortByReferenceNumber() {
-  var rows = $('#dataTable tbody tr').get();
-  rows.sort(function(a, b) {
-    var keyA = $(a).children('td').eq(3).text(); // Column index 4 for Reference Number
-    var keyB = $(b).children('td').eq(3).text();
-    return keyA.localeCompare(keyB);
-  });
-  $.each(rows, function(index, row) {
-    $('#dataTable').children('tbody').append(row);
-  });
-}
-
-function restoreOriginalTable() {
-        $('#dataTable').replaceWith(originalTable.clone()); // Replace the current table with the original table clone
-      }
-
-
-// Modify the event handler for the "Sort" dropdown
-$('[data-sort]').on('click', function() {
-  var sortType = $(this).data('sort');
-  if (sortType === 'name') {
-    sortByName();
-  } else if (sortType === 'referencenumber') {
-    sortByReferenceNumber(); // Sort by Reference Number
-  } else if (sortType === 'reason') {
-    sortByReason(); // Sort by Reason
-  } else if (sortType === 'all') {
-    restoreOriginalTable();
-  }
-});
-});
-
-
-</script>
-
-
-
-<script>
-  // Function to handle the search
-  function searchTable() {
-    let input, filter, table, tr, td, i, j, txtValue;
-    input = document.getElementById("searchInput");
-    filter = input.value.toLowerCase();
-    table = document.getElementById("dataTable");
-    tr = table.getElementsByTagName("tr");
-
-    // Loop through all table rows (excluding the first row, which contains the column headers)
-    for (i = 1; i < tr.length; i++) {
-      let rowVisible = false;
-      td = tr[i].getElementsByTagName("td");
-
-      // Loop through all table cells (columns) in each row
-      for (j = 0; j < td.length; j++) {
-        if (td[j]) {
-          txtValue = td[j].textContent || td[j].innerText;
-          if (txtValue.toLowerCase().indexOf(filter) > -1) {
-            rowVisible = true;
-            break;
-          }
+<!--<script>
+  // Function to sort the table by the selected column
+  function sortTableName() {
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementById("myTable");
+    switching = true;
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+      for (i = 1; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("td")[2];
+        y = rows[i + 1].getElementsByTagName("td")[2];
+        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          shouldSwitch = true;
+          break;
         }
       }
-
-      // Show/hide the row based on the search results
-      tr[i].style.display = rowVisible ? "" : "none";
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+      }
     }
   }
 
-  // Attach the search function to the input field's "input" event
-  document.getElementById("searchInput").addEventListener("input", searchTable);
+  function sortTableTotal() {
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementById("myTable");
+    switching = true;
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+      for (i = 1; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("td")[1];
+        y = rows[i + 1].getElementsByTagName("td")[1];
+        if (x.innerHTML > y.innerHTML) {
+          shouldSwitch = true;
+          break;
+        }
+      }
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+      }
+    }
+  }
 </script>
 
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script>
+  jQuery(document).ready(function ($) {
+    $(".clickable-row td").click(function () {
+      window.location = $(this).data("href");
+    });
+  });
+</script>
 
+
+<script>
+  var $rows = $('table tbody tr');
+  $('#search').keyup(function () {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    $rows.hide().filter(function () {
+      var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+      return ~text.indexOf(val);
+    }).show();
+  });
+</script>-->
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+  </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+  </script>
+
+
+  <script>
+    // Add click event listener to all rows with class "clickable-row"
+    const rows = document.querySelectorAll('.clickable-row');
+    rows.forEach(row => {
+      row.addEventListener('click', () => {
+        // Get the URL from the "data-href" attribute
+        const url = row.getAttribute('data-href');
+        // Navigate to the URL
+        window.location.href = url;
+      });
+    });
+  </script>
+  <script>
+    var $rows = $('#table tr');
+    $('#search').keyup(function() {
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+        
+        $rows.hide().filter(function() {
+            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return ~text.indexOf(val);
+        }).show();
+    });
+  
+    
+  </script>
+
+  
+<script>
+  $(document).ready(function () {
+    var $rows = $('#table-id tbody tr');
+    var originalOrder = $rows.toArray(); // Keep a reference to the original order of rows
+
+    $('#search').keyup(function () {
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+        $rows.hide().filter(function () {
+            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return ~text.indexOf(val);
+        }).show();
+    });
+
+    $('#sort-challan').on('click', function () {
+        sortTable(0, 'date'); 
+    });
+
+    $('#sort-customer').on('click', function () {
+        sortTable(3, 'string'); 
+    });
+
+    $('#all-challan').on('click', function () {
+        // Reset to the original order of rows
+        $('#table-id tbody').empty().append(originalOrder);
+    });
+
+    function sortTable(column, type) {
+        $rows.sort(function (a, b) {
+            var aVal = $(a).find('td').eq(column).text();
+            var bVal = $(b).find('td').eq(column).text();
+
+            if (type === 'date') {
+                // Parse the date strings into Date objects
+                var aDate = parseDate(aVal);
+                var bDate = parseDate(bVal);
+                // Compare the dates
+                return aDate - bDate;
+            } else {
+                // For string comparison
+                return aVal.localeCompare(bVal);
+            }
+        });
+
+        $('#table-id tbody').html($rows);
+    }
+
+    function parseDate(dateString) {
+        var parts = dateString.split('-');
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+    }
+});
+
+
+
+
+function exportToExcel() {
+  $('.export_hide').remove()
+  var table = document.querySelector('table');
+  var ws = XLSX.utils.table_to_sheet(table);
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+  XLSX.writeFile(wb, 'inventory_adjustment.xlsx');
+  window.location.href=""
+}
+function call_import()
+{
+$('#call_input').click()
+}
+$(document).ready(function(){
+$('#call_input').on('change',function(){
+  $('#click_sbmt').click()
+  // window.location.url="{% url 'import_payment_recieved' %}"
+})
+})
+// function reduce_dash(){
+//   alert($('.form-inline .form-check').Width())
+//   if($('.form-inline .form-check').css('width')=== '100%')
+//   {
+//     $('.mdi-menu').click()
+//   }
+// }
+
+
+</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script>
+  
+  
 {% endblock %}
-
-
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -1217,8 +1217,9 @@ urlpatterns = [
     path('invoice_item_in_dropdown',views.invoice_item_in_dropdown,name='invoice_item_in_dropdown'),
     path('download_invoice_sampleImportFile', views.download_invoice_sampleImportFile, name='download_invoice_sampleImportFile'),
     path('import_invoice_listout_page', views.import_invoice_listout_page, name='import_invoice_listout_page'),
-    
-    
+    path('inventory_adjustment_filter_draft',views.inventory_adjustment_filter_draft,name='inventory_adjustment_filter_draft'),
+    path('inventory_adjustment_filter_save',views.inventory_adjustment_filter_save,name='inventory_adjustment_filter_save'),
+    path('shareInventoryAdjustmentToEmail/<int:id>',views.shareInventoryAdjustmentToEmail,name='shareInventoryAdjustmentToEmail'),
     
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

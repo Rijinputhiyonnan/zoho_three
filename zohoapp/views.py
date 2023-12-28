@@ -27302,3 +27302,61 @@ def import_invoice_listout_page(request):
         #     messages.warning(request,"Table field is missing / you are importing the wrong File.")
         return redirect('payment_reciedved_list_out')
     return redirect('payment_reciedved_list_out')
+
+
+
+
+@login_required(login_url='login')
+def inventory_adjustment_filter_draft(request):
+    user=request.user.id
+    company_data = company_details.objects.get(user=request.user)
+    adjustment=Adjustment.objects.filter(status='draft')
+    return render(request,'inventory_adjustment.html',{'company': company_data,'adjustment':adjustment})
+
+
+@login_required(login_url='login')
+def inventory_adjustment_filter_save(request):
+    user=request.user.id
+    company_data = company_details.objects.get(user=request.user)
+    adjustment=Adjustment.objects.filter(status='Adjusted')
+    return render(request,'inventory_adjustment.html',{'company': company_data,'adjustment':adjustment})
+
+
+
+
+def shareInventoryAdjustmentToEmail(request,id):
+    if request.user:
+        try:
+            if request.method == 'POST':
+                emails_string = request.POST['email_ids']
+
+                # Split the string by commas and remove any leading or trailing whitespace
+                emails_list = [email.strip() for email in emails_string.split(',')]
+                email_message = request.POST['email_message']
+                # print(emails_list)
+
+                cmp = company_details.objects.get( user = request.user.id)
+                bill = Adjustment.objects.get(id = id)
+                items = ItemAdjustment.objects.filter( adjustment = bill.id)
+                itemall = ItemAdjustment.objects.all()
+                        
+                context = {'bill': bill, 'cmp': cmp,'items':items, 'itemall':itemall}
+                template_path = 'inventory_adjustment_email_pdf.html'
+                template = get_template(template_path)
+
+                html  = template.render(context)
+                result = BytesIO()
+                pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)#, link_callback=fetch_resources)
+                pdf = result.getvalue()
+                filename = f'InventoryAdjustment - {bill.reference_number}.pdf'
+                subject = f"INVENTORYADJUSTMENT - {bill.reference_number}"
+                email = EmailMessage(subject, f"Hi,\nPlease find the attached Inventory_adjustment - reference No-{bill.reference_number}. \n{email_message}\n\n--\nRegards,\n{cmp.company_name}\n{cmp.address}\n{cmp.state} - {cmp.country}\n{cmp.contact_number}", from_email=settings.EMAIL_HOST_USER,to=emails_list)
+                email.attach(filename, pdf, "application/pdf")
+                email.send(fail_silently=False)
+
+                msg = messages.success(request, 'Inventory Adjustment has been shared via email successfully..!')
+                return redirect(inv_overview,id)
+        except Exception as e:
+            print(e)
+            messages.error(request, f'{e}')
+            return redirect(inv_overview, id)

@@ -176,7 +176,13 @@
                   <input required type="date" class="form-control bg-white text-dark" name="date" id="dateInput">
               </div>
           </div>
+          <script>
 
+            $(document).ready(function () {
+              var currentDate = moment().format("YYYY-MM-DD");
+              document.getElementById("dateInput").value = currentDate;
+            });
+          </script>
           <div class="form-group row">
             <label class="col-sm-2 col-form-label">Account *</label>
             <div class="col-sm-6 col-md-5 col-6" style="margin-left: -2.2rem;">
@@ -195,6 +201,11 @@
           <div class="col-sm-6 col-md-5 col-6" style="margin-left: -2.2rem;">
               <select name="reason" class="form-control bg-white text-dark rsn" id="rsns">
                 <option selected hidden disabled>Select a reason</option>
+                <option value="High demand Goods ">High demand Goods </option>
+                <option value="Stock Written Off ">Stock Written Off </option>
+                <option value="Inventory Revaluation">Inventory Revaluation</option>
+                <option value="Stock on Fire ">Stock on Fire </option>
+
                  {% for i in reason %}
                   <option value="{{ i.reason }}">{{ i.reason }}</option>
                   {% endfor %}
@@ -661,8 +672,8 @@ function populateSelectsFromJSON() {
                             <!-- <input type="submit" class="btn text-white mt-5" style="background-color:  rgb(59, 59, 58) ; " 
                 onclick="saveAsDraftDialog()" value="Save As Draft"> -->
 
-                <input type="submit" class="btn text-white mt-5" style="background-color:  rgb(59, 59, 58) ;  " name="save_draft" value="Save As Draft">
-                <input type="submit" class="btn text-white mt-5" style="background-color: rgb(210, 132, 30) ; " name="convert_adjusted" value="Convert to Adjusted"> 
+                <input type="submit" class="btn text-white mt-5" style="background-color:  rgb(59, 59, 58) ;  " name="save_draft" value="Draft">
+                <input type="submit" class="btn text-white mt-5" style="background-color: rgb(210, 132, 30) ; " name="convert_adjusted" value="Save"> 
                 <input type="reset" class="btn text-white mt-5" style="background-color: rgb(59, 59, 58);" value="Cancel">
                 <!-- <input type="submit" class="btn text-white mt-5" style="background-color:  rgb(59, 59, 58) ; " onclick="cancelDialog()" value="Cancel"> -->
                 <!-- <input type="submit" class="btn text-white mt-5" style="background-color: rgb(210, 132, 30) ; "

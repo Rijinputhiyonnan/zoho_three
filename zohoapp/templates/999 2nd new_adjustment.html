@@ -3,7 +3,7 @@
 {% load static %}
 {% load tz %}
 
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
 
 
@@ -132,7 +132,7 @@
     <div class="card-body">
       <div class="card-title">
         <h2 class="mb-0 text-uppercase text-right"> New
-          Invoice</h2>
+          Adjustment</h2>
         {% for message in messages %}
         <div class="alert alert-success">
           <a class="close" href="#" data-dismiss="alert">x</a>
@@ -145,144 +145,33 @@
   <div>
 
     <div class="card  p-5">
-      <form action="{% url 'add_prod' %}" class="mt-2 mb-4" method="post" enctype="multipart/form-data">
+      <form action="{% url 'save_adjustment' %}" class="mt-2 mb-4" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="row">
-          <div class="col-md-3">
-            <label>Customer Name *</label>
+        <fieldset class="form-group">
+          <div class="row">
+            <label class="col-form-label col-sm-2 pt-3">Mode of Adjustment</label>
+          
+            <div class="col-sm-10">
+              <div class="col-sm-10 form-inline">
+                <div class="form-check " style="margin-left: -2.2rem;">
+                  <input required class="form-check-input " type="radio" name="type" id="gridRadios1" value="Quantity" style="margin-left:5px;" >
+                  <label  class="form-check-label" for="gridRadios1" style="color: white;">Quantity Adjustment</label>
+                </div>
+                <div class="form-check ml-5">
+                  <input required class="form-check-input " type="radio" name="type" id="gridRadios2" value="Value" style="margin-left:50px;" >
+                  <label  class="form-check-label" for="gridRadios2" style="color: white;">Value Adjustment</label>
+                </div>
+                      
+              </div>
+                    
+            </div>
           </div>
-          <div class="col-md-6 d-flex">
-
-            <select name="cx_name" id="customer_sel" class="form-control bg-light text-dark" style="width: 91%;" required>
-              <option value="" hidden>Select Customer</option>
-              {% for cust in c %}
-                <option value="{{ cust.id }}" data-pos="{{ cust.placeofsupply }}" id="crt_cust">{{ cust.customerName }}</option>
-              {% endfor %}
-            </select>
-    
-            <!-- Script to Initialize Selectize -->
-            <script>
-              $(document).ready(function() {
-                $('#customer_sel').selectize({
-                  create: true,
-                  sortField: 'text',
-                  dropdownParent: 'body',
-                });
-              });
-            </script>
-
-
-
-            
-
-            <a data-toggle="modal" data-target="#newcustomer" class="btn"
-              style="background-color: chocolate; color: black; height: 80%; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
-          </div>
-        </div>
-
-        <div class="row mt-2">
-          <div class="col-md-3">
-            <label for="">Customer Mail</label>
-          </div>
-
-          <div class="col-md-6">
-            <input type="email" class="form-control bg-light text-dark" id="cx_mail" name="customer_email" readonly>
-          </div>
-        </div>
-
-        <div class="row mt-2" id="cx_addressdiv" style="display: none;">
-          <div class="col-md-3">
-            <label for="">Billing Address</label>
-          </div>
-
-          <div class="col-md-6">
-            <textarea class="form-control bg-light text-dark" id="cx_address" name="cx_address" readonly
-              style="height: auto;"></textarea>
-          </div>
-        </div>
-
-        <div class="row mt-2" id="treatmentdiv" style="display:none;">
-          <div class="col-md-9 d-flex">
-            <label for="" style="width: 52%;">GST Treatment</label>
-            <input type="text" class="form-control bg-light text-dark" id="cx_treat" name="gst_treatment" readonly>
-          </div>
-        </div>
-
-        <div class="row mt-2" id="gstdiv" style="display:none;">
-          <div class="col-md-9 d-flex">
-            <label for="" style="width: 52%;">GST Number</label>
-            <input type="text" class="form-control bg-light text-dark" id="cx_gst" name="gst_number" readonly>
-          </div>
-        </div>
-
-        <div class="row mt-2">
-          <div class="col-md-3">
-            <label>Source of Supply*</label>
-          </div>
-
-          <div class="col-md-6">
-            <select name="place_of_supply" id="srcofsupply" onchange="toggleDateInput()" onselect="calculateTaxAmount()"
-              class="form-control bg-light text-dark">
-              <option value=""></option>
-              <option value="[AN]-Andaman and Nicobar Islads">[AN] Andaman and Nicobar Islads</option>
-              <option value="[AD]-Andhra Pradhesh">[AD] Andhra Pradhesh</option>
-              <option value="[AR]-Arunachal Pradesh">[AR] Arunachal Pradesh</option>
-              <option value="[AS]-Assam">[AS] Assam</option>
-              <option value="[BR]-Bihar">[BR] Bihar</option>
-              <option value="[CH]-Chandigarh">[CH] Chandigarh</option>
-              <option value="[CG]-Chhattisgarh">[CG] Chhattisgarh</option>
-              <option value="[DNH]-Dadra and Nagar Haveli">[DNH] Dadra and Nagar Haveli</option>
-              <option value="[DD]-Damn anad Diu">[DD] Damn anad Diu</option>
-              <option value="[DL]-Delhi">[DL] Delhi</option>
-              <option value="[GA]-Goa">[GA] Goa</option>
-              <option value="[GJ]-Gujarat">[GJ] Gujarat</option>
-              <option value="[HR]-Haryana">[HR] Haryana</option>
-              <option value="[HP]-Himachal Pradesh">[HP] Himachal Pradesh</option>
-              <option value="[JK]-Jammu and Kashmir">[JK] Jammu and Kashmir</option>
-              <option value="[JH]-Jharkhand">[JH] Jharkhand</option>
-              <option value="[KA]-Karnataka">[KA] Karnataka</option>
-              <option value="[KL]-Kerala">[KL] Kerala</option>
-              <option value="[LA]-Ladakh">[LA] Ladakh</option>
-              <option value="[LD]-Lakshadweep">[LD] Lakshadweep</option>
-              <option value="[MP]-Madhya Pradesh">[MP] Madhya Pradesh</option>
-              <option value="[MH]-Maharashtra">[MH] Maharashtra</option>
-              <option value="[MN]-Manipur">[MN] Manipur</option>
-              <option value="[ML]-Meghalaya">[ML] Meghalaya</option>
-              <option value="[MZ]-Mizoram">[MZ] Mizoram</option>
-              <option value="[NL]-Nagaland">[NL] Nagaland</option>
-              <option value="[OD]-Odisha">[OD] Odisha</option>
-              <option value="[PY]-Puducherry">[PY] Puducherry</option>
-              <option value="[PB]-Punjab">[PB] Punjab</option>
-              <option value="[RJ]-Rajasthan">[RJ] Rajasthan</option>
-              <option value="[SK]-Sikkim">[SK] Sikkim</option>
-              <option value="[TN]-Tamil Nadu">[TN] Tamil Nadu</option>
-              <option value="[TS]-Telangana">[TS] Telangana</option>
-              <option value="[TR]-Tripura">[TR] Tripura</option>
-              <option value="[UP]-Uttar Pradesh">[UP] Uttar Pradesh</option>
-              <option value="[UK]-Uttarakhand">[UK] Uttarakhand</option>
-              <option value="[WB]-West Bengal">[WB] West Bengal</option>
-              <option value="[OT]-Other Territory">[OT] Other Territory</option>
-            </select>
-          </div>
-        </div>
-
+        </fieldset>
 
 
         <div class="row mt-2">
           <div class="col-md-3">
-            <label for="prof_name">Invoice#*</label>
-          </div>
-
-          <div class="col-md-6">
-            <input type="text" class="form-control bg-light text-dark" id="prof_name" name="inv_no"
-              value="{{remaining_characters}}" required>
-            <label id="order_label" style="display: none;"></label>
-          </div>
-        </div>
-
-        <div class="row mt-2">
-          <div class="col-md-3">
-            <label for="prof_name">Reference</label>
+            <label for="prof_name">Reference Number</label>
           </div>
 
           <div class="col-md-6">
@@ -293,7 +182,7 @@
 
         <div class="row mt-2">
           <div class="col-md-3">
-            <label for="date1">Invoice Date</label>
+            <label for="date1">Date</label>
           </div>
 
           <div class="col-md-6">
@@ -301,87 +190,47 @@
           </div>
         </div>
 
-        <div class="row mt-2">
-          <div class="col-md-3">
-            <label for="date2">Expiry Date</label>
-          </div>
 
-          <div class="col-md-6">
-            <input type="date" class="form-control bg-light text-dark" id="date2" name="due_date" readonly required>
-          </div>
-        </div>
-
-        <div class="row mt-2">
-          <div class="col-md-3">
-            <label for="date2">Payment Terms</label>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex">
-              <select class="form-control bg-light text-dark" id="pay_term" name="term" required>
-                <option value="" hidden>Select Payment Term</option>
-                {% for p in payments %}
-                <option value="{{p.id}}">{{p.Terms}}</option>
-                {% endfor %}
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label">Account *</label>
+          <div class="col-sm-6 col-md-5 col-6" style="margin-left: -2.2rem;">
+              <select required name="account" class="form-control bg-white text-dark" id="unit">
+                <option selected hidden disabled>Select an account</option>
+                  {% for a in accounts %}
+                  <option required value="{{a.id}}">{{a.account_name}}</option>
+                  
+                  {% endfor %}
               </select>
-              <a data-toggle="modal" data-target="#newpayment" class="btn" id="termadd">+</a>
-            </div>
           </div>
-        </div>
+      </div>
 
-        <div class="row mt-2">
-          <div class="col-md-3">
-            <label for="date2">Payment Method</label>
-          </div>
-
-          <div class="col-md-6">
-            <div class="d-flex">
-              <select class="form-control bg-light text-dark my-select" id="pay_method" name="payment_method" required>
-                <option value="" hidden>Select Payment Method</option>
-                <option value="cash">Cash</option>
-                <option value="cheque">Cheque</option>
-                <option value="upi">UPI</option>
-                {% for item in banks %}
-                <option value="{{item.name}}">{{item.name}}</option>
+      <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Reason *</label>
+        <div class="col-sm-6 col-md-5 col-6" style="margin-left: -2.2rem;">
+            <select name="reason" class="form-control bg-white text-dark rsn" id="rsns">
+              <option selected hidden disabled>Select a reason</option>
+               {% for i in reason %}
+                <option value="{{ i.reason }}">{{ i.reason }}</option>
                 {% endfor %}
-              </select>
-            </div>
-          </div>
+
+
+            </select>
         </div>
+        <div class="col-2">
 
-        <div class="row mt-2" id="chequediv" style="display: none;">
-          <div class="col-md-3">
-            <label for="date2">Cheque Number</label>
-          </div>
+          <!-- onclick="openForm()" -->
+          <a href="#" class="btn btn-outline-secondary py-2 mt-1 mx-1 mx-auto p-3" style="background-color:  rgb(245, 154, 36);color: #ffffff; padding-bottom: 6px!important;border-color:  rgb(245, 154, 36);" data-target="#newreason" data-toggle="modal">+ Add Reason</a></button>
+      </div>
+    </div>
 
-          <div class="col-md-6">
-            <input type="text" class="form-control text-black" name="cheque_number" id="cheque_id"
-              placeholder="Enter Cheque Number">
-          </div>
-        </div>
-
-        <div class="row mt-2" id="upidiv" style="display: none;">
-          <div class="col-md-3">
-            <label for="date2">UPI ID</label>
-          </div>
-
-          <div class="col-md-6">
-            <input type="text" class="form-control text-black" name="upi_id" id="upi_id" placeholder="Enter UPI ID">
-          </div>
-        </div>
-
-        <div class="row mt-2" id="bnkdiv" style="display: none;">
-          <div class="col-md-3">
-            <label for="date2">Bank Account</label>
-          </div>
-
-          <div class="col-md-6">
-            <input type="text" class="form-control text-black" name="bank_name" id="bnk_id" readonly>
-          </div>
-        </div>
-
-        <div id="demo">
-          <p></p>
-        </div>
+    
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Description</label>
+      <div class="col-sm-6 col-md-5 col-6" style="margin-left: -2.2rem;">
+          <textarea name="description" id="" cols="66" rows="3" style=" border:1px white solid;border-radius:5px;" placeholder="&nbsp;Max 500 characters"></textarea>
+      </div>
+  </div>
+        
         <div class="row mt-2">
           <div class="col-md-12 mt-3">
             <table class="table table-bordered table-responsive" id="item_table" onclick='toggleDateInput()'>
@@ -3232,15 +3081,4 @@
 
 
 </script>
-
-
-<!-- Include jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
-<!-- Include Selectize CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/css/selectize.default.min.css" integrity="sha512-TGssUsmfKu1d31zjxyM8+4v5tCCVJr3R63oAzhbWS2D7zN1ek7x11hxBEuaaU4M4+bvjWw6W07F+4g5n4MniVg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-<!-- Include Selectize JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/js/standalone/selectize.min.js" integrity="sha512-QB9e/2fARy7H9o6nZaei/RwTm5SQ7Mu+YHggrI9oKmr2M4s+NjQkdxNc7TrOa7gbc/ZVPCPU8v8uclbSgK6DSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
 {% endblock %}

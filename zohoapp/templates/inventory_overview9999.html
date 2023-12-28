@@ -336,8 +336,6 @@
   .table-cell {
     padding: 5px;
   }
-
-  
 </style>
 
 <section>
@@ -348,7 +346,7 @@
         <div class="row">
           <div class="col-md-3" style="border-right: 1px solid white; overflow-y: scroll; height: 84vh;">
             <div class="row">
-              <a class="text-white" style="font-size: 1.5rem;">All Inventory Adjustments</a>
+              <a class="text-white" style="font-size: 1.5rem;">All Inventory Adjustments<</a>
               <div class="col-md-9">
                 <input type="text" id="search" class="form-control bg-light text-dark mt-2 " placeholder="Search.."
                   autocomplete="off">
@@ -367,7 +365,7 @@
                   <div class="dropdown-menu m-1">
                     <a class="dropdown-item" href="#">All</a>
                     <a class="dropdown-item" onclick="sortTable()">Date</a>
-                    <a class="dropdown-item" onclick="sortTablebybillno()">Date</a>
+                    <a class="dropdown-item" onclick="sortTablebybillno()">Reference Number</a>
                   </div>
                 </div>
               </div>
@@ -378,8 +376,8 @@
                     <i class="fa fa-filter mt-1"></i>
                   </a>
                   <div class="dropdown-menu m-1">
-                    <a class="dropdown-item" href="{% url 'inv_overview' adj.id %}">All</a>
-                    <a class="dropdown-item" href="{% url 'filterby_draft' adj.id %}">Draft</a>
+                    <a class="dropdown-item" href="{% url 'inv_overview' adj.id  %}">All</a>
+                    <a class="dropdown-item" href="{% url 'filterby_draft' adj.id   %}">Draft</a>
                     <a class="dropdown-item" href="{% url 'filterby_adjusted' adj.id  %}">Save</a>
                   </div>
 
@@ -388,14 +386,14 @@
               <div class="col-md-6"></div>
 
             </div>
-            {% for i in alladj %}
-            <div class="scrollable-table clickable">
-              <a href="{% url 'inv_overview' i.id %}"> <table class="table  text-white" id="myTable">
+
+            <div class="scrollable-table">
+              <table class="table  text-white" id="myTable">
 
                 <tbody>
-                 
+                  {% for i in alladj %}
 
-                  <tr >
+                  <tr class="clickable" id="{{i.id}}">
 
                     <td class="justify-content-between align-items-center ">
                       <p><b>{{i.adjustment_type}}</b></p>
@@ -414,12 +412,12 @@
                     </td>
                   </tr>
 
-                
+                  {% endfor %}
 
                 </tbody>
-              </table></a>
+              </table>
             </div>
-            {% endfor %}
+
 
           </div>
 
@@ -435,10 +433,10 @@
               <div class="col-md-6">
                 <a class="btn" style="background-color: chocolate; margin-right: 2vh;"><i class="fas fa-eye"></i>
                   Overview</a>
-              <!--  <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
+                <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
                   aria-haspopup="true" aria-expanded="false"
                   style="background-color: white; color: black; margin-right: 2vh;"> Templates
-                </a>-->
+                </a>
                 <div class="dropdown-menu" aria-labelledby="attachmentDropdown">
                   <a class="dropdown-item" onclick="totemplate()"><i class="fa fa-file-alt"></i> Template 1</a>
 
@@ -454,7 +452,7 @@
               </div>
 
               <div class="col-md-6" style="text-align: center;">
-                {% if adj.status == "Draft" %}
+                {% if invoice.status == "draft" %}
                 <a href="{% url 'change_inventory_status' adj.id  %}" class="btn btn-outline-warning" title="Save">
                   <i class="fa fa-save" aria-hidden="true"></i>
                 </a>
@@ -479,18 +477,16 @@
                   <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
                   </button>
                 </a>
-                <!--<a class="text-dark" onclick="show_slip()">
-                  <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>-->
+                <a class="text-dark" onclick="show_slip()">
+                  <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
               </div>
             </div><br>
 
-            <div  id="selected-area" >
-
-            <div class="row" id="div-to-pdf selected-area"
+            <div class="row" id="div-to-pdf"
               style="background-color: #ffddb0;  height: auto; margin-left:1px; margin-right: 1rem; ">
 
               <div class="row text-center">
-                <h2 style="color: #000000;"><br>Inventory Adjustment
+                <h2 style="color: #000000; text-transform: uppercase;" ><br>Inventory Adjustment
                   <hr>
                 </h2>
               </div>
@@ -548,71 +544,64 @@
                     <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">: &nbsp;{{adj.company.company_name }}</p>
                   
                   </div>
-                </div>
-                {% if adj.description != "" %}
-                <div class="row mt-3">
-                  <div class="col-5"><label class="text-dark" for="">Description </label></div>
-                  <div class="col-7">
-                    <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">: &nbsp;{{adj.description}}
-                    </p>
-                  </div>
-                </div>
-               {% endif %}
               </div>
               <div class="p-info col-6" style="height: 100%; margin-bottom: 1vh;">
                 <div class="card" style="background-color: rgb(110, 61, 46); padding-left: 1rem; padding-top: 1rem;">
                   <div class="row text-center">
-                    <h2>Adjusted Items
-                    
+                    <h2>PRODUCT INFORMATION
+                      <hr>
                     </h2>
                   </div>
-                  {% for item in adjItems %}
-                  <hr>
+                  {% for i in invoiceitem %}
+
                   <div class="row mt-2">
-                    <div class="col-5"><label for="">Item Name :</label></div>
+                    <div class="col-5"><label for="">Product Name :</label></div>
                     <div class="col-7">
-                      <p class="bold"> {{ item.item }}
-                      </p>
+                      <p class="bold">{{i.product}}</p>
                     </div>
                   </div>
                   <div class="row mt-2">
-                    <div class="col-5"><label for=""> {% if adjItems.0.adjustment.type == "Value" %}
-                      Changed Value
-                  {% else %}
-                      New Quantity on Hand
-                  {% endif %}</label></div>
+                    <div class="col-5"><label for="">HSN Number :</label></div>
                     <div class="col-7">
-                      <p class="bold"> {% if item.adjustment.adjustment_type == "Value" %}{{ item.changed_value }} {% else %}{{ item.quantity_available }}{% endif %}</p>
+                      <p class="bold">{{i.hsn}}</p>
                     </div>
                   </div>
                   <div class="row mt-2">
-                    <div class="col-5"><label for=""> {% if adjItems.0.adjustment.type == "Value" %}
-                      Current Value
-                  {% else %}
-                      Quantity Available
-                  {% endif %}</label></div>
+                    <div class="col-5"><label for="">Product Quantity :</label></div>
                     <div class="col-7">
-                      <p class="bold">{% if item.adjustment.adjustment_type == "Value" %}{{ item.current_value }}   {% else %}{{ item.new_quantity_on_hand }}  {% endif %}
-                      </p>
+                      <p class="bold">{{i.quantity}}</p>
                     </div>
                   </div>
                   <div class="row mt-2">
-                    <div class="col-5"><label for="">   {% if adjItems.0.adjustment.type == "Value" %}
-                      Value Adjusted
-                  {% else %}
-                      Quantity Adjusted
-                  {% endif %}</label></div>
+                    <div class="col-5"><label for="">Product Rate :</label></div>
                     <div class="col-7">
-                      <p class="bold">{% if item.adjustment.adjustment_type == "Value" %}{{ item.adjusted_value }} {% else %}{{ item.adjusted_quantity }} {% endif %}</p>
+                      <p class="bold">{{i.rate}}</p>
                     </div>
+                  </div>
+
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Product Discount :</label></div>
+                    <div class="col-7">
+                      <p class="bold">{{i.discount}}</p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Product Tax :</label></div>
+                    <div class="col-7">
+                      <p class="bold">{{i.tax}}</p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-5"><label for="">Product Total :</label></div>
+                    <div class="col-7">
+                      <p class="bold">{{i.total}}</p>
+                    </div>
+                    <hr>
                   </div>
                   {% endfor %}
-                 
-                 
                 </div><br>
               </div>
             </div>
-         
 
             <!-- <div class="row">
             <div class="tab-content" style="background-color: rgba(252, 236, 217, 0.8); ">
@@ -860,8 +849,8 @@
               </div>
 
               <div class="col-md-6" style="text-align: center;">
-                {% if adj.status == "Draft" %}
-                <a href="{% url 'change_inventory_status' adj.id %}" class="btn btn-outline-warning" title="Save">
+                {% if adj.status == 'Draft'%}
+                <a href="{% url 'change_inventory_status' adj.id   %}" class="btn btn-outline-warning" title="Save">
                   <i class="fa fa-save" aria-hidden="true"></i>
                 </a>
                 {% endif %}
@@ -876,7 +865,7 @@
                   <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
                 </div>
 
-                <a href="{% url  'delete_inventory' adj.id %}" class="  text-dark">
+                <a href="{% url 'delete_inventory' adj.id %}" class="  text-dark">
                   <button class="btn btn-outline-warning" title="Delete"><i class="fas fa-trash-alt"></i></button>
                 </a>
                 <a class="  text-dark" onclick="exportToPDF4()">
@@ -1117,7 +1106,7 @@
                   <i class="fa fa-save" aria-hidden="true"></i>
                 </a>
                 {% endif %}
-                <a href="{% url 'edit_inventory' adj.id  %}" class=" text-dark">
+                <a href="{% url 'edit_inventory' adj.id %}" class=" text-dark">
                   <button class="btn btn-outline-warning" title="Edit"><i class="mdi mdi-pencil"></i></button>
                 </a>
                 <a class="text-dark" data-toggle="dropdown">
@@ -1128,7 +1117,7 @@
                   <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
                 </div>
 
-                <a href="{% url  'delete_inventory' adj.id %}" class="  text-dark">
+                <a href="{% url 'delete_inventory' adj.id %}" class="  text-dark">
                   <button class="btn btn-outline-warning" title="Delete"><i class="fas fa-trash-alt"></i></button>
                 </a>
                 <a class="  text-dark" onclick="exportToPDF()">
@@ -1149,7 +1138,7 @@
 
             <div class="mt-3 template2 whatToPrint2" style="height: auto;width: 100%; margin-left: -1vh">
 
-             <!-- <section id="selected-area" style="background-color: rgb(255, 221, 176);height: auto;" class=" p-2 m-2">-->
+              <section id="selected-area" style="background-color: rgb(255, 221, 176);height: auto;" class=" p-2 m-2">
                 <header style="	background-color: #8b3131;border-radius: 1rem;">
                   <div class="logo ">
                     <img class="ml-2" width="100rem" style="border-radius: 50%;" src="{% static 'images/zlogo.png' %}"
@@ -1163,46 +1152,46 @@
                   </div>
                 </header>
                 <div class="invoice-box">
-                  <h1 class="text-dark">Inventory Adjustment</h1>
+                  <h1 class="text-dark">INVOICE</h1>
                   <div class="invoice-header">
                     <div class="invoice-details text-dark">
                       <table>
                         <tr>
-                          <td class="table-cell text-black" style="border: none;">Date</td>
+                          <td class="table-cell text-black" style="border: none;">Invoice No#</td>
                           <td class="table-cell text-black" style="border: none;">:</td>
-                          <td class="table-cell text-black" style="border: none;"> &nbsp;{{ adj.date }}</td>
+                          <td class="table-cell text-black" style="border: none;">{{invoice.invoice_no}}</td>
                         </tr>
                         <tr>
-                          <td class="table-cell text-black" style="border: none;">Reason</td>
+                          <td class="table-cell text-black" style="border: none;">Invoice Date</td>
                           <td class="table-cell text-black" style="border: none;">:</td>
-                          <td class="table-cell text-black" style="border: none;">{{ adj.reason}}</td>
+                          <td class="table-cell text-black" style="border: none;">{{invoice.inv_date}}</td>
                         </tr>
                         <tr>
-                          <td class="table-cell text-black" style="border: none;">Status</td>
+                          <td class="table-cell text-black" style="border: none;">Expiry Date</td>
                           <td class="table-cell text-black" style="border: none;">:</td>
-                          <td class="table-cell text-black" style="border: none;"> {% if adj.status == "Adjusted" %}Save{%else%}{{ adj.status }} {%endif%}</td>
+                          <td class="table-cell text-black" style="border: none;">{{invoice.due_date}}</td>
                         </tr>
                       </table>
                     </div>
                     <div class="client-details" style="width: 50vh;">
                       <table>
                         <tr>
-                          <td class="table-cell text-black" style="border: none;"><b>{{ adj.account.account_name }}</b>
+                          <td class="table-cell text-black" style="border: none;"><b>{{invoice.customer.customerName}}</b>
                           </td>
                         </tr>
-                       
+                        {% if invoice.customer.Address1 %}
                         <tr>
-                          <td class="table-cell text-black" style="border: none;">{{ adj.type }}</td>
+                          <td class="table-cell text-black" style="border: none;">{{invoice.customer.Address1}}</td>
                         </tr>
-                    
+                        {% endif %}
                         <tr>
-                          <td class="table-cell text-black" style="border: none;">{{ adj.reference_number }}</td>
+                          <td class="table-cell text-black" style="border: none;">{{invoice.customer.GSTTreatment}}</td>
                         </tr>
-                       
+                        {% if invoice.customer.GSTIN %}
                         <tr>
-                          <td class="table-cell text-black" style="border: none;">{{ adj.company.company_name }}</td>
+                          <td class="table-cell text-black" style="border: none;">{{invoice.customer.GSTIN}}</td>
                         </tr>
-                      
+                        {% endif %}
                       </table>
                     </div>
                   </div>
@@ -1212,49 +1201,24 @@
                       <tr>
 
                         <th id="th" style="text-align: center;">Product</th>
-                        <th id="th" style="text-align: center;"> {% if adjItems.0.adjustment.type == "Value" %}
-                                        Changed Value
-                                    {% else %}
-                                        New Quantity on Hand
-                                    {% endif %}</th>
-                        <th id="th" style="text-align: center;">{% if adjItems.0.adjustment.type == "Value" %}
-                          Current Value
-                      {% else %}
-                          Quantity Available
-                      {% endif %}</th>
-                        <th id="th" style="text-align: center;"> {% if adjItems.0.adjustment.type == "Value" %}
-                          Value Adjusted
-                      {% else %}
-                          Quantity Adjusted
-                      {% endif %}</th>
-                       <!-- <th id="th" style="text-align: center;">Discount</th>
+                        <th id="th" style="text-align: center;">HSN</th>
+                        <th id="th" style="text-align: center;">Quantity</th>
+                        <th id="th" style="text-align: center;">Price</th>
+                        <th id="th" style="text-align: center;">Discount</th>
                         <th id="th" style="text-align: center;">Tax %</th>
-                        <th id="th" style="text-align: center;"> Total</th>-->
+                        <th id="th" style="text-align: center;"> Total</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {% for item in adjItems %}
+                      {% for i in invoiceitem %}
                       <tr style="color: black;">
-                        <td>{{ item.item }}</td>
-
-                        {% if item.adjustment.adjustment_type == "Value" %}
-                        <td style="text-align: center;">{{ item.changed_value }}</td>
-                        {% else %}
-                        <td style="text-align: center;">{{ item.quantity_available }}</td>
-                        {% endif %}
-
-                        {% if item.adjustment.adjustment_type == "Value" %}
-                        <td style="text-align: center;">{{ item.current_value }}</td>
-                        {% else %}
-                        <td style="text-align: center;">{{ item.new_quantity_on_hand }}</td>
-                        {% endif %}
-
-
-                        {% if item.adjustment.adjustment_type == "Value" %}
-                        <td style="text-align: center;">{{ item.adjusted_value }}</td>
-                        {% else %}
-                        <td style="text-align: center;">{{ item.adjusted_quantity }}</td>
-                        {% endif %}
+                        <td style="text-align: center;">{{i.product}}</td>
+                        <td style="text-align: center;">{{i.hsn}}</td>
+                        <td style="text-align: center;">{{i.quantity}}</td>
+                        <td style="text-align: center;">{{i.rate}}</td>
+                        <td style="text-align: center;">{{i.desc}}</td>
+                        <td style="text-align: center;">{{i.tax}}</td>
+                        <td style="text-align: center;">{{i.total}}</td>
                       </tr>
                       {% endfor %}
 
@@ -1368,12 +1332,12 @@
               </div>
 
               <div class="col-md-6" style="text-align: center;">
-                {% if invoice.status == 'draft'%}
-                <a href="{% url 'edit_inventory' adj.id %}" class="btn btn-outline-warning" title="Save">
+                {% if adj.status == 'Draft'%}
+                <a href="{% url 'change_inventory_status' adj.id  %}" class="btn btn-outline-warning" title="Save">
                   <i class="fa fa-save" aria-hidden="true"></i>
                 </a>
                 {% endif %}
-                <a href="{% url 'edit_inventory' adj.id  %}" class=" text-dark">
+                <a href="{% url 'edit_inventory' adj.id %}" class=" text-dark">
                   <button class="btn btn-outline-warning" title="Edit"><i class="mdi mdi-pencil"></i></button>
                 </a>
                 <a class="text-dark" data-toggle="dropdown">
@@ -1384,7 +1348,7 @@
                   <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
                 </div>
 
-                <a href="{% url  'delete_inventory' adj.id %}" class="  text-dark">
+                <a href="{% url 'delete_inventory' adj.id %}" class="  text-dark">
                   <button class="btn btn-outline-warning" title="Delete"><i class="fas fa-trash-alt"></i></button>
                 </a>
                 <a class="  text-dark" onclick="exportToPDF2()">
@@ -1655,7 +1619,7 @@
               </div>
 
               <div class="col-md-6" style="text-align: center;">
-                {% if invoice.status == 'draft'%}
+                {% if adj.status == 'Draft'%}
                 <a href="{% url 'change_inventory_status' adj.id  %}" class="btn btn-outline-warning" title="Save">
                   <i class="fa fa-save" aria-hidden="true"></i>
                 </a>
@@ -1671,7 +1635,7 @@
                   <a class="dropdown-item" href="javascript:void(0);" onclick="shareOnWhatsApp()">WhatsApp</a>
                 </div>
 
-                <a href="{% url  'delete_inventory' adj.id %}" class="  text-dark">
+                <a href="{% url 'delete_inventory' adj.id %}" class="  text-dark">
                   <button class="btn btn-outline-warning" title="Delete"><i class="fas fa-trash-alt"></i></button>
                 </a>
                 <a class="  text-dark" onclick="exportToPDF3()">
@@ -1901,13 +1865,13 @@
             <div class="modal-dialog modal-xl">
               <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
                 <div class="modal-header" style="background: rgb(32, 35, 37);">
-                  <h5 class="m-3 text-uppercase" id="shareBillEmailLabel">Share Inventory Adjustment Via Email</h5>
+                  <h5 class="m-3 text-uppercase" id="shareBillEmailLabel">Share Inoice Via Email</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                       aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body" style="background: rgb(32, 35, 37);">
                   <div class="card p-3 m-3">
-                    <form action="{% url 'shareInventoryAdjustmentToEmail' adj.id %}" method="post" class="needs-validation"
+                    <form action="{% url 'shareInvoiceToEmail' adj.id %}" method="post" class="needs-validation"
                       id="share_to_email_form" autocomplete="off">
                       {% csrf_token %}
                       <div class="form-group">
@@ -2050,22 +2014,19 @@
 </script>
 
 <script>
- function printSelectedArea(area) {
+  function printSelectedArea(area) {
+
     var printContents = document.getElementById("selected-area").innerHTML;
-    var $printerDiv = $('<div class="printContainer"></div>'); // create the div that will contain the stuff to be printed
+    document.getElementById("selected-area").style.backgroundColor = "white"
+    var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
     $printerDiv.html(printContents); // add the content to be printed
-
-    // Add inline style to maintain background color
-    var inlineStyle = '<style> .printContainer { ' + $('#selected-area').attr('style') + ' }</style>';
-    $printerDiv.prepend(inlineStyle);
-
-    $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of CSS styles to the body to hide its contents)
+    $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
 
     window.print(); // call print
     $printerDiv.remove(); // remove the div
     $('body').removeClass("printingContent");
-}
 
+  }
 
   function printSelectedArea2(area) {
 
