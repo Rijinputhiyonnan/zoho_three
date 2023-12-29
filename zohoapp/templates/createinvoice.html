@@ -124,6 +124,10 @@
   #pay_term option {
     color: black;
   }
+
+
+
+  
 </style>
 
 
@@ -144,41 +148,82 @@
   </div>
   <div>
 
-    <div class="card  p-5">
+    <div class="card p-5">
       <form action="{% url 'add_prod' %}" class="mt-2 mb-4" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="row">
-          <div class="col-md-3">
-            <label>Customer Name *</label>
-          </div>
-          <div class="col-md-6 d-flex">
-
-            <select name="cx_name" id="customer_sel" class="form-control bg-light text-dark" style="width: 91%;" required>
-              <option value="" hidden>Select Customer</option>
-              {% for cust in c %}
-                <option value="{{ cust.id }}" data-pos="{{ cust.placeofsupply }}" id="crt_cust">{{ cust.customerName }}</option>
-              {% endfor %}
-            </select>
-    
-            <!-- Script to Initialize Selectize -->
-            <script>
-              $(document).ready(function() {
-                $('#customer_sel').selectize({
-                  create: true,
-                  sortField: 'text',
-                  dropdownParent: 'body',
-                });
-              });
-            </script>
-
-
-
+          {% csrf_token %}
+          <div class="row">
+              <div class="col-md-3">
+                  <label for="customer_search">Customer Name *</label>
+              </div>
+              <div class="col-md-6 position-relative ">
+                  <input type="text" class="form-control bg-light text-dark" id="customer_search" name="cx_name" placeholder="Search Customer" autocomplete="off" style="width: 90%;">
+                  <div id="custom_dropdown" class="position-absolute bg-success rounded bg-light text-dark border border-dark mt-2" style="width: 30%; max-height: 150px; overflow-y: auto;  display: none;">
+                      <div  style="overflow-y: auto; max-height: 150px;">
+                          {% if c %}
+                              {% for cust in c %}
+                                  <p class="drop_hovers ps-3 p-2 m-0" data-value="{{ cust.id }}">{{ cust.customerName }}</p>
+                              {% endfor %}
+                          {% else %}
+                              <p class="ps-3 p-2 m-0" style="cursor: not-allowed; pointer-events: none;">No customers available</p>
+                          {% endif %}
+                    
+               
             
+              <input hidden id="customer_value" type="text" name="customer_id" value="">
+            
+     
+  </div>
+  
+  <script>
+      $(document).ready(function () {
+          var date = new Date().toISOString().split('T')[0];
+          $('#date1').val(date);
+      });
+  
+      $('#customer_search').on('input', function () {
+          var searchText = $(this).val().toLowerCase();
+          $('#custom_dropdown p').each(function () {
+              var optionText = $(this).text().toLowerCase();
+              $(this).toggle(optionText.includes(searchText));
+          });
+          $('#custom_dropdown').show();
+      });
+  
+      $(document).on('click', '#custom_dropdown p', function () {
+          var selectedCustomer = $(this).text();
+          var customerId = $(this).data('value');
+          $('#customer_search').val(selectedCustomer);
+          $('#customer_value').val(customerId);
+          $('#custom_dropdown').hide();
+      });
+  
+      $(document).on('click', function (e) {
+          if (!$(e.target).closest('#custom_dropdown').length && !$(e.target).is('#customer_search')) {
+              $('#custom_dropdown').hide();
+          }
+      });
+  </script>
+   
+</div>
+   
+</div>
+   
+</div>
+   
+</div>
+   
+<div class="d-flex">
 
-            <a data-toggle="modal" data-target="#newcustomer" class="btn"
-              style="background-color: chocolate; color: black; height: 80%; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
-          </div>
-        </div>
+  <a data-toggle="modal" data-target="#newcustomer" class="btn"
+  style="background-color: chocolate; color: black; height: 80%; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>    
+
+
+   
+
+           
+      
+      </div>
+      
 
         <div class="row mt-2">
           <div class="col-md-3">
@@ -3232,15 +3277,4 @@
 
 
 </script>
-
-
-<!-- Include jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
-<!-- Include Selectize CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/css/selectize.default.min.css" integrity="sha512-TGssUsmfKu1d31zjxyM8+4v5tCCVJr3R63oAzhbWS2D7zN1ek7x11hxBEuaaU4M4+bvjWw6W07F+4g5n4MniVg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-<!-- Include Selectize JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/js/standalone/selectize.min.js" integrity="sha512-QB9e/2fARy7H9o6nZaei/RwTm5SQ7Mu+YHggrI9oKmr2M4s+NjQkdxNc7TrOa7gbc/ZVPCPU8v8uclbSgK6DSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
 {% endblock %}

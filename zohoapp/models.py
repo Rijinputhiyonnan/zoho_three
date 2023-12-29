@@ -1485,46 +1485,7 @@ class JournalComment(models.Model):
     def __str__(self):
         return f"Comment by {self.user.username} on Journal {self.journal.journal_no}"    
         
-        
-class Reason(models.Model):
-    reason=models.TextField(max_length=255)
 
-    def __str__(self):
-        return self.reason
-        
-        
-class Adjustment(models.Model):
-    user=models.ForeignKey(User,on_delete=models.CASCADE)
-    type = models.CharField(max_length=255)
-    adjustment_type= models.CharField(max_length=255)
-    reference_number = models.CharField(max_length=255)
-    date = models.DateField()
-    account = models.ForeignKey(Chart_of_Account, on_delete=models.CASCADE,null=True,blank=True)
-    reason= models.ForeignKey(Reason, on_delete=models.CASCADE,null=True,blank=True)
-    description = models.TextField()
-    status=models.CharField(max_length=100,null=True,blank=True)
-    company = models.ForeignKey(company_details,on_delete=models.CASCADE,null=True,blank=True)
-    itemtable=models.ForeignKey(AddItem,on_delete=models.CASCADE,null=True)
-    
-    
-class ItemAdjustment(models.Model):
-    user=models.ForeignKey(User,on_delete=models.CASCADE)
-    adjustment = models.ForeignKey(Adjustment, on_delete=models.CASCADE)
-    item = models.CharField(max_length=255)
-    adjustment_type= models.CharField(max_length=255)
-    quantity_available = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    new_quantity_on_hand = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    adjusted_quantity = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    current_value=models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    changed_value=models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    adjusted_value=models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
-    itemtable=models.ForeignKey(AddItem,on_delete=models.CASCADE,null=True)
-    
-    
-class Inventory_adj_comments(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
-    adjustment=models.ForeignKey(Adjustment,on_delete=models.CASCADE,null=True,blank=True)
-    comments=models.CharField(max_length=500,null=True,blank=True)
     
 class repeat_everyterms(models.Model):
     Terms=models.CharField(max_length=100,null=True,blank=True)
@@ -1970,3 +1931,51 @@ class invoice_comments(models.Model):
 class Invoice_Reference(models.Model):
     invoice_reference = models.BigIntegerField()
     user = models.ForeignKey(User,on_delete=models.CASCADE)
+    
+    
+class Inventoryadjust_Reference(models.Model):
+    inventory_reference = models.BigIntegerField()
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    
+    
+    
+        
+class Reason(models.Model):
+    reason=models.TextField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.reason
+        
+        
+class Adjustment(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    type = models.CharField(max_length=255)
+    adjustment_type= models.CharField(max_length=255)
+    reference_number = models.CharField(max_length=255)
+    date = models.DateField()
+    account = models.ForeignKey(Chart_of_Account, on_delete=models.CASCADE,null=True,blank=True)
+    reason= models.ForeignKey(Reason, on_delete=models.CASCADE,null=True,blank=True)
+    description = models.TextField()
+    status=models.CharField(max_length=100,null=True,blank=True)
+    company = models.ForeignKey(company_details,on_delete=models.CASCADE,null=True,blank=True)
+    itemtable=models.ForeignKey(AddItem,on_delete=models.CASCADE,null=True)
+    
+    
+class ItemAdjustment(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    adjustment = models.ForeignKey(Adjustment, on_delete=models.CASCADE)
+    item = models.CharField(max_length=255)
+    adjustment_type= models.CharField(max_length=255)
+    quantity_available = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
+    new_quantity_on_hand = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
+    adjusted_quantity = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
+    current_value=models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
+    changed_value=models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
+    adjusted_value=models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
+    itemtable=models.ForeignKey(AddItem,on_delete=models.CASCADE,null=True)
+    
+    
+class Inventory_adj_comments(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
+    adjustment=models.ForeignKey(Adjustment,on_delete=models.CASCADE,null=True,blank=True)
+    comments=models.CharField(max_length=500,null=True,blank=True)
