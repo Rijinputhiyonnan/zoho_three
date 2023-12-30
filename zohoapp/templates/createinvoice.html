@@ -127,7 +127,20 @@
 
 
 
-  
+.drop_hovers{
+  background-color: transparent;
+  }
+  .drop_hovers:hover
+  {
+    background-color: rgb(0, 149, 255);
+    color: rgb(255, 255, 255);
+  }
+  ::-webkit-scrollbar{
+  display: none;
+  }
+  #custom_dropdowns{
+  display: none;
+  }
 </style>
 
 
@@ -148,84 +161,162 @@
   </div>
   <div>
 
-    <div class="card p-5">
+    <div class="card  p-5">
       <form action="{% url 'add_prod' %}" class="mt-2 mb-4" method="post" enctype="multipart/form-data">
-          {% csrf_token %}
-          <div class="row">
-              <div class="col-md-3">
-                  <label for="customer_search">Customer Name *</label>
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-md-3">
+            <label>Customer Name *</label>
+          </div>
+          <div class="col-md-6 d-flex"> 
+            <div id="custom_dropdowns" class="position-relative">
+              <div class="position-absolute bg-success rounded bg-light text-dark  border border-dark"  style="margin-top: 3rem;">
+                <div id="custom-dropdown">
+                  <div style="overflow-y: auto;height: 10rem;">
+                    {% if c %}
+                    {% for i in c %}
+                    <p class="drop_hovers ps-3 p-2 m-0"
+                    hx-post="{% url 'get_customer_details_for_pay_rec' %}"
+                    hx-trigger="click delay:0s"
+                    hx-target="#get_customer_details_target"
+                    >{{ i.customerName }}</p>
+                    <span hidden>{{ i.id }}</span>
+                    {% endfor %}
+                    {% else %}
+                    <h6 class="drop_hovers ps-3 p-2 m-0" style="cursor: not-allowed;pointer-events: none;">No customers are available</h6>
+                    {% endif %}
+                  </div>
+                </div>
               </div>
-              <div class="col-md-6 position-relative ">
-                  <input type="text" class="form-control bg-light text-dark" id="customer_search" name="cx_name" placeholder="Search Customer" autocomplete="off" style="width: 90%;">
-                  <div id="custom_dropdown" class="position-absolute bg-success rounded bg-light text-dark border border-dark mt-2" style="width: 30%; max-height: 150px; overflow-y: auto;  display: none;">
-                      <div  style="overflow-y: auto; max-height: 150px;">
-                          {% if c %}
-                              {% for cust in c %}
-                                  <p class="drop_hovers ps-3 p-2 m-0" data-value="{{ cust.id }}">{{ cust.customerName }}</p>
-                              {% endfor %}
-                          {% else %}
-                              <p class="ps-3 p-2 m-0" style="cursor: not-allowed; pointer-events: none;">No customers available</p>
-                          {% endif %}
-                    
-               
+            </div>
+            <input hidden id="customer_value" type="text" name="customer_id" value="">
+            <input type="text" class="form-control bg-light text-dark" id="customer_list" name="cx_name" required>
+            <a data-toggle="modal" data-target="#newcustomer" class="btn  p-2 fs-5 fw-bolder ms-2" style="background-color: chocolate; color: black; height: 80%; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
+          </div>
+        </div>
+
+        <script>
+          $(document).on('change', '#customer_sel', function () {
+           var customer = $('#customer_sel').val();
+           $.ajax({
+               type: "GET",
+               url: "{% url 'customerdata' %}",
+               data: {
+                   id: customer
+               },
+               success: function (response) {
+                 data7 = response.email
+                 data_gst = response.gstno
+                 place = response.place
+                 gsttreat = response.gsttreat
+                 document.getElementById('cx_mail').value = data7
+                 if(data_gst == ""){
+                   document.getElementById('gstdiv').style.display = "none"
+                   document.getElementById('treatmentdiv').style.display = "block"
+                  document.getElementById('cx_treat').value = gsttreat
+                 }else{
+                   document.getElementById('gstdiv').style.display = "block"
+                   document.getElementById('treatmentdiv').style.display = "block"
+                   document.getElementById('cx_gst').value = data_gst
+                   document.getElementById('cx_treat').value = gsttreat
+                 }
+       
+                 var selectElement = document.getElementById("srcofsupply");
+       
+                 // Loop through the options to find the one you want to select
+                 for (var i = 0; i < selectElement.options.length; i++) {
+                   if (selectElement.options[i].value === place) {
+                     // Set the selected attribute of the desired option to true
+                     selectElement.options[i].selected = true;
+                     break; // Exit the loop once the option is selected
+                   }
+                 }
+               }
+           });
+       });
+       </script>
+            <script>
+              $(document).ready(function(){
+                var date = new Date().toISOString().split('T')[0]
+                $('#date1').val(date)
+              })
+              $('#customer_list').on('click',function(){
+                $('#custom_dropdowns').toggle()
+                // $('#customer_list').val('')
+              })
+              $('#custom_dropdowns').on('click',function(){
+                $('#custom_dropdowns').toggle()
+                $('#custom_dropdowns p').each(function(){
+                  $(this).show()
+                })
+              })
+              $('.drop_hovers').on('click',function(){
+                $('#customer_list').val($(this).text())
+                $('#customer_value').val($(this).next('span').text())
+              })
+              $(document).ready(function(){
+                $('#customer_value').val('')
+              })
+              $('#customer_list').on('keyup',function(){
+                var textInput = $(this).val().toLowerCase()
+                $('#custom_dropdowns p').each(function(){
+                  if(($(this).text().toLowerCase().indexOf(textInput)) >-1 )
+                  {
+                    $(this).show()
+                  }
+                  else{
+                    $(this).hide()
+                  }
+                })
+              })</script>
+
             
-              <input hidden id="customer_value" type="text" name="customer_id" value="">
+              <div id="get_customer_details_target">
+                <div class="row mt-2">
+                  <div class="col-md-3">
+                    <label for="" >Customer Mail</label>
+                  </div>
             
-     
-  </div>
-  
-  <script>
-      $(document).ready(function () {
-          var date = new Date().toISOString().split('T')[0];
-          $('#date1').val(date);
-      });
-  
-      $('#customer_search').on('input', function () {
-          var searchText = $(this).val().toLowerCase();
-          $('#custom_dropdown p').each(function () {
-              var optionText = $(this).text().toLowerCase();
-              $(this).toggle(optionText.includes(searchText));
-          });
-          $('#custom_dropdown').show();
-      });
-  
-      $(document).on('click', '#custom_dropdown p', function () {
-          var selectedCustomer = $(this).text();
-          var customerId = $(this).data('value');
-          $('#customer_search').val(selectedCustomer);
-          $('#customer_value').val(customerId);
-          $('#custom_dropdown').hide();
-      });
-  
-      $(document).on('click', function (e) {
-          if (!$(e.target).closest('#custom_dropdown').length && !$(e.target).is('#customer_search')) {
-              $('#custom_dropdown').hide();
-          }
-      });
-  </script>
-   
-</div>
-   
-</div>
-   
-</div>
-   
-</div>
-   
-<div class="d-flex">
+                  <div class="col-md-7">
+                    <input type="email" class="form-control bg-light text-dark"   id="" name="customer_mail" value="{{ cust.customerEmail }}" required>
+                  </div>
+                </div>
+            
+                <div class="row mt-2">
+                  <div class="col-md-3">
+                    <label for="prof_name" >Billing Address</label>
+                  </div>
+            
+                  <div class="col-md-7">
+                    <textarea id="" cols="30" rows="3" name="customer_bill_address" required></textarea>
+                    <label id="order_label" style="display: none;"></label>
+                  </div>
+                </div>
+            
+                <div class="row mt-2">
+                  <div class="col-md-3">
+                    <label for="prof_name" >GST Treatment</label>
+                  </div>
+            
+                  <div class="col-md-7">
+                    <input type="text" name="customer_gst_treatment" required>
+                    <label id="order_label" style="display: none;"></label>
+                  </div>
+                </div>
+            
+                <div class="row mt-3">
+                  <div class="col-md-3">
+                    <label for="prof_name" >GST Number</label>
+                  </div>
+            
+                  <div class="col-md-7">
+                    <input type="text" name="customer_gst_number" required>
+                    <label id="order_label" style="display: none;"></label>
+                  </div>
+                </div>
 
-  <a data-toggle="modal" data-target="#newcustomer" class="btn"
-  style="background-color: chocolate; color: black; height: 80%; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>    
-
-
-   
-
-           
-      
-      </div>
-      
-
-        <div class="row mt-2">
+              <div id="get_customer_details_target">
+      <!--  <div class="row mt-2">
           <div class="col-md-3">
             <label for="">Customer Mail</label>
           </div>
@@ -259,7 +350,7 @@
             <input type="text" class="form-control bg-light text-dark" id="cx_gst" name="gst_number" readonly>
           </div>
         </div>
-
+-->
         <div class="row mt-2">
           <div class="col-md-3">
             <label>Source of Supply*</label>
@@ -311,6 +402,7 @@
           </div>
         </div>
 
+      </div>
 
 
         <div class="row mt-2">

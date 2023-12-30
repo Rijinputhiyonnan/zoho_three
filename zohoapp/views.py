@@ -26345,10 +26345,10 @@ def import_payment_recieved(request):
 @login_required(login_url='login')
 def add_prod(request):     #updation
     user = request.user
-    c = customer.objects.all()
+    c = customer.objects.filter(user = request.user)
     company = company_details.objects.get(user=request.user.id)
     p = AddItem.objects.filter(user = request.user)
-    items = AddItem.objects.filter(user_id=user.id)
+    items = AddItem.objects.filter(user_id=user.id, status_stock__iexact='Active')
     i = invoice.objects.all()
     payments = payment_terms.objects.filter(user = request.user)
     sales = Sales.objects.all()
@@ -27404,4 +27404,5 @@ def new_adjustment(request):   #updation
     
     return render(request,'new_adjustment.html',{'company': company_data,'accounts':accounts,'items':items,'sales':sales,'purchase':purchase,'units':unit,'reason':reason,'reford':reford})
 
-             
+
+
