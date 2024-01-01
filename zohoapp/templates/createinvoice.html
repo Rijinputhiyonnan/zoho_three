@@ -4,6 +4,8 @@
 {% load tz %}
 
 
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
 
 
 
@@ -172,14 +174,10 @@
             <div id="custom_dropdowns" class="position-relative">
               <div class="position-absolute bg-success rounded bg-light text-dark  border border-dark"  style="margin-top: 3rem;">
                 <div id="custom-dropdown">
-                  <div style="overflow-y: auto;height: 10rem;">
+                  <div style="overflow-y: auto;height: 10rem; width:20rem;">
                     {% if c %}
                     {% for i in c %}
-                    <p class="drop_hovers ps-3 p-2 m-0"
-                    hx-post="{% url 'get_customer_details_for_pay_rec' %}"
-                    hx-trigger="click delay:0s"
-                    hx-target="#get_customer_details_target"
-                    >{{ i.customerName }}</p>
+                    <p class="drop_hovers ps-3 p-2 m-0" data-customer-id="{{ i.id }}" >{{ i.customerName }}</p>
                     <span hidden>{{ i.id }}</span>
                     {% endfor %}
                     {% else %}
@@ -195,80 +193,93 @@
           </div>
         </div>
 
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
         <script>
+          $(document).ready(function () {
+            var date = new Date().toISOString().split('T')[0];
+            $('#date1').val(date);
+          });
+        
+          $('#customer_list').on('click', function () {
+            $('#custom_dropdowns').toggle();
+          });
+        
+          $('#custom_dropdowns').on('click', function () {
+            $('#custom_dropdowns').toggle();
+            $('#custom_dropdowns p').each(function () {
+              $(this).show();
+            });
+          });
+        
+          $('.drop_hovers').on('click', function () {
+            $('#customer_list').val($(this).text());
+            $('#customer_value').val($(this).next('span').text());
+          });
+        
+          $(document).ready(function () {
+            $('#customer_value').val('');
+          });
+        
+          $('#customer_list').on('keyup', function () {
+            var textInput = $(this).val().toLowerCase();
+            $('#custom_dropdowns p').each(function () {
+              if (($(this).text().toLowerCase().indexOf(textInput)) > -1) {
+                $(this).show();
+              } else {
+                $(this).hide();
+              }
+            });
+          });
+        
           $(document).on('change', '#customer_sel', function () {
-           var customer = $('#customer_sel').val();
-           $.ajax({
-               type: "GET",
-               url: "{% url 'customerdata' %}",
-               data: {
-                   id: customer
-               },
-               success: function (response) {
-                 data7 = response.email
-                 data_gst = response.gstno
-                 place = response.place
-                 gsttreat = response.gsttreat
-                 document.getElementById('cx_mail').value = data7
-                 if(data_gst == ""){
-                   document.getElementById('gstdiv').style.display = "none"
-                   document.getElementById('treatmentdiv').style.display = "block"
-                  document.getElementById('cx_treat').value = gsttreat
-                 }else{
-                   document.getElementById('gstdiv').style.display = "block"
-                   document.getElementById('treatmentdiv').style.display = "block"
-                   document.getElementById('cx_gst').value = data_gst
-                   document.getElementById('cx_treat').value = gsttreat
-                 }
-       
-                 var selectElement = document.getElementById("srcofsupply");
-       
-                 // Loop through the options to find the one you want to select
-                 for (var i = 0; i < selectElement.options.length; i++) {
-                   if (selectElement.options[i].value === place) {
-                     // Set the selected attribute of the desired option to true
-                     selectElement.options[i].selected = true;
-                     break; // Exit the loop once the option is selected
-                   }
-                 }
-               }
-           });
-       });
-       </script>
-            <script>
-              $(document).ready(function(){
-                var date = new Date().toISOString().split('T')[0]
-                $('#date1').val(date)
-              })
-              $('#customer_list').on('click',function(){
-                $('#custom_dropdowns').toggle()
-                // $('#customer_list').val('')
-              })
-              $('#custom_dropdowns').on('click',function(){
-                $('#custom_dropdowns').toggle()
-                $('#custom_dropdowns p').each(function(){
-                  $(this).show()
-                })
-              })
-              $('.drop_hovers').on('click',function(){
-                $('#customer_list').val($(this).text())
-                $('#customer_value').val($(this).next('span').text())
-              })
-              $(document).ready(function(){
-                $('#customer_value').val('')
-              })
-              $('#customer_list').on('keyup',function(){
-                var textInput = $(this).val().toLowerCase()
-                $('#custom_dropdowns p').each(function(){
-                  if(($(this).text().toLowerCase().indexOf(textInput)) >-1 )
-                  {
-                    $(this).show()
+            var customer = $('#customer_sel').val();
+            $.ajax({
+              type: "GET",
+              url: "{% url 'customerdata' %}",
+              data: { id: customer },
+              success: function (response) {
+                console.log('Ajax success:', response);
+                document.getElementById('cx_mail').value = response.customerEmail;
+                document.getElementById('cx_address').value = response.Address1; // Update with the actual attribute name
+                document.getElementById('cx_gst_treat').value = response.GSTTreatment; // Update with the actual attribute name
+                document.getElementById('cx_gst_number').value = response.GSTIN; // Update with the actual attribute name
+        
+                if (response.Address1) {
+                  document.getElementById('cx_addressdiv').style.display = "block";
+                } else {
+                  document.getElementById('cx_addressdiv').style.display = "none";
+                }
+        
+                if (response.GSTIN) {
+                  document.getElementById('gstdiv').style.display = "block";
+                } else {
+                  document.getElementById('gstdiv').style.display = "none";
+                }
+        
+                if (response.GSTTreatment) {
+                  document.getElementById('treatmentdiv').style.display = "block";
+                } else {
+                  document.getElementById('treatmentdiv').style.display = "none";
+                }
+        
+                var selectElement = document.getElementById("srcofsupply");
+                for (var i = 0; i < selectElement.options.length; i++) {
+                  if (selectElement.options[i].value === response.place) {
+                    selectElement.options[i].selected = true;
+                    break;
                   }
-                  else{
-                    $(this).hide()
-                  }
-                })
-              })</script>
+                }
+                // Add any additional logic related to selectElement here
+              },
+              error: function (error) {
+                console.log('Ajax error:', error);
+              }
+            });
+          });
+        </script>
+        
+        
 
             
               <div id="get_customer_details_target">
@@ -282,18 +293,18 @@
                   </div>
                 </div>
             
-                <div class="row mt-2">
+                <div class="row mt-2" id="cx_addressdiv">
                   <div class="col-md-3">
                     <label for="prof_name" >Billing Address</label>
                   </div>
             
-                  <div class="col-md-7">
-                    <textarea id="" cols="30" rows="3" name="customer_bill_address" required></textarea>
+                  <div class="col-md-7" >
+                    <textarea  cols="30" rows="3" name="customer_bill_address" required></textarea>
                     <label id="order_label" style="display: none;"></label>
                   </div>
                 </div>
             
-                <div class="row mt-2">
+                <div class="row mt-2" id="treatmentdiv">
                   <div class="col-md-3">
                     <label for="prof_name" >GST Treatment</label>
                   </div>
@@ -304,7 +315,7 @@
                   </div>
                 </div>
             
-                <div class="row mt-3">
+                <div class="row mt-3"  id="gstdiv">
                   <div class="col-md-3">
                     <label for="prof_name" >GST Number</label>
                   </div>
@@ -315,7 +326,7 @@
                   </div>
                 </div>
 
-              <div id="get_customer_details_target">
+
       <!--  <div class="row mt-2">
           <div class="col-md-3">
             <label for="">Customer Mail</label>
