@@ -27405,4 +27405,30 @@ def new_adjustment(request):   #updation
     return render(request,'new_adjustment.html',{'company': company_data,'accounts':accounts,'items':items,'sales':sales,'purchase':purchase,'units':unit,'reason':reason,'reford':reford})
 
 
+def getdata(request):
+    cmp1 = company_details.objects.get(id=request.session['uid'])
+    id = request.GET.get('id')
+   
+    custobject = customer.objects.get(id = id, cid=cmp1)
+    list = []
+    dict = {'customerid': custobject.id, 'name': custobject.customerName, 'firstname': custobject.Fname,
+            'lastname': custobject.Lname, 'company': custobject.companyName, 'location': custobject.location,
+            'gsttype': custobject.GSTTreatment,'placeofsupply': custobject.placeofsupply,
+            'gstin': custobject.GSTIN, 'panno': custobject.pan_no, 'email': custobject.customerEmail,
+            'website': custobject.website,
+            'mobile': custobject.customerMobile, 'street': custobject.Address1, 'city': custobject.city,
+            'state': custobject.state,
+            'pincode': custobject.szipcode, 'country': custobject.country}
+    list.append(dict)
+    return JsonResponse(json.dumps(list), content_type="application/json", safe=False)
 
+def getterm(request):
+    id = request.GET.get('id')
+    date1 = request.GET.get('date')
+    date2 = datetime.datetime.strptime(date1, "%Y-%m-%d").date()
+    list = []
+    toda = date2 + timedelta(days=int(id))
+    newdate = toda.strftime("%d/%m/%Y")
+    dict = {'newdate': newdate}
+    list.append(dict)
+    return JsonResponse(json.dumps(list), content_type="application/json", safe=False)

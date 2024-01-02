@@ -1220,6 +1220,9 @@ urlpatterns = [
     path('inventory_adjustment_filter_draft',views.inventory_adjustment_filter_draft,name='inventory_adjustment_filter_draft'),
     path('inventory_adjustment_filter_save',views.inventory_adjustment_filter_save,name='inventory_adjustment_filter_save'),
     path('shareInventoryAdjustmentToEmail/<int:id>',views.shareInventoryAdjustmentToEmail,name='shareInventoryAdjustmentToEmail'),
+    path('getdata/',views.getdata,name='getdata'),
+    path('getterm/',views.getterm,name='getterm'),
+    
     
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
