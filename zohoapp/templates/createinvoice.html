@@ -143,6 +143,57 @@
   #custom_dropdowns{
   display: none;
   }
+
+
+
+
+
+  .custom-dropdown {
+    position: relative;
+    display: inline-block;
+    width: 90%;
+    
+   
+}
+
+.dropdown-input {
+    padding: 4vh;
+    width: 40%;
+    border: 1vh solid #010101;
+    border-radius: 2vh;
+    color: black;
+}
+
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 90%;
+    border: .5vh solid #161616;
+    border-top: none;
+    border-radius: 2vh 2vh 2vh 2vh;
+    background-color: #f1fefe;
+    max-height: 30vh;
+    overflow-y: scroll;
+    display: none;
+}
+
+.dropdown-item {
+    padding: 1vh;
+    color: black;
+}
+
+.dropdown-item:hover {
+    background-color: #014889;
+    color: white;
+}
+
+
+.dropdown-input_item {
+  background-color: #3b3b3b;
+  color: white;
+}
+
 </style>
 
 
@@ -170,29 +221,106 @@
           <div class="col-md-3">
             <label>Customer Name *</label>
           </div>
-          <div class="col-md-6 d-flex"> 
-            <div id="custom_dropdowns" class="position-relative">
-              <div class="position-absolute bg-success rounded bg-light text-dark  border border-dark"  style="margin-top: 3rem;">
-                <div id="custom-dropdown">
-                  <div style="overflow-y: auto;height: 10rem; width:20rem;">
-                    {% if c %}
-                    {% for i in c %}
-                    <p class="drop_hovers ps-3 p-2 m-0" data-customer-id="{{ i.id }}" >{{ i.customerName }}</p>
-                    <span hidden>{{ i.id }}</span>
-                    {% endfor %}
-                    {% else %}
-                    <h6 class="drop_hovers ps-3 p-2 m-0" style="cursor: not-allowed;pointer-events: none;">No customers are available</h6>
-                    {% endif %}
-                  </div>
+          
+          <div class="col-md-6">
+          
+                <div class="custom-dropdown"  style="height: 9vh;"> 
+                    <input type="text" id="employee_id"  name="employee" hidden>
+                    <input type="text" class="dropdown-input" placeholder="Select Customer">
+                    <div class="dropdown-list" id="employee">
+                        {% for payroll in c %}
+                       
+                            <div class="dropdown-item"
+                                data-value="{{ payroll.id }}" data-name = "{{ payroll.title }} {{ payroll.customerName }} {{ payroll.last_name }}"
+                                data-email="{{ payroll.customerEmail }}"
+                                data-address="{{ payroll.Address1 }}"
+                                data-GSTTreatment="{{ payroll.GSTTreatment }}"
+                                data-GSTN="{{ payroll.GSTIN }}"
+                                data-placeofsupply="{{ payroll.placeofsupply }}"
+                                data-joindate="{{ payroll.joindate | date:'Y-m-d' }}" >{{ payroll.title }} {{ payroll.customerName }} {{ payroll.last_name }}</div>
+                    
+                        {% endfor %}
+                    </div>
                 </div>
-              </div>
-            </div>
-            <input hidden id="customer_value" type="text" name="customer_id" value="">
-            <input type="text" class="form-control bg-light text-dark" id="customer_list" name="cx_name" required>
             <a data-toggle="modal" data-target="#newcustomer" class="btn  p-2 fs-5 fw-bolder ms-2" style="background-color: chocolate; color: black; height: 80%; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
           </div>
         </div>
 
+        <script>
+          document.addEventListener('DOMContentLoaded', function () {
+              var input = document.querySelector('.dropdown-input');
+              var dropdownList = document.querySelector('#employee');
+      
+              input.addEventListener('focus', function () {
+                  dropdownList.style.display = 'block';
+              });
+      
+              document.addEventListener('mousedown', function (event) {
+                  if (!event.target.closest('.custom-dropdown')) {
+                      dropdownList.style.display = 'none';
+                  }
+              });
+      
+              dropdownList.addEventListener('click', function (event) {
+                  if (event.target.classList.contains('dropdown-item')) {
+                      input.value = event.target.textContent;
+                      dropdownList.style.display = 'none';
+                      fillEmployeeDetails();
+                      clearErrorMessage();
+                  }
+              });
+      
+              input.addEventListener('input', function () {
+                  var filterValue = input.value.toLowerCase();
+                  var items = dropdownList.querySelectorAll('.dropdown-item');
+      
+                  items.forEach(function (item) {
+                      var itemText = item.textContent.toLowerCase();
+                      if (itemText.includes(filterValue)) {
+                          item.style.display = 'block';
+                      } else {
+                          item.style.display = 'none';
+                      }
+                  });
+              });
+          });
+
+
+          function fillEmployeeDetails() {
+            var input = document.querySelector('.dropdown-input');
+            var selectedValue = input.value;
+            var selectedItem = document.querySelector('.dropdown-item[data-name="' + selectedValue + '"]');
+            
+            var value = selectedItem.getAttribute("data-value");
+            var email = selectedItem.getAttribute("data-email");
+            var address = selectedItem.getAttribute("data-address");
+            var treatment = selectedItem.getAttribute("data-GSTTreatment");
+            var GSTNumber = selectedItem.getAttribute("data-GSTN");
+            var placeofsupply = selectedItem.getAttribute("data-placeofsupply");
+            var joinDate = selectedItem.getAttribute("data-joindate");
+            
+            // Set values to corresponding fields
+            $("#cx_mail").val(email);
+            $("#cx_address").val(address);
+            $("#srcofsupply").val(placeofsupply);
+            $("#cx_treat").val(treatment);
+            $("#treatmentdiv").show();
+            
+            // Show/Hide GST Number and label based on GST treatment
+            if (treatment === "Unregistered Business-not Registered under GST" || treatment === "Overseas- Persons with who you do import or exports of supplies outside india") {
+                $("#cx_gst").val("").hide();
+                $("#gstdiv").hide();
+            } else {
+                $("#cx_gst").val(GSTNumber).show();
+                $("#gstdiv").show();
+            }
+            
+            $("#joindate").val(joinDate);
+            $("#employee_id").val(value);
+        }
+        
+    
+      </script>
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
         <script>
@@ -291,7 +419,7 @@
           </div>
         </div>
 
-        <div class="row mt-2" id="cx_addressdiv" style="display: none;">
+        <div class="row mt-2" >
           <div class="col-md-3">
             <label for="">Billing Address</label>
           </div>
@@ -504,14 +632,94 @@
                 <tr id="row1">
                   <td class="text-white">1</td>
                   <td>
-                    <select class='form-control border-0 bg-transparent text-white item_select itm' name='item[]'
-                      id='item1' onchange="itemfunction(this.id)">
-                      <option value="" selected hidden>Select Item</option>
-                      {% for i in items %}
-                      <option class="text-black" value="{{i.id}}">{{ i.Name}} </option>
-                      {% endfor %}
-                    </select>
+                    <div class="custom-dropdown"  style="height: 8vh;"> 
+                      <input type="text" id="employee_id1"  name="employee" hidden>
+                      <input type="text" class="dropdown-input_item" placeholder="Select item">
+                      <div class="dropdown-list" id="item_one">
+                          {% for payroll in items %}
+                         
+                              <div class="dropdown-item"
+                                  data-value="{{ payroll.id }}" data-name = " {{ payroll.Name }} "
+                                  data-hsn="{{ payroll.hsn }}"
+                                  data-rate="{{ payroll.s_price }}"
+                                  data-tax="{{ payroll.tax }}"
+                                >{{ payroll.title }} {{ payroll.Name }} {{ payroll.last_name }}</div>
+                      
+                          {% endfor %}
+                      </div>
+                  </div>
                   </td>
+
+
+                  <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var input = document.querySelector('.dropdown-input_item');
+                        var dropdownList = document.querySelector('#item_one');
+                
+                        input.addEventListener('focus', function () {
+                            dropdownList.style.display = 'block';
+                        });
+                
+                        document.addEventListener('mousedown', function (event) {
+                            if (!event.target.closest('.custom-dropdown')) {
+                                dropdownList.style.display = 'none';
+                            }
+                        });
+                
+                        dropdownList.addEventListener('click', function (event) {
+                            if (event.target.classList.contains('dropdown-item')) {
+                                input.value = event.target.textContent;
+                                dropdownList.style.display = 'none';
+                                fillItemDetails();
+                                clearErrorMessage();
+                            }
+                        });
+                
+                        input.addEventListener('input', function () {
+                            var filterValue = input.value.toLowerCase();
+                            var items = dropdownList.querySelectorAll('.dropdown-item');
+                
+                            items.forEach(function (item) {
+                                var itemText = item.textContent.toLowerCase();
+                                if (itemText.includes(filterValue)) {
+                                    item.style.display = 'block';
+                                } else {
+                                    item.style.display = 'none';
+                                }
+                            });
+                        });
+                    });
+          
+          
+                    function fillItemDetails() {
+                      var input = document.querySelector('.dropdown-input_item');
+                      var selectedValue = input.value;
+                      var selectedItem = document.querySelector('.dropdown-item[data-name="' + selectedValue + '"]');
+                      
+                      var value = selectedItem.getAttribute("data-value");
+                      var hsn = selectedItem.getAttribute("data-hsn");
+                      var rate = selectedItem.getAttribute("data-rate");
+                      var treatment = selectedItem.getAttribute("data-GSTTreatment");
+                      var GSTNumber = selectedItem.getAttribute("data-GSTN");
+                      var tax = selectedItem.getAttribute("data-tax");
+                      var joinDate = selectedItem.getAttribute("data-joindate");
+                      
+                      // Set values to corresponding fields
+                      $("#hsn1").val(hsn);
+                      $("#rate1").val(rate);
+                      $("#tax1").val(tax);
+                      $("#srcofsupply").val(placeofsupply);
+                      $("#cx_treat").val(treatment);
+                    
+                      
+              
+                      
+                      $("#joindate").val(joinDate);
+                      $("#employee_id").val(value);
+                  }
+                  
+              
+                </script>
                   <td style="width: 15%;" class='text-right'>
                     <input type='number' id='hsn1'
                       class=' text-right hsn border-0 form-control bg-transparent text-white' name='hsn[]' readonly>
@@ -2806,14 +3014,22 @@
       <tr id='row${rowCount}'>
         <td class="text-light">${rowCount}</td>
         <td >
-          <div>
-            <select class='form-control border-0 bg-transparent text-white  border-0 item_select itm' name='item[]' id='item${rowCount}' onchange="itemfunction(this.id)">
-              <option value=" " selected disabled hidden>Select Item</option>
-              {% for i in items %}
-                <option  class="text-black" value="{{i.id}}">{{ i.Name }}</option>
-              {% endfor %}
-            </select>
-          </div>
+          <div class="custom-dropdown"  style="height: 8vh;"> 
+            <input type="text" id="employee_id"  name="employee" hidden>
+            <input type="text" class="dropdown-input_item" placeholder="Select item">
+            <div class="dropdown-list" id="item${rowCount}">
+                {% for payroll in items %}
+               
+                    <div class="dropdown-item"
+                        data-value="{{ payroll.id }}" data-name = " {{ payroll.Name }} "
+                        data-hsn="{{ payroll.hsn }}"
+                        data-rate="{{ payroll.rate }}"
+                        data-tax="{{ payroll.tax }}"
+                      >{{ payroll.title }} {{ payroll.Name }} {{ payroll.last_name }}</div>
+            
+                {% endfor %}
+            </div>
+        </div>
         </td>
 
       
