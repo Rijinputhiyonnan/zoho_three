@@ -225,7 +225,7 @@
           <div class="col-md-6">
           
                 <div class="custom-dropdown"  style="height: 9vh;"> 
-                    <input type="text" id="employee_id"  name="employee" hidden>
+                    <input type="text" id="employee_id"  name="cx_name" hidden>
                     <input type="text" class="dropdown-input" placeholder="Select Customer">
                     <div class="dropdown-list" id="employee">
                         {% for payroll in c %}
@@ -633,13 +633,13 @@
                   <td class="text-white">1</td>
                   <td>
                     <div class="custom-dropdown"  style="height: 8vh;"> 
-                      <input type="text" id="employee_id1"  name="employee" hidden>
+                      <input type="text" id="item1"  name="item[]" hidden>
                       <input type="text" class="dropdown-input_item" placeholder="Select item">
-                      <div class="dropdown-list" id="item_one">
+                      <div class="dropdown-list" id="item_one1">
                           {% for payroll in items %}
                          
                               <div class="dropdown-item"
-                                  data-value="{{ payroll.id }}" data-name = " {{ payroll.Name }} "
+                                  data-value="{{ payroll.Name }}" data-name = " {{ payroll.Name }} "
                                   data-hsn="{{ payroll.hsn }}"
                                   data-rate="{{ payroll.s_price }}"
                                   data-tax="{{ payroll.tax }}"
@@ -654,42 +654,47 @@
                   <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         var input = document.querySelector('.dropdown-input_item');
-                        var dropdownList = document.querySelector('#item_one');
+                        var dropdownList = document.querySelector('#item_one' + rowCount);
+
                 
-                        input.addEventListener('focus', function () {
+                        for (let i = 1; i <= rowCount; i++) {
+                          let input = document.querySelector(`#row${i} .dropdown-input_item`);
+                          let dropdownList = document.querySelector(`#item_one${i}`);
+                      
+                          input.addEventListener('focus', function () {
                             dropdownList.style.display = 'block';
-                        });
-                
-                        document.addEventListener('mousedown', function (event) {
-                            if (!event.target.closest('.custom-dropdown')) {
-                                dropdownList.style.display = 'none';
+                          });
+                      
+                          document.addEventListener('mousedown', function (event) {
+                            if (!event.target.closest(`#row${i} .custom-dropdown`)) {
+                              dropdownList.style.display = 'none';
                             }
-                        });
-                
-                        dropdownList.addEventListener('click', function (event) {
+                          });
+                      
+                          dropdownList.addEventListener('click', function (event) {
                             if (event.target.classList.contains('dropdown-item')) {
-                                input.value = event.target.textContent;
-                                dropdownList.style.display = 'none';
-                                fillItemDetails();
-                                clearErrorMessage();
+                              input.value = event.target.textContent;
+                              dropdownList.style.display = 'none';
+                              fillItemDetails(i);  // Pass the row number
+                              clearErrorMessage();
                             }
-                        });
-                
-                        input.addEventListener('input', function () {
-                            var filterValue = input.value.toLowerCase();
-                            var items = dropdownList.querySelectorAll('.dropdown-item');
-                
+                          });
+                      
+                          input.addEventListener('input', function () {
+                            let filterValue = input.value.toLowerCase();
+                            let items = dropdownList.querySelectorAll('.dropdown-item');
+                      
                             items.forEach(function (item) {
-                                var itemText = item.textContent.toLowerCase();
-                                if (itemText.includes(filterValue)) {
-                                    item.style.display = 'block';
-                                } else {
-                                    item.style.display = 'none';
-                                }
+                              let itemText = item.textContent.toLowerCase();
+                              if (itemText.includes(filterValue)) {
+                                item.style.display = 'block';
+                              } else {
+                                item.style.display = 'none';
+                              }
                             });
-                        });
-                    });
-          
+                          });
+                        }
+                      });
           
                     function fillItemDetails() {
                       var input = document.querySelector('.dropdown-input_item');
@@ -715,9 +720,85 @@
               
                       
                       $("#joindate").val(joinDate);
-                      $("#employee_id").val(value);
+                      $("#item1").val(value);
+                  }
+
+
+
+                  function fillItemDetails2(row) {
+                    var input = row.find('.dropdown-input_item');
+                    var selectedValue = input.val();
+                    var selectedItem = row.find('.dropdown-item[data-name="' + selectedValue + '"]');
+                
+                    var value = selectedItem.attr("data-value");
+                    var hsn = selectedItem.attr("data-hsn");
+                    var rate = selectedItem.attr("data-rate");
+                    var interstateTax = selectedItem.attr("data-interstate");
+                    var intrastateTax = selectedItem.attr("data-intrastate");
+                
+                    // Set values to corresponding fields for the specific row
+                    row.find('.hsn').val(hsn);
+                    row.find('.rate').val(rate);
+                
+                    // Determine place of supply for the row
+                    var placeOfSupply = row.find('.srcofsupply').val();
+                
+                    // Set tax based on place of supply
+                    var selectedTax = (placeOfSupply === "Kerala") ? intrastateTax : interstateTax;
+                    row.find('.tax').val(selectedTax);
+                
+                    // Set treatment based on place of supply
+                    row.find('.cx_treat').val((placeOfSupply === "Kerala") ? "SGST/CGST" : "IGST");
+                
+                    var joinDate = selectedItem.attr("data-joindate");
+                    row.find('.joindate').val(joinDate);
+                    row.find('.item1').val(value);
+                }
+                
+                  
+                  
+
+                  function initializeRow(row) {
+                    var id = row.attr("id").replace("row", "");
+                    var dropdownList = row.find(`#item_one${id}`);
+                  
+                    row.find('.dropdown-input_item').on('focus', function () {
+                      dropdownList.show();
+                    });
+                  
+                    $(document).on('mousedown', function (event) {
+                      if (!$(event.target).closest(`#row${id} .custom-dropdown`).length) {
+                        dropdownList.hide();
+                      }
+                    });
+                  
+                    dropdownList.on('click', '.dropdown-item', function (event) {
+                      var input = row.find('.dropdown-input_item');
+                      input.val($(this).text());
+                      dropdownList.hide();
+                      fillItemDetails2(row);  // Pass the row element
+                      clearErrorMessage();
+                    });
+                  
+                    row.find('.dropdown-input_item').on('input', function () {
+                      var filterValue = $(this).val().toLowerCase();
+                      var items = dropdownList.find('.dropdown-item');
+                  
+                      items.each(function () {
+                        var itemText = $(this).text().toLowerCase();
+                        if (itemText.includes(filterValue)) {
+                          $(this).show();
+                        } else {
+                          $(this).hide();
+                        }
+                      });
+                    });
+                  
+                    // Add other event listeners and handlers as needed
                   }
                   
+               
+              
               
                 </script>
                   <td style="width: 15%;" class='text-right'>
@@ -3007,6 +3088,8 @@
       calculateGrandTotal();
     });
 
+   
+ 
     $('#add-row').click(function () {
       rowCount++; // Increment row counter
       console.log()
@@ -3015,16 +3098,17 @@
         <td class="text-light">${rowCount}</td>
         <td >
           <div class="custom-dropdown"  style="height: 8vh;"> 
-            <input type="text" id="employee_id"  name="employee" hidden>
+            <input type="text" id="item${rowCount}" name="item[]" hidden>
             <input type="text" class="dropdown-input_item" placeholder="Select item">
-            <div class="dropdown-list" id="item${rowCount}">
+          
+              <div class="dropdown-list" id="item_one${rowCount}">
                 {% for payroll in items %}
                
                     <div class="dropdown-item"
                         data-value="{{ payroll.id }}" data-name = " {{ payroll.Name }} "
                         data-hsn="{{ payroll.hsn }}"
-                        data-rate="{{ payroll.rate }}"
-                        data-tax="{{ payroll.tax }}"
+                        data-rate="{{ payroll.s_price }}"
+                        data-tax="{{ payroll.interstate }}"
                       >{{ payroll.title }} {{ payroll.Name }} {{ payroll.last_name }}</div>
             
                 {% endfor %}
@@ -3090,6 +3174,7 @@
       </tr>
     `;
       $('#item_table tbody').append(newRow);
+      initializeRow($(`#row${rowCount}`));
       toggleDateInput();
       calculateSubtotal();
       calculateGrandTotal();
