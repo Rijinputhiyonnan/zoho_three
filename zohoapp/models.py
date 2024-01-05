@@ -1854,7 +1854,7 @@ class invoice(models.Model):
     customer=models.ForeignKey(customer,on_delete=models.CASCADE,null=True,blank=True)
     bank = models.ForeignKey(Bankcreation,on_delete=models.SET_NULL,null=True,blank=True)
     invoice_no=models.TextField(max_length=255)
-    terms=models.ForeignKey(payment_terms,on_delete=models.CASCADE)
+    pterms=models.ForeignKey(payment_terms,on_delete=models.CASCADE,null=True,blank=True)
     terms=models.CharField(max_length=100)
     order_no=models.IntegerField()
     inv_date=models.DateField()
@@ -1919,6 +1919,7 @@ class InvoicePayment(models.Model):
     cheque_number = models.CharField(max_length=100, null=True, blank=True)
     upi_id = models.CharField(max_length=100, null=True, blank=True)
     banking = models.ForeignKey(Bankcreation, on_delete=models.SET_NULL, null=True, blank=True)
+    account_number= models.CharField(max_length=100, null=True, blank=True)
     
 
 class invoice_comments(models.Model):

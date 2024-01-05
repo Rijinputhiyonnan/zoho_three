@@ -20318,29 +20318,7 @@ def get_customer_details(request):
             return JsonResponse({'error': 'Customer not found'}, status=404)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
-        
-def invoice_overview(request,id):
-    user=request.user
-    inv_dat=invoice.objects.filter(user=user)
-    inv_master=invoice.objects.get(id=id)
-    customers= customer.objects.filter(user=user,invoice=id)
-    invoiceitem=invoice_item.objects.filter(inv_id=id)
-    company=company_details.objects.get(user_id=request.user.id)
-    inv_comments=invoice_comments.objects.filter(user=user,invoice=id)
-    payment=InvoicePayment.objects.filter(invoice=id)
-    bank= Bankcreation.objects.filter(user=user)
-    
-    context={
-        'inv_dat':inv_dat,
-        'invoiceitem':invoiceitem,
-        'company':company,
-        'invoice':inv_master,
-        'inv_comments':inv_comments,
-        'customers':customers,
-        'payment':payment,
-        'bank':bank,
-    }
-    return render(request,'invoice_overview.html',context)
+
     
     
 def delivery_challan_overview(request, id):
@@ -26416,11 +26394,14 @@ def add_prod(request):     #updation
         custo = cus
         invoice_no = request.POST['inv_no']
         terms = request.POST['term']
+        pterms = payment_terms.objects.get(id=terms)
+        
         # term=payment_terms.objects.get(id=terms)
         order_no = request.POST['ord_no']
         cheque_number = ''
         upi_id = ''
         payment_method = request.POST['payment_method']
+        
         if payment_method == 'cash':
             pass
             # Handle cash related operations here
@@ -26431,9 +26412,11 @@ def add_prod(request):     #updation
             upi_id = request.POST.get('upi_id', '')
             # Handle UPI related operations here
         elif payment_method == 'bank':
-            bank_id = request.POST.get('bank_name')
+            bankacc = request.POST.get('bank_name', '')
             cheque_number = request.POST.get('cheque_number', '')
             upi_id = request.POST.get('upi_id', '')
+            
+           
             
         else:
             
@@ -26477,7 +26460,9 @@ def add_prod(request):     #updation
                 invn = invoice(user=user, customer=custo, invoice_no=invoice_no, terms=terms, order_no=order_no, 
                                 inv_date=inv_date, due_date=due_date, cxnote=cxnote, subtotal=subtotal, 
                                 igst=igst, cgst=cgst, sgst=sgst, t_tax=totaltax, grandtotal=t_total, 
-                                status=status, terms_condition=tc, file=file, adjustment=adjustment_charge, shipping_charge=shipping_charge, paid_amount=paid_amount, balance=balance, reference=reference)
+                                status=status, terms_condition=tc, file=file, adjustment=adjustment_charge, 
+                                shipping_charge=shipping_charge, paid_amount=paid_amount, balance=balance, reference=reference,
+                                pterms=pterms)
                 invn.save()
                 
                 invoice_payment = InvoicePayment(
@@ -26485,10 +26470,10 @@ def add_prod(request):     #updation
                                     payment_method=payment_method,
                                     cheque_number=cheque_number,
                                     upi_id=upi_id,
+                                    account_number=bankacc,
+                                    
                                 )
-                if payment_method == 'bank' and bank_id:
-                    bank_instance = Bankcreation.objects.get(id=bank_id)
-                    invoice_payment.bank = bank_instance
+                
                 invoice_payment.save()
                 
                 
@@ -27432,3 +27417,31 @@ def getterm(request):
     dict = {'newdate': newdate}
     list.append(dict)
     return JsonResponse(json.dumps(list), content_type="application/json", safe=False)
+
+
+
+        
+def invoice_overview(request,id):
+    user=request.user
+    inv_dat=invoice.objects.filter(user=user)
+    inv_master=invoice.objects.get(id=id)
+    customers= customer.objects.filter(user=user,invoice=id)
+    invoiceitem=invoice_item.objects.filter(inv_id=id)
+    company=company_details.objects.get(user_id=request.user.id)
+    inv_comments=invoice_comments.objects.filter(user=user,invoice=id)
+    payment=InvoicePayment.objects.filter(invoice=id)
+    bank= Bankcreation.objects.filter(user=user)
+    pt= payment_terms.objects.filter(user=user)
+    
+    context={
+        'inv_dat':inv_dat,
+        'invoiceitem':invoiceitem,
+        'company':company,
+        'invoice':inv_master,
+        'inv_comments':inv_comments,
+        'customers':customers,
+        'payment':payment,
+        'bank':bank,
+        'pt':pt,
+    }
+    return render(request,'invoice_overview.html',context)

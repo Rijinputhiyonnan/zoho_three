@@ -550,7 +550,9 @@
               <select class="form-control bg-light text-dark" id="pay_term" name="term" required>
                 <option value="" hidden>Select Payment Term</option>
                 {% for p in payments %}
-                <option value="{{p.id}}">{{p.Terms}}</option>
+                <option value="{{p.id}}" >{{p.Terms}}</option>
+                
+                
                 {% endfor %}
               </select>
               <a data-toggle="modal" data-target="#newpayment" class="btn" id="termadd">+</a>
@@ -571,7 +573,7 @@
                 <option value="cheque">Cheque</option>
                 <option value="upi">UPI</option>
                 {% for item in banks %}
-                <option value="{{item.name}}">{{item.name}}</option>
+                <option value="{{item.name}}" >{{item.name}}</option>
                 {% endfor %}
               </select>
             </div>
@@ -601,7 +603,7 @@
 
         <div class="row mt-2" id="bnkdiv" style="display: none;">
           <div class="col-md-3">
-            <label for="date2">Bank Account</label>
+            <label for="date2">Bank Account Number</label>
           </div>
 
           <div class="col-md-6">
@@ -633,8 +635,8 @@
                   <td class="text-white">1</td>
                   <td>
                     <div class="custom-dropdown"  style="height: 8vh;"> 
-                      <input type="text" id="item1"  name="item[]" hidden>
-                      <input type="text" class="dropdown-input_item" placeholder="Select item">
+                      <input type="text" id="item1"   hidden>
+                      <input type="text" class="dropdown-input_item" name="item[]" placeholder="Select item">
                       <div class="dropdown-list" id="item_one1">
                           {% for payroll in items %}
                          
@@ -2261,11 +2263,11 @@
         if (reford != x) {
           document.getElementById("order_label").style.display = "block"
           document.getElementById("order_label").style.color = "yellow"
-          document.getElementById("order_label").innerHTML = "Sale Order is not Continuous"
+          document.getElementById("order_label").innerHTML = "Invoice Number is not Continuous"
         } else {
           document.getElementById("order_label").style.display = "block"
           document.getElementById("order_label").style.color = "green"
-          document.getElementById("order_label").innerHTML = "Sale Order is now Continuous"
+          document.getElementById("order_label").innerHTML = "Invoice Number is now Continuous"
         }
       }
     });
@@ -3098,8 +3100,8 @@
         <td class="text-light">${rowCount}</td>
         <td >
           <div class="custom-dropdown"  style="height: 8vh;"> 
-            <input type="text" id="item${rowCount}" name="item[]" hidden>
-            <input type="text" class="dropdown-input_item" placeholder="Select item">
+            <input type="text" id="item${rowCount}"  hidden>
+            <input type="text" class="dropdown-input_item" name="item[]"  placeholder="Select item">
           
               <div class="dropdown-list" id="item_one${rowCount}">
                 {% for payroll in items %}
