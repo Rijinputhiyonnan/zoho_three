@@ -26380,6 +26380,9 @@ def add_prod(request):     #updation
     cur_user = request.user
     user = User.objects.get(id=cur_user.id)
     unit = Unit.objects.all()
+    bank_id = ''  # Initialize bank_id
+    bank_instance = None
+
     
     if request.method == 'POST':
         items = request.POST.getlist('item[]')
@@ -26401,6 +26404,7 @@ def add_prod(request):     #updation
         cheque_number = ''
         upi_id = ''
         payment_method = request.POST['payment_method']
+        account_number = ''  # Initialize account_number
         
         if payment_method == 'cash':
             pass
@@ -26412,16 +26416,22 @@ def add_prod(request):     #updation
             upi_id = request.POST.get('upi_id', '')
             # Handle UPI related operations here
         elif payment_method == 'bank':
-            bankacc = request.POST.get('bank_name', '')
+            bank_id = request.POST.get('bank_name', '')
             cheque_number = request.POST.get('cheque_number', '')
             upi_id = request.POST.get('upi_id', '')
-            
-           
-            
+            if bank_id:
+                try:
+                    bank_instance = Bankcreation.objects.get(id=bank_id)
+                    account_number = bank_instance.ac_no
+                except Bankcreation.DoesNotExist:
+                    print(f"Bank with ID {bank_id} does not exist.")
+            else:
+                print("No bank ID provided.")
         else:
-            
             pass
-        
+
+        print(f"Bank ID: {bank_id}")
+        print(f"Account Number: {account_number}")
     
 
         
@@ -26464,13 +26474,16 @@ def add_prod(request):     #updation
                                 shipping_charge=shipping_charge, paid_amount=paid_amount, balance=balance, reference=reference,
                                 pterms=pterms)
                 invn.save()
+                account_number = bank_instance.ac_no if bank_instance else ''
+
                 
                 invoice_payment = InvoicePayment(
                                     invoice=invn,
                                     payment_method=payment_method,
                                     cheque_number=cheque_number,
                                     upi_id=upi_id,
-                                    account_number=bankacc,
+                                    account_number=account_number,
+                                    banking=bank_instance
                                     
                                 )
                 
