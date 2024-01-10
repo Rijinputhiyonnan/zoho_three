@@ -1980,3 +1980,9 @@ class Inventory_adj_comments(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     adjustment=models.ForeignKey(Adjustment,on_delete=models.CASCADE,null=True,blank=True)
     comments=models.CharField(max_length=500,null=True,blank=True)
+    
+    
+    
+class InvoiceAttach(models.Model):
+    invoice = models.ForeignKey(invoice, on_delete=models.CASCADE, null=True)   
+    attach = models.FileField(upload_to='invoice_attachments/', blank=True)

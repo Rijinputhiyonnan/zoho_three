@@ -1222,6 +1222,10 @@ urlpatterns = [
     path('shareInventoryAdjustmentToEmail/<int:id>',views.shareInventoryAdjustmentToEmail,name='shareInventoryAdjustmentToEmail'),
     path('getdata/',views.getdata,name='getdata'),
     path('getterm/',views.getterm,name='getterm'),
+    path('download_invoice_attach/<int:invoice_id>/<int:attachment_id>/', views.download_invoice_attach, name='download_invoice_attach'),
+    path('delete_invoice_attach/<int:attach_id>/', views.delete_invoice_attach, name='delete_invoice_attach'),
+    path('add_invoice_attach/<int:invoice_id>/', views.add_invoice_attach, name='add_invoice_attach'),
+
     
     
 ]

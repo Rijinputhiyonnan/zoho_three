@@ -14785,26 +14785,7 @@ def edit_loan(request, loan_id):
     return render(request, 'edit_loan.html', context)
     
     
-def employee_loan_details(request, payroll_id):
-    loan = Loan.objects.get(id=payroll_id)
-    all_loan = Loan.objects.filter(user=request.user)
-    company=company_details.objects.get(user=request.user)
-    comments = LoanComment.objects.filter(loan=loan)
-    attach = LoanAttach.objects.filter(loan=loan)
-    repay = LoanRepayment.objects.filter(loan=payroll_id)
-    last_loan = LoanRepayment.objects.filter(loan=payroll_id).last().balance
-    context = {
-        'loan': loan,
-        'all_loan': all_loan,
-        'company': company,
-        'comments':comments,
-        'attach':attach,
-        'repay':repay,
-        'last_loan':last_loan,
-        'state':'0'
-    }
-    messages.info(request, '')
-    return render(request, 'employee_loan_details.html', context)
+
     
     
 def activate_loan(request, loan_id):
@@ -26899,11 +26880,11 @@ def invoice_item_in_dropdown(request):
 @login_required(login_url='login')
 def download_invoice_sampleImportFile(request):
     
-    bank_table = [['DATE','INVOICE NO.','CUSTOMER NAME','MAIL ID','AMOUNT','STATUS','BALANCE'], 
-                  ['Nov. 11, 2023','INV 01','Mr. Jithin P', 'jithin@gmail.com', '999800', 'Save','1000' ], 
-                  ['Nov. 21, 2023','INV 02','Mr. Jithin P', 'jithin@gmail.com', '999800', 'Draft','1000'], 
-                  ['Nov. 22, 2023','INV 03','Mr. Jithin P', 'jithin@gmail.com', '999800', 'Save','1000'],
-                  ['Nov. 01, 2023','INV 04','Mr. Jithin P', 'jithin@gmail.com', '999800', 'Draft','1000']]
+    bank_table = [['ORDER NO.', 'DATE', 'DUE DATE','INVOICE NO.','CUSTOMER NAME','MAIL ID','STATUS', 'PLACE OF SUPPLY','SUB TOTAL','IGST','CGST','SGST','TAX AMOUNT','SHIPPING CHARGE','ADJUSTMENT','GRAND TOTAL', 'PAID AMOUNT', 'BALANCE'], 
+                  ['01', '2023-08-11','2023-08-11','INV 01','Mr. Jithin P', 'jithin@gmail.com', 'Draft','Kerala','900','0','10','10','20','10','10', '940', '900', '40' ], 
+                  ['02', '2023-08-11','2023-08-11','INV 02','Mr. Jithin P', 'jithin@gmail.com',  'Draft', 'Kerala','900','0','10','10','20','10','10', '940', '900', '40'], 
+                  ['03', '2023-08-11','2023-08-11','INV 03','Mr. Jithin P', 'jithin@gmail.com',  'Save', 'Kerala','900','0','10','10','20','10','10', '940', '900', '40'],
+                  ['04', '2023-08-11','2023-08-11','INV 04','Mr. Jithin P', 'jithin@gmail.com', 'Draft', 'Kerala','900','0','10','10','20','10','10', '940', '900', '40']]
 
     wb = Workbook()
 
@@ -27030,52 +27011,85 @@ def import_estimate(request):
         messages.success(request, 'Data imported successfully.!')
         return redirect("allestimates")
            
-def import_invoice_listout_page(request):
-    user1=request.user.id
-    user2=User.objects.get(id=user1)
-    cmp=company_details.objects.get(user=user1)
-    
-    
-    
-     
 
+def import_invoice_listout_page(request):
+    user1 = request.user.id
+    user2 = User.objects.get(id=user1)
+    cmp = company_details.objects.get(user=user1)
+
+    mail_id = None  # Replace this with the actual value or logic to get mail_id
+
+    
 
     if request.method == 'POST' and 'excel_file' in request.FILES:
         excel_file = request.FILES.get('excel_file')
-        
+
         wb = load_workbook(excel_file)
+
         try:
             ws = wb["Sheet1"]
             header_row = ws[1]
             column_names = [cell.value for cell in header_row]
             print("Column Names:", column_names)
         except:
-          print('sheet not found')
-          messages.error(request,'`invoice` sheet not found.! Please check.')
-          return redirect('invoiceview')
-        
+            print('sheet not found')
+            messages.error(request, '`invoice` sheet not found.! Please check.')
+            return redirect('invoiceview')
+
         ws = wb["Sheet1"]
-        estimate_columns = ['DATE','INVOICE NO.','CUSTOMER NAME','MAIL ID','AMOUNT','STATUS','BALANCE']
+        estimate_columns = ['ORDER NO.', 'DATE', 'DUE DATE', 'INVOICE NO.', 'CUSTOMER NAME', 'MAIL ID','STATUS','PLACE OF SUPPLY','SUB TOTAL','IGST','CGST','SGST','TAX AMOUNT','SHIPPING CHARGE','ADJUSTMENT', 'GRAND TOTAL', 'PAID AMOUNT', 'BALANCE']
         estimate_sheet = [cell.value for cell in ws[1]]
+
         if estimate_sheet != estimate_columns:
-          print('invalid sheet')
-          messages.error(request,'`invoice` sheet column names or order is not in the required formate.! Please check.')
-          return redirect("invoiceview")
+            print('invalid sheet')
+            messages.error(request, '`invoice` sheet column names or order are not in the required format.!'
+                                    ' Please check.')
+            return redirect("invoiceview")
+        
         
         for row in ws.iter_rows(min_row=2, values_only=True):
-          date,invoice_no,customer_name,mail_id,amount,status,balance  = row
-          try:
-                # Retrieve the customer using mail_id
-                cust = customer.objects.get(customerEmail=mail_id)
-          except customer.DoesNotExist:
-            # Handle the case when no customer is found with the specified email
-            messages.warning(request, f'No customer found with email {mail_id}. Skipping this entry.')
-            continue
-          if date is None or invoice_no is None or customer_name is None or mail_id is None or amount is None or status is None or balance is None:
+            order, date,ddate, invoice_no, customer_name, mail_id, status, psupply, stotal, igst, cgst, sgst, taxamount, shipping, adjustment, gtotal, paid, balance = row
 
-            print('challan == invalid data')
-            messages.error(request,'`invoice` sheet entries missing required fields.! Please check.')
-            return redirect("invoiceview")
+            # Set a default value for customer_name if it is None
+            customer_name = customer_name or "DefaultName"
+
+            if order is None or date is None or ddate is None or invoice_no is None or mail_id is None or \
+                    status is None or gtotal is None or paid is None or balance is None:
+                print('challan == invalid data')
+                messages.error(request, '`invoice` sheet entries missing required fields.! Please check.')
+                return redirect("invoiceview")
+
+            # Retrieve or create the customer with the specified email
+            customers = customer.objects.filter(customerEmail=mail_id)
+
+            if customers.exists():
+                if customers.count() == 1:
+                    cust = customers.first()
+                else:
+                    # Choose one customer (e.g., the first one)
+                    cust = customers[0]
+                    messages.warning(request, f'Multiple customers found with email {mail_id}. Using the first one.')
+            else:
+                # Use customer_name from the row data or the default value
+                if not customer_name:
+                    # Set a default value if customer_name is still None
+                    customer_name = "DefaultName"
+
+                cust = customer.objects.create(user=user2, customerEmail=mail_id, Fname=customer_name)
+                messages.warning(request, f'Created a new customer with email {mail_id} and name {customer_name}.')
+
+            # Rest of your code...
+
+
+
+
+       
+
+
+
+
+
+
           
         # checking items sheet columns
         '''ws = wb["Sheet2"]
@@ -27096,7 +27110,7 @@ def import_invoice_listout_page(request):
          # getting data from estimate sheet and create estimate.
         ws = wb['Sheet1']
         for row in ws.iter_rows(min_row=2, values_only=True):
-            date,invoice_no,customer_name,mail_id,amount,status,balance = row
+            order, date, ddate, invoice_no,customer_name,mail_id,status, psupply, stotal, igst, cgst, sgst, taxamount, shipping, adjustment, gtotal, paid, balance = row
             #dcNo = slno
             #if slno is None:
                 #continue
@@ -27136,13 +27150,22 @@ def import_invoice_listout_page(request):
             else:
                 estno="INV-"+str(new_number)
             custname=customer_name.upper()
-            cust=customer.objects.get(customerEmail=mail_id)
-            challn=invoice(customer=cust,customer_mailid=mail_id,
-                            reference=new_number,estimate_date=date,
-                            balance=balance,
+            
+            c= customer(customerEmail=mail_id, customerName=customer_name, user=user2, placeofsupply=psupply,) 
+            c.save()
+            challn=invoice(user=user2,
+                customer=c, order_no=order,
+                invoice_no=estno,
+                            reference=new_number,inv_date=date, due_date=ddate,
+                             
+                            subtotal=stotal, igst=igst, cgst=cgst, sgst=sgst, t_tax=taxamount, shipping_charge=shipping, adjustment=adjustment,
+                            
+                            grandtotal=gtotal, paid_amount=paid,
+                            balance=float(balance),
                             status=status)
                            # convert_recinvoice='not_converted',company=cmp,customer=cust,user=user2)
             challn.save()
+            
             return redirect("invoiceview")
             # Items for the estimate
             '''ws = wb['Sheet2']
@@ -27562,27 +27585,96 @@ def getterm(request):
 
 
         
-def invoice_overview(request,id):
-    user=request.user
-    inv_dat=invoice.objects.filter(user=user)
-    inv_master=invoice.objects.get(id=id)
-    customers= customer.objects.filter(user=user,invoice=id)
-    invoiceitem=invoice_item.objects.filter(inv_id=id)
-    company=company_details.objects.get(user_id=request.user.id)
-    inv_comments=invoice_comments.objects.filter(user=user,invoice=id)
-    payment=InvoicePayment.objects.filter(invoice=id)
-    bank= Bankcreation.objects.filter(user=user)
-    pt= payment_terms.objects.filter(user=user)
-    
-    context={
-        'inv_dat':inv_dat,
-        'invoiceitem':invoiceitem,
-        'company':company,
-        'invoice':inv_master,
-        'inv_comments':inv_comments,
-        'customers':customers,
-        'payment':payment,
-        'bank':bank,
-        'pt':pt,
+
+
+
+from django.http import HttpResponse
+
+def add_invoice_attach(request, invoice_id):
+    if request.method == "POST" and request.FILES.get("file"):
+        # Process the file upload and save it to the database
+        files = request.FILES["file"]
+        inv_instance = get_object_or_404(invoice, id=invoice_id)
+        a = InvoiceAttach(attach=files, invoice=inv_instance)
+        a.save()
+
+        # Return a JSON response indicating success
+        response_data = {'message': 'The file was uploaded successfully. Please reload the page to download it.'}
+        return JsonResponse(response_data)
+
+    # If the request method is not POST or no file is provided, handle accordingly
+    # You can redirect to a different page or return a different response
+    return HttpResponse("Invalid request or no file provided.")
+
+
+def download_invoice_attach(request, invoice_id, attachment_id):
+    # Retrieve the InvoiceAttach object based on the attach_id
+    invoice_attach = get_object_or_404(InvoiceAttach, id=attachment_id, invoice_id=invoice_id)
+
+    # Get the file to be downloaded
+    attachment_file = invoice_attach.attach
+
+    # Create a FileResponse and set content disposition for download
+    response = FileResponse(attachment_file)
+    response['Content-Disposition'] = f'attachment; filename="{attachment_file.name}"'
+
+    return response
+
+def delete_invoice_attach(request, invoice_id, attach_id):
+    try:
+        attach = get_object_or_404(InvoiceAttach, id=attach_id)
+        invoice_instance = attach.invoice
+        attach.delete()
+        return redirect('invoice_overview', id=invoice_instance.id)
+    except InvoiceAttach.DoesNotExist:
+        return redirect('invoice_overview', id=invoice_id)
+
+def invoice_overview(request, id):
+    user = request.user
+    inv_dat = invoice.objects.filter(user=user)
+    inv_master = get_object_or_404(invoice, id=id)
+    customers = customer.objects.filter(user=user, invoice=id)
+    invoiceitem = invoice_item.objects.filter(inv_id=id)
+    company = company_details.objects.get(user_id=request.user.id)
+    inv_comments = invoice_comments.objects.filter(user=user, invoice=id)
+    payment = InvoicePayment.objects.filter(invoice=id)
+    bank = Bankcreation.objects.filter(user=user)
+    pt = payment_terms.objects.filter(user=user)
+    attach = InvoiceAttach.objects.filter(invoice=inv_master)
+
+    context = {
+        'inv_dat': inv_dat,
+        'invoiceitem': invoiceitem,
+        'company': company,
+        'invoice': inv_master,
+        'inv_comments': inv_comments,
+        'customers': customers,
+        'payment': payment,
+        'bank': bank,
+        'pt': pt,
+        'attach': attach,
     }
-    return render(request,'invoice_overview.html',context)
+    return render(request, 'invoice_overview.html', context)
+
+  
+    
+def employee_loan_details(request, payroll_id):
+    loan = Loan.objects.get(id=payroll_id)
+    all_loan = Loan.objects.filter(user=request.user)
+    company=company_details.objects.get(user=request.user)
+    comments = LoanComment.objects.filter(loan=loan)
+    attach = LoanAttach.objects.filter(loan=loan)
+    repay = LoanRepayment.objects.filter(loan=payroll_id)
+    last_loan = LoanRepayment.objects.filter(loan=payroll_id).last().balance
+    context = {
+        'loan': loan,
+        'all_loan': all_loan,
+        'company': company,
+        'comments':comments,
+        'attach':attach,
+        'repay':repay,
+        'last_loan':last_loan,
+        'state':'0'
+    }
+    messages.info(request, '')
+    return render(request, 'employee_loan_details.html', context)

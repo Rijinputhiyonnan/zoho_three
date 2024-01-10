@@ -148,6 +148,8 @@
                   <td>
                     {% if v.status == 'Send' %}
                         Save
+                        {% elif v.status == 'Save' %}
+                        Save
                     
                     {% elif v.status == 'draft' %}
                     Draft
@@ -182,15 +184,17 @@
             <div style="overflow-x: auto;">
               <table class="table table-bordered border-secondary">
                 <thead>
-                 
+                  <th class="text-light">ORDER NO.</th>
                   <th class="text-light">DATE</th>
                   <th class="text-light">INVOICE NO.</th>
                   
                  
                   <th class="text-light">CUSTOMER NAME</th>
                   <th class="text-light">MAIL ID</th>
-                  <th class="text-light">AMOUNT</th>
+                  
                   <th class="text-light">STATUS</th>
+                  <th class="text-light">GRAND TOTAL</th>
+                  <th class="text-light">PAID AMOUNT</th>
                   <th class="text-light">BALANCE</th>
                 </thead>
               </table>

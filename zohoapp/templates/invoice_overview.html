@@ -477,6 +477,49 @@
                   <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
                   </button>
                 </a>
+
+
+                <a class="btn btn-outline-warning" href="" id="dd1" data-bs-toggle="dropdown" aria-haspopup="true"
+                data-toggle="tooltip" title="Download Attachments" aria-expanded="false" role="button">
+                 <i class="fas fa-download"></i>
+             </a>
+             <div class="dropdown-menu" id="dd1">
+                 {% if attach %}
+                     <table class="table table-borderless">
+                         {% for a in attach %}
+                             <tr>
+                                 <td>{{ forloop.counter }}.</td>
+                                 <td><a href="{% url 'download_invoice_attach' a.id %}"><i class="fas fa-paperclip"></i> {{ a.attach }}</a></td>
+                                 <td><a href="{% url 'delete_invoice_attach' a.id %}"><i class="fas fa-trash"></i></a></td>
+                             </tr>
+                         {% endfor %}
+                     </table>
+                 {% else %}
+                     <div class="text-center">No Attachment found</div>
+                 {% endif %}
+             </div>
+             
+             {% if invoice.id %}
+             <a class="btn btn-outline-warning" href="{% url 'add_invoice_attach' invoice.id %}">
+                 <i class="fas fa-paperclip"></i>
+             </a>
+             <input type="file" name="file" style="display:none;" onchange="submitForm(this)">
+         {% else %}
+             <!-- Handle the case when invoice.id is not available -->
+             <span class="text-danger">Invalid invoice ID</span>
+         {% endif %}
+         
+             
+             <script>
+                 function submitForm(fileInput) {
+                     // Assuming the file input is inside a form
+                     fileInput.form.submit();
+                 }
+             </script>
+     
+              
+
+
                 <a class="text-dark" onclick="show_slip()">
                   <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
               </div>
