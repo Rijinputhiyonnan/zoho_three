@@ -1434,11 +1434,7 @@ class LoanComment(models.Model):
     def __str__(self):
         return f'Comment on Loan {self.loan.id}'
         
-        
-class LoanAttach(models.Model):
-    loan = models.ForeignKey(Loan, on_delete=models.CASCADE, null=True)   
-    attach = models.FileField(upload_to='loan_attachments/', blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+
     
     
 #-------------------------------------------------Mirna--------Manual journal------------------------------------------
@@ -1986,3 +1982,10 @@ class Inventory_adj_comments(models.Model):
 class InvoiceAttach(models.Model):
     invoice = models.ForeignKey(invoice, on_delete=models.CASCADE, null=True)   
     attach = models.FileField(upload_to='invoice_attachments/', blank=True)
+    
+    
+        
+class LoanAttach(models.Model):
+    loan = models.ForeignKey(Loan, on_delete=models.CASCADE, null=True)   
+    attach = models.FileField(upload_to='loan_attachments/', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)

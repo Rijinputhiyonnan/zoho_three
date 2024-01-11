@@ -27588,46 +27588,8 @@ def getterm(request):
 
 
 
-from django.http import HttpResponse
+    
 
-def add_invoice_attach(request, invoice_id):
-    if request.method == "POST" and request.FILES.get("file"):
-        # Process the file upload and save it to the database
-        files = request.FILES["file"]
-        inv_instance = get_object_or_404(invoice, id=invoice_id)
-        a = InvoiceAttach(attach=files, invoice=inv_instance)
-        a.save()
-
-        # Return a JSON response indicating success
-        response_data = {'message': 'The file was uploaded successfully. Please reload the page to download it.'}
-        return JsonResponse(response_data)
-
-    # If the request method is not POST or no file is provided, handle accordingly
-    # You can redirect to a different page or return a different response
-    return HttpResponse("Invalid request or no file provided.")
-
-
-def download_invoice_attach(request, invoice_id, attachment_id):
-    # Retrieve the InvoiceAttach object based on the attach_id
-    invoice_attach = get_object_or_404(InvoiceAttach, id=attachment_id, invoice_id=invoice_id)
-
-    # Get the file to be downloaded
-    attachment_file = invoice_attach.attach
-
-    # Create a FileResponse and set content disposition for download
-    response = FileResponse(attachment_file)
-    response['Content-Disposition'] = f'attachment; filename="{attachment_file.name}"'
-
-    return response
-
-def delete_invoice_attach(request, invoice_id, attach_id):
-    try:
-        attach = get_object_or_404(InvoiceAttach, id=attach_id)
-        invoice_instance = attach.invoice
-        attach.delete()
-        return redirect('invoice_overview', id=invoice_instance.id)
-    except InvoiceAttach.DoesNotExist:
-        return redirect('invoice_overview', id=invoice_id)
 
 def invoice_overview(request, id):
     user = request.user
@@ -27640,7 +27602,7 @@ def invoice_overview(request, id):
     payment = InvoicePayment.objects.filter(invoice=id)
     bank = Bankcreation.objects.filter(user=user)
     pt = payment_terms.objects.filter(user=user)
-    attach = InvoiceAttach.objects.filter(invoice=inv_master)
+    attach = InvoiceAttach.objects.filter(invoice=id)
 
     context = {
         'inv_dat': inv_dat,
@@ -27653,11 +27615,50 @@ def invoice_overview(request, id):
         'bank': bank,
         'pt': pt,
         'attach': attach,
+        'id': id,
     }
     return render(request, 'invoice_overview.html', context)
 
-  
-    
+
+
+
+def add_invoice_attach(request, id):
+    if request.method == "POST" and request.FILES.get("file"):
+        files = request.FILES["file"]
+        # Assuming invoice_no is a unique identifier for your invoices
+        invoice_inst = get_object_or_404(invoice, id=id)
+        a = InvoiceAttach(attach=files, invoice=invoice_inst)
+        a.save()
+
+        response_data = {'message': 'The file was uploaded successfully. Please reload the page to download it.'}
+        return JsonResponse(response_data)
+
+    return JsonResponse({'message': 'Invalid request or no file provided.'})
+
+
+
+def download_invoice_attach(request, invoice_id, attach_id):
+    # Retrieve the InvoiceAttach object based on the attach_id and invoice_id
+    invoice_attach = get_object_or_404(InvoiceAttach, id=attach_id, invoice_id=invoice_id)
+
+    # Get the file to be downloaded
+    attachment_file = invoice_attach.attach
+
+    # Create a FileResponse and set content disposition for download
+    response = HttpResponse(attachment_file.read(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{attachment_file.name}"'
+
+    return response
+
+def delete_invoice_attach(request, invoice_id, attach_id):
+    try:
+        attach = get_object_or_404(InvoiceAttach, id=attach_id, invoice_id=invoice_id)
+        attach.delete()
+        return redirect('invoice_overview', id=invoice_id)
+    except InvoiceAttach.DoesNotExist:
+        return redirect('invoice_overview', id=invoice_id)
+
+            
 def employee_loan_details(request, payroll_id):
     loan = Loan.objects.get(id=payroll_id)
     all_loan = Loan.objects.filter(user=request.user)

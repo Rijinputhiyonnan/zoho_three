@@ -425,12 +425,12 @@
             <div class="row">
               <div class="col-md-7">
                 <a class="text-white" style="font-size: 1.5rem;">
-                  <h2>{{sale.sales_no}}</h2>
+                  <h2>{{invoice.invoice_no}}</h2>
                 </a>
               </div>
             </div>
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-5">
                 <a class="btn" style="background-color: chocolate; margin-right: 2vh;"><i class="fas fa-eye"></i>
                   Overview</a>
                 <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
@@ -451,7 +451,7 @@
 
               </div>
 
-              <div class="col-md-6" style="text-align: center;">
+              <div class="col-md-7" style="text-align: center;">
                 {% if invoice.status == "draft" %}
                 <a href="{% url 'change_status_invoice' id=invoice.id  %}" class="btn btn-outline-warning" title="Save">
                   <i class="fa fa-save" aria-hidden="true"></i>
@@ -477,51 +477,89 @@
                   <button class="btn btn-outline-warning" title="Print"><i class="fas fa-print"></i>
                   </button>
                 </a>
-
-
-                <a class="btn btn-outline-warning" href="" id="dd1" data-bs-toggle="dropdown" aria-haspopup="true"
-                data-toggle="tooltip" title="Download Attachments" aria-expanded="false" role="button">
-                 <i class="fas fa-download"></i>
-             </a>
-             <div class="dropdown-menu" id="dd1">
-                 {% if attach %}
-                     <table class="table table-borderless">
-                         {% for a in attach %}
-                             <tr>
-                                 <td>{{ forloop.counter }}.</td>
-                                 <td><a href="{% url 'download_invoice_attach' a.id %}"><i class="fas fa-paperclip"></i> {{ a.attach }}</a></td>
-                                 <td><a href="{% url 'delete_invoice_attach' a.id %}"><i class="fas fa-trash"></i></a></td>
-                             </tr>
-                         {% endfor %}
-                     </table>
-                 {% else %}
-                     <div class="text-center">No Attachment found</div>
-                 {% endif %}
-             </div>
-             
-             {% if invoice.id %}
-             <a class="btn btn-outline-warning" href="{% url 'add_invoice_attach' invoice.id %}">
-                 <i class="fas fa-paperclip"></i>
-             </a>
-             <input type="file" name="file" style="display:none;" onchange="submitForm(this)">
-         {% else %}
-             <!-- Handle the case when invoice.id is not available -->
-             <span class="text-danger">Invalid invoice ID</span>
-         {% endif %}
-         
-             
-             <script>
-                 function submitForm(fileInput) {
-                     // Assuming the file input is inside a form
-                     fileInput.form.submit();
-                 }
-             </script>
-     
-              
-
-
                 <a class="text-dark" onclick="show_slip()">
                   <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+
+                <a class="btn btn-outline-warning" href="" id="dd1" data-bs-toggle="dropdown" aria-haspopup="true"
+                  data-toggle="tooltip" title="Download Attachments" aria-expanded="false" role="button">
+                <i class="fas fa-download"></i>
+              </a>
+              <div class="dropdown-menu" id="dd1">
+                {% if attach %}
+                  <table class="table table-borderless">
+                    {% for a in attach %}
+                    <tr>
+                      <td>{{forloop.counter}}.</td>
+                      <td><a href="{% url 'download_invoice_attach' invoice_id=invoice.id attach_id=a.id %}">{{a.attach.name}}</a></td>
+                      <td><a href="{% url 'delete_invoice_attach' invoice_id=invoice.id attach_id=a.id %}"><i class="fas fa-trash"></i></a></td>
+                    </tr>
+                    {% endfor %}
+                  </table>
+                  {% else %}
+                    <div class="text-center">No Attachment found</div>
+                  {% endif %}
+              </div>
+<!-- Your HTML structure for the file input and triggering button -->
+<input id="file-input" data-invoice-id="{{ id }}" type="file" name="file" style="display:none;" onchange="uploadFile()">
+<button type="button" class="btn btn-outline-warning" onclick="triggerFileInput()"> <i class="fas fa-paperclip"></i></button>
+
+<!-- Add an element to store the invoice_id -->
+<div id="invoice-data" data-invoice-id="{{ id }}"></div>
+
+
+<script>
+// Get the invoice ID from the data attribute
+var invoiceIdElement = document.getElementById('invoice-data');
+var invoiceId = invoiceIdElement ? invoiceIdElement.dataset.invoiceId : null;
+
+// Trigger the file input click event
+function triggerFileInput() {
+    document.getElementById('file-input').click();
+}
+
+// Upload the file
+function uploadFile() {
+    if (!invoiceId) {
+        alert('Error: Invoice ID not found.');
+        return;
+    }
+
+    var fileInput = document.getElementById('file-input');
+    var file = fileInput.files[0];
+
+    if (!file) {
+        alert('Error: No file selected.');
+        return;
+    }
+
+    var formData = new FormData();
+    formData.append('file', file);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');  
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/add_invoice_attach/' + invoiceId + '/');
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            alert(response.message);
+        } else {
+            alert('Error uploading file.');
+        }
+    };
+
+    xhr.send(formData);
+}
+</script>
+
+
+
+
+
+
+
+
+
+               
               </div>
             </div><br>
 
@@ -707,6 +745,7 @@
                 </div>
                 {% endif %}
               </div>
+              {% if invoiceitem %}
               <div class="p-info col-6" style="height: 100%; margin-bottom: 1vh;">
                 <div class="card" style="background-color: rgb(110, 61, 46); padding-left: 1rem; padding-top: 1rem;">
                   <div class="row text-center">
@@ -764,6 +803,7 @@
                 </div><br>
               </div>
             </div>
+            {% endif %}
 
             <!-- <div class="row">
             <div class="tab-content" style="background-color: rgba(252, 236, 217, 0.8); ">
@@ -988,7 +1028,7 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-5">
                 <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate; "><i
                     class="fas fa-eye"></i> Overview</a>
                 <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
@@ -1010,7 +1050,7 @@
 
               </div>
 
-              <div class="col-md-6" style="text-align: center;">
+              <div class="col-md-7" style="text-align: center;">
                 {% if invoice.status == 'draft'%}
                 <a href="{% url 'change_status_invoice' id=invoice.id  %}" class="btn btn-outline-warning" title="Save">
                   <i class="fa fa-save" aria-hidden="true"></i>
@@ -1039,6 +1079,8 @@
                 </a>
                 <a class="text-dark" onclick="show_slip()">
                   <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+
+                  
               </div>
             </div>
 
@@ -1080,6 +1122,7 @@
                         </div>
                       </div>
                       <div><br>
+                        {% if invoiceitem %}
                         <div class="equal-length-container" style="color: black; font-weight: bold;">
                           <div class="equal-length-item" style=" text-align: center;">
                             Product
@@ -1139,6 +1182,7 @@
                         </div>
                         {% endfor %}
                       </div>
+                      {% endif %}
 
                       <div><br>
                         <div class="row ">
@@ -1235,12 +1279,12 @@
             <div class="row">
               <div class="col-md-7">
                 <a class="text-white" style="font-size: 1.5rem;">
-                  <h2>{{sale.sales_no}}</h2>
+                  <h2>{{invoice.invoice_no}}</h2>
                 </a>
               </div>
             </div>
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-5">
                 <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate; "><i
                     class="fas fa-eye"></i> Overview</a>
                 <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
@@ -1262,7 +1306,7 @@
 
               </div>
 
-              <div class="col-md-6" style="text-align: center;">
+              <div class="col-md-7" style="text-align: center;">
                 {% if invoice.status == 'draft'%}
                 <a href="{% url 'change_status_invoice' id=invoice.id  %}" class="btn btn-outline-warning" title="Save">
                   <i class="fa fa-save" aria-hidden="true"></i>
@@ -1291,6 +1335,32 @@
                 </a>
                 <a class="text-dark" onclick="show_slip()">
                   <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+
+                  <a class="btn btn-outline-warning" href="" id="dd1" data-bs-toggle="dropdown" aria-haspopup="true"
+                  data-toggle="tooltip" title="Download Attachments" aria-expanded="false" role="button">
+                <i class="fas fa-download"></i>
+              </a>
+              <div class="dropdown-menu" id="dd1">
+                {% if attach %}
+                  <table class="table table-borderless">
+                    {% for a in attach %}
+                    <tr>
+                      <td>{{forloop.counter}}.</td>
+                      <td><a href="{% url 'download_invoice_attach' invoice_id=invoice.id attach_id=a.id %}">{{a.attach.name}}</a></td>
+                      <td><a href="{% url 'delete_invoice_attach' invoice_id=invoice.id attach_id=a.id %}"><i class="fas fa-trash"></i></a></td>
+                    </tr>
+                    {% endfor %}
+                  </table>
+                  {% else %}
+                    <div class="text-center">No Attachment found</div>
+                  {% endif %}
+              </div>
+<!-- Your HTML structure for the file input and triggering button -->
+<input id="file-input" data-invoice-id="{{ id }}" type="file" name="file" style="display:none;" onchange="uploadFile()">
+<button type="button" class="btn btn-outline-warning" onclick="triggerFileInput()"> <i class="fas fa-paperclip"></i></button>
+
+<!-- Add an element to store the invoice_id -->
+<div id="invoice-data" data-invoice-id="{{ id }}"></div>
               </div>
             </div>
 
@@ -1466,12 +1536,12 @@
             <div class="row">
               <div class="col-md-7">
                 <a class="text-white" style="font-size: 1.5rem;">
-                  <h2>{{sale.sales_no}}</h2>
+                  <h2>{{invoice.invoice_no}}</h2>
                 </a>
               </div>
             </div>
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-5">
                 <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate; "><i
                     class="fas fa-eye"></i> Overview</a>
                 <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
@@ -1493,7 +1563,7 @@
 
               </div>
 
-              <div class="col-md-6" style="text-align: center;">
+              <div class="col-md-7" style="text-align: center;">
                 {% if invoice.status == 'draft'%}
                 <a href="{% url 'change_status_invoice' id=invoice.id  %}" class="btn btn-outline-warning" title="Save">
                   <i class="fa fa-save" aria-hidden="true"></i>
@@ -1522,6 +1592,34 @@
                 </a>
                 <a class="text-dark" onclick="show_slip()">
                   <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+
+
+
+                  <a class="btn btn-outline-warning" href="" id="dd1" data-bs-toggle="dropdown" aria-haspopup="true"
+                  data-toggle="tooltip" title="Download Attachments" aria-expanded="false" role="button">
+                <i class="fas fa-download"></i>
+              </a>
+              <div class="dropdown-menu" id="dd1">
+                {% if attach %}
+                  <table class="table table-borderless">
+                    {% for a in attach %}
+                    <tr>
+                      <td>{{forloop.counter}}.</td>
+                      <td><a href="{% url 'download_invoice_attach' invoice_id=invoice.id attach_id=a.id %}">{{a.attach.name}}</a></td>
+                      <td><a href="{% url 'delete_invoice_attach' invoice_id=invoice.id attach_id=a.id %}"><i class="fas fa-trash"></i></a></td>
+                    </tr>
+                    {% endfor %}
+                  </table>
+                  {% else %}
+                    <div class="text-center">No Attachment found</div>
+                  {% endif %}
+              </div>
+<!-- Your HTML structure for the file input and triggering button -->
+<input id="file-input" data-invoice-id="{{ id }}" type="file" name="file" style="display:none;" onchange="uploadFile()">
+<button type="button" class="btn btn-outline-warning" onclick="triggerFileInput()"> <i class="fas fa-paperclip"></i></button>
+
+<!-- Add an element to store the invoice_id -->
+<div id="invoice-data" data-invoice-id="{{ id }}"></div>
               </div>
             </div>
 
@@ -1758,7 +1856,7 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-5">
                 <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: chocolate;"><i
                     class="fas fa-eye"></i> Overview</a>
                 <a href=" " class=" btn fa fa-file-alt" data-bs-toggle="dropdown" id="attachmentDropdown"
@@ -1780,7 +1878,7 @@
 
               </div>
 
-              <div class="col-md-6" style="text-align: center;">
+              <div class="col-md-7" style="text-align: left;">
                 {% if invoice.status == 'draft'%}
                 <a href="{% url 'change_status_invoice' id=invoice.id  %}" class="btn btn-outline-warning" title="Save">
                   <i class="fa fa-save" aria-hidden="true"></i>
@@ -1809,6 +1907,33 @@
                 </a>
                 <a class="text-dark" onclick="show_slip()">
                   <button class="btn btn-outline-warning" title="Slip"><i class="fas fa-receipt"></i></button></a>
+
+
+                  <a class="btn btn-outline-warning" href="" id="dd1" data-bs-toggle="dropdown" aria-haspopup="true"
+                  data-toggle="tooltip" title="Download Attachments" aria-expanded="false" role="button">
+                <i class="fas fa-download"></i>
+              </a>
+              <div class="dropdown-menu" id="dd1">
+                {% if attach %}
+                  <table class="table table-borderless">
+                    {% for a in attach %}
+                    <tr>
+                      <td>{{forloop.counter}}.</td>
+                      <td><a href="{% url 'download_invoice_attach' invoice_id=invoice.id attach_id=a.id %}">{{a.attach.name}}</a></td>
+                      <td><a href="{% url 'delete_invoice_attach' invoice_id=invoice.id attach_id=a.id %}"><i class="fas fa-trash"></i></a></td>
+                    </tr>
+                    {% endfor %}
+                  </table>
+                  {% else %}
+                    <div class="text-center">No Attachment found</div>
+                  {% endif %}
+              </div>
+<!-- Your HTML structure for the file input and triggering button -->
+<input id="file-input" data-invoice-id="{{ id }}" type="file" name="file" style="display:none;" onchange="uploadFile()">
+<button type="button" class="btn btn-outline-warning" onclick="triggerFileInput()"> <i class="fas fa-paperclip"></i></button>
+
+<!-- Add an element to store the invoice_id -->
+<div id="invoice-data" data-invoice-id="{{ id }}"></div>
               </div>
             </div>
 
