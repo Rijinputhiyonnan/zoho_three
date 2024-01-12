@@ -26254,7 +26254,7 @@ def add_prod(request):     #updation
     cur_user = request.user
     user = User.objects.get(id=cur_user.id)
     unit = Unit.objects.all()
-    bank_id = ''  # Initialize bank_id
+    bank_id = ''  
     bank_instance = None
 
     

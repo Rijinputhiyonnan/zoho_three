@@ -574,7 +574,7 @@
                 <option value="upi">UPI</option>
                 {% for item in banks %}
                 <option value="{{item.name}}" >{{item.name}}</option>
-                
+
                 {% endfor %}
               </select>
             </div>
@@ -639,14 +639,15 @@
                       <input type="text" id="item1"   hidden>
                       <input type="text" class="dropdown-input_item" name="item[]" placeholder="Select item">
                       <div class="dropdown-list" id="item_one1">
-                          {% for payroll in items %}
+                          {% for p in items %}
                          
                               <div class="dropdown-item"
-                                  data-value="{{ payroll.Name }}" data-name = " {{ payroll.Name }} "
-                                  data-hsn="{{ payroll.hsn }}"
-                                  data-rate="{{ payroll.s_price }}"
-                                  data-tax="{{ payroll.tax }}"
-                                >{{ payroll.title }} {{ payroll.Name }} {{ payroll.last_name }}</div>
+                                  data-value="{{ p.Name }}" data-name = " {{ p.Name }} "
+                                  data-hsn="{{ p.hsn }}"
+                                  data-rate="{{ p.s_price }}"
+                                  data-intrastate="{{ p.intrastate }}"
+    data-interstate="{{ p.interstate }}"
+                                >{{ p.title }} {{ p.Name }} {{ p.last_name }}</div>
                       
                           {% endfor %}
                       </div>
@@ -699,65 +700,108 @@
                         }
                       });
           
-                    function fillItemDetails() {
-                      var input = document.querySelector('.dropdown-input_item');
-                      var selectedValue = input.value;
-                      var selectedItem = document.querySelector('.dropdown-item[data-name="' + selectedValue + '"]');
-                      
-                      var value = selectedItem.getAttribute("data-value");
-                      var hsn = selectedItem.getAttribute("data-hsn");
-                      var rate = selectedItem.getAttribute("data-rate");
-                      var treatment = selectedItem.getAttribute("data-GSTTreatment");
-                      var GSTNumber = selectedItem.getAttribute("data-GSTN");
-                      var tax = selectedItem.getAttribute("data-tax");
-                      var joinDate = selectedItem.getAttribute("data-joindate");
-                      
-                      // Set values to corresponding fields
-                      $("#hsn1").val(hsn);
-                      $("#rate1").val(rate);
-                      $("#tax1").val(tax);
-                      $("#srcofsupply").val(placeofsupply);
-                      $("#cx_treat").val(treatment);
+                      function fillItemDetails(rowNumber) {
+                        var input = document.querySelector(`#row${rowNumber} .dropdown-input_item`);
+                        var selectedValue = input.value;
+                        var selectedItem = document.querySelector(`#row${rowNumber} .dropdown-item[data-name="${selectedValue}"]`);
                     
-                      
-              
-                      
-                      $("#joindate").val(joinDate);
-                      $("#item1").val(value);
-                  }
+                        var value = selectedItem.getAttribute("data-value");
+                        var hsn = selectedItem.getAttribute("data-hsn");
+                        var rate = selectedItem.getAttribute("data-rate");
+                        var tax;
+                    
+                        var placeOfSupply = $("#srcofsupply").val();
+                    
+                        // Determine tax based on place of supply
+                        if (placeOfSupply === "[KL]Kerala") {
+                            tax = selectedItem.getAttribute("data-intrastate");
+                        } else {
+                            tax = selectedItem.getAttribute("data-interstate");
+                        }
+                    
+                        // Extract numeric part from the tax value (assuming it follows a consistent format)
+                        var numericTax = tax.match(/\d+/);
+                    
+                        // Set values to corresponding fields
+                        $(`#hsn${rowNumber}`).val(hsn);
+                        $(`#rate${rowNumber}`).val(rate);
+                    
+                        // Set the numeric part of tax to the tax field
+                        $(`#tax${rowNumber}`).val(numericTax);
+                    
+                        $(`#item${rowNumber}`).val(value);
+                    }
+                   
+                    
+
+$(document).ready(function () {
+  // Add event listener to the place of supply dropdown
+  $('#srcofsupply').change(function () {
+      updateTaxGroupAndLabel();
+  });
+});
+
+function updateTaxGroupAndLabel() {
+  // Get the current place of supply
+  var placeOfSupply = $("#srcofsupply").val();
+
+  // Determine tax group based on place of supply
+  var taxGroupId;
+  if (placeOfSupply === "[KL]-Kerala") {
+      taxGroupId = "igst-group";
+  } else {
+      taxGroupId = "gst-group";
+  }
+
+  // Update tax group
+  updateTaxGroup(taxGroupId);
+}
+
+function updateTaxGroup(taxGroupId) {
+  // Update the id attribute of the tax dropdown based on the place of supply
+  var taxDropdown = document.getElementById('tax1');
+  var gstOptgroup = taxDropdown.querySelector('optgroup[label="GST"]');
+  var igstOptgroup = taxDropdown.querySelector('optgroup[label="IGST"]');
+
+  gstOptgroup.id = (taxGroupId === "gst-group") ? "tax-group" : "";
+  igstOptgroup.id = (taxGroupId === "igst-group") ? "tax-group" : "";
+}
 
 
 
-                  function fillItemDetails2(row) {
-                    var input = row.find('.dropdown-input_item');
-                    var selectedValue = input.val();
-                    var selectedItem = row.find('.dropdown-item[data-name="' + selectedValue + '"]');
-                
-                    var value = selectedItem.attr("data-value");
-                    var hsn = selectedItem.attr("data-hsn");
-                    var rate = selectedItem.attr("data-rate");
-                    var interstateTax = selectedItem.attr("data-interstate");
-                    var intrastateTax = selectedItem.attr("data-intrastate");
-                
-                    // Set values to corresponding fields for the specific row
-                    row.find('.hsn').val(hsn);
-                    row.find('.rate').val(rate);
-                
-                    // Determine place of supply for the row
-                    var placeOfSupply = row.find('.srcofsupply').val();
-                
-                    // Set tax based on place of supply
-                    var selectedTax = (placeOfSupply === "Kerala") ? intrastateTax : interstateTax;
-                    row.find('.tax').val(selectedTax);
-                
-                    // Set treatment based on place of supply
-                    row.find('.cx_treat').val((placeOfSupply === "Kerala") ? "SGST/CGST" : "IGST");
-                
-                    var joinDate = selectedItem.attr("data-joindate");
-                    row.find('.joindate').val(joinDate);
-                    row.find('.item1').val(value);
-                }
-                
+
+
+function fillItemDetails2(row) {
+  var input = row.find('.dropdown-input_item');
+  var selectedValue = input.val();
+  var selectedItem = row.find('.dropdown-item[data-name="' + selectedValue + '"]');
+  
+  var value = selectedItem.attr("data-value");
+  var hsn = selectedItem.attr("data-hsn");
+  var rate = selectedItem.attr("data-rate");
+  var interstateTax = selectedItem.attr("data-interstate");
+  var intrastateTax = selectedItem.attr("data-intrastate");
+  
+  // Set values to corresponding fields for the specific row
+  row.find('.hsn').val(hsn);
+  row.find('.rate').val(rate);
+  
+  // Determine place of supply for the row
+  var placeOfSupply = row.find('.srcofsupply').val();
+  
+  // Set tax based on place of supply
+  var selectedTax = (placeOfSupply === "[KL]-Kerala") ? intrastateTax : interstateTax;
+  var numericTax = selectedTax.match(/\d+/);
+  row.find('.tax').val(numericTax);
+  
+  // Set treatment based on place of supply
+  row.find('.cx_treat').val((placeOfSupply === "[KL]-Kerala") ? "SGST/CGST" : "IGST");
+  
+  var joinDate = selectedItem.attr("data-joindate");
+ 
+  row.find('.item1').val(value);
+}
+
                   
                   
 
@@ -779,7 +823,7 @@
                       var input = row.find('.dropdown-input_item');
                       input.val($(this).text());
                       dropdownList.hide();
-                      fillItemDetails2(row);  // Pass the row element
+                      fillItemDetails2(row);  
                       clearErrorMessage();
                     });
                   
@@ -797,7 +841,7 @@
                       });
                     });
                   
-                    // Add other event listeners and handlers as needed
+                  
                   }
                   
                
@@ -902,39 +946,39 @@
                 })
                 
                 // Function to update Available Stock and display warning message if necessary
-                function updateAvailableStock(row) {
-                  var selectedItem = row.find(".item_select").val();
-                  var quantity = parseInt(row.find(".quantity").val());
-                  var availableStock = parseInt(row.find(".stock_data").text());
-                
-                  if (isNaN(quantity) || isNaN(availableStock)) {
-                    // Handle invalid input (non-numeric values)
-                    return;
-                  }
-                
-                  // Update Available Stock span
-                  row.find(".stock_data").text(availableStock - quantity);
-                
-                  // Display a warning message if the entered quantity is greater than available stock
-                  if (quantity > availableStock) {
-                    row.find(".stock_warning").text("Entered quantity greater than available quantity").css('color', 'red');
-                  } else {
-                    row.find(".stock_warning").text('').css('color', ''); // Reset the warning message
-                  }
-                }
-                
-                // Add event handler for changes in item selection
-                $(document).on('change', '.item_select', function () {
-                  var selectedItem = $(this).val();
-                  var row = $(this).closest('tr');
-                  fetchItemData(selectedItem, row);
-                });
-                
-                // Add event handler for changes in quantity
-                $(document).on('change', '.quantity', function () {
-                  var row = $(this).closest('tr');
-                  updateAvailableStock(row);
-                });
+function updateAvailableStock(row) {
+  var selectedItem = row.find(".dropdown-input_item").val();
+  var quantity = parseInt(row.find(".qty").val());
+  var availableStock = parseInt(row.find(".stock_data").text());
+
+  if (isNaN(quantity) || isNaN(availableStock)) {
+      // Handle invalid input (non-numeric values)
+      return;
+  }
+
+  // Update Available Stock span
+  row.find(".stock_data").text(availableStock - quantity);
+
+  // Display a warning message if the entered quantity is greater than available stock
+  if (quantity > availableStock) {
+      row.find(".stock_warning").text("Entered quantity greater than available quantity").css('color', 'red');
+  } else {
+      row.find(".stock_warning").text('').css('color', ''); // Reset the warning message
+  }
+}
+
+// Add event handler for changes in quantity
+$(document).on('change', '.qty', function () {
+  var row = $(this).closest('tr');
+  updateAvailableStock(row);
+});
+
+// Add event handler for changes in item selection
+$(document).on('input', '.dropdown-input_item', function () {
+  var row = $(this).closest('tr');
+  updateAvailableStock(row);
+});
+
                 
                   </script>
                   <td style="width: 15%;" class='text-right'><input type='number' id='rate1'
@@ -945,27 +989,30 @@
                       class=' text-right discount border-0 bg-transparent text-white form-control' name='desc[]'
                       value='0'>
                   </td>
-                  <td style="width: 22%;" class='text-right '> <select name='tax[]' id='tax1'
-                      class='form-control border-0 bg-transparent text-white text-right border-0 tax'
-                      onselect="toggleDateInput()">
-                      <optgroup class="text-center text-black" label="GST">
-                        <option class="text-black" value="0">0% GST(0%)</option>
-                        <option class="text-black" value="3">3.0% GST(3%)</option>
-                        <option class="text-black" value="5">5.0% GST(5%)</option>
-                        <option class="text-black" value="12">12.0% GST(12%)</option>
-                        <option class="text-black" value="18">18.0% GST(18%)</option>
-                        <option class="text-black" value="28">28.0% GST(28%)</option>
-                      </optgroup>
-                      <optgroup class="text-center text-black" label="IGST">
-                        <option class="text-black" value="0">0% IGST(0%)</option>
-                        <option class="text-black" value="3">3.0% IGST(3%)</option>
-                        <option class="text-black" value="5">5.0% IGST(5%)</option>
-                        <option class="text-black" value="12">12.0% IGST(12%)</option>
-                        <option class="text-black" value="18">18.0% IGST(18%)</option>
-                        <option class="text-black" value="28">28.0% IGST(28%)</option>
-                      </optgroup>
+                  <td style="width: 22%;" class='text-right '> 
+                    <select name='tax[]' id='tax1'
+                        class='form-control border-0 bg-transparent text-white text-right border-0 tax'
+                        onselect="toggleDateInput()">
+                        <optgroup id="gst-group" class="text-center text-black" label="GST">
+                            <option class="text-black" value="0">0% GST(0%)</option>
+                            <option class="text-black" value="3">3.0% GST(3%)</option>
+                            <option class="text-black" value="5">5.0% GST(5%)</option>
+                            <option class="text-black" value="12">12.0% GST(12%)</option>
+                            <option class="text-black" value="18">18.0% GST(18%)</option>
+                            <option class="text-black" value="28">28.0% GST(28%)</option>
+                        </optgroup>
+                        <optgroup id="igst-group" class="text-center text-black" label="IGST">
+                            <option class="text-black" value="0">0% IGST(0%)</option>
+                            <option class="text-black" value="3">3.0% IGST(3%)</option>
+                            <option class="text-black" value="5">5.0% IGST(5%)</option>
+                            <option class="text-black" value="12">12.0% IGST(12%)</option>
+                            <option class="text-black" value="18">18.0% IGST(18%)</option>
+                            <option class="text-black" value="28">28.0% IGST(28%)</option>
+                        </optgroup>
                     </select>
                     <label id="ml1" class="text-warning" style="display: none;"></label>
+                </td>
+                
                   </td>
                   <td style="display: none;">
                     <input type="text" name='taxamount' id="taxamount1"
@@ -3105,14 +3152,15 @@
             <input type="text" class="dropdown-input_item" name="item[]"  placeholder="Select item">
           
               <div class="dropdown-list" id="item_one${rowCount}">
-                {% for payroll in items %}
+                {% for p in items %}
                
                     <div class="dropdown-item"
-                        data-value="{{ payroll.id }}" data-name = " {{ payroll.Name }} "
-                        data-hsn="{{ payroll.hsn }}"
-                        data-rate="{{ payroll.s_price }}"
-                        data-tax="{{ payroll.interstate }}"
-                      >{{ payroll.title }} {{ payroll.Name }} {{ payroll.last_name }}</div>
+                        data-value="{{ p.id }}" data-name = " {{ p.Name }} "
+                        data-hsn="{{ p.hsn }}"
+                        data-rate="{{ p.s_price }}"
+                        data-intrastate="{{ p.intrastate }}"
+    data-interstate="{{ p.interstate }}"
+                      >{{ p.title }} {{ p.Name }} {{ p.last_name }}</div>
             
                 {% endfor %}
             </div>
