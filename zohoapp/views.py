@@ -14701,7 +14701,26 @@ def create_loan(request):
     }
     return render(request, 'create_loan.html', context)
     
-    
+def employee_loan_details(request, payroll_id):
+    loan = Loan.objects.get(id=payroll_id)
+    all_loan = Loan.objects.filter(user=request.user)
+    company=company_details.objects.get(user=request.user)
+    comments = LoanComment.objects.filter(loan=loan)
+    attach = LoanAttach.objects.filter(loan=loan)
+    repay = LoanRepayment.objects.filter(loan=payroll_id)
+    last_loan = LoanRepayment.objects.filter(loan=payroll_id).last().balance
+    context = {
+        'loan': loan,
+        'all_loan': all_loan,
+        'company': company,
+        'comments':comments,
+        'attach':attach,
+        'repay':repay,
+        'last_loan':last_loan,
+        'state':'0'
+    }
+    messages.info(request, '')
+    return render(request, 'employee_loan_details.html', context)
 def employee_list(request):
     employees_with_loans = Payroll.objects.filter(loan__isnull=False,user=request.user)
     company=company_details.objects.get(user=request.user)
@@ -27666,24 +27685,9 @@ def delete_invoice_attach(request, invoice_id, attach_id):
     except InvoiceAttach.DoesNotExist:
         return redirect('invoice_overview', id=invoice_id)
 
+
+
+
+
+
             
-def employee_loan_details(request, payroll_id):
-    loan = Loan.objects.get(id=payroll_id)
-    all_loan = Loan.objects.filter(user=request.user)
-    company=company_details.objects.get(user=request.user)
-    comments = LoanComment.objects.filter(loan=loan)
-    attach = LoanAttach.objects.filter(loan=loan)
-    repay = LoanRepayment.objects.filter(loan=payroll_id)
-    last_loan = LoanRepayment.objects.filter(loan=payroll_id).last().balance
-    context = {
-        'loan': loan,
-        'all_loan': all_loan,
-        'company': company,
-        'comments':comments,
-        'attach':attach,
-        'repay':repay,
-        'last_loan':last_loan,
-        'state':'0'
-    }
-    messages.info(request, '')
-    return render(request, 'employee_loan_details.html', context)
