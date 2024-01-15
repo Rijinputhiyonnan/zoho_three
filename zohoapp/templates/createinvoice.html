@@ -5,6 +5,11 @@
 
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- Your script comes after the jQuery inclusion -->
+<script src="path/to/your/script.js"></script>
+
 
 
 
@@ -405,6 +410,28 @@
               }
             });
           });
+
+
+
+
+
+          var itemId = encodeURIComponent("thorium");
+          var url = "/get_invoice_item_details/?id=" + itemId;
+          
+          $.ajax({
+              url: url,
+              type: 'GET',
+              dataType: 'json', // Specify the expected data type
+              success: function(data) {
+                  // Handle success (update UI, etc.)
+                  console.log('Success:', data);
+              },
+              error: function(xhr, status, error) {
+                  // Handle error (log details to the console)
+                  console.error('Error:', xhr, status, error);
+              }
+          });
+          
         </script>
         
         
@@ -642,11 +669,12 @@
                           {% for p in items %}
                          
                               <div class="dropdown-item"
-                                  data-value="{{ p.Name }}" data-name = " {{ p.Name }} "
+                                  data-value="{{ p.id }}" data-name = " {{ p.Name }} "
                                   data-hsn="{{ p.hsn }}"
                                   data-rate="{{ p.s_price }}"
                                   data-intrastate="{{ p.intrastate }}"
     data-interstate="{{ p.interstate }}"
+    data-stock="{{ p.stock }}"
                                 >{{ p.title }} {{ p.Name }} {{ p.last_name }}</div>
                       
                           {% endfor %}
@@ -657,81 +685,96 @@
 
                   <script>
                     document.addEventListener('DOMContentLoaded', function () {
-                        var input = document.querySelector('.dropdown-input_item');
-                        var dropdownList = document.querySelector('#item_one' + rowCount);
-
-                
-                        for (let i = 1; i <= rowCount; i++) {
+                      for (let i = 1; i <= rowCount; i++) {
                           let input = document.querySelector(`#row${i} .dropdown-input_item`);
                           let dropdownList = document.querySelector(`#item_one${i}`);
-                      
+                  
                           input.addEventListener('focus', function () {
-                            dropdownList.style.display = 'block';
+                              dropdownList.style.display = 'block';
                           });
-                      
+                  
                           document.addEventListener('mousedown', function (event) {
-                            if (!event.target.closest(`#row${i} .custom-dropdown`)) {
-                              dropdownList.style.display = 'none';
-                            }
-                          });
-                      
-                          dropdownList.addEventListener('click', function (event) {
-                            if (event.target.classList.contains('dropdown-item')) {
-                              input.value = event.target.textContent;
-                              dropdownList.style.display = 'none';
-                              fillItemDetails(i);  // Pass the row number
-                              clearErrorMessage();
-                            }
-                          });
-                      
-                          input.addEventListener('input', function () {
-                            let filterValue = input.value.toLowerCase();
-                            let items = dropdownList.querySelectorAll('.dropdown-item');
-                      
-                            items.forEach(function (item) {
-                              let itemText = item.textContent.toLowerCase();
-                              if (itemText.includes(filterValue)) {
-                                item.style.display = 'block';
-                              } else {
-                                item.style.display = 'none';
+                              if (!event.target.closest(`#row${i} .custom-dropdown`)) {
+                                  dropdownList.style.display = 'none';
                               }
-                            });
                           });
-                        }
-                      });
-          
-                      function fillItemDetails(rowNumber) {
-                        var input = document.querySelector(`#row${rowNumber} .dropdown-input_item`);
-                        var selectedValue = input.value;
-                        var selectedItem = document.querySelector(`#row${rowNumber} .dropdown-item[data-name="${selectedValue}"]`);
+                  
+                          dropdownList.addEventListener('click', function (event) {
+                              if (event.target.classList.contains('dropdown-item')) {
+                                  input.value = event.target.textContent;
+                                  dropdownList.style.display = 'none';
+                                  fillItemDetails(i);
+                                  clearErrorMessage();
+                              }
+                          });
+                  
+                          input.addEventListener('input', function () {
+                              let filterValue = input.value.toLowerCase();
+                              let items = dropdownList.querySelectorAll('.dropdown-item');
+                  
+                              items.forEach(function (item) {
+                                  let itemText = item.textContent.toLowerCase();
+                                  item.style.display = itemText.includes(filterValue) ? 'block' : 'none';
+                              });
+                          });
+                      }
+                  });
+                  
+                  function fillItemDetails(rowNumber) {
+                    var row = $('#row' + rowNumber);
+                    var input = row.find('.dropdown-input_item');
+                    var selectedItem = row.find('.dropdown-item[data-name="' + input.val() + '"]');
+                
+                    var hsn = selectedItem.attr("data-hsn") || "";
+                    var rate = selectedItem.attr("data-rate") || "";
+                    var intrastate = selectedItem.attr("data-intrastate") || "";
+                    var interstate = selectedItem.attr("data-interstate") || "";
+                    var stockData = selectedItem.attr("data-stock") || "";
                     
-                        var value = selectedItem.getAttribute("data-value");
-                        var hsn = selectedItem.getAttribute("data-hsn");
-                        var rate = selectedItem.getAttribute("data-rate");
-                        var tax;
+                    var placeOfSupply = $("#srcofsupply" + rowNumber).val();  // Use row-specific ID
                     
-                        var placeOfSupply = $("#srcofsupply").val();
-                    
-                        // Determine tax based on place of supply
-                        if (placeOfSupply === "[KL]Kerala") {
-                            tax = selectedItem.getAttribute("data-intrastate");
-                        } else {
-                            tax = selectedItem.getAttribute("data-interstate");
-                        }
-                    
-                        // Extract numeric part from the tax value (assuming it follows a consistent format)
-                        var numericTax = tax.match(/\d+/);
-                    
-                        // Set values to corresponding fields
-                        $(`#hsn${rowNumber}`).val(hsn);
-                        $(`#rate${rowNumber}`).val(rate);
-                    
-                        // Set the numeric part of tax to the tax field
-                        $(`#tax${rowNumber}`).val(numericTax);
-                    
-                        $(`#item${rowNumber}`).val(value);
+                    // Determine tax based on place of supply
+                    var tax;
+                    if (placeOfSupply === "[KL]Kerala") {
+                        tax = selectedItem.attr("data-intrastate");
+                    } else {
+                        tax = selectedItem.attr("data-interstate");
                     }
-                   
+                
+                    // Extract numeric part from the tax value (assuming it follows a consistent format)
+                    var numericTax = tax.match(/\d+/);
+                
+                    // Set values to corresponding fields
+                    $("#hsn" + rowNumber).val(hsn);
+                    $("#rate" + rowNumber).val(rate);
+                    $("#tax" + rowNumber).val(numericTax);  // Display the full tax value
+                
+                    // Update stock data
+                    var stockData = selectedItem.attr("data-stock") || "";
+                    $("#stock_data" + rowNumber).text(stockData);
+                
+                    // Additional code for updating available stock
+                    updateAvailableStock(row);
+                }
+                
+                  
+                  function updateAvailableStock(row) {
+                      var quantity = parseInt(row.find('.qty').val()) || 0;
+                      var availableStock = parseInt(row.find('.stock_data').text()) || 0;
+                  
+                      // Update Available Stock span
+                      row.find('.stock_data').text(availableStock - quantity);
+                  
+                      // Display a warning message if the entered quantity is greater than available stock
+                      var stockWarning = row.find('.stock_warning');
+                      if (quantity > availableStock) {
+                          stockWarning.text("Entered quantity greater than available quantity").css('color', 'red');
+                      } else {
+                          stockWarning.text('').css('color', ''); // Reset the warning message
+                      }
+                  }
+                  
+                    
                     
 
 $(document).ready(function () {
@@ -781,10 +824,12 @@ function fillItemDetails2(row) {
   var rate = selectedItem.attr("data-rate");
   var interstateTax = selectedItem.attr("data-interstate");
   var intrastateTax = selectedItem.attr("data-intrastate");
+  var stockData = selectedItem.attr("data-stock") ;
   
   // Set values to corresponding fields for the specific row
   row.find('.hsn').val(hsn);
   row.find('.rate').val(rate);
+  row.find('.stock_data').val(stockData);
   
   // Determine place of supply for the row
   var placeOfSupply = row.find('.srcofsupply').val();
@@ -797,11 +842,32 @@ function fillItemDetails2(row) {
   // Set treatment based on place of supply
   row.find('.cx_treat').val((placeOfSupply === "[KL]-Kerala") ? "SGST/CGST" : "IGST");
   
-  var joinDate = selectedItem.attr("data-joindate");
+  
  
   row.find('.item1').val(value);
-}
 
+  
+
+  // Additional code for updating available stock
+  updateAvailableStock2(row);
+
+  
+}
+function updateAvailableStock2(row) {
+  var quantity = parseInt(row.find('.qty').val()) || 0;
+  var availableStock = parseInt(row.find('.stock_data').text()) || 0;
+
+  // Update Available Stock span
+  row.find('.stock_data').text(availableStock - quantity);
+
+  // Display a warning message if the entered quantity is greater than available stock
+  var stockWarning = row.find('.stock_warning');
+  if (quantity > availableStock) {
+      stockWarning.text("Entered quantity greater than available quantity").css('color', 'red');
+  } else {
+      stockWarning.text('').css('color', ''); // Reset the warning message
+  }
+}
                   
                   
 
@@ -853,131 +919,115 @@ function fillItemDetails2(row) {
                       class=' text-right hsn border-0 form-control bg-transparent text-white' name='hsn[]' readonly>
                   </td>
                   <td style="width: 17%;" class='text-right'>
-                    <input type='number' id='qty1'
-                      class=' text-right qty form-control border-0 bg-transparent text-white' name='quantity[]'
-                      value='0' onchange="qtychange(this.id); changeqty(this.id);">
-
-                      <span class="text-warning">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
-                      <span class="stock_warning text-danger"></span>
+                    <input type='number' id='qty1' class='text-right qty form-control border-0 bg-transparent text-white' name='quantity[]' value='0' onchange="updateAvailableStock(this);">
+                    <span class="text-warning">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
+                    <span class="stock_warning text-danger"></span>
                   </td>
+                  
 
                   <script>
-                    $(document).ready(function () {
-                      function qtychange(id_str) {
-                        var id = id_str.split("qty")[1];
-                        var qty = $(`#qty${id}`).val();
-                        
-                        // Assuming you have a way to uniquely identify the selected item, e.g., using a dropdown with id 'itemSelect'
-                        var selectedItem = $("#itemSelect option:selected").val();
-                        var avl = $(`#stock_data${id}`).text();
-                  
-                        console.log('Qty:', qty);
-                        console.log('Available:', avl);
-                  
-                        if (parseInt(qty) > parseInt(avl)) {
-                          $(".stock_warning").text("Entered quantity greater than available quantity");
-                          // Optionally, you can add a delay and then clear the warning message
-                          // setTimeout(function() { $(".stock_warning").text(""); }, 3000);
-                        } else {
-                          $(".stock_warning").text(""); // Clear the warning message if quantity is within limits
-                        }
-                      }
-                    });
-                  </script>
-                  
-                  <script>
-                  function fetchItemData(selectedItem, row) {
-                    $.ajax({
+
+                    
+
+
+                  //  function updateAvailableStock(row) {
+                      var selectedItem = row.find(".dropdown-input_item").val();
+                      var quantity = parseInt(row.find(".qty").val());
+                    
+                      console.log("Selected Item: " + selectedItem); // Debugging statement
+                    
+                      // Use AJAX to fetch the actual available stock from the server
+                      $.ajax({
                         type: 'GET',
                         url: "{% url 'get_invoice_item_details' %}",
-                        data: {
-                            id: selectedItem
-                        },
+                        data: { id: selectedItem },
                         dataType: 'json',
                         success: function (response) {
-                            // Update the HSN and rate fields in the current row with the fetched data
-                            row.find(".hsn").val(response.hsn);
-                            row.find(".rate").val(response.rate);
-                            row.find(".stock_data").text(response.stock);  // Add this line to update available stock
+                          console.log("Response from server: " + JSON.stringify(response)); // Debugging statement
+                          
+                          // Check if the response contains the 'stock' property
+                          if ('stock' in response) {
+                            var availableStock = parseInt(response.stock);
+                    
+                            // Update Available Stock span
+                            row.find(".stock_data").text(availableStock - quantity);
+                    
+                            // Display a warning message if the entered quantity is greater than available stock
+                            var stockWarning = row.find(".stock_warning");
+                            if (quantity > availableStock) {
+                              stockWarning.text("Entered quantity greater than available quantity").css('color', 'red');
+                            } else {
+                              stockWarning.text('').css('color', ''); // Reset the warning message
+                            }
+                          } else {
+                            console.log('Error: Response does not contain the expected stock property.');
+                          }
                         },
                         error: function () {
-                            // Handle errors if the data cannot be fetched or the item doesn't exist
-                            console.log('Error fetching item data.');
-                            // You can display an error message to the user if needed.
+                          console.log('Error fetching item data.');
                         },
-                    });
-                }
-                
-                // Add event handler for changes in item selection
-                $(document).on('change', '.item_select', function () {
-                    var selectedItem = $(this).val();
-                    var row = $(this).closest('tr');
-                    fetchItemData(selectedItem, row);
-                });
-                
-                
-                // Add event handler for changes in item selection
-                $(document).on('change', '.item_select', function () {
-                  var selectedItem = $(this).val();
-                  var row = $(this).closest('tr');
-                  
-                  $.ajax({
-                    type: 'GET',
-                    url: "{% url 'get_invoice_item_details' %}",
-                    data: {
-                      id: selectedItem
-                    },
-                    dataType: 'json',
-                    success: function (response) {
-                      // Update the HSN and rate fields in the current row with the fetched data
-                      row.find(".hsn").val(response.hsn);
-                      row.find(".rate").val(response.rate);
-                
-                      // Trigger the updateAvailableStock function after fetching item details
-                      updateAvailableStock(row);
-                    },
-                    error: function () {
-                      // Handle errors if the data cannot be fetched or the item doesn't exist
-                      console.log('Error fetching item data.');
-                     
-                    },
-                  });
-                
-                })
-                
-                // Function to update Available Stock and display warning message if necessary
-function updateAvailableStock(row) {
-  var selectedItem = row.find(".dropdown-input_item").val();
-  var quantity = parseInt(row.find(".qty").val());
-  var availableStock = parseInt(row.find(".stock_data").text());
+                      });
+                    }
+                    
+                      
+                      // Event handler for changes in quantity and item selection
+                      $(document).on('change input', '.qty, .dropdown-input_item', function () {
+                        var row = $(this).closest('tr');
+                        updateAvailableStock(row);
+                      });
+                      
+                      // Function to fetch item data using AJAX
+                     // function fetchItemData(selectedItem, row) {
+                       // $.ajax({
+                          type: 'GET',
+                          url: "{% url 'get_invoice_item_details' %}",
+                          data: { id: selectedItem },
+                          dataType: 'json',
+                          success: function (response) {
+                            row.find(".hsn").val(response.hsn);
+                            row.find(".rate").val(response.rate);
+                            row.find(".stock_data").text(response.stock);
+                            //updateAvailableStock(row);
+                          },
+                          error: function () {
+                            console.log('Error fetching item data.');
+                          },
+                        });
+                      }
+                      
+                      // Event handler for changes in item selection
+                      $(document).on('change', '.dropdown-input_item', function () {
+                        var selectedItem = $(this).val();
+                        var row = $(this).closest('tr');
+                        fetchItemData(selectedItem, row);
+                      });
+                      
+                      // Add event handler for changes in quantity
+                      $(document).on('change', '.qty', function () {
+                        var row = $(this).closest('tr');
+                        updateAvailableStock(row);
+                      });
+                      
+                      // Adding the new AJAX request
+var itemId = encodeURIComponent("thorium"); // Encode the item ID
+var url = "/get_invoice_item_details/?id=" + itemId;
 
-  if (isNaN(quantity) || isNaN(availableStock)) {
-      // Handle invalid input (non-numeric values)
-      return;
-  }
-
-  // Update Available Stock span
-  row.find(".stock_data").text(availableStock - quantity);
-
-  // Display a warning message if the entered quantity is greater than available stock
-  if (quantity > availableStock) {
-      row.find(".stock_warning").text("Entered quantity greater than available quantity").css('color', 'red');
-  } else {
-      row.find(".stock_warning").text('').css('color', ''); // Reset the warning message
-  }
-}
-
-// Add event handler for changes in quantity
-$(document).on('change', '.qty', function () {
-  var row = $(this).closest('tr');
-  updateAvailableStock(row);
+$.ajax({
+    url: url,
+    type: 'GET',
+    success: function(data) {
+        // Handle success (update UI, etc.)
+        console.log('Success:', data);
+    },
+    error: function(xhr, status, error) {
+        // Handle error (log details to the console)
+        console.error('Error:', xhr, status, error);
+    }
 });
+                      
+                    
+                      
 
-// Add event handler for changes in item selection
-$(document).on('input', '.dropdown-input_item', function () {
-  var row = $(this).closest('tr');
-  updateAvailableStock(row);
-});
 
                 
                   </script>
@@ -3160,6 +3210,7 @@ $(document).on('input', '.dropdown-input_item', function () {
                         data-rate="{{ p.s_price }}"
                         data-intrastate="{{ p.intrastate }}"
     data-interstate="{{ p.interstate }}"
+    data-stock="{{ p.stock }}"
                       >{{ p.title }} {{ p.Name }} {{ p.last_name }}</div>
             
                 {% endfor %}
@@ -3174,7 +3225,7 @@ $(document).on('input', '.dropdown-input_item', function () {
         
         <td style="width: 17%;" class='text-right'>
           <input type='number' id='qty${rowCount}' class='text-right border-0 bg-transparent text-white qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange(this.id)'><br>
-          <span class="text-warning">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
+          <span class="text-warning">Available Stock : <span id="stock_data${rowCount}" class="stock_data text-warning"></span></span>
           <span class="stock_warning text-danger"></span>
         </td>
         

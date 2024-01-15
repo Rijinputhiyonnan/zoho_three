@@ -26793,8 +26793,16 @@ def edited_prod(request, id):
     return render(request, 'invoiceedit.html', context)
 
 
+from django.http import JsonResponse
+
 def get_invoice_item_details(request):
-    id = request.GET.get('id')
+    id_param = request.GET.get('id')
+
+    try:
+        # Check if id_param is a valid integer
+        id = int(id_param)
+    except ValueError:
+        return JsonResponse({'error': 'Invalid item id'}, status=400)
 
     try:
         item = AddItem.objects.get(id=id)
@@ -26817,7 +26825,7 @@ def get_invoice_item_details(request):
         return JsonResponse(data)
     except AddItem.DoesNotExist:
         return JsonResponse({'error': 'Item not found'}, status=404)
-    
+
     
     
     
