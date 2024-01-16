@@ -647,21 +647,23 @@
             <table class="table table-bordered table-responsive" id="item_table" onclick='toggleDateInput()'>
               <thead>
                 <tr>
-                  <th class="text-right">#</th>
-                  <th>Item<a href="" data-toggle="modal" data-target="#newitem" class="text-capitalize">+ Item</a></th>
-                  <th class="text-right" >HSN</th>
-                  <th class="text-right">Quantity</th>
-                  <th class="text-right">Rate</th>
-                  <th class="text-right">Discount</th>
-                  <th class="text-right">Tax</th>
-                  <th class="text-right">Amount</th>
+                  <th class="text-center">#</th>
+                  <th  class="text-center" style="width: 10vh; font-size: 10px; padding-right: 2px; margin-right: 1px;" style="font-size: 10px;">Item<a href="" data-toggle="modal" data-target="#newitem" class="text-capitalize">+new</a></th>
+
+                  <th class="text-center" style="width: 15%; font-size: 10px;">HSN</th>
+
+                  <th  class="text-center" style="font-size: 10px;">Quantity</th>
+                  <th class="text-center" style="font-size: 10px;">Rate</th>
+                  <th class="text-center" style="font-size: 10px;">Discount</th>
+                  <th class="text-center" style="font-size: 10px;">Tax</th>
+                  <th class="text-center"style="font-size: 10px;">Amount</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody id="item_table_body">
                 <tr id="row1">
-                  <td class="text-white">1</td>
-                  <td>
+                  <td class="text-white text-center" style="font-size: 10px;">1</td>
+                  <td style="font-size: 13px;" class="text-center">
                     <div class="custom-dropdown"  style="height: 8vh;"> 
                       <input type="text" id="item1"   hidden>
                       <input type="text" class="dropdown-input_item" name="item[]" placeholder="Select item">
@@ -749,32 +751,13 @@
                     $("#rate" + rowNumber).val(rate);
                     $("#tax" + rowNumber).val(numericTax);  // Display the full tax value
                 
-                    // Update stock data
-                    var stockData = selectedItem.attr("data-stock") || "";
-                    $("#stock_data" + rowNumber).text(stockData);
+                   
                 
-                    // Additional code for updating available stock
-                    updateAvailableStock(row);
+                   
                 }
                 
                   
-                  function updateAvailableStock(row) {
-                      var quantity = parseInt(row.find('.qty').val()) || 0;
-                      var availableStock = parseInt(row.find('.stock_data').text()) || 0;
-                  
-                      // Update Available Stock span
-                      row.find('.stock_data').text(availableStock - quantity);
-                  
-                      // Display a warning message if the entered quantity is greater than available stock
-                      var stockWarning = row.find('.stock_warning');
-                      if (quantity > availableStock) {
-                          stockWarning.text("Entered quantity greater than available quantity").css('color', 'red');
-                      } else {
-                          stockWarning.text('').css('color', ''); // Reset the warning message
-                      }
-                  }
-                  
-                    
+           
                     
 
 $(document).ready(function () {
@@ -914,13 +897,14 @@ function updateAvailableStock2(row) {
               
               
                 </script>
-                  <td style="width: 15%;" class='text-right'>
-                    <input type='number' id='hsn1'
+                  <td style="width: 15%; font-size: 10px;" class='text-center' >
+                    <input style="font-size: 13px;" type='number' id='hsn1'
                       class=' text-right hsn border-0 form-control bg-transparent text-white' name='hsn[]' readonly>
                   </td>
-                  <td style="width: 17%;" class='text-right'>
-                    <input type='number' id='qty1' class='text-right qty form-control border-0 bg-transparent text-white' name='quantity[]' value='0' onchange="updateAvailableStock(this);">
-                    <span class="text-warning">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
+                  <td style="width: 17%;" class='text-center'>
+                    <input style="font-size: 13px;" type='number' id='qty1' class='text-center qty form-control border-0 bg-transparent text-white' name='quantity[]' value='0'  onchange="changeqty(this.id)">
+                    <input type="text" id="avl1" style="display: none;">
+                    <span class="text-warning" style="font-size: 10px;">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
                     <span class="stock_warning text-danger"></span>
                   </td>
                   
@@ -933,7 +917,7 @@ function updateAvailableStock2(row) {
                         if( parseFloat(qty) > parseFloat(avl_val) ){
                             alert("Quantity Greater than Available Quantity")
                             document.getElementById(id).value = 0
-                            document.getElementById(`product${id_val}`).value =  ' '
+                            document.getElementById(`item_one${id_val}`).value =  ' '
                             document.getElementById(`tax1${id_val}`).value = ' '
                             document.getElementById(`tax2${id_val}`).value = ' '
                             document.getElementById(`disc${id_val}`).value = 0
@@ -941,12 +925,12 @@ function updateAvailableStock2(row) {
                             document.getElementById(`total${id_val}`).value = 0
                             calc()
                         }else{
-                           document.getElementById(`qtyspan${id_val}`).textContent = parseInt(avl_val) - parseInt(qty)
+                           document.getElementById(`stock_data${id_val}`).textContent = parseInt(avl_val) - parseInt(qty)
                         }
                     }
                 </script>
                 
-                  <script>
+             <!--     <script>
 
                     
 
@@ -1051,34 +1035,34 @@ $.ajax({
 
 
                 
-                  </script>
-                  <td style="width: 15%;" class='text-right'><input type='number' id='rate1'
+                  </script>-->
+                  <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='rate1'
                       class=' text-right rate form-control border-0  bg-transparent text-white' name='rate[]' value='0'
                       readonly>
                   </td>
-                  <td style="width: 10%;" class='text-right text-dark'><input type='number' id='discount1'
+                  <td style="width: 10%;" class='text-center text-dark'><input style="font-size: 13px;" type='number' id='discount1'
                       class=' text-right discount border-0 bg-transparent text-white form-control' name='desc[]'
                       value='0'>
                   </td>
-                  <td style="width: 22%;" class='text-right '> 
+                  <td style="width: 22%;" class='text-center ' style="font-size: 13px;"> 
                     <select name='tax[]' id='tax1'
-                        class='form-control border-0 bg-transparent text-white text-right border-0 tax'
-                        onselect="toggleDateInput()">
+                        class='form-control border-0 bg-transparent text-white text-center border-0 tax'
+                        onselect="toggleDateInput()" style="font-size: 13px;">
                         <optgroup id="gst-group" class="text-center text-black" label="GST">
-                            <option class="text-black" value="0">0% GST(0%)</option>
-                            <option class="text-black" value="3">3.0% GST(3%)</option>
-                            <option class="text-black" value="5">5.0% GST(5%)</option>
-                            <option class="text-black" value="12">12.0% GST(12%)</option>
-                            <option class="text-black" value="18">18.0% GST(18%)</option>
-                            <option class="text-black" value="28">28.0% GST(28%)</option>
+                            <option class="text-black" value="0">0% GST</option>
+                            <option class="text-black" value="3">3% GST</option>
+                            <option class="text-black" value="5">5% GST</option>
+                            <option class="text-black" value="12">12% GST</option>
+                            <option class="text-black" value="18">18% GST</option>
+                            <option class="text-black" value="28">28% GST</option>
                         </optgroup>
                         <optgroup id="igst-group" class="text-center text-black" label="IGST">
-                            <option class="text-black" value="0">0% IGST(0%)</option>
-                            <option class="text-black" value="3">3.0% IGST(3%)</option>
-                            <option class="text-black" value="5">5.0% IGST(5%)</option>
-                            <option class="text-black" value="12">12.0% IGST(12%)</option>
-                            <option class="text-black" value="18">18.0% IGST(18%)</option>
-                            <option class="text-black" value="28">28.0% IGST(28%)</option>
+                            <option class="text-black" value="0">0% IGST</option>
+                            <option class="text-black" value="3">3% IGST</option>
+                            <option class="text-black" value="5">5% IGST</option>
+                            <option class="text-black" value="12">12% IGST</option>
+                            <option class="text-black" value="18">18% IGST</option>
+                            <option class="text-black" value="28">28% IGST</option>
                         </optgroup>
                     </select>
                     <label id="ml1" class="text-warning" style="display: none;"></label>
@@ -1089,8 +1073,8 @@ $.ajax({
                     <input type="text" name='taxamount' id="taxamount1"
                       class=" taxamount border-0 bg-transparent text-white" />
                   </td>
-                  <td style="width: 15%;" class='text-right'><input type='number' id='amount1'
-                      class=' text-right form-control amount border-0 bg-transparent text-white' name='amount[]'
+                  <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='amount1'
+                      class=' text-center form-control amount border-0 bg-transparent text-white' name='amount[]'
                       value='0.00' readonly>
                   </td>
                   <td class='text-center'>
