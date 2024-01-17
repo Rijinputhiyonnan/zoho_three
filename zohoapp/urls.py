@@ -1225,6 +1225,10 @@ urlpatterns = [
     path('download_invoice_attach/<int:invoice_id>/<int:attach_id>/', views.download_invoice_attach, name='download_invoice_attach'),
     path('delete_invoice_attach/<int:invoice_id>/<int:attach_id>/', views.delete_invoice_attach, name='delete_invoice_attach'),
     path('add_invoice_attach/<int:id>/', views.add_invoice_attach, name='add_invoice_attach'),
+    
+    
+    #new 16-01-2024
+    path('invoice_item_table',views.invoice_item_table,name='invoice_item_table'),
 
     
     

@@ -27684,10 +27684,34 @@ def delete_invoice_attach(request, invoice_id, attach_id):
         return redirect('invoice_overview', id=invoice_id)
     except InvoiceAttach.DoesNotExist:
         return redirect('invoice_overview', id=invoice_id)
+def invoice_item_table(request):
+    item_id = request.GET.get('id')
 
+    try:
+        item = AddItem.objects.get(pk=item_id)
+        hsn = item.hsn
+        qty = item.stock
+        price = str(item.s_price)
+        gst = str(item.intrastate)
+        sgst = str(item.interstate)
+        minimum_stock = item.minimum_stock  # Add this line
+    except AddItem.DoesNotExist:
+        hsn = ''
+        qty = ''
+        price = ''
+        gst = ''
+        sgst = ''
+        minimum_stock = ''  # Set minimum_stock to an appropriate default value
 
+    response_data = {
+        'hsn': hsn,
+        'qty': qty,
+        'price': price,
+        'gst': gst,
+        'sgst': sgst,
+        'minimum_stock': minimum_stock,  # Add this line
+    }
 
-
-
+    return JsonResponse(response_data)
 
             

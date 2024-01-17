@@ -9,6 +9,15 @@
 
 <!-- Your script comes after the jQuery inclusion -->
 <script src="path/to/your/script.js"></script>
+<!-- Include jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- Include jQuery Cookie plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+<!-- Your other scripts go here -->
+<script src="path/to/misc.js"></script>
+
 
 
 
@@ -477,6 +486,7 @@
           </div>
 
           <div class="col-md-6">
+            <input hidden value="{{company.state}}" id="cmpstate">
             <select name="place_of_supply" id="srcofsupply" onchange="toggleDateInput()" onselect="calculateTaxAmount()"
               class="form-control bg-light text-dark">
               <option value=""></option>
@@ -706,7 +716,7 @@
                                   input.value = event.target.textContent;
                                   dropdownList.style.display = 'none';
                                   fillItemDetails(i);
-                                  clearErrorMessage();
+                                  //clearErrorMessage();
                               }
                           });
                   
@@ -909,25 +919,104 @@ function updateAvailableStock2(row) {
                   </td>
                   
                   <script>
-                    function changeqty(id){
-                        id_val = id.slice(3)
-                        qty = document.getElementById(id).value
-                        avl_val = document.getElementById(`avl${id_val}`).innerText
-               
-                        if( parseFloat(qty) > parseFloat(avl_val) ){
-                            alert("Quantity Greater than Available Quantity")
-                            document.getElementById(id).value = 0
-                            document.getElementById(`item_one${id_val}`).value =  ' '
-                            document.getElementById(`tax1${id_val}`).value = ' '
-                            document.getElementById(`tax2${id_val}`).value = ' '
-                            document.getElementById(`disc${id_val}`).value = 0
-                            document.getElementById(`taxamount${id_val}`).value = 0
-                            document.getElementById(`total${id_val}`).value = 0
-                            calc()
-                        }else{
-                           document.getElementById(`stock_data${id_val}`).textContent = parseInt(avl_val) - parseInt(qty)
-                        }
-                    }
+                    function changeqty(id) {
+                      var id_val = id.slice(3);
+                      var qty = parseFloat(document.getElementById(id).value);
+                      var avl_val = parseFloat(document.getElementById(`avl${id_val}`).innerText);
+                  
+                      if (isNaN(qty) || isNaN(avl_val)) {
+                          console.error("Invalid numeric value for available stock or quantity");
+                          return;
+                      }
+                  
+                      if (qty > avl_val) {
+                          alert("Quantity Greater than Available Quantity");
+                          document.getElementById(id).value = 0;
+                          document.getElementById(`item_one${id_val}`).value = '';
+                          document.getElementById(`tax1${id_val}`).value = '';
+                          document.getElementById(`tax2${id_val}`).value = '';
+                          document.getElementById(`disc${id_val}`).value = 0;
+                          document.getElementById(`taxamount${id_val}`).value = 0;
+                          document.getElementById(`total${id_val}`).value = 0;
+                          calc();
+                      } else {
+                          document.getElementById(`stock_data${id_val}`).textContent = avl_val - qty;
+                      }
+                  }
+                  
+
+
+
+
+
+                    
+    $(document).on('change', '.item_one',function(){ 
+                
+      var n = $(this).attr("id").slice(7);
+      $.ajax({
+      url: "{% url 'invoice_item_table' %}",
+      type : 'GET',
+      data:{
+          id : $(this).val(),
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+      
+      success: function(response) {
+          data = response.hsn
+          data2 = response.qty
+          data3 = response.price
+          data4 = response.gst
+          data5 = response.sgst
+
+          // console.log(data)
+          // console.log(data2)
+          // console.log(data3)
+          document.getElementById('hsn'+n).value = data;
+          document.getElementById('avl' + n).innerHTML = response.minimum_stock;
+
+
+          document.getElementById('stock_data'+n).innerHTML = data2;
+          document.getElementById('unit'+n).value = data3;
+          var bc = document.getElementById("srcofsupply").value;
+          var compstate = document.getElementById("cmpstate").value;
+          if (bc == compstate ) {
+              $(".seltax").removeClass('d-flex');
+              $(".seltax").addClass('d-none');
+              $(".inter_tax").removeClass('d-flex');
+              $(".inter_tax").addClass('d-none');
+              $(".intra_tax").removeClass('d-none');
+              $(".intra_tax").addClass('d-flex');
+              if (data4 != ' '){
+                  document.getElementById('tax1'+n).value = data4;
+                  document.getElementById('tax_percent'+n).value = data4;
+              }else{
+                  document.getElementById('tax1'+n).value = 0;
+                  document.getElementById('tax_percent'+n).value = 0;
+              }
+              
+              
+              
+          } else {
+              $(".seltax").removeClass('d-flex');
+              $(".seltax").addClass('d-none');
+              $(".intra_tax").removeClass('d-flex');
+              $(".intra_tax").addClass('d-none');
+              $(".inter_tax").removeClass('d-none');
+              $(".inter_tax").addClass('d-flex');
+              if(data5 != ' '){
+                  document.getElementById('tax2'+n).value = data5;
+                  document.getElementById('tax_percent'+n).value = data5;
+              }else{
+                  document.getElementById('tax2'+n).value = 0;
+                  document.getElementById('tax_percent'+n).value = 0;
+              }
+
+          }
+      },
+      });
+      
+
+  });
                 </script>
                 
              <!--     <script>
