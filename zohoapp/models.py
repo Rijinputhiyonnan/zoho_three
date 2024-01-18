@@ -83,6 +83,15 @@ class AddItem(models.Model):
     stock=models.IntegerField(blank=True,null=True,default=0)
     rate=models.IntegerField(blank=True,null=True,)
     status_stock=models.TextField(default='active')
+    
+    available_stock = models.IntegerField(blank=True, null=True, default=0)
+
+    def save(self, *args, **kwargs):
+        # Update available stock when stock is saved
+        if self.pk is None:  # Only on creation
+            self.available_stock = self.stock
+
+        super().save(*args, **kwargs)
 
 
 class History(models.Model):
