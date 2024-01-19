@@ -26228,11 +26228,30 @@ def add_prod(request):     #updation
     banks = Bankcreation.objects.filter(user = request.user)
     last_record = invoice.objects.filter(user=request.user.id).last()
     last_reference = Invoice_Reference.objects.filter(user=request.user.id).last()
-    if invoice.objects.all().exists():
+    inv_last1 = invoice.objects.filter(user = request.user)
+    inv_last = 0
+    if inv_last1.exists():
+        inv_last = invoice.objects.filter(user = request.user).last().invoice_no
+    else:
+        inv_last = 1
+        
+    last_digit_index = len(inv_last)
+    for i in range(len(inv_last) - 1, -1, -1):
+        if not inv_last[i].isdigit():
+            last_digit_index = i +1
+            break
+
+    prefix = inv_last[:last_digit_index]
+    number = int(inv_last[last_digit_index:])
+    number+= 1
+    count = f"{prefix}{number}"
+
+
+    '''if invoice.objects.all().exists():
         invoice_count = invoice.objects.last().id
         count = invoice_count
     else:
-        count = 1
+        count = 1'''
     # invoice_count = invoice.objects.last().id
     # count=invoice_count+1
     if not payment_terms.objects.filter(Terms='net 15').exists():
@@ -27694,14 +27713,14 @@ def invoice_item_table(request):
         price = str(item.s_price)
         gst = str(item.intrastate)
         sgst = str(item.interstate)
-        minimum_stock = item.minimum_stock  # Add this line
+        minimum_stock = item.minimum_stock  
     except AddItem.DoesNotExist:
         hsn = ''
         qty = ''
         price = ''
         gst = ''
         sgst = ''
-        minimum_stock = ''  # Set minimum_stock to an appropriate default value
+        minimum_stock = ''  
 
     response_data = {
         'hsn': hsn,
@@ -27709,7 +27728,7 @@ def invoice_item_table(request):
         'price': price,
         'gst': gst,
         'sgst': sgst,
-        'minimum_stock': minimum_stock,  # Add this line
+        'minimum_stock': minimum_stock, 
     }
 
     return JsonResponse(response_data)

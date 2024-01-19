@@ -545,7 +545,7 @@
 
           <div class="col-md-6">
             <input type="text" class="form-control bg-light text-dark" id="prof_name" name="inv_no"
-              value="{{remaining_characters}}" required>
+                placeholder="{{count}}" required>
             <label id="order_label" style="display: none;"></label>
           </div>
         </div>
@@ -817,7 +817,56 @@
                   
                   
                 
-                   
+             
+                  
+
+
+
+                  document.addEventListener('DOMContentLoaded', function () {
+                    for (let i = 1; i <= rowCount; i++) {
+                        // Add event listener for source of supply changes
+                        let sourceOfSupplySelect = document.getElementById(`srcofsupply${i}`);
+                        sourceOfSupplySelect.addEventListener('change', function () {
+                            updateTaxOptions(i);
+                        });
+                    }
+                });
+                
+                function updateTaxOptions(rowNumber) {
+                    let sourceOfSupplySelect = document.getElementById(`srcofsupply${rowNumber}`);
+                    let taxSelect = document.getElementById(`tax${rowNumber}`);
+                    let gstGroup = document.getElementById(`gst-group${rowNumber}`);
+                    let igstGroup = document.getElementById(`igst-group${rowNumber}`);
+                
+                    // Clear previous options
+                    gstGroup.innerHTML = '';
+                    igstGroup.innerHTML = '';
+                
+                    let sourceOfSupply = sourceOfSupplySelect.value.trim(); // Trim to remove leading/trailing spaces
+                
+                    if (sourceOfSupply === "[KL] Kerala") {
+                        // Display GST options
+                        gstGroup.innerHTML = `
+                            <option class="text-black" value="0">0% GST</option>
+                            <option class="text-black" value="3">3% GST</option>
+                            <option class="text-black" value="5">5% GST</option>
+                            <option class="text-black" value="12">12% GST</option>
+                            <option class="text-black" value="18">18% GST</option>
+                            <option class="text-black" value="28">28% GST</option>
+                        `;
+                    } else {
+                        // Display IGST options
+                        igstGroup.innerHTML = `
+                            <option class="text-black" value="0">0% IGST</option>
+                            <option class="text-black" value="3">3% IGST</option>
+                            <option class="text-black" value="5">5% IGST</option>
+                            <option class="text-black" value="12">12% IGST</option>
+                            <option class="text-black" value="18">18% IGST</option>
+                            <option class="text-black" value="28">28% IGST</option>
+                        `;
+                    }
+                }
+                
 
 </script>       
                
@@ -2495,7 +2544,7 @@ $.ajax({
   $(document).ready(function () {
     $("#prof_name").keyup(function () {
       var x = $('#prof_name').val();
-      reford = "{{reference}}"
+      reford = "{{count}}"
       if (reford != '01') {
         if (reford != x) {
           document.getElementById("order_label").style.display = "block"
