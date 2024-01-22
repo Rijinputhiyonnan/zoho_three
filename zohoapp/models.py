@@ -20,7 +20,7 @@ class company_details(models.Model):
     country = models.CharField(max_length=100,null=True,blank=True)
     gst_num = models.CharField(max_length=100,null=True,blank=True)
     pan_num = models.CharField(max_length=100,null=True,blank=True)
-    cid = models.AutoField(('CID'), primary_key=True)
+    
 
 
 
