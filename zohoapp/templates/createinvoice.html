@@ -493,6 +493,7 @@
             <select name="place_of_supply" id="srcofsupply" onchange="toggleDateInput()" onselect="calculateTaxAmount()"
               class="form-control bg-light text-dark">
               <option value=""></option>
+              <option value="{{ company.state }}" selected> {{ company.state }}</option>
               <option value="[AN]-Andaman and Nicobar Islads">[AN] Andaman and Nicobar Islads</option>
               <option value="[AD]-Andhra Pradhesh">[AD] Andhra Pradhesh</option>
               <option value="[AR]-Arunachal Pradesh">[AR] Arunachal Pradesh</option>
@@ -1228,25 +1229,29 @@ $.ajax({
                       value='0'>
                   </td>
                   <td style="width: 22%;" class='text-center ' style="font-size: 13px;"> 
-                    <select name='tax[]' id='tax1'
+                    <input hidden value="{{company.state}}" id="cmpstate">
+                      <input type="text"  id="select_tax" placeholder="Tax Rate" class="form-control seltax d-flex">
+                      <select name='tax[]' id="tax11" class="form-control tax intra_tax d-none" onchange="taxchange(this.id)">
+                    <!--<select name='tax[]' id='tax1'
                         class='form-control border-0 bg-transparent text-white text-center border-0 tax'
                         onselect="toggleDateInput()" style="font-size: 13px;">
-                        <optgroup id="gst-group" class="text-center text-black" label="GST">
+                        <optgroup id="gst-group" class="text-center text-black" label="GST">-->
                             <option class="text-black" value="0">0% GST</option>
                             <option class="text-black" value="3">3% GST</option>
                             <option class="text-black" value="5">5% GST</option>
                             <option class="text-black" value="12">12% GST</option>
                             <option class="text-black" value="18">18% GST</option>
                             <option class="text-black" value="28">28% GST</option>
-                        </optgroup>
-                        <optgroup id="igst-group" class="text-center text-black" label="IGST">
+                        </select>
+                        <!--<optgroup id="igst-group" class="text-center text-black" label="IGST">-->
+                          <select name='tax2[]' id="tax21" class="form-control tax inter_tax d-none " onchange="taxchange(this.id)">
                             <option class="text-black" value="0">0% IGST</option>
                             <option class="text-black" value="3">3% IGST</option>
                             <option class="text-black" value="5">5% IGST</option>
                             <option class="text-black" value="12">12% IGST</option>
                             <option class="text-black" value="18">18% IGST</option>
                             <option class="text-black" value="28">28% IGST</option>
-                        </optgroup>
+                        
                     </select>
                     <label id="ml1" class="text-warning" style="display: none;"></label>
                 </td>

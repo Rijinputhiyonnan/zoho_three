@@ -20,6 +20,7 @@ class company_details(models.Model):
     country = models.CharField(max_length=100,null=True,blank=True)
     gst_num = models.CharField(max_length=100,null=True,blank=True)
     pan_num = models.CharField(max_length=100,null=True,blank=True)
+    cid = models.AutoField(('CID'), primary_key=True)
 
 
 
@@ -61,6 +62,7 @@ class Unit(models.Model):
     
     
 class AddItem(models.Model):
+    cid = models.ForeignKey(company_details, on_delete=models.CASCADE,null=True)
     user=models.ForeignKey(User,on_delete=models.CASCADE,default='')
     type=models.TextField(max_length=255)
     Name=models.TextField(max_length=255)

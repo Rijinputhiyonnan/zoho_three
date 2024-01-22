@@ -26235,14 +26235,20 @@ def add_prod(request):     #updation
     else:
         inv_last = 1
         
-    last_digit_index = len(inv_last)
-    for i in range(len(inv_last) - 1, -1, -1):
-        if not inv_last[i].isdigit():
-            last_digit_index = i +1
-            break
+    inv_last_str = str(inv_last)
+    last_digit_index = len(inv_last_str)
 
-    prefix = inv_last[:last_digit_index]
-    number = int(inv_last[last_digit_index:])
+
+
+    prefix = str(inv_last)[:last_digit_index]
+
+    if inv_last_str[last_digit_index:]:
+        number = int(inv_last_str[last_digit_index:]) + 1
+    else:
+        number = 1
+
+
+
     number+= 1
     count = f"{prefix}{number}"
 
@@ -27734,3 +27740,21 @@ def invoice_item_table(request):
     return JsonResponse(response_data)
 
             
+def itemdetails(request):
+    if 'uid' in request.session:
+        if request.session.has_key('uid'):
+            uid = request.session['uid']
+        else:
+            return redirect('/')
+        cmp1 = company_details.objects.get(id=request.session['uid'])
+        id = request.GET.get('id')
+
+        item = AddItem.objects.get(Name=id,cid=cmp1)
+        hsn = item.hsn
+        qty = item.stock
+        price = item.s_price
+        gst = item.intrastate
+        sgst = item.interstate
+        places=cmp1.state
+        return JsonResponse({"status":" not",'hsn':hsn,'qty':qty,'places':places,'price':price,'gst':gst,'sgst':sgst})
+    return redirect('/')

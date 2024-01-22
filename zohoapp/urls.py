@@ -1229,9 +1229,11 @@ urlpatterns = [
     
     #new 16-01-2024
     path('invoice_item_table',views.invoice_item_table,name='invoice_item_table'),
+    path('itemdetails',views.itemdetails,name='itemdetails'),
 
     
     
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
