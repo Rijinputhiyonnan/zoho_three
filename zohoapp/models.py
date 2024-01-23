@@ -20,7 +20,6 @@ class company_details(models.Model):
     country = models.CharField(max_length=100,null=True,blank=True)
     gst_num = models.CharField(max_length=100,null=True,blank=True)
     pan_num = models.CharField(max_length=100,null=True,blank=True)
-    
 
 
 
@@ -62,7 +61,6 @@ class Unit(models.Model):
     
     
 class AddItem(models.Model):
-    cid = models.ForeignKey(company_details, on_delete=models.CASCADE,null=True)
     user=models.ForeignKey(User,on_delete=models.CASCADE,default='')
     type=models.TextField(max_length=255)
     Name=models.TextField(max_length=255)
@@ -85,15 +83,7 @@ class AddItem(models.Model):
     stock=models.IntegerField(blank=True,null=True,default=0)
     rate=models.IntegerField(blank=True,null=True,)
     status_stock=models.TextField(default='active')
-    
-    available_stock = models.IntegerField(blank=True, null=True, default=0)
-
-    def save(self, *args, **kwargs):
-        # Update available stock when stock is saved
-        if self.pk is None:  # Only on creation
-            self.available_stock = self.stock
-
-        super().save(*args, **kwargs)
+   
 
 
 class History(models.Model):
