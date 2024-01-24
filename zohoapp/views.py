@@ -27758,3 +27758,29 @@ def itemdetails(request):
         places=cmp1.state
         return JsonResponse({"status":" not",'hsn':hsn,'qty':qty,'places':places,'price':price,'gst':gst,'sgst':sgst})
     return redirect('/')
+
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+from .models import AddItem  # Import your model
+
+@require_GET
+def get_item_details_invoice(request):
+    item_name = request.GET.get('item', '').strip()  # Remove leading and trailing whitespaces
+
+    try:
+        item = AddItem.objects.get(Name=item_name)
+        item_details = {
+            'hsn': item.hsn,
+            'rate': item.s_price,
+            'tax': item.tax,
+            'availableStock': item.stock
+        }
+        return JsonResponse(item_details)
+    except AddItem.DoesNotExist:
+        print(f'Item not found: {item_name}')
+        return JsonResponse({'error': 'Item not found'}, status=404)
+    except Exception as e:
+        print(f'Error: {str(e)}')
+        return JsonResponse({'error': 'Internal server error'}, status=500)
+

@@ -1230,6 +1230,8 @@ urlpatterns = [
     #new 16-01-2024
     path('invoice_item_table',views.invoice_item_table,name='invoice_item_table'),
     path('itemdetails',views.itemdetails,name='itemdetails'),
+    path('get_item_details_invoice/', views.get_item_details_invoice, name='get_item_details_invoice'),
+
 
     
     

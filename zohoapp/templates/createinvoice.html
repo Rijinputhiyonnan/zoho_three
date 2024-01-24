@@ -679,8 +679,8 @@
                   <td class="text-white text-center" style="font-size: 10px;">1</td>
                   <td style="font-size: 13px;" class="text-center">
                     <div class="custom-dropdown"  style="height: 8vh;"> 
-                      <input type="text" id="item1"   hidden>
-                      <input type="text" class="dropdown-input_item" name="item[]" placeholder="Select item">
+                     
+                      <input type="text" class="dropdown-input_item" id="item1" name="item[]" placeholder="Select item">
                       <div class="dropdown-list" id="item_one1">
                           {% for p in items %}
                          
@@ -711,9 +711,160 @@
                     
                   </td>
                   
-
-
                   <script>
+
+// Function to fetch item details (HSN, rate, tax) based on the selected item
+function fillItemDetails(rowNumber) {
+  let itemInput = document.getElementById(`item${rowNumber}`);
+  let hsnElement = document.getElementById(`hsn${rowNumber}`);
+  let rateElement = document.getElementById(`rate${rowNumber}`);
+  let taxElement = document.getElementById(`tax${rowNumber}`);
+  let availableStockElement = document.getElementById(`available_stock${rowNumber}`);
+
+  // Check if the elements are found before accessing them
+  if (!itemInput) {
+    console.error(`Item input element (item${rowNumber}) not found.`);
+  }
+  if (!hsnElement) {
+    console.error(`HSN element (hsn${rowNumber}) not found.`);
+  }
+  if (!rateElement) {
+    console.error(`Rate element (rate${rowNumber}) not found.`);
+  }
+  if (!taxElement) {
+    console.error(`Tax element (tax${rowNumber}) not found.`);
+  }
+  if (!availableStockElement) {
+    console.error(`Available stock element (available_stock${rowNumber}) not found.`);
+  }
+
+  if (!itemInput || !hsnElement || !rateElement || !taxElement || !availableStockElement) {
+    // Log the rowNumber to help identify which row is causing the issue
+    console.error(`One or more elements not found for row ${rowNumber}.`);
+    return;
+  }
+
+  let selectedItem = itemInput.value;
+
+  $.ajax({
+    url: '/get_item_details_invoice/',
+    method: 'GET',
+    data: { item: encodeURIComponent(selectedItem) },
+    success: function (data) {
+      // Check if the elements are still valid before setting properties
+      if (hsnElement) hsnElement.innerText = data.hsn;
+      if (rateElement) rateElement.innerText = data.rate;
+      if (taxElement) taxElement.innerText = data.tax;
+      if (availableStockElement) availableStockElement.innerText = data.availableStock;
+    },
+    error: function (xhr, status, error) {
+      alert(`Failed to fetch item details. Status: ${status}, Error: ${error}`);
+    }
+  });
+}
+
+
+
+// Function to update available stock when quantity is entered
+function updateAvailableStock(rowNumber) {
+  let quantityInput = document.getElementById(`qty${rowNumber}`);
+  let availableStockElement = document.getElementById(`available_stock${rowNumber}`);
+  let quantity = parseFloat(quantityInput.value) || 0;
+  let availableStock = parseFloat(availableStockElement.innerText) || 0;
+
+  if (quantity > availableStock) {
+    alert('Quantity cannot be greater than available stock');
+    // Reset quantity to available stock
+    quantityInput.value = availableStock.toFixed(2);
+    quantity = availableStock;
+  }
+
+  // Update available stock after deduction
+  availableStockElement.innerText = (availableStock - quantity).toFixed(2);
+}
+
+// Function to update tax type based on place of supply
+function updateTaxType() {
+  let placeOfSupplyDropdown = document.getElementById('srcofsupply');
+  let selectedPlaceOfSupply = placeOfSupplyDropdown.value;
+  let taxTypeElement = document.getElementById('taxTypeDisplay');
+
+  // Default tax type
+  let taxType = 'Default Tax Type';
+
+  // Check if the selected place of supply is Kerala
+  if (selectedPlaceOfSupply === 'KL') {
+    taxType = 'GST'; // Update with your GST tax type
+  } else {
+    taxType = 'IGST'; // Update with your IGST tax type
+  }
+
+  // Update the tax type element with the new tax type
+  taxTypeElement.innerText = 'Tax Type: ' + taxType;
+}
+
+// Add event listener for place of supply dropdown change
+document.getElementById('srcofsupply').addEventListener('change', updateTaxType);
+
+// Document ready event listener
+document.addEventListener('DOMContentLoaded', function () {
+  // Add your existing code for handling DOMContentLoaded
+
+  // Add additional code for initializing or setting up other elements on the page
+  let rowCount = 1; // Set the initial row count
+
+  for (let i = 1; i <= rowCount; i++) {
+    let qtyInput = document.getElementById(`qty${i}`);
+
+    qtyInput.addEventListener('input', function () {
+      updateAvailableStock(i);
+    });
+
+    qtyInput.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        updateAvailableStock(i);
+      }
+    });
+
+    let input = document.getElementById(`row${i}`).getElementsByClassName('dropdown-input_item')[0];
+    let dropdownList = document.getElementById(`item_one${i}`);
+
+    input.addEventListener('focus', function () {
+      dropdownList.style.display = 'block';
+    });
+
+    document.addEventListener('mousedown', function (event) {
+      if (!event.target.closest(`#row${i} .custom-dropdown`)) {
+        dropdownList.style.display = 'none';
+      }
+    });
+
+    dropdownList.addEventListener('click', function (event) {
+      if (event.target.classList.contains('dropdown-item')) {
+        input.value = event.target.textContent;
+        dropdownList.style.display = 'none';
+        fillItemDetails(i);
+      }
+    });
+
+    input.addEventListener('input', function () {
+      let filterValue = input.value.toLowerCase();
+      let items = dropdownList.querySelectorAll('.dropdown-item');
+
+      items.forEach(function (item) {
+        let itemText = item.textContent.toLowerCase();
+        item.style.display = itemText.includes(filterValue) ? 'block' : 'none';
+      });
+    });
+  }
+});
+
+
+
+                </script>
+                
+
+             <!--    <script>
                
                     
 
