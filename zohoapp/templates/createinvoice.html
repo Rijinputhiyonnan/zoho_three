@@ -660,7 +660,7 @@
           <div class="col-md-12 mt-3">
             <table class="table table-bordered table-responsive" id="item_table" onclick='toggleDateInput()'>
               <thead>
-                <tr>
+                <tr >
                   <th class="text-center">#</th>
                   <th  class="text-center" style="width: 10vh; font-size: 10px; padding-right: 2px; margin-right: 1px;" style="font-size: 10px;">Item<a href="" data-toggle="modal" data-target="#newitem" class="text-capitalize">+new</a></th>
 
@@ -710,52 +710,30 @@
                     <span class="text-warning" style="font-size: 10px;">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
                     
                   </td>
-                  
-                  <script>
+        
+<script>
 
-// Function to fetch item details (HSN, rate, tax) based on the selected item
+  
+
+  // Function to fetch item details (HSN, rate, tax) based on the selected item
 function fillItemDetails(rowNumber) {
   let itemInput = document.getElementById(`item${rowNumber}`);
   let hsnElement = document.getElementById(`hsn${rowNumber}`);
   let rateElement = document.getElementById(`rate${rowNumber}`);
   let taxElement = document.getElementById(`tax${rowNumber}`);
-  let availableStockElement = document.getElementById(`available_stock${rowNumber}`);
+  let availableStockElement = document.getElementById(`stock_data${rowNumber}`);
 
-  // Check if the elements are found before accessing them
-  if (!itemInput) {
-    console.error(`Item input element (item${rowNumber}) not found.`);
-  }
-  if (!hsnElement) {
-    console.error(`HSN element (hsn${rowNumber}) not found.`);
-  }
-  if (!rateElement) {
-    console.error(`Rate element (rate${rowNumber}) not found.`);
-  }
-  if (!taxElement) {
-    console.error(`Tax element (tax${rowNumber}) not found.`);
-  }
-  if (!availableStockElement) {
-    console.error(`Available stock element (available_stock${rowNumber}) not found.`);
-  }
-
-  if (!itemInput || !hsnElement || !rateElement || !taxElement || !availableStockElement) {
-    // Log the rowNumber to help identify which row is causing the issue
-    console.error(`One or more elements not found for row ${rowNumber}.`);
-    return;
-  }
-
-  let selectedItem = itemInput.value;
+  let selectedItem = encodeURIComponent(itemInput.value);
 
   $.ajax({
-    url: '/get_item_details_invoice/',
+    url: `/get_item_details_invoice/?item=${selectedItem}`,
     method: 'GET',
-    data: { item: encodeURIComponent(selectedItem) },
     success: function (data) {
-      // Check if the elements are still valid before setting properties
-      if (hsnElement) hsnElement.innerText = data.hsn;
-      if (rateElement) rateElement.innerText = data.rate;
-      if (taxElement) taxElement.innerText = data.tax;
-      if (availableStockElement) availableStockElement.innerText = data.availableStock;
+      // Check if the elements exist before updating values
+      if (hsnElement) hsnElement.value = data.hsn;
+      if (rateElement) rateElement.value = data.rate;
+      if (taxElement) taxElement.value = data.tax;
+      if (availableStockElement) availableStockElement.textContent = data.availableStock;
     },
     error: function (xhr, status, error) {
       alert(`Failed to fetch item details. Status: ${status}, Error: ${error}`);
@@ -765,612 +743,100 @@ function fillItemDetails(rowNumber) {
 
 
 
-// Function to update available stock when quantity is entered
-function updateAvailableStock(rowNumber) {
-  let quantityInput = document.getElementById(`qty${rowNumber}`);
-  let availableStockElement = document.getElementById(`available_stock${rowNumber}`);
-  let quantity = parseFloat(quantityInput.value) || 0;
-  let availableStock = parseFloat(availableStockElement.innerText) || 0;
+  // Function to update available stock when quantity is entered
+  function updateAvailableStock(rowNumber) {
+    let quantityInput = document.getElementById(`qty${rowNumber}`);
+    let availableStockElement = document.getElementById(`stock_data${rowNumber}`);
+    let quantity = parseFloat(quantityInput.value) || 0;
+    let availableStock = parseFloat(availableStockElement.textContent) || 0;
 
-  if (quantity > availableStock) {
-    alert('Quantity cannot be greater than available stock');
-    // Reset quantity to available stock
-    quantityInput.value = availableStock.toFixed(2);
-    quantity = availableStock;
-  }
-
-  // Update available stock after deduction
-  availableStockElement.innerText = (availableStock - quantity).toFixed(2);
-}
-
-// Function to update tax type based on place of supply
-function updateTaxType() {
-  let placeOfSupplyDropdown = document.getElementById('srcofsupply');
-  let selectedPlaceOfSupply = placeOfSupplyDropdown.value;
-  let taxTypeElement = document.getElementById('taxTypeDisplay');
-
-  // Default tax type
-  let taxType = 'Default Tax Type';
-
-  // Check if the selected place of supply is Kerala
-  if (selectedPlaceOfSupply === 'KL') {
-    taxType = 'GST'; // Update with your GST tax type
-  } else {
-    taxType = 'IGST'; // Update with your IGST tax type
-  }
-
-  // Update the tax type element with the new tax type
-  taxTypeElement.innerText = 'Tax Type: ' + taxType;
-}
-
-// Add event listener for place of supply dropdown change
-document.getElementById('srcofsupply').addEventListener('change', updateTaxType);
-
-// Document ready event listener
-document.addEventListener('DOMContentLoaded', function () {
-  // Add your existing code for handling DOMContentLoaded
-
-  // Add additional code for initializing or setting up other elements on the page
-  let rowCount = 1; // Set the initial row count
-
-  for (let i = 1; i <= rowCount; i++) {
-    let qtyInput = document.getElementById(`qty${i}`);
-
-    qtyInput.addEventListener('input', function () {
-      updateAvailableStock(i);
-    });
-
-    qtyInput.addEventListener('keydown', function (event) {
-      if (event.key === 'Enter') {
-        updateAvailableStock(i);
-      }
-    });
-
-    let input = document.getElementById(`row${i}`).getElementsByClassName('dropdown-input_item')[0];
-    let dropdownList = document.getElementById(`item_one${i}`);
-
-    input.addEventListener('focus', function () {
-      dropdownList.style.display = 'block';
-    });
-
-    document.addEventListener('mousedown', function (event) {
-      if (!event.target.closest(`#row${i} .custom-dropdown`)) {
-        dropdownList.style.display = 'none';
-      }
-    });
-
-    dropdownList.addEventListener('click', function (event) {
-      if (event.target.classList.contains('dropdown-item')) {
-        input.value = event.target.textContent;
-        dropdownList.style.display = 'none';
-        fillItemDetails(i);
-      }
-    });
-
-    input.addEventListener('input', function () {
-      let filterValue = input.value.toLowerCase();
-      let items = dropdownList.querySelectorAll('.dropdown-item');
-
-      items.forEach(function (item) {
-        let itemText = item.textContent.toLowerCase();
-        item.style.display = itemText.includes(filterValue) ? 'block' : 'none';
-      });
-    });
-  }
-});
-
-
-
-                </script>
-                
-
-             <!--    <script>
-               
-                    
-
-                    document.addEventListener('DOMContentLoaded', function () {
-                      for (let i = 1; i <= rowCount; i++) {
-                          let qtyInput = document.getElementById(`qty${i}`);
-                  
-                          qtyInput.addEventListener('input', function () {
-                              updateAvailableStock(i);
-                          });
-                  
-                          qtyInput.addEventListener('keydown', function (event) {
-                              if (event.key === 'Enter') {
-                                  updateAvailableStock(i);
-                              }
-                          });
-                  
-                          let input = document.getElementById(`row${i}`).getElementsByClassName('dropdown-input_item')[0];
-                          let dropdownList = document.getElementById(`item_one${i}`);
-                  
-                          input.addEventListener('focus', function () {
-                              dropdownList.style.display = 'block';
-                          });
-                  
-                          document.addEventListener('mousedown', function (event) {
-                              if (!event.target.closest(`#row${i} .custom-dropdown`)) {
-                                  dropdownList.style.display = 'none';
-                              }
-                          });
-                  
-                          dropdownList.addEventListener('click', function (event) {
-                              if (event.target.classList.contains('dropdown-item')) {
-                                  input.value = event.target.textContent;
-                                  dropdownList.style.display = 'none';
-                                  fillItemDetails(i);
-                              }
-                          });
-                  
-                          input.addEventListener('input', function () {
-                              let filterValue = input.value.toLowerCase();
-                              let items = dropdownList.querySelectorAll('.dropdown-item');
-                  
-                              items.forEach(function (item) {
-                                  let itemText = item.textContent.toLowerCase();
-                                  item.style.display = itemText.includes(filterValue) ? 'block' : 'none';
-                              });
-                          });
-                      }
-                  });
-                  
-                  function updateAvailableStock(rowNumber) {
-                      var qtyInput = document.getElementById(`qty${rowNumber}`);
-                      var stockData = parseInt(document.getElementById(`stock_data${rowNumber}`).innerText);
-                      var availableStockSpan = document.getElementById(`avl${rowNumber}`);
-                      var quantity = parseInt(qtyInput.value);
-                      var availableStock = stockData - quantity;
-                  
-                      if (availableStock >= 0) {
-                          availableStockSpan.innerText = availableStock;
-                          document.getElementById(`avl${rowNumber}`).value = availableStock;
-                      } else {
-                          alert('Quantity entered exceeds available stock!');
-                          qtyInput.value = stockData;
-                          availableStockSpan.innerText = 0;
-                          document.getElementById(`avl${rowNumber}`).value = 0;
-                      }
-                  }
-                  
-                  
-                  
-                  
-                  
-                  
-                  function fillItemDetails(rowNumber) {
-                      var row = $('#row' + rowNumber);
-                      var input = row.find('.dropdown-input_item');
-                      var selectedItem = row.find('.dropdown-item[data-name="' + input.val() + '"]');
-                      
-                      var hsn = selectedItem.attr("data-hsn") || "";
-                      var rate = selectedItem.attr("data-rate") || "";
-                      var intrastate = selectedItem.attr("data-intrastate") || "";
-                      var interstate = selectedItem.attr("data-interstate") || "";
-                      var stockData = selectedItem.attr("data-stock") || "";
-                  
-                      var placeOfSupply = $("#srcofsupply" + rowNumber).val();
-                      var tax = placeOfSupply === "[KL]Kerala" ? selectedItem.attr("data-intrastate") : selectedItem.attr("data-interstate");
-                      var numericTax = tax.match(/\d+/);
-                  
-                      $("#hsn" + rowNumber).val(hsn);
-                      $("#rate" + rowNumber).val(rate);
-                      $("#tax" + rowNumber).val(numericTax);
-                  
-                      var stockInput = $("#stock_data" + rowNumber);
-                      var qtyInput = $("#qty" + rowNumber);
-                      var availableStock = parseInt(stockData) - parseInt(qtyInput.val());
-                  
-                      stockInput.text(Math.max(availableStock, 0));
-                      $("#avl" + rowNumber).val(Math.max(availableStock, 0));
-                  
-                      updateAvailableStock(rowNumber); // Call changeqty after updating the necessary fields
-                  }
-                  
-                  
-                
-             
-                  
-
-
-
-                  document.addEventListener('DOMContentLoaded', function () {
-                    for (let i = 1; i <= rowCount; i++) {
-                        // Add event listener for source of supply changes
-                        let sourceOfSupplySelect = document.getElementById(`srcofsupply${i}`);
-                        sourceOfSupplySelect.addEventListener('change', function () {
-                            updateTaxOptions(i);
-                        });
-                    }
-                });
-                
-                function updateTaxOptions(rowNumber) {
-                    let sourceOfSupplySelect = document.getElementById(`srcofsupply${rowNumber}`);
-                    let taxSelect = document.getElementById(`tax${rowNumber}`);
-                    let gstGroup = document.getElementById(`gst-group${rowNumber}`);
-                    let igstGroup = document.getElementById(`igst-group${rowNumber}`);
-                
-                    // Clear previous options
-                    gstGroup.innerHTML = '';
-                    igstGroup.innerHTML = '';
-                
-                    let sourceOfSupply = sourceOfSupplySelect.value.trim(); // Trim to remove leading/trailing spaces
-                
-                    if (sourceOfSupply === "[KL] Kerala") {
-                        // Display GST options
-                        gstGroup.innerHTML = `
-                            <option class="text-black" value="0">0% GST</option>
-                            <option class="text-black" value="3">3% GST</option>
-                            <option class="text-black" value="5">5% GST</option>
-                            <option class="text-black" value="12">12% GST</option>
-                            <option class="text-black" value="18">18% GST</option>
-                            <option class="text-black" value="28">28% GST</option>
-                        `;
-                    } else {
-                        // Display IGST options
-                        igstGroup.innerHTML = `
-                            <option class="text-black" value="0">0% IGST</option>
-                            <option class="text-black" value="3">3% IGST</option>
-                            <option class="text-black" value="5">5% IGST</option>
-                            <option class="text-black" value="12">12% IGST</option>
-                            <option class="text-black" value="18">18% IGST</option>
-                            <option class="text-black" value="28">28% IGST</option>
-                        `;
-                    }
-                }
-                
-
-</script>       
-               
-                
-                  
- <script>       
-                    
-
-$(document).ready(function () {
-  // Add event listener to the place of supply dropdown
-  $('#srcofsupply').change(function () {
-      updateTaxGroupAndLabel();
-  });
-});
-
-function updateTaxGroupAndLabel() {
-  // Get the current place of supply
-  var placeOfSupply = $("#srcofsupply").val();
-
-  // Determine tax group based on place of supply
-  var taxGroupId;
-  if (placeOfSupply === "[KL]-Kerala") {
-      taxGroupId = "igst-group";
-  } else {
-      taxGroupId = "gst-group";
-  }
-
-  // Update tax group
-  updateTaxGroup(taxGroupId);
-}
-
-function updateTaxGroup(taxGroupId) {
-  // Update the id attribute of the tax dropdown based on the place of supply
-  var taxDropdown = document.getElementById('tax1');
-  var gstOptgroup = taxDropdown.querySelector('optgroup[label="GST"]');
-  var igstOptgroup = taxDropdown.querySelector('optgroup[label="IGST"]');
-
-  gstOptgroup.id = (taxGroupId === "gst-group") ? "tax-group" : "";
-  igstOptgroup.id = (taxGroupId === "igst-group") ? "tax-group" : "";
-}
-
-
-
-
-
-function fillItemDetails2(row) {
-  var input = row.find('.dropdown-input_item');
-  var selectedValue = input.val();
-  var selectedItem = row.find('.dropdown-item[data-name="' + selectedValue + '"]');
-  
-  var value = selectedItem.attr("data-value");
-  var hsn = selectedItem.attr("data-hsn");
-  var rate = selectedItem.attr("data-rate");
-  var interstateTax = selectedItem.attr("data-interstate");
-  var intrastateTax = selectedItem.attr("data-intrastate");
-  var stockData = selectedItem.attr("data-stock") ;
-  
-  // Set values to corresponding fields for the specific row
-  row.find('.hsn').val(hsn);
-  row.find('.rate').val(rate);
-  row.find('.stock_data').val(stockData);
-  
-  // Determine place of supply for the row
-  var placeOfSupply = row.find('.srcofsupply').val();
-  
-  // Set tax based on place of supply
-  var selectedTax = (placeOfSupply === "[KL]-Kerala") ? intrastateTax : interstateTax;
-  var numericTax = selectedTax.match(/\d+/);
-  row.find('.tax').val(numericTax);
-  
-  // Set treatment based on place of supply
-  row.find('.cx_treat').val((placeOfSupply === "[KL]-Kerala") ? "SGST/CGST" : "IGST");
-  
-  
- 
-  row.find('.item1').val(value);
-
-  
-
-  // Additional code for updating available stock
-  updateAvailableStock2(row);
-
-  
-}
-function updateAvailableStock2(row) {
-  var quantity = parseInt(row.find('.qty').val()) || 0;
-  var availableStock = parseInt(row.find('.stock_data').text()) || 0;
-
-  // Update Available Stock span
-  row.find('.stock_data').text(availableStock - quantity);
-
-  // Display a warning message if the entered quantity is greater than available stock
-  var stockWarning = row.find('.stock_warning');
-  if (quantity > availableStock) {
-      stockWarning.text("Entered quantity greater than available quantity").css('color', 'red');
-  } else {
-      stockWarning.text('').css('color', ''); // Reset the warning message
-  }
-}
-                  
-                  
-
-                  function initializeRow(row) {
-                    var id = row.attr("id").replace("row", "");
-                    var dropdownList = row.find(`#item_one${id}`);
-                  
-                    row.find('.dropdown-input_item').on('focus', function () {
-                      dropdownList.show();
-                    });
-                  
-                    $(document).on('mousedown', function (event) {
-                      if (!$(event.target).closest(`#row${id} .custom-dropdown`).length) {
-                        dropdownList.hide();
-                      }
-                    });
-                  
-                    dropdownList.on('click', '.dropdown-item', function (event) {
-                      var input = row.find('.dropdown-input_item');
-                      input.val($(this).text());
-                      dropdownList.hide();
-                      fillItemDetails2(row);  
-                      clearErrorMessage();
-                    });
-                  
-                    row.find('.dropdown-input_item').on('input', function () {
-                      var filterValue = $(this).val().toLowerCase();
-                      var items = dropdownList.find('.dropdown-item');
-                  
-                      items.each(function () {
-                        var itemText = $(this).text().toLowerCase();
-                        if (itemText.includes(filterValue)) {
-                          $(this).show();
-                        } else {
-                          $(this).hide();
-                        }
-                      });
-                    });
-                  
-                  
-                  }
-                  
-               
-              
-              
-                </script>
-                 <!-- <script>
-                    function changeqty(id) {
-                      var id_val = id.slice(3);
-                      var qty = parseFloat(document.getElementById(id).value);
-                      var avl_val = parseFloat(document.getElementById(`avl${id_val}`).innerText);
-                  
-                      if (isNaN(qty) || isNaN(avl_val)) {
-                          console.error("Invalid numeric value for available stock or quantity");
-                          return;
-                      }
-                  
-                      if (qty > avl_val) {
-                          alert("Quantity Greater than Available Quantity");
-                          document.getElementById(id).value = 0;
-                          document.getElementById(`item_one${id_val}`).value = '';
-                          document.getElementById(`tax1${id_val}`).value = '';
-                          document.getElementById(`tax2${id_val}`).value = '';
-                          document.getElementById(`disc${id_val}`).value = 0;
-                          document.getElementById(`taxamount${id_val}`).value = 0;
-                          document.getElementById(`total${id_val}`).value = 0;
-                          calc();
-                      } else {
-                          document.getElementById(`stock_data${id_val}`).textContent = avl_val - qty;
-                      }
-                  }
-                  
-
-
-
-
-
-                    
-    $(document).on('change', '.item_one',function(){ 
-                
-      var n = $(this).attr("id").slice(7);
-      $.ajax({
-      url: "{% url 'invoice_item_table' %}",
-      type : 'GET',
-      data:{
-          id : $(this).val(),
-          csrfmiddlewaretoken: '{{ csrf_token }}'
-          },
-      
-      success: function(response) {
-          data = response.hsn
-          data2 = response.qty
-          data3 = response.price
-          data4 = response.gst
-          data5 = response.sgst
-
-          // console.log(data)
-          // console.log(data2)
-          // console.log(data3)
-          document.getElementById('hsn'+n).value = data;
-          document.getElementById('avl' + n).innerHTML = response.minimum_stock;
-
-
-          document.getElementById('stock_data'+n).innerHTML = data2;
-          document.getElementById('unit'+n).value = data3;
-          var bc = document.getElementById("srcofsupply").value;
-          var compstate = document.getElementById("cmpstate").value;
-          if (bc == compstate ) {
-              $(".seltax").removeClass('d-flex');
-              $(".seltax").addClass('d-none');
-              $(".inter_tax").removeClass('d-flex');
-              $(".inter_tax").addClass('d-none');
-              $(".intra_tax").removeClass('d-none');
-              $(".intra_tax").addClass('d-flex');
-              if (data4 != ' '){
-                  document.getElementById('tax1'+n).value = data4;
-                  document.getElementById('tax_percent'+n).value = data4;
-              }else{
-                  document.getElementById('tax1'+n).value = 0;
-                  document.getElementById('tax_percent'+n).value = 0;
-              }
-              
-              
-              
-          } else {
-              $(".seltax").removeClass('d-flex');
-              $(".seltax").addClass('d-none');
-              $(".intra_tax").removeClass('d-flex');
-              $(".intra_tax").addClass('d-none');
-              $(".inter_tax").removeClass('d-none');
-              $(".inter_tax").addClass('d-flex');
-              if(data5 != ' '){
-                  document.getElementById('tax2'+n).value = data5;
-                  document.getElementById('tax_percent'+n).value = data5;
-              }else{
-                  document.getElementById('tax2'+n).value = 0;
-                  document.getElementById('tax_percent'+n).value = 0;
-              }
-
-          }
-      },
-      });
-      
-
-  });
-                </script>-->
-                
-             <!--     <script>
-
-                    
-
-
-                  //  function updateAvailableStock(row) {
-                      var selectedItem = row.find(".dropdown-input_item").val();
-                      var quantity = parseInt(row.find(".qty").val());
-                    
-                      console.log("Selected Item: " + selectedItem); // Debugging statement
-                    
-                      // Use AJAX to fetch the actual available stock from the server
-                      $.ajax({
-                        type: 'GET',
-                        url: "{% url 'get_invoice_item_details' %}",
-                        data: { id: selectedItem },
-                        dataType: 'json',
-                        success: function (response) {
-                          console.log("Response from server: " + JSON.stringify(response)); // Debugging statement
-                          
-                          // Check if the response contains the 'stock' property
-                          if ('stock' in response) {
-                            var availableStock = parseInt(response.stock);
-                    
-                            // Update Available Stock span
-                            row.find(".stock_data").text(availableStock - quantity);
-                    
-                            // Display a warning message if the entered quantity is greater than available stock
-                            var stockWarning = row.find(".stock_warning");
-                            if (quantity > availableStock) {
-                              stockWarning.text("Entered quantity greater than available quantity").css('color', 'red');
-                            } else {
-                              stockWarning.text('').css('color', ''); // Reset the warning message
-                            }
-                          } else {
-                            console.log('Error: Response does not contain the expected stock property.');
-                          }
-                        },
-                        error: function () {
-                          console.log('Error fetching item data.');
-                        },
-                      });
-                    }
-                    
-                      
-                      // Event handler for changes in quantity and item selection
-                      $(document).on('change input', '.qty, .dropdown-input_item', function () {
-                        var row = $(this).closest('tr');
-                        updateAvailableStock(row);
-                      });
-                      
-                      // Function to fetch item data using AJAX
-                     // function fetchItemData(selectedItem, row) {
-                       // $.ajax({
-                          type: 'GET',
-                          url: "{% url 'get_invoice_item_details' %}",
-                          data: { id: selectedItem },
-                          dataType: 'json',
-                          success: function (response) {
-                            row.find(".hsn").val(response.hsn);
-                            row.find(".rate").val(response.rate);
-                            row.find(".stock_data").text(response.stock);
-                            //updateAvailableStock(row);
-                          },
-                          error: function () {
-                            console.log('Error fetching item data.');
-                          },
-                        });
-                      }
-                      
-                      // Event handler for changes in item selection
-                      $(document).on('change', '.dropdown-input_item', function () {
-                        var selectedItem = $(this).val();
-                        var row = $(this).closest('tr');
-                        fetchItemData(selectedItem, row);
-                      });
-                      
-                      // Add event handler for changes in quantity
-                      $(document).on('change', '.qty', function () {
-                        var row = $(this).closest('tr');
-                        updateAvailableStock(row);
-                      });
-                      
-                      // Adding the new AJAX request
-var itemId = encodeURIComponent("thorium"); // Encode the item ID
-var url = "/get_invoice_item_details/?id=" + itemId;
-
-$.ajax({
-    url: url,
-    type: 'GET',
-    success: function(data) {
-        // Handle success (update UI, etc.)
-        console.log('Success:', data);
-    },
-    error: function(xhr, status, error) {
-        // Handle error (log details to the console)
-        console.error('Error:', xhr, status, error);
+    if (quantity > availableStock) {
+      alert('Quantity cannot be greater than available stock');
+      // Reset quantity to available stock
+      quantityInput.value = availableStock.toFixed(2);
+      quantity = availableStock;
     }
-});
-                      
-                    
-                      
 
+    // Update available stock after deduction
+    availableStockElement.textContent = (availableStock - quantity).toFixed(2);
+  }
+
+  // Function to update tax type based on place of supply
+  function updateTaxType() {
+    let placeOfSupplyDropdown = document.getElementById('srcofsupply');
+    let selectedPlaceOfSupply = placeOfSupplyDropdown.value;
+    let taxTypeElement = document.getElementById('taxTypeDisplay');
+
+    // Default tax type
+    let taxType = 'Default Tax Type';
+
+    // Check if the selected place of supply is Kerala
+    if (selectedPlaceOfSupply === 'KL') {
+      taxType = 'GST'; // Update with your GST tax type
+    } else {
+      taxType = 'IGST'; // Update with your IGST tax type
+    }
+
+    // Update the tax type element with the new tax type
+    taxTypeElement.textContent = 'Tax Type: ' + taxType;
+  }
+
+  // Add event listener for place of supply dropdown change
+  document.getElementById('srcofsupply').addEventListener('change', updateTaxType);
+
+  // Document ready event listener
+  document.addEventListener('DOMContentLoaded', function () {
+    let rowCount = 1; // Set the initial row count
+
+    for (let i = 1; i <= rowCount; i++) {
+      let qtyInput = document.getElementById(`qty${i}`);
+      let input = document.getElementById(`item${i}`);
+      let dropdownList = document.getElementById(`item_one${i}`);
+
+      qtyInput.addEventListener('input', function () {
+        updateAvailableStock(i);
+      });
+
+      qtyInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          updateAvailableStock(i);
+        }
+      });
+
+      input.addEventListener('focus', function () {
+        dropdownList.style.display = 'block';
+      });
+
+      document.addEventListener('mousedown', function (event) {
+        if (!event.target.closest(`#row${i} .custom-dropdown`)) {
+          dropdownList.style.display = 'none';
+        }
+      });
+
+      dropdownList.addEventListener('click', function (event) {
+        if (event.target.classList.contains('dropdown-item')) {
+          input.value = event.target.textContent;
+          dropdownList.style.display = 'none';
+          fillItemDetails(i);
+        }
+      });
+
+      input.addEventListener('input', function () {
+        let filterValue = input.value.toLowerCase();
+        let items = dropdownList.querySelectorAll('.dropdown-item');
+
+        items.forEach(function (item) {
+          let itemText = item.textContent.toLowerCase();
+          item.style.display = itemText.includes(filterValue) ? 'block' : 'none';
+        });
+      });
+    }
+  });
+</script>
 
                 
-                  </script>-->
+
+            
                   <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='rate1'
                       class=' text-right rate form-control border-0  bg-transparent text-white' name='rate[]' value='0'
                       readonly>
@@ -4081,4 +3547,545 @@ $.ajax({
 
 
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ <!--    <script>
+               
+                    
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                      for (let i = 1; i <= rowCount; i++) {
+                          let qtyInput = document.getElementById(`qty${i}`);
+                  
+                          qtyInput.addEventListener('input', function () {
+                              updateAvailableStock(i);
+                          });
+                  
+                          qtyInput.addEventListener('keydown', function (event) {
+                              if (event.key === 'Enter') {
+                                  updateAvailableStock(i);
+                              }
+                          });
+                  
+                          let input = document.getElementById(`row${i}`).getElementsByClassName('dropdown-input_item')[0];
+                          let dropdownList = document.getElementById(`item_one${i}`);
+                  
+                          input.addEventListener('focus', function () {
+                              dropdownList.style.display = 'block';
+                          });
+                  
+                          document.addEventListener('mousedown', function (event) {
+                              if (!event.target.closest(`#row${i} .custom-dropdown`)) {
+                                  dropdownList.style.display = 'none';
+                              }
+                          });
+                  
+                          dropdownList.addEventListener('click', function (event) {
+                              if (event.target.classList.contains('dropdown-item')) {
+                                  input.value = event.target.textContent;
+                                  dropdownList.style.display = 'none';
+                                  fillItemDetails(i);
+                              }
+                          });
+                  
+                          input.addEventListener('input', function () {
+                              let filterValue = input.value.toLowerCase();
+                              let items = dropdownList.querySelectorAll('.dropdown-item');
+                  
+                              items.forEach(function (item) {
+                                  let itemText = item.textContent.toLowerCase();
+                                  item.style.display = itemText.includes(filterValue) ? 'block' : 'none';
+                              });
+                          });
+                      }
+                  });
+                  
+                  function updateAvailableStock(rowNumber) {
+                      var qtyInput = document.getElementById(`qty${rowNumber}`);
+                      var stockData = parseInt(document.getElementById(`stock_data${rowNumber}`).innerText);
+                      var availableStockSpan = document.getElementById(`avl${rowNumber}`);
+                      var quantity = parseInt(qtyInput.value);
+                      var availableStock = stockData - quantity;
+                  
+                      if (availableStock >= 0) {
+                          availableStockSpan.innerText = availableStock;
+                          document.getElementById(`avl${rowNumber}`).value = availableStock;
+                      } else {
+                          alert('Quantity entered exceeds available stock!');
+                          qtyInput.value = stockData;
+                          availableStockSpan.innerText = 0;
+                          document.getElementById(`avl${rowNumber}`).value = 0;
+                      }
+                  }
+                  
+                  
+                  
+                  
+                  
+                  
+                  function fillItemDetails(rowNumber) {
+                      var row = $('#row' + rowNumber);
+                      var input = row.find('.dropdown-input_item');
+                      var selectedItem = row.find('.dropdown-item[data-name="' + input.val() + '"]');
+                      
+                      var hsn = selectedItem.attr("data-hsn") || "";
+                      var rate = selectedItem.attr("data-rate") || "";
+                      var intrastate = selectedItem.attr("data-intrastate") || "";
+                      var interstate = selectedItem.attr("data-interstate") || "";
+                      var stockData = selectedItem.attr("data-stock") || "";
+                  
+                      var placeOfSupply = $("#srcofsupply" + rowNumber).val();
+                      var tax = placeOfSupply === "[KL]Kerala" ? selectedItem.attr("data-intrastate") : selectedItem.attr("data-interstate");
+                      var numericTax = tax.match(/\d+/);
+                  
+                      $("#hsn" + rowNumber).val(hsn);
+                      $("#rate" + rowNumber).val(rate);
+                      $("#tax" + rowNumber).val(numericTax);
+                  
+                      var stockInput = $("#stock_data" + rowNumber);
+                      var qtyInput = $("#qty" + rowNumber);
+                      var availableStock = parseInt(stockData) - parseInt(qtyInput.val());
+                  
+                      stockInput.text(Math.max(availableStock, 0));
+                      $("#avl" + rowNumber).val(Math.max(availableStock, 0));
+                  
+                      updateAvailableStock(rowNumber); // Call changeqty after updating the necessary fields
+                  }
+                  
+                  
+                
+             
+                  
+
+
+
+                  document.addEventListener('DOMContentLoaded', function () {
+                    for (let i = 1; i <= rowCount; i++) {
+                        // Add event listener for source of supply changes
+                        let sourceOfSupplySelect = document.getElementById(`srcofsupply${i}`);
+                        sourceOfSupplySelect.addEventListener('change', function () {
+                            updateTaxOptions(i);
+                        });
+                    }
+                });
+                
+                function updateTaxOptions(rowNumber) {
+                    let sourceOfSupplySelect = document.getElementById(`srcofsupply${rowNumber}`);
+                    let taxSelect = document.getElementById(`tax${rowNumber}`);
+                    let gstGroup = document.getElementById(`gst-group${rowNumber}`);
+                    let igstGroup = document.getElementById(`igst-group${rowNumber}`);
+                
+                    // Clear previous options
+                    gstGroup.innerHTML = '';
+                    igstGroup.innerHTML = '';
+                
+                    let sourceOfSupply = sourceOfSupplySelect.value.trim(); // Trim to remove leading/trailing spaces
+                
+                    if (sourceOfSupply === "[KL] Kerala") {
+                        // Display GST options
+                        gstGroup.innerHTML = `
+                            <option class="text-black" value="0">0% GST</option>
+                            <option class="text-black" value="3">3% GST</option>
+                            <option class="text-black" value="5">5% GST</option>
+                            <option class="text-black" value="12">12% GST</option>
+                            <option class="text-black" value="18">18% GST</option>
+                            <option class="text-black" value="28">28% GST</option>
+                        `;
+                    } else {
+                        // Display IGST options
+                        igstGroup.innerHTML = `
+                            <option class="text-black" value="0">0% IGST</option>
+                            <option class="text-black" value="3">3% IGST</option>
+                            <option class="text-black" value="5">5% IGST</option>
+                            <option class="text-black" value="12">12% IGST</option>
+                            <option class="text-black" value="18">18% IGST</option>
+                            <option class="text-black" value="28">28% IGST</option>
+                        `;
+                    }
+                }
+                
+
+</script>       
+               
+                
+                  
+ <script>       
+                    
+
+$(document).ready(function () {
+  // Add event listener to the place of supply dropdown
+  $('#srcofsupply').change(function () {
+      updateTaxGroupAndLabel();
+  });
+});
+
+function updateTaxGroupAndLabel() {
+  // Get the current place of supply
+  var placeOfSupply = $("#srcofsupply").val();
+
+  // Determine tax group based on place of supply
+  var taxGroupId;
+  if (placeOfSupply === "[KL]-Kerala") {
+      taxGroupId = "igst-group";
+  } else {
+      taxGroupId = "gst-group";
+  }
+
+  // Update tax group
+  updateTaxGroup(taxGroupId);
+}
+
+function updateTaxGroup(taxGroupId) {
+  // Update the id attribute of the tax dropdown based on the place of supply
+  var taxDropdown = document.getElementById('tax1');
+  var gstOptgroup = taxDropdown.querySelector('optgroup[label="GST"]');
+  var igstOptgroup = taxDropdown.querySelector('optgroup[label="IGST"]');
+
+  gstOptgroup.id = (taxGroupId === "gst-group") ? "tax-group" : "";
+  igstOptgroup.id = (taxGroupId === "igst-group") ? "tax-group" : "";
+}
+
+
+
+
+
+function fillItemDetails2(row) {
+  var input = row.find('.dropdown-input_item');
+  var selectedValue = input.val();
+  var selectedItem = row.find('.dropdown-item[data-name="' + selectedValue + '"]');
+  
+  var value = selectedItem.attr("data-value");
+  var hsn = selectedItem.attr("data-hsn");
+  var rate = selectedItem.attr("data-rate");
+  var interstateTax = selectedItem.attr("data-interstate");
+  var intrastateTax = selectedItem.attr("data-intrastate");
+  var stockData = selectedItem.attr("data-stock") ;
+  
+  // Set values to corresponding fields for the specific row
+  row.find('.hsn').val(hsn);
+  row.find('.rate').val(rate);
+  row.find('.stock_data').val(stockData);
+  
+  // Determine place of supply for the row
+  var placeOfSupply = row.find('.srcofsupply').val();
+  
+  // Set tax based on place of supply
+  var selectedTax = (placeOfSupply === "[KL]-Kerala") ? intrastateTax : interstateTax;
+  var numericTax = selectedTax.match(/\d+/);
+  row.find('.tax').val(numericTax);
+  
+  // Set treatment based on place of supply
+  row.find('.cx_treat').val((placeOfSupply === "[KL]-Kerala") ? "SGST/CGST" : "IGST");
+  
+  
+ 
+  row.find('.item1').val(value);
+
+  
+
+  // Additional code for updating available stock
+  updateAvailableStock2(row);
+
+  
+}
+function updateAvailableStock2(row) {
+  var quantity = parseInt(row.find('.qty').val()) || 0;
+  var availableStock = parseInt(row.find('.stock_data').text()) || 0;
+
+  // Update Available Stock span
+  row.find('.stock_data').text(availableStock - quantity);
+
+  // Display a warning message if the entered quantity is greater than available stock
+  var stockWarning = row.find('.stock_warning');
+  if (quantity > availableStock) {
+      stockWarning.text("Entered quantity greater than available quantity").css('color', 'red');
+  } else {
+      stockWarning.text('').css('color', ''); // Reset the warning message
+  }
+}
+                  
+                  
+
+                  function initializeRow(row) {
+                    var id = row.attr("id").replace("row", "");
+                    var dropdownList = row.find(`#item_one${id}`);
+                  
+                    row.find('.dropdown-input_item').on('focus', function () {
+                      dropdownList.show();
+                    });
+                  
+                    $(document).on('mousedown', function (event) {
+                      if (!$(event.target).closest(`#row${id} .custom-dropdown`).length) {
+                        dropdownList.hide();
+                      }
+                    });
+                  
+                    dropdownList.on('click', '.dropdown-item', function (event) {
+                      var input = row.find('.dropdown-input_item');
+                      input.val($(this).text());
+                      dropdownList.hide();
+                      fillItemDetails2(row);  
+                      clearErrorMessage();
+                    });
+                  
+                    row.find('.dropdown-input_item').on('input', function () {
+                      var filterValue = $(this).val().toLowerCase();
+                      var items = dropdownList.find('.dropdown-item');
+                  
+                      items.each(function () {
+                        var itemText = $(this).text().toLowerCase();
+                        if (itemText.includes(filterValue)) {
+                          $(this).show();
+                        } else {
+                          $(this).hide();
+                        }
+                      });
+                    });
+                  
+                  
+                  }
+                  
+               
+              
+              
+                </script>
+                 <!-- <script>
+                    function changeqty(id) {
+                      var id_val = id.slice(3);
+                      var qty = parseFloat(document.getElementById(id).value);
+                      var avl_val = parseFloat(document.getElementById(`avl${id_val}`).innerText);
+                  
+                      if (isNaN(qty) || isNaN(avl_val)) {
+                          console.error("Invalid numeric value for available stock or quantity");
+                          return;
+                      }
+                  
+                      if (qty > avl_val) {
+                          alert("Quantity Greater than Available Quantity");
+                          document.getElementById(id).value = 0;
+                          document.getElementById(`item_one${id_val}`).value = '';
+                          document.getElementById(`tax1${id_val}`).value = '';
+                          document.getElementById(`tax2${id_val}`).value = '';
+                          document.getElementById(`disc${id_val}`).value = 0;
+                          document.getElementById(`taxamount${id_val}`).value = 0;
+                          document.getElementById(`total${id_val}`).value = 0;
+                          calc();
+                      } else {
+                          document.getElementById(`stock_data${id_val}`).textContent = avl_val - qty;
+                      }
+                  }
+                  
+
+
+
+
+
+                    
+    $(document).on('change', '.item_one',function(){ 
+                
+      var n = $(this).attr("id").slice(7);
+      $.ajax({
+      url: "{% url 'invoice_item_table' %}",
+      type : 'GET',
+      data:{
+          id : $(this).val(),
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+      
+      success: function(response) {
+          data = response.hsn
+          data2 = response.qty
+          data3 = response.price
+          data4 = response.gst
+          data5 = response.sgst
+
+          // console.log(data)
+          // console.log(data2)
+          // console.log(data3)
+          document.getElementById('hsn'+n).value = data;
+          document.getElementById('avl' + n).innerHTML = response.minimum_stock;
+
+
+          document.getElementById('stock_data'+n).innerHTML = data2;
+          document.getElementById('unit'+n).value = data3;
+          var bc = document.getElementById("srcofsupply").value;
+          var compstate = document.getElementById("cmpstate").value;
+          if (bc == compstate ) {
+              $(".seltax").removeClass('d-flex');
+              $(".seltax").addClass('d-none');
+              $(".inter_tax").removeClass('d-flex');
+              $(".inter_tax").addClass('d-none');
+              $(".intra_tax").removeClass('d-none');
+              $(".intra_tax").addClass('d-flex');
+              if (data4 != ' '){
+                  document.getElementById('tax1'+n).value = data4;
+                  document.getElementById('tax_percent'+n).value = data4;
+              }else{
+                  document.getElementById('tax1'+n).value = 0;
+                  document.getElementById('tax_percent'+n).value = 0;
+              }
+              
+              
+              
+          } else {
+              $(".seltax").removeClass('d-flex');
+              $(".seltax").addClass('d-none');
+              $(".intra_tax").removeClass('d-flex');
+              $(".intra_tax").addClass('d-none');
+              $(".inter_tax").removeClass('d-none');
+              $(".inter_tax").addClass('d-flex');
+              if(data5 != ' '){
+                  document.getElementById('tax2'+n).value = data5;
+                  document.getElementById('tax_percent'+n).value = data5;
+              }else{
+                  document.getElementById('tax2'+n).value = 0;
+                  document.getElementById('tax_percent'+n).value = 0;
+              }
+
+          }
+      },
+      });
+      
+
+  });
+                </script>-->
+                
+             <!--     <script>
+
+                    
+
+
+                  //  function updateAvailableStock(row) {
+                      var selectedItem = row.find(".dropdown-input_item").val();
+                      var quantity = parseInt(row.find(".qty").val());
+                    
+                      console.log("Selected Item: " + selectedItem); // Debugging statement
+                    
+                      // Use AJAX to fetch the actual available stock from the server
+                      $.ajax({
+                        type: 'GET',
+                        url: "{% url 'get_invoice_item_details' %}",
+                        data: { id: selectedItem },
+                        dataType: 'json',
+                        success: function (response) {
+                          console.log("Response from server: " + JSON.stringify(response)); // Debugging statement
+                          
+                          // Check if the response contains the 'stock' property
+                          if ('stock' in response) {
+                            var availableStock = parseInt(response.stock);
+                    
+                            // Update Available Stock span
+                            row.find(".stock_data").text(availableStock - quantity);
+                    
+                            // Display a warning message if the entered quantity is greater than available stock
+                            var stockWarning = row.find(".stock_warning");
+                            if (quantity > availableStock) {
+                              stockWarning.text("Entered quantity greater than available quantity").css('color', 'red');
+                            } else {
+                              stockWarning.text('').css('color', ''); // Reset the warning message
+                            }
+                          } else {
+                            console.log('Error: Response does not contain the expected stock property.');
+                          }
+                        },
+                        error: function () {
+                          console.log('Error fetching item data.');
+                        },
+                      });
+                    }
+                    
+                      
+                      // Event handler for changes in quantity and item selection
+                      $(document).on('change input', '.qty, .dropdown-input_item', function () {
+                        var row = $(this).closest('tr');
+                        updateAvailableStock(row);
+                      });
+                      
+                      // Function to fetch item data using AJAX
+                     // function fetchItemData(selectedItem, row) {
+                       // $.ajax({
+                          type: 'GET',
+                          url: "{% url 'get_invoice_item_details' %}",
+                          data: { id: selectedItem },
+                          dataType: 'json',
+                          success: function (response) {
+                            row.find(".hsn").val(response.hsn);
+                            row.find(".rate").val(response.rate);
+                            row.find(".stock_data").text(response.stock);
+                            //updateAvailableStock(row);
+                          },
+                          error: function () {
+                            console.log('Error fetching item data.');
+                          },
+                        });
+                      }
+                      
+                      // Event handler for changes in item selection
+                      $(document).on('change', '.dropdown-input_item', function () {
+                        var selectedItem = $(this).val();
+                        var row = $(this).closest('tr');
+                        fetchItemData(selectedItem, row);
+                      });
+                      
+                      // Add event handler for changes in quantity
+                      $(document).on('change', '.qty', function () {
+                        var row = $(this).closest('tr');
+                        updateAvailableStock(row);
+                      });
+                      
+                      // Adding the new AJAX request
+var itemId = encodeURIComponent("thorium"); // Encode the item ID
+var url = "/get_invoice_item_details/?id=" + itemId;
+
+$.ajax({
+    url: url,
+    type: 'GET',
+    success: function(data) {
+        // Handle success (update UI, etc.)
+        console.log('Success:', data);
+    },
+    error: function(xhr, status, error) {
+        // Handle error (log details to the console)
+        console.error('Error:', xhr, status, error);
+    }
+});
+                      
+                    
+                      
+
+
+                
+                  </script>-->
 {% endblock %}
