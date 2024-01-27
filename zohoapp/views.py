@@ -27130,7 +27130,7 @@ def import_invoice_listout_page(request):
                 cust = customer.objects.create(user=user2, customerEmail=mail_id, Fname=customer_name)
                 messages.warning(request, f'Created a new customer with email {mail_id} and name {customer_name}.')
 
-            # Rest of your code...
+           
 
 
 
@@ -27760,14 +27760,10 @@ def itemdetails(request):
     return redirect('/')
 
 
-from django.http import JsonResponse
-from django.views.decorators.http import require_GET
-from .models import AddItem  # Import your model
 
-@require_GET
 def get_item_details_invoice(request):
-    item_name = request.GET.get('item', '').strip()  # Remove leading and trailing whitespaces
-
+    item_name = request.GET.get('item', '')
+    
     try:
         item = AddItem.objects.get(Name=item_name)
         item_details = {
@@ -27784,3 +27780,104 @@ def get_item_details_invoice(request):
         print(f'Error: {str(e)}')
         return JsonResponse({'error': 'Internal server error'}, status=500)
 
+
+
+
+
+
+def download_inventory_sampleImportFile(request):
+    
+    bank_table = [['Date', 'Reason', 'Description','Reference Number','Type','Status','Adjusted by',], 
+                  ['01', '2023-08-11','2023-08-11','INV 01','Mr. Jithin P', 'jithin@gmail.com', 'Draft','Kerala','900','0','10','10','20','10','10', '940', '900', '40' ], 
+                  ['02', '2023-08-11','2023-08-11','INV 02','Mr. Jithin P', 'jithin@gmail.com',  'Draft', 'Kerala','900','0','10','10','20','10','10', '940', '900', '40'], 
+                  ['03', '2023-08-11','2023-08-11','INV 03','Mr. Jithin P', 'jithin@gmail.com',  'Save', 'Kerala','900','0','10','10','20','10','10', '940', '900', '40'],
+                  ['04', '2023-08-11','2023-08-11','INV 04','Mr. Jithin P', 'jithin@gmail.com', 'Draft', 'Kerala','900','0','10','10','20','10','10', '940', '900', '40']]
+
+    wb = Workbook()
+
+    sheet1 = wb.active
+    sheet1.title = 'Sheet1'
+
+    # Populate the sheets with data
+    for row in bank_table:
+        sheet1.append(row)
+
+    # Create a response with the Excel file
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=invoice_import_file_format.xlsx'
+
+    # Save the workbook to the response
+    wb.save(response)
+
+    return response
+
+
+
+
+
+
+def import_inventory_listout_page(request):
+    user1 = request.user.id
+    user2 = User.objects.get(id=user1)
+    cmp = company_details.objects.get(user=user1)
+
+    mail_id = None  # Replace this with the actual value or logic to get mail_id
+
+    
+
+    if request.method == 'POST' and 'excel_file' in request.FILES:
+        excel_file = request.FILES.get('excel_file')
+
+        wb = load_workbook(excel_file)
+
+        try:
+            ws = wb["Sheet1"]
+            header_row = ws[1]
+            column_names = [cell.value for cell in header_row]
+            print("Column Names:", column_names)
+        except:
+            print('sheet not found')
+            messages.error(request, '`invoice` sheet not found.! Please check.')
+            return redirect('invoiceview')
+
+        ws = wb["Sheet1"]
+        estimate_columns = ['ORDER NO.', 'DATE', 'DUE DATE', 'INVOICE NO.', 'CUSTOMER NAME', 'MAIL ID','STATUS','PLACE OF SUPPLY','SUB TOTAL','IGST','CGST','SGST','TAX AMOUNT','SHIPPING CHARGE','ADJUSTMENT', 'GRAND TOTAL', 'PAID AMOUNT', 'BALANCE']
+        estimate_sheet = [cell.value for cell in ws[1]]
+
+        if estimate_sheet != estimate_columns:
+            print('invalid sheet')
+            messages.error(request, '`invoice` sheet column names or order are not in the required format.!'
+                                    ' Please check.')
+            return redirect("invoiceview")
+        
+        
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            order, date,ddate, invoice_no, customer_name, mail_id, status, psupply, stotal, igst, cgst, sgst, taxamount, shipping, adjustment, gtotal, paid, balance = row
+
+            # Set a default value for customer_name if it is None
+            customer_name = customer_name or "DefaultName"
+
+            if order is None or date is None or ddate is None or invoice_no is None or mail_id is None or \
+                    status is None or gtotal is None or paid is None or balance is None:
+                print('challan == invalid data')
+                messages.error(request, '`invoice` sheet entries missing required fields.! Please check.')
+                return redirect("invoiceview")
+
+            # Retrieve or create the customer with the specified email
+            customers = customer.objects.filter(customerEmail=mail_id)
+
+            if customers.exists():
+                if customers.count() == 1:
+                    cust = customers.first()
+                else:
+                    # Choose one customer (e.g., the first one)
+                    cust = customers[0]
+                    messages.warning(request, f'Multiple customers found with email {mail_id}. Using the first one.')
+            else:
+                # Use customer_name from the row data or the default value
+                if not customer_name:
+                    # Set a default value if customer_name is still None
+                    customer_name = "DefaultName"
+
+                cust = customer.objects.create(user=user2, customerEmail=mail_id, Fname=customer_name)
+                messages.warning(request, f'Created a new customer with email {mail_id} and name {customer_name}.')

@@ -1231,6 +1231,8 @@ urlpatterns = [
     path('invoice_item_table',views.invoice_item_table,name='invoice_item_table'),
     path('itemdetails',views.itemdetails,name='itemdetails'),
     path('get_item_details_invoice/', views.get_item_details_invoice, name='get_item_details_invoice'),
+    path('download_inventory_sampleImportFile', views.download_inventory_sampleImportFile, name='download_inventory_sampleImportFile'),
+    path('import_inventory_listout_page', views.import_inventory_listout_page, name='import_inventory_listout_page'),
 
 
     
