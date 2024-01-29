@@ -27881,3 +27881,27 @@ def import_inventory_listout_page(request):
 
                 cust = customer.objects.create(user=user2, customerEmail=mail_id, Fname=customer_name)
                 messages.warning(request, f'Created a new customer with email {mail_id} and name {customer_name}.')
+
+
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+from .models import AddItem
+
+@require_GET
+def get_items_list(request):
+    term = request.GET.get('term', '')  # Get the search term from the request
+    items = AddItem.objects.filter(Name__icontains=term)  # Perform case-insensitive partial match
+
+    # Prepare the data for Select2
+    items_list = []
+    for item in items:
+        items_list.append({
+            'id': item.id,
+            'text': f"{item.Name} - {item.s_desc}",  # Adjust as needed
+            'data-hsn': item.hsn,
+            'data-rate': item.s_price,
+            # Add more data attributes as needed
+        })
+
+    return JsonResponse({'items': items_list})

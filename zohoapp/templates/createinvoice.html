@@ -661,20 +661,18 @@
                 <tr id="row1">
                   <td class="text-white text-center" style="font-size: 10px;">1</td>
                   <td style="font-size: 13px;" class="text-center">
-                    <div class="custom-dropdown" style="height: 8vh;"> 
-                      <input type="text" class="dropdown-input_item" id="item1" name="item[]" placeholder="Select item">
-                      <div class="dropdown-list" id="item_one1">
+                    <div class="custom-dropdown" style="height: 8vh;">
+                      <select class="dropdown-input_item  " id="item1" name="item[]" placeholder="Select item">
                         {% for p in items %}
-                          <div class="dropdown-item"
-                            data-value="{{ p.id }}" data-name="{{ p.Name }}"
-                            data-hsn="{{ p.hsn }}" data-rate="{{ p.s_price }}"
-                            data-intrastate="{{ p.intrastate }}" data-interstate="{{ p.interstate }}"
-                            data-stock="{{ p.stock }}">
+                          <option value="{{ p.id }}" data-name="{{ p.Name }}" data-hsn="{{ p.hsn }}" data-rate="{{ p.s_price }}"
+                            data-intrastate="{{ p.intrastate }}" data-interstate="{{ p.interstate }}" data-stock="{{ p.stock }}">
                             {{ p.title }} {{ p.Name }} {{ p.last_name }}
-                          </div>
+                          </option>
                         {% endfor %}
-                      </div>
+                      </select>
                     </div>
+                    
+                    
                   </td>
                   
 
@@ -690,124 +688,129 @@
                     <span class="text-warning" style="font-size: 10px;">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
                     
                   </td>
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+
+<!-- Include Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
 <script>
-// Function to fetch item details (HSN, rate, tax) based on the selected item
-function fillItemDetails(rowNumber) {
-  let itemInput = document.getElementById(`item${rowNumber}`);
-  let hsnElement = document.getElementById(`hsn${rowNumber}`);
-  let rateElement = document.getElementById(`rate${rowNumber}`);
-  let taxElement = document.getElementById(`tax${rowNumber}`);
-  let availableStockElement = document.getElementById(`stock_data${rowNumber}`);
-
-  let selectedItem = itemInput.value;
-
-  $.ajax({
-    url: '/get_item_details_invoice/',
-    method: 'GET',
-    data: { id: selectedItem },
-    success: function (data) {
-      hsnElement.value = data.hsn;
-      rateElement.value = data.rate;
-      taxElement.value = data.tax;
-      availableStockElement.innerText = data.availableStock;
-    },
-    error: function (xhr, status, error) {
-      alert(`Failed to fetch item details. Status: ${status}, Error: ${error}`);
-    }
-  });
-}
-
-// Function to update available stock when quantity is entered
-function updateAvailableStock(rowNumber) {
-  let quantityInput = document.getElementById(`qty${rowNumber}`);
-  let availableStockElement = document.getElementById(`stock_data${rowNumber}`);
-  let quantity = parseFloat(quantityInput.value) || 0;
-  let availableStock = parseFloat(availableStockElement.innerText) || 0;
-
-  if (quantity > availableStock) {
-    alert('Quantity cannot be greater than available stock');
-    // Reset quantity to available stock
-    quantityInput.value = availableStock.toFixed(2);
-    quantity = availableStock;
-  }
-
-  // Update available stock after deduction
-  availableStockElement.innerText = (availableStock - quantity).toFixed(2);
-}
-
-// Function to update tax type based on place of supply
-function updateTaxType() {
-  let placeOfSupplyDropdown = document.getElementById('srcofsupply');
-  let selectedPlaceOfSupply = placeOfSupplyDropdown.value;
-  let taxTypeElement = document.getElementById('taxTypeDisplay');
-
-  // Default tax type
-  let taxType = 'Default Tax Type';
-
-  // Check if the selected place of supply is Kerala
-  if (selectedPlaceOfSupply === 'KL') {
-    taxType = 'GST'; // Update with your GST tax type
-  } else {
-    taxType = 'IGST'; // Update with your IGST tax type
-  }
-
-  // Update the tax type element with the new tax type
-  taxTypeElement.innerText = 'Tax Type: ' + taxType;
-}
-
-// Add event listener for place of supply dropdown change
-document.getElementById('srcofsupply').addEventListener('change', updateTaxType);
-
-// Document ready event listener
-document.addEventListener('DOMContentLoaded', function () {
-  let rowCount = 1; // Set the initial row count
-
-  for (let i = 1; i <= rowCount; i++) {
-    let qtyInput = document.getElementById(`qty${i}`);
-    let input = document.getElementById(`item${i}`);
-    let dropdownList = document.getElementById(`item_one${i}`);
-
-    qtyInput.addEventListener('input', function () {
-      updateAvailableStock(i);
-    });
-
-    qtyInput.addEventListener('keydown', function (event) {
-      if (event.key === 'Enter') {
-        updateAvailableStock(i);
+  $(document).ready(function() {
+    // Initialize Select2 on your dropdown input
+    $('.dropdown-input_item').select2({
+      theme: 'bootstrap', // Optional: You can choose a different theme
+      minimumInputLength: 1, // Enable search after typing at least one character
+      placeholder: 'Select item', // Placeholder text
+      ajax: {
+        url: '/get_items_list/', 
+        dataType: 'json',
+        delay: 250,
+        processResults: function(data) {
+          return {
+            results: data.items // Adjust this based on the actual structure of your items data
+          };
+        },
+        cache: true
       }
     });
 
-    input.addEventListener('focus', function () {
-      dropdownList.style.display = 'block';
-    });
+    // Function to fetch item details (HSN, rate, tax) based on the selected item
+    function fillItemDetails(rowNumber) {
+      let itemInput = $(`#item${rowNumber}`);
+      let hsnElement = $(`#hsn${rowNumber}`);
+      let rateElement = $(`#rate${rowNumber}`);
+      let taxElement = $(`#tax${rowNumber}`);
+      let availableStockElement = $(`#stock_data${rowNumber}`);
 
-    document.addEventListener('mousedown', function (event) {
-      if (!event.target.closest(`#row${i} .custom-dropdown`)) {
-        dropdownList.style.display = 'none';
-      }
-    });
+      let selectedItem = itemInput.val();
 
-    dropdownList.addEventListener('click', function (event) {
-      if (event.target.classList.contains('dropdown-item')) {
-        input.value = event.target.textContent;
-        dropdownList.style.display = 'none';
-        fillItemDetails(i);
-      }
-    });
-
-    input.addEventListener('input', function () {
-      let filterValue = input.value.toLowerCase();
-      let items = dropdownList.querySelectorAll('.dropdown-item');
-
-      items.forEach(function (item) {
-        let itemText = item.textContent.toLowerCase();
-        item.style.display = itemText.includes(filterValue) ? 'block' : 'none';
+      $.ajax({
+        url: '/get_item_details_invoice/',
+        method: 'GET',
+        data: { item: encodeURIComponent(selectedItem) },
+        success: function(data) {
+          hsnElement.val(data.hsn);
+          rateElement.val(data.rate);
+          taxElement.val(data.tax);
+          availableStockElement.val(data.availableStock);
+        },
+        error: function(xhr, status, error) {
+          alert(`Failed to fetch item details. Status: ${status}, Error: ${error}`);
+        }
       });
+    }
+
+    // Function to update available stock when quantity is entered
+    function updateAvailableStock(rowNumber) {
+      let quantityInput = $(`#qty${rowNumber}`);
+      let availableStockElement = $(`#stock_data${rowNumber}`);
+      let quantity = parseFloat(quantityInput.val()) || 0;
+      let availableStock = parseFloat(availableStockElement.val()) || 0;
+
+      if (quantity > availableStock) {
+        alert('Quantity cannot be greater than available stock');
+        // Reset quantity to available stock
+        quantityInput.val(availableStock.toFixed(2));
+        quantity = availableStock;
+      }
+
+      // Update available stock after deduction
+      availableStockElement.val((availableStock - quantity).toFixed(2));
+    }
+
+    // Function to update tax type based on place of supply
+    function updateTaxType() {
+      let placeOfSupplyDropdown = $('#srcofsupply');
+      let selectedPlaceOfSupply = placeOfSupplyDropdown.val();
+      let taxTypeElement = $('#taxTypeDisplay');
+
+      // Default tax type
+      let taxType = 'Default Tax Type';
+
+      // Check if the selected place of supply is Kerala
+      if (selectedPlaceOfSupply === 'KL') {
+        taxType = 'GST'; // Update with your GST tax type
+      } else {
+        taxType = 'IGST'; // Update with your IGST tax type
+      }
+
+      // Update the tax type element with the new tax type
+      taxTypeElement.text('Tax Type: ' + taxType);
+    }
+
+    // Add event listener for place of supply dropdown change
+    $('#srcofsupply').on('change', updateTaxType);
+
+    // Document ready event listener
+    $(document).on('DOMContentLoaded', function() {
+      let rowCount = 1; // Set the initial row count
+
+      for (let i = 1; i <= rowCount; i++) {
+        let qtyInput = $(`#qty${i}`);
+        let input = $(`#item${i}`);
+
+        qtyInput.on('input', function() {
+          updateAvailableStock(i);
+        });
+
+        qtyInput.on('keydown', function(event) {
+          if (event.key === 'Enter') {
+            updateAvailableStock(i);
+          }
+        });
+
+        input.on('change', function() {
+          fillItemDetails(i);
+        });
+      }
     });
-  }
-});
+  });
 </script>
+
+
 
 
                 
