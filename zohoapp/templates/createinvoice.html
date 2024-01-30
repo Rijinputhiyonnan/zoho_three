@@ -661,17 +661,144 @@
                 <tr id="row1">
                   <td class="text-white text-center" style="font-size: 10px;">1</td>
                   <td style="font-size: 13px;" class="text-center">
-                    <div class="custom-dropdown" style="height: 8vh;">
-                      <select class="dropdown-input_item  " id="item1" name="item[]" placeholder="Select item">
+                  <!--  <div class="custom-dropdown" style="height: 8vh;"> 
+                      <input type="text" class="dropdown-input_item" id="item1" name="item[]" placeholder="Select item">
+                      <div class="dropdown-list" id="item_one1">
                         {% for p in items %}
-                          <option value="{{ p.id }}" data-name="{{ p.Name }}" data-hsn="{{ p.hsn }}" data-rate="{{ p.s_price }}"
-                            data-intrastate="{{ p.intrastate }}" data-interstate="{{ p.interstate }}" data-stock="{{ p.stock }}">
+                          <div class="dropdown-item"
+                            data-value="{{ p.id }}" data-name="{{ p.Name }}"
+                            data-hsn="{{ p.hsn }}" data-rate="{{ p.s_price }}"
+                            data-intrastate="{{ p.intrastate }}" data-interstate="{{ p.interstate }}"
+                            data-stock="{{ p.stock }}">
                             {{ p.title }} {{ p.Name }} {{ p.last_name }}
-                          </option>
+                          </div>
                         {% endfor %}
-                      </select>
-                    </div>
+                      </div>
+                    </div>-->
+                    <select name='items[]' id="product" class="form-control select2">
+                      <option selected>Choose..</option>
+                      {% for i in item %}
+                          <option value="{{ i.name }}" data-tokens="{{ i.name }}">
+                              {{ i.name }}
+                          </option>
+                      {% endfor %}
+                  </select>
+
+ 
+
+
+
+                  <a class="btn btn-outline-secondary ml-1" role="button" data-target="#newitem" data-toggle="modal">+</a> 
+              </div>
+              <div id="errorLabel" style="color: red;"></div>
+          </td>
+          <td>
+              <input type="text" name='hsn[]' id="hsn1" placeholder='HSN'
+              class="form-control hsn"/>
+          </td>
+          <td>
+              <input type="number" name='quantitys'   style='margin-top:21px' placeholder='Enter Qty' id="quantitys" class="form-control quty"   hidden>
+              <input type="number" name='anotherQuantityInput'   style='margin-top:21px' placeholder='Enter Qty' id="anotherQuantityInput" value="0" class="form-control quty" hidden >
+              <input type="number" name='quantity[]' oninput="qtychange1(this)"  style='margin-top:21px' placeholder='Enter Qty' id="qty1" class="form-control qty" step=0 min=0 >
+                      <div><span>Available Qty :</span> <span id="qtyspan"class='text-muted'></span></div>
+          </td> 
+          
+          <td>
+           
+  <script>
+      $('.select2').select2();
+      console.log('hi')
+      $(document).on('change', '#product', function () {
+     
+          console.log('hhhhh')
+         var select = $('#product').val();
+         var vid = $('#billno').val();
+         console.log('hhhhh',vid,select)
+         $.ajax({
+             type: "GET",
+             url: "{% url 'itemdatadebit' %}",
+             data: {
+                 id: select,
+                 vid: vid
+             },
+             success: function (response) {
+              console.log(response,'res')
+              
+                 if (response.error_flag === 1) {
+                     // Show error message in a label
+                     $('#errorLabel').text("Item is not purchased for this bill number");
+                 }else {
+                     // Remove the error message if error_flag is zero
+                     $('#errorLabel').text("");
+                 }
+                     // Update the HTML elements based on the response
+                     var data = response.hsn;
+                     var data2 =  response.qty;
+
+                     console.log(data2,'data2')
+                     var data3 = response.price;
+                     var data4 = response.gst;
+                     var data5 = response.sgst;
+                     var data6 = response.quty;
+                     var data7 =response.taxs;
+                     console.log(data7);
+                
+                     document.getElementById('hsn1').value = data; 
+     
+         
+     
+                     document.getElementById('qtyspan').innerHTML = data2 ;
+                     document.getElementById('unit1').value = data3;
+                     document.getElementById('taxs').value = data7;
+                     document.getElementById('quantitys').value = data6;
+
+                     var place = 'Kerala'
                     
+                     if (place == '{{ cmp1.state }}') {
+
+                         document.getElementById('ta1').value = data4;
+                         
+                         
+                     }
+                     else{
+                      document.getElementById('ta5').value = data5;
+                     }
+                     
+             
+             },
+             
+         });
+     });
+     
+function reloadbill(vid) {
+console.log(vid);
+$.ajax({
+url: "{% url 'get_vendor_data_bill' %}",
+type: "GET",
+dataType: "json",
+data:{
+id:vid
+},
+success: function(data) {
+console.log(data,'hie')
+var dropdow = $('#billno');
+dropdow.empty();
+$.each(data, function(key, value) {
+dropdow.append($('<option></option>').attr('value', key).text(value).val(value));
+});
+
+},
+error: function(xhr, status, error) {
+console.error(xhr.responseText);
+
+}
+
+
+});
+}
+     
+     
+                                                     </script>
                     
                   </td>
                   
@@ -700,22 +827,7 @@
 <script>
   $(document).ready(function() {
     // Initialize Select2 on your dropdown input
-    $('.dropdown-input_item').select2({
-      theme: 'bootstrap', // Optional: You can choose a different theme
-      minimumInputLength: 1, // Enable search after typing at least one character
-      placeholder: 'Select item', // Placeholder text
-      ajax: {
-        url: '/get_items_list/', 
-        dataType: 'json',
-        delay: 250,
-        processResults: function(data) {
-          return {
-            results: data.items // Adjust this based on the actual structure of your items data
-          };
-        },
-        cache: true
-      }
-    });
+    $('.dropdown-input_item').select2();
 
     // Function to fetch item details (HSN, rate, tax) based on the selected item
     function fillItemDetails(rowNumber) {
@@ -809,7 +921,6 @@
     });
   });
 </script>
-
 
 
 

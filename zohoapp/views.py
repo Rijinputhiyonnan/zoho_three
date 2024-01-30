@@ -27905,3 +27905,45 @@ def get_items_list(request):
         })
 
     return JsonResponse({'items': items_list})
+
+def itemdatadebit(request):
+    user= request.user.id
+
+    user = User.objects.get(id=uid)  
+    cmp1 = company_details.objects.get(user=user)  
+    
+    
+    id = request.GET.get('id')
+    print(id,'id')
+    vid_param = request.GET.get('vid')
+    
+    print(vid_param)
+
+    
+    quty = 0
+    error_flag = 0
+    taxs=0
+
+    if not vid_param:
+        item = AddItem.objects.get(Name=id, user=user)
+        print(item)
+
+        hsn = item.hsn
+        qty = item.stock
+        price = item.s_price
+        gst = item.interstate
+        sgst = item.intrastate
+        places = cmp1.state
+
+        return JsonResponse({
+            "status": "not",
+            'hsn': hsn,
+            'qty': qty,
+            'places': places,
+            'price': price,
+            'gst': gst,
+            'sgst': sgst, 
+            })
+
+        return redirect('/')
+        
