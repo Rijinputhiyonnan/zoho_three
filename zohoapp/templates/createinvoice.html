@@ -657,11 +657,11 @@
                   <th></th>
                 </tr>
               </thead>
-              <tbody id="item_table_body">
+               <!--  <tbody id="item_table_body">
                 <tr id="row1">
                   <td class="text-white text-center" style="font-size: 10px;">1</td>
                   <td style="font-size: 13px;" class="text-center">
-                  <!--  <div class="custom-dropdown" style="height: 8vh;"> 
+                 <div class="custom-dropdown" style="height: 8vh;"> 
                       <input type="text" class="dropdown-input_item" id="item1" name="item[]" placeholder="Select item">
                       <div class="dropdown-list" id="item_one1">
                         {% for p in items %}
@@ -674,12 +674,12 @@
                           </div>
                         {% endfor %}
                       </div>
-                    </div>-->
+                    </div>
                     <select name='items[]' id="product" class="form-control select2">
                       <option selected>Choose..</option>
-                      {% for i in item %}
-                          <option value="{{ i.name }}" data-tokens="{{ i.name }}">
-                              {{ i.name }}
+                      {% for i in items %}
+                          <option value="{{ i.Name }}" data-tokens="{{ i.Name }}">
+                              {{ i.Name }}
                           </option>
                       {% endfor %}
                   </select>
@@ -703,7 +703,7 @@
                       <div><span>Available Qty :</span> <span id="qtyspan"class='text-muted'></span></div>
           </td> 
           
-          <td>
+          
            
   <script>
       $('.select2').select2();
@@ -770,35 +770,10 @@
          });
      });
      
-function reloadbill(vid) {
-console.log(vid);
-$.ajax({
-url: "{% url 'get_vendor_data_bill' %}",
-type: "GET",
-dataType: "json",
-data:{
-id:vid
-},
-success: function(data) {
-console.log(data,'hie')
-var dropdow = $('#billno');
-dropdow.empty();
-$.each(data, function(key, value) {
-dropdow.append($('<option></option>').attr('value', key).text(value).val(value));
-});
 
-},
-error: function(xhr, status, error) {
-console.error(xhr.responseText);
-
-}
-
-
-});
-}
      
      
-                                                     </script>
+</script>
                     
                   </td>
                   
@@ -824,7 +799,7 @@ console.error(xhr.responseText);
 <!-- Include Select2 JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
-<script>
+<!--<script>
   $(document).ready(function() {
     // Initialize Select2 on your dropdown input
     $('.dropdown-input_item').select2();
@@ -939,10 +914,10 @@ console.error(xhr.responseText);
                     <input hidden value="{{company.state}}" id="cmpstate">
                       <input type="text"  id="select_tax" placeholder="Tax Rate" class="form-control seltax d-flex">
                       <select name='tax[]' id="tax11" class="form-control tax intra_tax d-none" onchange="taxchange(this.id)">
-                    <!--<select name='tax[]' id='tax1'
+               <select name='tax[]' id='tax1'
                         class='form-control border-0 bg-transparent text-white text-center border-0 tax'
                         onselect="toggleDateInput()" style="font-size: 13px;">
-                        <optgroup id="gst-group" class="text-center text-black" label="GST">-->
+                        <optgroup id="gst-group" class="text-center text-black" label="GST">
                             <option class="text-black" value="0">0% GST</option>
                             <option class="text-black" value="3">3% GST</option>
                             <option class="text-black" value="5">5% GST</option>
@@ -950,7 +925,7 @@ console.error(xhr.responseText);
                             <option class="text-black" value="18">18% GST</option>
                             <option class="text-black" value="28">28% GST</option>
                         </select>
-                        <!--<optgroup id="igst-group" class="text-center text-black" label="IGST">-->
+                     <optgroup id="igst-group" class="text-center text-black" label="IGST">
                           <select name='tax2[]' id="tax21" class="form-control tax inter_tax d-none " onchange="taxchange(this.id)">
                             <option class="text-black" value="0">0% IGST</option>
                             <option class="text-black" value="3">3% IGST</option>
@@ -971,7 +946,205 @@ console.error(xhr.responseText);
                   <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='amount1'
                       class=' text-center form-control amount border-0 bg-transparent text-white' name='amount[]'
                       value='0.00' readonly>
-                  </td>
+                  </td>-->
+
+
+
+                  <tbody id="item_table_body">
+                    <tr id='addr0'>
+                        <td>1</td>
+                        <td style="width: 20%;">
+                            <div class="d-flex">
+<!-- 
+                                <input list="brow" name='items[]' class="form-control " id="product">
+<datalist id="brow" >
+{% for i in item %}
+<option value="{{ i.name }}" data-tokens="{{ i.name }}" >{{ i.name }}</option>
+
+
+{% endfor %}
+</datalist>   -->
+
+<!-- <select class="form-control select2 vendor" data-width="100%" id="selected">
+{% for v in vndr %}
+<option value="{{ v.firstname }} {{ v.lastname }}" data-tokens="{{ v.firstname }} {{ v.lastname }}" >{{ v.firstname }} {{ v.lastname }}</option>
+{% endfor %}
+</select> 
+-->
+
+                                <select name='items[]' id="product" class="form-control select2">
+                                    <option selected>Choose..</option>
+                                    {% for i in items %}
+                                        <option value="{{ i.Name }}" data-tokens="{{ i.Name }}">
+                                            {{ i.Name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+
+               
+
+
+
+                                <a class="btn btn-outline-secondary ml-1" role="button" data-target="#newitem" data-toggle="modal">+</a> 
+                            </div>
+                            <div id="errorLabel" style="color: red;"></div>
+                        </td>
+                        <td>
+                            <input type="text" name='hsn[]' id="hsn1" placeholder='HSN'
+                            class="form-control hsn"/>
+                        </td>
+                        <td>
+                            <input type="number" name='quantitys'   style='margin-top:21px' placeholder='Enter Qty' id="quantitys" class="form-control quty"   hidden>
+                            <input type="number" name='anotherQuantityInput'   style='margin-top:21px' placeholder='Enter Qty' id="anotherQuantityInput" value="0" class="form-control quty" hidden >
+                            <input type="number" name='quantity[]' oninput="qtychange1(this)"  style='margin-top:21px' placeholder='Enter Qty' id="qty1" class="form-control qty" step=0 min=0 >
+                                    <div><span>Available Qty :</span> <span id="qtyspan"class='text-muted'></span></div>
+                        </td> 
+                        
+                        <td>
+                         
+                <script>
+                    $('.select2').select2();
+                    console.log('hi')
+                    $(document).on('change', '#product', function () {
+                   
+                        console.log('hhhhh')
+                       var select = $('#product').val();
+                       //var vid = $('#billno').val();
+                       console.log('hhhhh',select)
+                       $.ajax({
+                           type: "GET",
+                           url: "{% url 'itemdatadebit' %}",
+                           data: {
+                               id: select,
+                               //vid: vid
+                           },
+                           success: function (response) {
+                            console.log(response,'res')
+                            
+                               if (response.error_flag === 1) {
+                                   // Show error message in a label
+                                   $('#errorLabel').text("Item is not purchased for this bill number");
+                               }else {
+                                   // Remove the error message if error_flag is zero
+                                   $('#errorLabel').text("");
+                               }
+                                   // Update the HTML elements based on the response
+                                   var data = response.hsn;
+                                   var data2 =  response.qty;
+
+                                   console.log(data2,'data2')
+                                   var data3 = response.price;
+                                   var data4 = response.gst;
+                                   var data5 = response.sgst;
+                                   var data6 = response.quty;
+                                   var data7 =response.taxs;
+                                   console.log(data7);
+                              
+                                   document.getElementById('hsn1').value = data; 
+                   
+                       
+                   
+                                   document.getElementById('qtyspan').innerHTML = data2 ;
+                                   document.getElementById('unit1').value = data3;
+                                   document.getElementById('taxs').value = data7;
+                                   document.getElementById('quantitys').value = data6;
+
+                                   var place = 'Kerala'
+                                  
+                                   if (place == '{{ cmp1.state }}') {
+
+                                       document.getElementById('ta1').value = data4;
+                                       
+                                       
+                                   }
+                                   else{
+                                    document.getElementById('ta5').value = data5;
+                                   }
+                                   
+                           
+                           },
+                           
+                       });
+                   });
+                   
+        function reloadbill(vid) {
+console.log(vid);
+$.ajax({
+    url: "{% url 'get_vendor_data_bill' %}",
+    type: "GET",
+    dataType: "json",
+    data:{
+        id:vid
+    },
+    success: function(data) {
+        console.log(data,'hie')
+        var dropdow = $('#billno');
+        dropdow.empty();
+        $.each(data, function(key, value) {
+            dropdow.append($('<option></option>').attr('value', key).text(value).val(value));
+        });
+        
+    },
+    error: function(xhr, status, error) {
+        console.error(xhr.responseText);
+      
+    }
+    
+
+});
+}
+                   
+                   
+                                                                   </script>
+                   
+
+                            <input type="text" name='price[]' id="unit1" placeholder='Enter Unit Price'
+                            class="form-control price" step="0.00" min="0"/>
+                        </td>
+                        
+                        <td>
+                            <input type="text" name='taxs' id="taxs" placeholder='Enter Unit Price'
+                            class="form-control taxs" onchange="taxchange(this)" step="0.00" min="0" hidden >
+                            <select name='tax[]' id="tax1" class="form-control tax">
+                                {% if cmp1.state == 'Kerala' %}
+                                <option id="ta1" value=0 text={{ cmp1.state }} hidden>Select</option>
+                                <option value=0 text={{ cmp1.state }}>00% GST(00%)</option>
+                                <option value=3 text={{ cmp1.state }}>03% GST(03%)</option>
+                                <option value=5 text={{ cmp1.state }}>05% GST(05%)</option>
+                                <option value=12 text={{ cmp1.state }}>12% GST(12%)</option>
+                                <option value=18 text={{ cmp1.state }}>18% GST(18%)</option>
+                                <option value=28 text={{ cmp1.state }}>28% GST(28%)</option>
+                                {% else %}
+                                <option id="ta5" value=0 text=" " hidden>Select</option>
+                                <option value=0 text=" ">0.0% IGST(00%)</option>
+                                <option value=3 text=" ">03.0% IGST(03%)</option>
+                                <option value=5 text=" ">05.0% IGST(05%)</option>
+                                <option value=12 text=" ">12.0% IGST(12%)</option>
+                                <option value=18 text=" ">18.0% IGST(18%)</option>
+                                <option value=28 text=" ">28.0% IGST(28%)</option>
+                                {% endif %}
+                          </select>
+                        </td>
+                        <td><input type="number" name='reduce[]' id="reduce" class="form-control reduce" 
+                            placeholder="0" step="any" value="0">
+                        </td> 
+                        
+                        <td>
+                            <input type="number" name='total[]' id="total1" placeholder='0' class="form-control total" step="any" readonly>
+                        </td>
+                        <td style="display: none;">
+                            <input type="text" name='taxamount1' id="taxamount1" class="form-control taxamount"/>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tr>
+                        <td style="border: none;"><a class="btn btn-outline-secondary ml-1" role="button" id="addrow" onclick="add_item_row()">+</a></td>
+                    </tr>
+
+
+
+                </table>
+
                   <td class='text-center'>
                     <button type='button' id='del_btn1'
                       class='btn  btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row'
@@ -4178,4 +4351,6 @@ $.ajax({
 
                 
                   </script>-->
+
+                  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer></script>
 {% endblock %}

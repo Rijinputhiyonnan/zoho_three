@@ -27906,44 +27906,86 @@ def get_items_list(request):
 
     return JsonResponse({'items': items_list})
 
+        
+        
+        
 def itemdatadebit(request):
+    id = request.GET.get('id')
+    print(id)
+    user = request.user.id
+
+    user = User.objects.get(id=user)
+    print(user, "hai")
+    cmp1 = company_details.objects.get(user=user)
+    print(cmp1, "ok")
+
+    # Use filter() to get all items for the user
+    items = AddItem.objects.filter(user=user, Name=id)
+    
+    # Check if there are items
+    if items.exists():
+        # Iterate through each item
+        for item in items:
+            print(item)
+
+            hsn = item.hsn
+            qty = item.stock
+            price = item.s_price
+            gst = item.interstate
+            sgst = item.intrastate
+            places = cmp1.state
+
+            # Return the details for each item
+            return JsonResponse({
+                "status": "not",
+                'hsn': hsn,
+                'qty': qty,
+                'places': places,
+                'price': price,
+                'gst': gst,
+                'sgst': sgst,
+            })
+    else:
+        return JsonResponse({
+            "status": "error",
+            'error_flag': 1,
+        })
+
+  
+
+
+  
+
+    
+def get_vendor_data_bill(request):
     user= request.user.id
 
-    user = User.objects.get(id=uid)  
-    cmp1 = company_details.objects.get(user=user)  
-    
+    user = User.objects.get(id=user)  
+    company1 = company_details.objects.get(user=user)
     
     id = request.GET.get('id')
-    print(id,'id')
-    vid_param = request.GET.get('vid')
     
-    print(vid_param)
-
+    options = {}
+    item_object = AddItem.objects.get(user=user)
     
-    quty = 0
-    error_flag = 0
-    taxs=0
+   
+    emails = str(' ') + str(item_object.email)
 
-    if not vid_param:
-        item = AddItem.objects.get(Name=id, user=user)
-        print(item)
+    vendor_recurring = recurring_bill.objects.filter(vendor_mail=emails,cid=company1.cid)
 
-        hsn = item.hsn
-        qty = item.stock
-        price = item.s_price
-        gst = item.interstate
-        sgst = item.intrastate
-        places = cmp1.state
+    option_objects = purchasebill.objects.filter(vendor_mail=vendor_object.email,cid=company1.cid)
+    print(option_objects, 'option objects')
 
-        return JsonResponse({
-            "status": "not",
-            'hsn': hsn,
-            'qty': qty,
-            'places': places,
-            'price': price,
-            'gst': gst,
-            'sgst': sgst, 
-            })
-
-        return redirect('/')
+    if option_objects or vendor_recurring:
+        for option in option_objects:
+            options[option.billid] = [option.bill_no]
+            print('yo')
         
+        for option in vendor_recurring:
+            options[option.rbillid] = [option.billno]
+    else:
+        options = {}
+    print('options', options)
+
+    return JsonResponse(options, safe=False)
+    

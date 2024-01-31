@@ -1234,6 +1234,7 @@ urlpatterns = [
     path('download_inventory_sampleImportFile', views.download_inventory_sampleImportFile, name='download_inventory_sampleImportFile'),
     path('import_inventory_listout_page', views.import_inventory_listout_page, name='import_inventory_listout_page'),
     path('get_items_list/', views.get_items_list, name='get_items_list'),
+    path('itemdatadebit',views.itemdatadebit,name='itemdatadebit'),
   
 
     
