@@ -654,7 +654,7 @@
                   <th class="text-center" style="font-size: 10px;">Discount</th>
                   <th class="text-center" style="font-size: 10px;">Tax</th>
                   <th class="text-center"style="font-size: 10px;">Amount</th>
-                  <th></th>
+                  <th>  </th>
                 </tr>
               </thead>
                <!--  <tbody id="item_table_body">
@@ -953,8 +953,8 @@
                   <tbody id="item_table_body">
                     <tr id='addr0'>
                         <td>1</td>
-                        <td style="width: 20%;">
-                            <div class="d-flex">
+                        <td style="width: 20%;" >
+                            <div class="d-flex  bg-transparent text-dark" style=" font-size: 10px;" class='text-center'>
 <!-- 
                                 <input list="brow" name='items[]' class="form-control " id="product">
 <datalist id="brow" >
@@ -972,43 +972,49 @@
 </select> 
 -->
 
-                                <select name='items[]' id="product" class="form-control select2">
-                                    <option selected>Choose..</option>
+                                <select name='item[]' id="item1" class="form-control select2  text-right hsn border-0  bg-transparent text-white">
+                                    <option class="form-control select2  text-right hsn border-0  bg-transparent text-white" selected>Choose..</option>
                                     {% for i in items %}
-                                        <option value="{{ i.Name }}" data-tokens="{{ i.Name }}">
+                                        <option class="form-control select2  text-right hsn border-0  bg-transparent text-white" value="{{ i.Name }}" data-tokens="{{ i.Name }}">
                                             {{ i.Name }}
                                         </option>
                                     {% endfor %}
                                 </select>
 
-               
+                               
 
 
 
-                                <a class="btn btn-outline-secondary ml-1" role="button" data-target="#newitem" data-toggle="modal">+</a> 
+                              <!--  <a class="btn btn-outline-secondary ml-1" role="button" data-target="#newitem" data-toggle="modal">+</a> -->
                             </div>
                             <div id="errorLabel" style="color: red;"></div>
                         </td>
-                        <td>
-                            <input type="text" name='hsn[]' id="hsn1" placeholder='HSN'
-                            class="form-control hsn"/>
+                        <td style="width: 15%; font-size: 10px;" class='text-center' >
+                          <input style="font-size: 13px;" type='number' id='hsn1'
+                            class=' text-right hsn border-0 form-control bg-transparent text-white' name='hsn[]' readonly>
                         </td>
-                        <td>
-                            <input type="number" name='quantitys'   style='margin-top:21px' placeholder='Enter Qty' id="quantitys" class="form-control quty"   hidden>
-                            <input type="number" name='anotherQuantityInput'   style='margin-top:21px' placeholder='Enter Qty' id="anotherQuantityInput" value="0" class="form-control quty" hidden >
-                            <input type="number" name='quantity[]' oninput="qtychange1(this)"  style='margin-top:21px' placeholder='Enter Qty' id="qty1" class="form-control qty" step=0 min=0 >
-                                    <div><span>Available Qty :</span> <span id="qtyspan"class='text-muted'></span></div>
-                        </td> 
+                        <td style="width: 17%;" class='text-center'>
+                          
+                          <input style="font-size: 13px;" type='number' id='qty1' class='text-center qty form-control border-0 bg-transparent text-white' name='quantity[]' value='0'>
+                          <input type="text" id="avl1" style="display: none;">
+                          <span class="text-warning" style="font-size: 10px;">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
+                          
+                        </td>
                         
-                        <td>
+
+
+                        
+                 
+
+                       
                          
                 <script>
                     $('.select2').select2();
                     console.log('hi')
-                    $(document).on('change', '#product', function () {
+                    $(document).on('change', '#item1', function () {
                    
                         console.log('hhhhh')
-                       var select = $('#product').val();
+                       var select = $('#item1').val();
                        //var vid = $('#billno').val();
                        console.log('hhhhh',select)
                        $.ajax({
@@ -1023,7 +1029,7 @@
                             
                                if (response.error_flag === 1) {
                                    // Show error message in a label
-                                   $('#errorLabel').text("Item is not purchased for this bill number");
+                                   $('#errorLabel').text("Item is not present");
                                }else {
                                    // Remove the error message if error_flag is zero
                                    $('#errorLabel').text("");
@@ -1044,10 +1050,10 @@
                    
                        
                    
-                                   document.getElementById('qtyspan').innerHTML = data2 ;
-                                   document.getElementById('unit1').value = data3;
+                                   document.getElementById('stock_data1').innerHTML = data2 ;
+                                   document.getElementById('rate1').value = data3;
                                    document.getElementById('taxs').value = data7;
-                                   document.getElementById('quantitys').value = data6;
+                                   document.getElementById('stock_data1').value = data6;
 
                                    var place = 'Kerala'
                                   
@@ -1096,24 +1102,28 @@ $.ajax({
                    
                    
                                                                    </script>
-                   
-
-                            <input type="text" name='price[]' id="unit1" placeholder='Enter Unit Price'
-                            class="form-control price" step="0.00" min="0"/>
-                        </td>
+                        <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='rate1'
+                        class=' text-right rate form-control border-0  bg-transparent text-white' name='rate[]' value='0'
+                        readonly>
+                    </td>
                         
+                    <td style="width: 10%;" class='text-center text-dark'><input style="font-size: 13px;" type='number' id='discount1'
+                      class=' text-right discount border-0 bg-transparent text-white form-control' name='desc[]'
+                      value='0'>
+                  </td> 
+                
                         <td>
                             <input type="text" name='taxs' id="taxs" placeholder='Enter Unit Price'
                             class="form-control taxs" onchange="taxchange(this)" step="0.00" min="0" hidden >
                             <select name='tax[]' id="tax1" class="form-control tax">
-                                {% if cmp1.state == 'Kerala' %}
-                                <option id="ta1" value=0 text={{ cmp1.state }} hidden>Select</option>
-                                <option value=0 text={{ cmp1.state }}>00% GST(00%)</option>
-                                <option value=3 text={{ cmp1.state }}>03% GST(03%)</option>
-                                <option value=5 text={{ cmp1.state }}>05% GST(05%)</option>
-                                <option value=12 text={{ cmp1.state }}>12% GST(12%)</option>
-                                <option value=18 text={{ cmp1.state }}>18% GST(18%)</option>
-                                <option value=28 text={{ cmp1.state }}>28% GST(28%)</option>
+                                {% if company.state == 'Kerala' %}
+                                <option id="ta1" value=0 text={{ company.state }} hidden>Select</option>
+                                <option value=0 text={{ company.state }}>00% GST(00%)</option>
+                                <option value=3 text={{ company.state }}>03% GST(03%)</option>
+                                <option value=5 text={{ company.state }}>05% GST(05%)</option>
+                                <option value=12 text={{ company.state }}>12% GST(12%)</option>
+                                <option value=18 text={{ company.state }}>18% GST(18%)</option>
+                                <option value=28 text={{ company.state }}>28% GST(28%)</option>
                                 {% else %}
                                 <option id="ta5" value=0 text=" " hidden>Select</option>
                                 <option value=0 text=" ">0.0% IGST(00%)</option>
@@ -1125,25 +1135,38 @@ $.ajax({
                                 {% endif %}
                           </select>
                         </td>
-                        <td><input type="number" name='reduce[]' id="reduce" class="form-control reduce" 
-                            placeholder="0" step="any" value="0">
-                        </td> 
+
+
                         
-                        <td>
+                     <!--   <td><input type="number" name='reduce[]' id="reduce" class="form-control reduce" 
+                            placeholder="0" step="any" value="0">
+                        </td> -->
+                        
+                       <!--<td>
                             <input type="number" name='total[]' id="total1" placeholder='0' class="form-control total" step="any" readonly>
                         </td>
                         <td style="display: none;">
                             <input type="text" name='taxamount1' id="taxamount1" class="form-control taxamount"/>
+                        </td>--> 
+
+
+                        <td style="display: none;">
+                          <input type="text" name='taxamount' id="taxamount1"
+                            class=" taxamount border-0 bg-transparent text-white" />
                         </td>
-                    </tr>
+                        <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='amount1'
+                            class=' text-center form-control amount border-0 bg-transparent text-white' name='amount[]'
+                            value='0.00' readonly>
+                        </td>
+                  <!--    </tr>
                     </tbody>
-                    <tr>
+                <tr>
                         <td style="border: none;"><a class="btn btn-outline-secondary ml-1" role="button" id="addrow" onclick="add_item_row()">+</a></td>
-                    </tr>
+                    </tr>--> 
 
 
 
-                </table>
+               <!--   </table>--> 
 
                   <td class='text-center'>
                     <button type='button' id='del_btn1'
