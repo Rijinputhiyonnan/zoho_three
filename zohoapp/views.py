@@ -26222,9 +26222,9 @@ def add_prod(request):     #updation
     items = AddItem.objects.filter(user_id=user.id, status_stock__iexact='Active')
     i = invoice.objects.all()
     payments = payment_terms.objects.filter(user = request.user)
-    sales = Sales.objects.all()
-    purchase = Purchase.objects.all()
-    unit = Unit.objects.all()
+    sales = Sales.objects.filter(additem__user=request.user)
+    purchase = Purchase.objects.filter(additem__user=request.user)
+    units = Unit.objects.all()
     banks = Bankcreation.objects.filter(user = request.user)
     last_record = invoice.objects.filter(user=request.user.id).last()
     last_reference = Invoice_Reference.objects.filter(user=request.user.id).last()
@@ -26292,12 +26292,16 @@ def add_prod(request):     #updation
             reford = '0'+ str(last_reference.invoice_reference+1)
         else:
             reford = str(last_reference.invoice_reference+1)
+    records=Invoice_Reference(invoice_reference=reford,
+                              user=user
+                              )
+    records.save()
         
         
         
     cur_user = request.user
     user = User.objects.get(id=cur_user.id)
-    unit = Unit.objects.all()
+    unit = Unit.objects.get(id=cur_user.id)
     bank_id = ''  
     bank_instance = None
 
@@ -26407,14 +26411,32 @@ def add_prod(request):     #updation
                 
                 invoice_payment.save()
                 
+                unit_id = request.POST.get('avlquantity', '') 
+
+    # Get the Unit instance based on the selected unit_id
+                avlitems = request.POST.getlist('avlquantity') 
+                unit_instance = get_object_or_404(Unit, id=unit_id)
+                additem = AddItem(
+                            stock=avlitems,
+                            user=user,
+                            unit=unit_instance,
+                            sales=sales,
+                            purchase=purchase,
+                            
+                            
+                        )
+        
+                additem.save()
+                print(additem, "maekmo")
                 
                 
-                if last_reference == None:
+                
+                '''if last_reference == None:
                     ref = Invoice_Reference(invoice_reference = int(reford),user=user)
                     ref.save()
                 else:
                     last_reference.invoice_reference = int(reford)
-                    last_reference.save()
+                    last_reference.save()'''
 
                 # Additional code for creating invoice items
 
@@ -26422,7 +26444,7 @@ def add_prod(request):     #updation
                 print(f"Value Error: {e}")
         
             
-                
+            
             items = request.POST.getlist('item[]')
             hsns = request.POST.getlist('hsn[]')
             quantity1 = request.POST.getlist('quantity[]')
@@ -26451,6 +26473,7 @@ def add_prod(request):     #updation
                     total=amounts[i]
                     
                 )
+    
 
         
 
@@ -26464,7 +26487,7 @@ def add_prod(request):     #updation
             'company': company,
             'sales': sales,
             'purchase': purchase,
-            'units': unit,
+            'units': units,
             'count': count,
             'payments': payments,
             'banks' : banks
