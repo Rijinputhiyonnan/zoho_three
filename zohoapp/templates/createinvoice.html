@@ -212,31 +212,47 @@
 }
 
 
-.select2-container--default .select2-search--dropdown .select2-search__field {
-  background-color: #000f1c; 
-  color: white !important;
-}
-form-control.select2.text-right.hsn.border-0,
-.select2-container--default .select2-selection--single {
-  
-  background-color: #41586bff !important;
-  color: white !important;
-}
 
-.noman{
-  background-color: #f76076 !important;
-  color:white;
-  
-
-}
-
-.select2-container--default .select2-results__option {
-  color: white;
-
-
-
-}
 </style>
+<style>
+  /* Customize the background color of the entire row */
+  td {
+    background-color: #4daaff;
+    color: white;
+  }
+  
+  /* Customize the background color of the dropdown menu */
+  .select2-container--default .select2-dropdown {
+    background-color: #3b3b3b;
+    color: white;
+  }
+  
+  /* Customize the background color of the upper portion of the dropdown menu */
+  .select2-container--default .select2-dropdown .select2-search {
+    background-color: #3b3b3b;
+    color: #3b3b3b;
+  }
+  
+  /* Customize the background color of the selected option */
+  .form-control.select2.text-right.hsn.border-0,
+  .select2-container--default .select2-selection--single {
+    background-color: #3b3b3b !important;
+    color: #da3d7b !important;
+  }
+  
+  /* Customize the color of the dropdown arrow */
+  .select2-container--default .select2-selection__arrow b {
+    border-color: #3b3b3b;
+  }
+
+
+  /* Customize the text color of the selected option */
+.select2-selection__rendered {
+  color: white !important;
+}
+
+</style>
+
 
 
 <div class="container-fulid containerprof">
@@ -519,7 +535,7 @@ form-control.select2.text-right.hsn.border-0,
               <option value="[JK]-Jammu and Kashmir">[JK] Jammu and Kashmir</option>
               <option value="[JH]-Jharkhand">[JH] Jharkhand</option>
               <option value="[KA]-Karnataka">[KA] Karnataka</option>
-              <option value="[KL]-Kerala">[KL] Kerala</option>
+            <!--<option value="[KL]-Kerala">[KL] Kerala</option>-->  
               <option value="[LA]-Ladakh">[LA] Ladakh</option>
               <option value="[LD]-Lakshadweep">[LD] Lakshadweep</option>
               <option value="[MP]-Madhya Pradesh">[MP] Madhya Pradesh</option>
@@ -682,139 +698,7 @@ form-control.select2.text-right.hsn.border-0,
                   <th>  </th>
                 </tr>
               </thead>
-               <!--  <tbody id="item_table_body">
-                <tr id="row1">
-                  <td class="text-white text-center" style="font-size: 10px;">1</td>
-                  <td style="font-size: 13px;" class="text-center">
-                 <div class="custom-dropdown" style="height: 8vh;"> 
-                      <input type="text" class="dropdown-input_item" id="item1" name="item[]" placeholder="Select item">
-                      <div class="dropdown-list" id="item_one1">
-                        {% for p in items %}
-                          <div class="dropdown-item"
-                            data-value="{{ p.id }}" data-name="{{ p.Name }}"
-                            data-hsn="{{ p.hsn }}" data-rate="{{ p.s_price }}"
-                            data-intrastate="{{ p.intrastate }}" data-interstate="{{ p.interstate }}"
-                            data-stock="{{ p.stock }}">
-                            {{ p.title }} {{ p.Name }} {{ p.last_name }}
-                          </div>
-                        {% endfor %}
-                      </div>
-                    </div>
-                    <select name='items[]' id="product" class="form-control select2">
-                      <option selected>Choose..</option>
-                      {% for i in items %}
-                          <option value="{{ i.Name }}" data-tokens="{{ i.Name }}">
-                              {{ i.Name }}
-                          </option>
-                      {% endfor %}
-                  </select>
-
- 
-
-
-
-                  <a class="btn btn-outline-secondary ml-1" role="button" data-target="#newitem" data-toggle="modal">+</a> 
-              </div>
-              <div id="errorLabel" style="color: red;"></div>
-          </td>
-          <td>
-              <input type="text" name='hsn[]' id="hsn1" placeholder='HSN'
-              class="form-control hsn"/>
-          </td>
-          <td>
-              <input type="number" name='quantitys'   style='margin-top:21px' placeholder='Enter Qty' id="quantitys" class="form-control quty"   hidden>
-              <input type="number" name='anotherQuantityInput'   style='margin-top:21px' placeholder='Enter Qty' id="anotherQuantityInput" value="0" class="form-control quty" hidden >
-              <input type="number" name='quantity[]' oninput="qtychange1(this)"  style='margin-top:21px' placeholder='Enter Qty' id="qty1" class="form-control qty" step=0 min=0 >
-                      <div><span>Available Qty :</span> <span id="qtyspan"class='text-muted'></span></div>
-          </td> 
-          
-          
-           
-  <script>
-      $('.select2').select2();
-      console.log('hi')
-      $(document).on('change', '#product', function () {
-     
-          console.log('hhhhh')
-         var select = $('#product').val();
-         var vid = $('#billno').val();
-         console.log('hhhhh',vid,select)
-         $.ajax({
-             type: "GET",
-             url: "{% url 'itemdatadebit' %}",
-             data: {
-                 id: select,
-                 vid: vid
-             },
-             success: function (response) {
-              console.log(response,'res')
-              
-                 if (response.error_flag === 1) {
-                     // Show error message in a label
-                     $('#errorLabel').text("Item is not purchased for this bill number");
-                 }else {
-                     // Remove the error message if error_flag is zero
-                     $('#errorLabel').text("");
-                 }
-                     // Update the HTML elements based on the response
-                     var data = response.hsn;
-                     var data2 =  response.qty;
-
-                     console.log(data2,'data2')
-                     var data3 = response.price;
-                     var data4 = response.gst;
-                     var data5 = response.sgst;
-                     var data6 = response.quty;
-                     var data7 =response.taxs;
-                     console.log(data7);
-                
-                     document.getElementById('hsn1').value = data; 
-     
-         
-     
-                     document.getElementById('qtyspan').innerHTML = data2 ;
-                     document.getElementById('unit1').value = data3;
-                     document.getElementById('taxs').value = data7;
-                     document.getElementById('quantitys').value = data6;
-
-                     var place = 'Kerala'
-                    
-                     if (place == '{{ cmp1.state }}') {
-
-                         document.getElementById('ta1').value = data4;
-                         
-                         
-                     }
-                     else{
-                      document.getElementById('ta5').value = data5;
-                     }
-                     
              
-             },
-             
-         });
-     });
-     
-
-     
-     
-</script>
-                    
-                  </td>
-                  
-
-
-                 
-                  <td style="width: 15%; font-size: 10px;" class='text-center' >
-                    <input style="font-size: 13px;" type='number' id='hsn1'
-                      class=' text-right hsn border-0 form-control bg-transparent text-white' name='hsn[]' readonly>
-                  </td>
-                  <td style="width: 17%;" class='text-center'>
-                    <input style="font-size: 13px;" type='number' id='qty1' class='text-center qty form-control border-0 bg-transparent text-white' name='quantity[]' value='0'>
-                    <input type="text" id="avl1" style="display: none;">
-                    <span class="text-warning" style="font-size: 10px;">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
-                    
-                  </td>
 <!-- Include jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
@@ -824,154 +708,6 @@ form-control.select2.text-right.hsn.border-0,
 <!-- Include Select2 JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
-<!--<script>
-  $(document).ready(function() {
-    // Initialize Select2 on your dropdown input
-    $('.dropdown-input_item').select2();
-
-    // Function to fetch item details (HSN, rate, tax) based on the selected item
-    function fillItemDetails(rowNumber) {
-      let itemInput = $(`#item${rowNumber}`);
-      let hsnElement = $(`#hsn${rowNumber}`);
-      let rateElement = $(`#rate${rowNumber}`);
-      let taxElement = $(`#tax${rowNumber}`);
-      let availableStockElement = $(`#stock_data${rowNumber}`);
-
-      let selectedItem = itemInput.val();
-
-      $.ajax({
-        url: '/get_item_details_invoice/',
-        method: 'GET',
-        data: { item: encodeURIComponent(selectedItem) },
-        success: function(data) {
-          hsnElement.val(data.hsn);
-          rateElement.val(data.rate);
-          taxElement.val(data.tax);
-          availableStockElement.val(data.availableStock);
-        },
-        error: function(xhr, status, error) {
-          alert(`Failed to fetch item details. Status: ${status}, Error: ${error}`);
-        }
-      });
-    }
-
-    // Function to update available stock when quantity is entered
-    function updateAvailableStock(rowNumber) {
-      let quantityInput = $(`#qty${rowNumber}`);
-      let availableStockElement = $(`#stock_data${rowNumber}`);
-      let quantity = parseFloat(quantityInput.val()) || 0;
-      let availableStock = parseFloat(availableStockElement.val()) || 0;
-
-      if (quantity > availableStock) {
-        alert('Quantity cannot be greater than available stock');
-        // Reset quantity to available stock
-        quantityInput.val(availableStock.toFixed(2));
-        quantity = availableStock;
-      }
-
-      // Update available stock after deduction
-      availableStockElement.val((availableStock - quantity).toFixed(2));
-    }
-
-    // Function to update tax type based on place of supply
-    function updateTaxType() {
-      let placeOfSupplyDropdown = $('#srcofsupply');
-      let selectedPlaceOfSupply = placeOfSupplyDropdown.val();
-      let taxTypeElement = $('#taxTypeDisplay');
-
-      // Default tax type
-      let taxType = 'Default Tax Type';
-
-      // Check if the selected place of supply is Kerala
-      if (selectedPlaceOfSupply === 'KL') {
-        taxType = 'GST'; // Update with your GST tax type
-      } else {
-        taxType = 'IGST'; // Update with your IGST tax type
-      }
-
-      // Update the tax type element with the new tax type
-      taxTypeElement.text('Tax Type: ' + taxType);
-    }
-
-    // Add event listener for place of supply dropdown change
-    $('#srcofsupply').on('change', updateTaxType);
-
-    // Document ready event listener
-    $(document).on('DOMContentLoaded', function() {
-      let rowCount = 1; // Set the initial row count
-
-      for (let i = 1; i <= rowCount; i++) {
-        let qtyInput = $(`#qty${i}`);
-        let input = $(`#item${i}`);
-
-        qtyInput.on('input', function() {
-          updateAvailableStock(i);
-        });
-
-        qtyInput.on('keydown', function(event) {
-          if (event.key === 'Enter') {
-            updateAvailableStock(i);
-          }
-        });
-
-        input.on('change', function() {
-          fillItemDetails(i);
-        });
-      }
-    });
-  });
-</script>
-
-
-
-                
-
-            
-                  <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='rate1'
-                      class=' text-right rate form-control border-0  bg-transparent text-white' name='rate[]' value='0'
-                      readonly>
-                  </td>
-                  <td style="width: 10%;" class='text-center text-dark'><input style="font-size: 13px;" type='number' id='discount1'
-                      class=' text-right discount border-0 bg-transparent text-white form-control' name='desc[]'
-                      value='0'>
-                  </td>
-                  <td style="width: 22%;" class='text-center ' style="font-size: 13px;"> 
-                    <input hidden value="{{company.state}}" id="cmpstate">
-                      <input type="text"  id="select_tax" placeholder="Tax Rate" class="form-control seltax d-flex">
-                      <select name='tax[]' id="tax11" class="form-control tax intra_tax d-none" onchange="taxchange(this.id)">
-               <select name='tax[]' id='tax1'
-                        class='form-control border-0 bg-transparent text-white text-center border-0 tax'
-                        onselect="toggleDateInput()" style="font-size: 13px;">
-                        <optgroup id="gst-group" class="text-center text-black" label="GST">
-                            <option class="text-black" value="0">0% GST</option>
-                            <option class="text-black" value="3">3% GST</option>
-                            <option class="text-black" value="5">5% GST</option>
-                            <option class="text-black" value="12">12% GST</option>
-                            <option class="text-black" value="18">18% GST</option>
-                            <option class="text-black" value="28">28% GST</option>
-                        </select>
-                     <optgroup id="igst-group" class="text-center text-black" label="IGST">
-                          <select name='tax2[]' id="tax21" class="form-control tax inter_tax d-none " onchange="taxchange(this.id)">
-                            <option class="text-black" value="0">0% IGST</option>
-                            <option class="text-black" value="3">3% IGST</option>
-                            <option class="text-black" value="5">5% IGST</option>
-                            <option class="text-black" value="12">12% IGST</option>
-                            <option class="text-black" value="18">18% IGST</option>
-                            <option class="text-black" value="28">28% IGST</option>
-                        
-                    </select>
-                    <label id="ml1" class="text-warning" style="display: none;"></label>
-                </td>
-                
-                  </td>
-                  <td style="display: none;">
-                    <input type="text" name='taxamount' id="taxamount1"
-                      class=" taxamount border-0 bg-transparent text-white" />
-                  </td>
-                  <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='amount1'
-                      class=' text-center form-control amount border-0 bg-transparent text-white' name='amount[]'
-                      value='0.00' readonly>
-                  </td>-->
 
 
 
@@ -979,13 +715,13 @@ form-control.select2.text-right.hsn.border-0,
                     <tr id='addr0'>
                         <td>1</td>
                         <td style="width: 10%;" >
-                            <div class="d-flex  bg-dark text-dark " style=" font-size: 10px;" class='text-center'>
+                            <div class="d-flex " style=" font-size: 10px;" class='text-center'>
 
 
-                                <select name='item[]' id="item1" class="form-control select2 noman text-right hsn border-0 " style="background-color : white">
-                                    <option class="form-control select2  text-right hsn border-0  bg-dark text-white" selected>Choose..</option>
+                                <select name='item[]' id="item1" class="form-control select2  text-right  "  >
+                                    <option class="form-control select2  text-right " selected>Choose..</option>
                                     {% for i in items %}
-                                        <option class="form-control select2  text-right hsn border-0  bg-dark text-white" value="{{ i.Name }}" data-tokens="{{ i.Name }}">
+                                        <option class="form-control select2  text-right  " value="{{ i.Name }}" data-tokens="{{ i.Name }}">
                                             {{ i.Name }}
                                         </option>
                                     {% endfor %}
@@ -1013,7 +749,7 @@ form-control.select2.text-right.hsn.border-0,
                           console.log('hi')
                           var initialStock = 0; // Variable to store the initial available quantity
                       
-                          $(document).on('change', '#item1', function () {
+                          $(document).on('change', '#item1',  function () {
                               console.log('hhhhh')
                               var select = $('#item1').val();
                               //var vid = $('#billno').val();
@@ -1044,7 +780,7 @@ form-control.select2.text-right.hsn.border-0,
                                       var data4 = response.gst;
                                       var data5 = response.sgst;
                                       var data6 = response.quty;
-                                      var data7 = response.taxs;
+                                      
                                       console.log(data7, 'blood');
                       
                                       document.getElementById('hsn1').value = data;
@@ -4393,4 +4129,287 @@ $.ajax({
                   </script>-->
 
                   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer></script>
+
+
+                  <!--<script>
+  $(document).ready(function() {
+    // Initialize Select2 on your dropdown input
+    $('.dropdown-input_item').select2();
+
+    // Function to fetch item details (HSN, rate, tax) based on the selected item
+    function fillItemDetails(rowNumber) {
+      let itemInput = $(`#item${rowNumber}`);
+      let hsnElement = $(`#hsn${rowNumber}`);
+      let rateElement = $(`#rate${rowNumber}`);
+      let taxElement = $(`#tax${rowNumber}`);
+      let availableStockElement = $(`#stock_data${rowNumber}`);
+
+      let selectedItem = itemInput.val();
+
+      $.ajax({
+        url: '/get_item_details_invoice/',
+        method: 'GET',
+        data: { item: encodeURIComponent(selectedItem) },
+        success: function(data) {
+          hsnElement.val(data.hsn);
+          rateElement.val(data.rate);
+          taxElement.val(data.tax);
+          availableStockElement.val(data.availableStock);
+        },
+        error: function(xhr, status, error) {
+          alert(`Failed to fetch item details. Status: ${status}, Error: ${error}`);
+        }
+      });
+    }
+
+    // Function to update available stock when quantity is entered
+    function updateAvailableStock(rowNumber) {
+      let quantityInput = $(`#qty${rowNumber}`);
+      let availableStockElement = $(`#stock_data${rowNumber}`);
+      let quantity = parseFloat(quantityInput.val()) || 0;
+      let availableStock = parseFloat(availableStockElement.val()) || 0;
+
+      if (quantity > availableStock) {
+        alert('Quantity cannot be greater than available stock');
+        // Reset quantity to available stock
+        quantityInput.val(availableStock.toFixed(2));
+        quantity = availableStock;
+      }
+
+      // Update available stock after deduction
+      availableStockElement.val((availableStock - quantity).toFixed(2));
+    }
+
+    // Function to update tax type based on place of supply
+    function updateTaxType() {
+      let placeOfSupplyDropdown = $('#srcofsupply');
+      let selectedPlaceOfSupply = placeOfSupplyDropdown.val();
+      let taxTypeElement = $('#taxTypeDisplay');
+
+      // Default tax type
+      let taxType = 'Default Tax Type';
+
+      // Check if the selected place of supply is Kerala
+      if (selectedPlaceOfSupply === 'KL') {
+        taxType = 'GST'; // Update with your GST tax type
+      } else {
+        taxType = 'IGST'; // Update with your IGST tax type
+      }
+
+      // Update the tax type element with the new tax type
+      taxTypeElement.text('Tax Type: ' + taxType);
+    }
+
+    // Add event listener for place of supply dropdown change
+    $('#srcofsupply').on('change', updateTaxType);
+
+    // Document ready event listener
+    $(document).on('DOMContentLoaded', function() {
+      let rowCount = 1; // Set the initial row count
+
+      for (let i = 1; i <= rowCount; i++) {
+        let qtyInput = $(`#qty${i}`);
+        let input = $(`#item${i}`);
+
+        qtyInput.on('input', function() {
+          updateAvailableStock(i);
+        });
+
+        qtyInput.on('keydown', function(event) {
+          if (event.key === 'Enter') {
+            updateAvailableStock(i);
+          }
+        });
+
+        input.on('change', function() {
+          fillItemDetails(i);
+        });
+      }
+    });
+  });
+</script>
+
+
+
+                
+
+            
+                  <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='rate1'
+                      class=' text-right rate form-control border-0  bg-transparent text-white' name='rate[]' value='0'
+                      readonly>
+                  </td>
+                  <td style="width: 10%;" class='text-center text-dark'><input style="font-size: 13px;" type='number' id='discount1'
+                      class=' text-right discount border-0 bg-transparent text-white form-control' name='desc[]'
+                      value='0'>
+                  </td>
+                  <td style="width: 22%;" class='text-center ' style="font-size: 13px;"> 
+                    <input hidden value="{{company.state}}" id="cmpstate">
+                      <input type="text"  id="select_tax" placeholder="Tax Rate" class="form-control seltax d-flex">
+                      <select name='tax[]' id="tax11" class="form-control tax intra_tax d-none" onchange="taxchange(this.id)">
+               <select name='tax[]' id='tax1'
+                        class='form-control border-0 bg-transparent text-white text-center border-0 tax'
+                        onselect="toggleDateInput()" style="font-size: 13px;">
+                        <optgroup id="gst-group" class="text-center text-black" label="GST">
+                            <option class="text-black" value="0">0% GST</option>
+                            <option class="text-black" value="3">3% GST</option>
+                            <option class="text-black" value="5">5% GST</option>
+                            <option class="text-black" value="12">12% GST</option>
+                            <option class="text-black" value="18">18% GST</option>
+                            <option class="text-black" value="28">28% GST</option>
+                        </select>
+                     <optgroup id="igst-group" class="text-center text-black" label="IGST">
+                          <select name='tax2[]' id="tax21" class="form-control tax inter_tax d-none " onchange="taxchange(this.id)">
+                            <option class="text-black" value="0">0% IGST</option>
+                            <option class="text-black" value="3">3% IGST</option>
+                            <option class="text-black" value="5">5% IGST</option>
+                            <option class="text-black" value="12">12% IGST</option>
+                            <option class="text-black" value="18">18% IGST</option>
+                            <option class="text-black" value="28">28% IGST</option>
+                        
+                    </select>
+                    <label id="ml1" class="text-warning" style="display: none;"></label>
+                </td>
+                
+                  </td>
+                  <td style="display: none;">
+                    <input type="text" name='taxamount' id="taxamount1"
+                      class=" taxamount border-0 bg-transparent text-white" />
+                  </td>
+                  <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='amount1'
+                      class=' text-center form-control amount border-0 bg-transparent text-white' name='amount[]'
+                      value='0.00' readonly>
+                  </td>-->
+  <!--  <tbody id="item_table_body">
+                <tr id="row1">
+                  <td class="text-white text-center" style="font-size: 10px;">1</td>
+                  <td style="font-size: 13px;" class="text-center">
+                 <div class="custom-dropdown" style="height: 8vh;"> 
+                      <input type="text" class="dropdown-input_item" id="item1" name="item[]" placeholder="Select item">
+                      <div class="dropdown-list" id="item_one1">
+                        {% for p in items %}
+                          <div class="dropdown-item"
+                            data-value="{{ p.id }}" data-name="{{ p.Name }}"
+                            data-hsn="{{ p.hsn }}" data-rate="{{ p.s_price }}"
+                            data-intrastate="{{ p.intrastate }}" data-interstate="{{ p.interstate }}"
+                            data-stock="{{ p.stock }}">
+                            {{ p.title }} {{ p.Name }} {{ p.last_name }}
+                          </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                    <select name='items[]' id="product" class="form-control select2">
+                      <option selected>Choose..</option>
+                      {% for i in items %}
+                          <option value="{{ i.Name }}" data-tokens="{{ i.Name }}">
+                              {{ i.Name }}
+                          </option>
+                      {% endfor %}
+                  </select>
+
+ 
+
+
+
+                  <a class="btn btn-outline-secondary ml-1" role="button" data-target="#newitem" data-toggle="modal">+</a> 
+              </div>
+              <div id="errorLabel" style="color: red;"></div>
+          </td>
+          <td>
+              <input type="text" name='hsn[]' id="hsn1" placeholder='HSN'
+              class="form-control hsn"/>
+          </td>
+          <td>
+              <input type="number" name='quantitys'   style='margin-top:21px' placeholder='Enter Qty' id="quantitys" class="form-control quty"   hidden>
+              <input type="number" name='anotherQuantityInput'   style='margin-top:21px' placeholder='Enter Qty' id="anotherQuantityInput" value="0" class="form-control quty" hidden >
+              <input type="number" name='quantity[]' oninput="qtychange1(this)"  style='margin-top:21px' placeholder='Enter Qty' id="qty1" class="form-control qty" step=0 min=0 >
+                      <div><span>Available Qty :</span> <span id="qtyspan"class='text-muted'></span></div>
+          </td> 
+          
+          
+           
+  <script>
+      $('.select2').select2();
+      console.log('hi')
+      $(document).on('change', '#product', function () {
+     
+          console.log('hhhhh')
+         var select = $('#product').val();
+         var vid = $('#billno').val();
+         console.log('hhhhh',vid,select)
+         $.ajax({
+             type: "GET",
+             url: "{% url 'itemdatadebit' %}",
+             data: {
+                 id: select,
+                 vid: vid
+             },
+             success: function (response) {
+              console.log(response,'res')
+              
+                 if (response.error_flag === 1) {
+                     // Show error message in a label
+                     $('#errorLabel').text("Item is not purchased for this bill number");
+                 }else {
+                     // Remove the error message if error_flag is zero
+                     $('#errorLabel').text("");
+                 }
+                     // Update the HTML elements based on the response
+                     var data = response.hsn;
+                     var data2 =  response.qty;
+
+                     console.log(data2,'data2')
+                     var data3 = response.price;
+                     var data4 = response.gst;
+                     var data5 = response.sgst;
+                     var data6 = response.quty;
+                     var data7 =response.taxs;
+                     console.log(data7);
+                
+                     document.getElementById('hsn1').value = data; 
+     
+         
+     
+                     document.getElementById('qtyspan').innerHTML = data2 ;
+                     document.getElementById('unit1').value = data3;
+                     document.getElementById('taxs').value = data7;
+                     document.getElementById('quantitys').value = data6;
+
+                     var place = 'Kerala'
+                    
+                     if (place == '{{ cmp1.state }}') {
+
+                         document.getElementById('ta1').value = data4;
+                         
+                         
+                     }
+                     else{
+                      document.getElementById('ta5').value = data5;
+                     }
+                     
+             
+             },
+             
+         });
+     });
+     
+
+     
+     
+</script>
+                    
+                  </td>
+                  
+
+
+                 
+                  <td style="width: 15%; font-size: 10px;" class='text-center' >
+                    <input style="font-size: 13px;" type='number' id='hsn1'
+                      class=' text-right hsn border-0 form-control bg-transparent text-white' name='hsn[]' readonly>
+                  </td>
+                  <td style="width: 17%;" class='text-center'>
+                    <input style="font-size: 13px;" type='number' id='qty1' class='text-center qty form-control border-0 bg-transparent text-white' name='quantity[]' value='0'>
+                    <input type="text" id="avl1" style="display: none;">
+                    <span class="text-warning" style="font-size: 10px;">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
+                    
+                  </td>
 {% endblock %}
