@@ -26295,7 +26295,7 @@ def add_prod(request):     #updation
     records=Invoice_Reference(invoice_reference=reford,
                               user=user
                               )
-    records.save()
+    
         
         
         
@@ -26411,21 +26411,21 @@ def add_prod(request):     #updation
                 
                 invoice_payment.save()
                 
-                unit_id = request.POST.get('avlquantity', '') 
-
-    # Get the Unit instance based on the selected unit_id
-                avlitems = request.POST.getlist('avlquantity') 
-                unit_instance = get_object_or_404(Unit, id=unit_id)
-                additem = AddItem(
-                            stock=avlitems,
-                            user=user,
-                            unit=unit_instance,
-                            sales=sales,
-                            purchase=purchase,
-                            
-                            
-                        )
+                avlquantity = request.POST.get('avlquantity', '')
         
+                unit_instance = get_object_or_404(Unit, id=avlquantity)
+                
+                # Create the AddItem instance with the selected Unit
+                additem = AddItem(
+                    stock=unit_instance.stock,  
+                    user=user,
+                    unit=unit_instance,
+                    sales=sales,
+                    purchase=purchase,
+                   
+                )
+                
+                
                 additem.save()
                 print(additem, "maekmo")
                 
@@ -26473,6 +26473,7 @@ def add_prod(request):     #updation
                     total=amounts[i]
                     
                 )
+            records.save()
     
 
         
@@ -27726,7 +27727,9 @@ def get_items_list(request):
         
 def itemdatadebit(request):
     id = request.GET.get('id')
+    isd = request.GET.get('isd')
     print(id)
+    print(isd, 'Geology')
     user = request.user.id
 
     user = User.objects.get(id=user)
@@ -27746,8 +27749,14 @@ def itemdatadebit(request):
             hsn = item.hsn
             qty = item.stock
             price = item.s_price
-            gst = item.interstate
-            sgst = item.intrastate
+            print(cmp1.state, "dotstate")
+            if isd == cmp1.state:
+                
+                print(isd, "place in gst")
+                gst = item.intrastate
+            else:
+                print("something")
+                gst = item.interstate
             places = cmp1.state
 
             # Return the details for each item
@@ -27758,7 +27767,7 @@ def itemdatadebit(request):
                 'places': places,
                 'price': price,
                 'gst': gst,
-                'sgst': sgst,
+                
             })
     else:
         return JsonResponse({

@@ -515,7 +515,7 @@
           <div class="col-md-6">
             <input hidden value="{{company.state}}" id="cmpstate">
             <select name="place_of_supply" id="srcofsupply" onchange="toggleDateInput()" onselect="calculateTaxAmount()"
-              class="form-control bg-light text-dark">
+              class="form-control bg-light text-dark ply">
               <option value=""></option>
               <option value="{{ company.state }}" selected> {{ company.state }}</option>
               <option value="[AN]-Andaman and Nicobar Islads">[AN] Andaman and Nicobar Islads</option>
@@ -745,73 +745,61 @@
                       </td>
                       
                       <script>
-                          $('.select2').select2();
-                          console.log('hi')
-                          var initialStock = 0; // Variable to store the initial available quantity
-                      
-                          $(document).on('change', '#item1',  function () {
-                              console.log('hhhhh')
-                              var select = $('#item1').val();
-                              //var vid = $('#billno').val();
-                              console.log('hhhhh',select)
-                              $.ajax({
-                                  type: "GET",
-                                  url: "{% url 'itemdatadebit' %}",
-                                  data: {
-                                      id: select,
-                                      //vid: vid
-                                  },
-                                  success: function (response) {
-                                      console.log(response,'res')
-                      
-                                      if (response.error_flag === 1) {
-                                          // Show error message in a label
-                                          $('#errorLabel').text("Item is not present");
-                                      } else {
-                                          // Remove the error message if error_flag is zero
-                                          $('#errorLabel').text("");
-                                      }
-                                      // Update the HTML elements based on the response
-                                      var data = response.hsn;
-                                      var data2 =  response.qty;
-                      
-                                      console.log(data2,'data2')
-                                      var data3 = response.price;
-                                      var data4 = response.gst;
-                                      var data5 = response.sgst;
-                                      var data6 = response.quty;
-                                      
-                                      console.log(data7, 'blood');
-                      
-                                      document.getElementById('hsn1').value = data;
-                                      document.getElementById('stock_data1').innerHTML = data2;
-                                      document.getElementById('rate1').value = data3;
-                                      document.getElementById('tax1').value = data4;
-                                      document.getElementById('stock_data1').value = data6;
-                      
-                                      initialStock = parseInt(data2); // Set the initial available quantity as an integer
-                                  },
-                              });
-                          });
-                      
-                          // Add this part to handle the blur event (when the input field loses focus)
-                          $(document).on('blur', '#qty1', function () {
-                              // Parse the entered quantity as an integer
-                              var enteredQuantity = parseInt($('#qty1').val());
-                      
-                              // Check if the entered quantity is greater than zero
-                              if (enteredQuantity > 0) {
-                                  // Update the available quantity (subtract the entered quantity from the initial stock)
-                                  var updatedStock = initialStock - enteredQuantity;
-                                  $('#stock_data1').text(updatedStock);
-                              }
-                      
-                              // Set the entered value
-                              $('#qty1').val(enteredQuantity);
-                          });
-                      
+                        $('.select2').select2();
+                        var initialStock = 0;
+                    
+                        $(document).on('change', '#item1', '.ply', function () {
+                            var select = $('#item1').val();
+                            var source = $('.ply').val();
+                            $.ajax({
+                                type: "GET",
+                                url: "{% url 'itemdatadebit' %}",
+                                data: {
+                                    id: select,
+                                    isd: source,
+                                },
+                                success: function (response) {
+                                    if (response.error_flag === 1) {
+                                        $('#errorLabel').text("Item is not present");
+                                    } else {
+                                        $('#errorLabel').text("");
+                                    }
+                    
+                                    var data = response.hsn;
+                                    var data2 = response.qty;
+                                    var data3 = response.price;
+                                    var data4 = response.gst;
+                                    console.log(data4, "gstmeaning")
+                                    //var data5 = response.sgst;
+                                    var data6 = response.quty;
+                    
+                                    document.getElementById('hsn1').value = data;
+                                    document.getElementById('stock_data1').innerHTML = data2;
+                                    document.getElementById('rate1').value = data3;
+                                    document.getElementById('tax1').value = data4;
+                                    document.getElementById('stock_data1').value = data6;
+                    
+                                    
 
-                   
+
+                                },
+                            });
+                        });
+                    
+                        $(document).on('blur', '#qty1', function () {
+                            var enteredQuantity = parseInt($('#qty1').val());
+                    
+                            if (enteredQuantity > 0) {
+                                var updatedStock = initialStock - enteredQuantity;
+                                $('#stock_data1').text(updatedStock);
+                            }
+                    
+                            $('#qty1').val(enteredQuantity);
+                        });
+                    </script>
+                    
+
+                  <script>        
                    
         function reloadbill(vid) {
 console.log(vid);
@@ -851,42 +839,41 @@ $.ajax({
                       class=' text-right discount border-0 bg-transparent text-white form-control' name='desc[]'
                       value='0'>
                   </td> 
-                  <script>
+                  <!--   <script>
                     function updateTaxOptions(placeOfSupply) {
-                        var gstSelect = $('#tax1');
+                        var gstSelect = $('.tax-options');
                         gstSelect.empty();
-                    
-                        if (placeOfSupply === "{{ company.state }}") {
-                            // If place of supply is the same as the company state, it's GST
-                            gstSelect.append('<option id="ta1" value=0 text={{ company.state }} hidden>Select</option>');
-                            gstSelect.append('<option value=0 text={{ company.state }}>00% GST(00%)</option>');
-                            gstSelect.append('<option value=3 text={{ company.state }}>03% GST(03%)</option>');
-                            gstSelect.append('<option value=5 text={{ company.state }}>05% GST(05%)</option>');
-                            gstSelect.append('<option value=12 text={{ company.state }}>12% GST(12%)</option>');
-                            gstSelect.append('<option value=18 text={{ company.state }}>18% GST(18%)</option>');
-                            gstSelect.append('<option value=28 text={{ company.state }}>28% GST(28%)</option>');
+                
+                        if (placeOfSupply === "Kerala") {
+                            gstSelect.append('<option value="0" hidden>Select</option>');
+                            gstSelect.append('<option value="0">00% GST(00%)</option>');
+                            gstSelect.append('<option value="3">03% GST(03%)</option>');
+                            gstSelect.append('<option value="5">05% GST(05%)</option>');
+                            gstSelect.append('<option value="12">12% GST(12%)</option>');
+                            gstSelect.append('<option value="18">18% GST(18%)</option>');
+                            gstSelect.append('<option value="28">28% GST(28%)</option>');
                         } else {
-                            // Otherwise, it's IGST
-                            gstSelect.append('<option id="ta5" value=0 text=" " hidden>Select</option>');
-                            gstSelect.append('<option value=0 text=" ">0.0% IGST(00%)</option>');
-                            gstSelect.append('<option value=3 text=" ">03.0% IGST(03%)</option>');
-                            gstSelect.append('<option value=5 text=" ">05.0% IGST(05%)</option>');
-                            gstSelect.append('<option value=12 text=" ">12.0% IGST(12%)</option>');
-                            gstSelect.append('<option value=18 text=" ">18.0% IGST(18%)</option>');
+                            gstSelect.append('<option value="0" hidden>Select</option>');
+                            gstSelect.append('<option value="0">0.0% IGST(00%)</option>');
+                            gstSelect.append('<option value="3">03.0% IGST(03%)</option>');
+                            gstSelect.append('<option value="5">05.0% IGST(05%)</option>');
+                            gstSelect.append('<option value="12">12.0% IGST(12%)</option>');
+                            gstSelect.append('<option value="18">18.0% IGST(18%)</option>');
                         }
                     }
-                    
-                    // Call updateTaxOptions when the place of supply changes
-                    $('#srcofsupply').on('change', function() {
+                
+                    $('#srcofsupply').on('change', function () {
                         var placeOfSupply = $(this).val();
                         updateTaxOptions(placeOfSupply);
                     });
-                    </script>
+                </script>-->
+                
+                    
                     
                         <td  style="width: 15%;" class='text-center'>
-                            <input type="text" name='taxs' id="taxs" placeholder='Enter Unit Price'
-                            class="text-right discount border-0 bg-transparent text-white form-control" onchange="taxchange(this)" step="0.00" min="0" hidden >
-                            <select name='tax[]' id="tax1" class="text-right discount border-0 form-control" style="background-color: #3b3b3b;">
+                          <!--  <input type="text" name='taxs' id="taxs" placeholder='Enter Unit Price'
+                            class="text-right discount border-0 bg-transparent text-white form-control" onchange="taxchange(this)" step="0.00" min="0" hidden >-->
+                            <select name='tax[]' id="tax1" class="text-right tax discount border-0 form-control tax-options" style="background-color: #3b3b3b;">
                                 {% if company.state == 'Kerala' %}
                                 <option id="ta1" value=0 text={{ company.state }} hidden>Select</option>
                                 <option value=0 text={{ company.state }}>00% GST(00%)</option>
