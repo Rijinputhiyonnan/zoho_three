@@ -745,12 +745,25 @@
                       </td>
                       
                       <script>
-                        $('.select2').select2();
-                        var initialStock = 0;
+                        $(document).ready(function() {
+                            // Initialize Select2 for item dropdown
+                            $('#item1').select2();
                     
-                        $(document).on('change', '#item1', '.ply', function () {
+                            // Update tax dropdown when source of supply changes
+                            $('#srcofsupply').change(function() {
+                                updateFields();
+                            });
+                    
+                            // Update tax dropdown when item changes
+                            $('#item1').change(function() {
+                                updateFields();
+                            });
+                        });
+                    
+                        function updateFields() {
                             var select = $('#item1').val();
-                            var source = $('.ply').val();
+                            var source = $('#srcofsupply').val();
+                    
                             $.ajax({
                                 type: "GET",
                                 url: "{% url 'itemdatadebit' %}",
@@ -758,34 +771,45 @@
                                     id: select,
                                     isd: source,
                                 },
-                                success: function (response) {
+                                success: function(response) {
                                     if (response.error_flag === 1) {
                                         $('#errorLabel').text("Item is not present");
                                     } else {
                                         $('#errorLabel').text("");
                                     }
                     
-                                    var data = response.hsn;
-                                    var data2 = response.qty;
-                                    var data3 = response.price;
-                                    var data4 = response.gst;
-                                    console.log(data4, "gstmeaning")
-                                    //var data5 = response.sgst;
-                                    var data6 = response.quty;
+                                    var hsn = response.hsn;
+                                    var rate = response.price;
+                                    var tax = response.gst;
                     
-                                    document.getElementById('hsn1').value = data;
-                                    document.getElementById('stock_data1').innerHTML = data2;
-                                    document.getElementById('rate1').value = data3;
-                                    document.getElementById('tax1').value = data4;
-                                    document.getElementById('stock_data1').value = data6;
+                                    // Populate HSN and rate fields
+                                    $('#hsn1').val(hsn);
+                                    $('#rate1').val(rate);
                     
-                                    
-
-
+                                    // Clear existing options and add new ones for tax dropdown
+                                    var taxDropdown = $('#tax1');
+                                    taxDropdown.empty();
+                    
+                                    // Check source of supply and set tax accordingly
+                                    if (source === "{{ company.state }}") {
+                                        // If source is Kerala, use GST
+                                        taxDropdown.append($('<option>', {value: tax}).text(tax + '% GST (' + tax + '%)'));
+                                    } else {
+                                        // For other states, use IGST
+                                        taxDropdown.append($('<option>', {value: tax}).text(tax + '% IGST (' + tax + '%)'));
+                                    }
+                    
+                                    // Refresh Select2 to reflect changes
+                                    taxDropdown.select2();
                                 },
                             });
-                        });
+                        }
+                    </script>
                     
+                    
+                    
+                    
+                  <script>
                         $(document).on('blur', '#qty1', function () {
                             var enteredQuantity = parseInt($('#qty1').val());
                     
@@ -874,7 +898,7 @@ $.ajax({
                           <!--  <input type="text" name='taxs' id="taxs" placeholder='Enter Unit Price'
                             class="text-right discount border-0 bg-transparent text-white form-control" onchange="taxchange(this)" step="0.00" min="0" hidden >-->
                             <select name='tax[]' id="tax1" class="text-right tax discount border-0 form-control tax-options" style="background-color: #3b3b3b;">
-                                {% if company.state == 'Kerala' %}
+                             
                                 <option id="ta1" value=0 text={{ company.state }} hidden>Select</option>
                                 <option value=0 text={{ company.state }}>00% GST(00%)</option>
                                 <option value=3 text={{ company.state }}>03% GST(03%)</option>
@@ -882,7 +906,7 @@ $.ajax({
                                 <option value=12 text={{ company.state }}>12% GST(12%)</option>
                                 <option value=18 text={{ company.state }}>18% GST(18%)</option>
                                 <option value=28 text={{ company.state }}>28% GST(28%)</option>
-                                {% else %}
+                              
                                 <option id="ta5" value=0 text=" " hidden>Select</option>
                                 <option value=0 text=" ">0.0% IGST(00%)</option>
                                 <option value=3 text=" ">03.0% IGST(03%)</option>
@@ -890,7 +914,7 @@ $.ajax({
                                 <option value=12 text=" ">12.0% IGST(12%)</option>
                                 <option value=18 text=" ">18.0% IGST(18%)</option>
                                 <option value=28 text=" ">28.0% IGST(28%)</option>
-                                {% endif %}
+                              
                           </select>
                         </td>
 
