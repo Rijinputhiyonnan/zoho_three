@@ -744,116 +744,7 @@
                           <span class="text-warning" style="font-size: 10px;">Available Stock: <span id="stock_data1" class="stock_data text-warning" name='avlquantity'></span></span>
                       </td>
                       
-                      <script>
-                        $(document).ready(function() {
-                            // Initialize Select2 for item dropdown
-                            $('#item1').select2();
-                    
-                            // Update tax dropdown when source of supply changes
-                            $('#srcofsupply').change(function() {
-                                updateFields();
-                            });
-                    
-                            // Update tax dropdown when item changes
-                            $('#item1').change(function() {
-                                updateFields();
-                            });
-                        });
-                    
-                        function updateFields() {
-                            var select = $('#item1').val();
-                            var source = $('#srcofsupply').val();
-                    
-                            $.ajax({
-                                type: "GET",
-                                url: "{% url 'itemdatadebit' %}",
-                                data: {
-                                    id: select,
-                                    isd: source,
-                                },
-                                success: function(response) {
-                                    if (response.error_flag === 1) {
-                                        $('#errorLabel').text("Item is not present");
-                                    } else {
-                                        $('#errorLabel').text("");
-                                    }
-                    
-                                    var hsn = response.hsn;
-                                    var rate = response.price;
-                                    var tax = response.gst;
-                    
-                                    // Populate HSN and rate fields
-                                    $('#hsn1').val(hsn);
-                                    $('#rate1').val(rate);
-                    
-                                    // Clear existing options and add new ones for tax dropdown
-                                    var taxDropdown = $('#tax1');
-                                    taxDropdown.empty();
-                    
-                                    // Check source of supply and set tax accordingly
-                                    if (source === "{{ company.state }}") {
-                                        // If source is Kerala, use GST
-                                        taxDropdown.append($('<option>', {value: tax}).text(tax + '% GST (' + tax + '%)'));
-                                    } else {
-                                        // For other states, use IGST
-                                        taxDropdown.append($('<option>', {value: tax}).text(tax + '% IGST (' + tax + '%)'));
-                                    }
-                    
-                                    // Refresh Select2 to reflect changes
-                                    taxDropdown.select2();
-                                },
-                            });
-                        }
-                    </script>
-                    
-                    
-                    
-                    
-                  <script>
-                        $(document).on('blur', '#qty1', function () {
-                            var enteredQuantity = parseInt($('#qty1').val());
-                    
-                            if (enteredQuantity > 0) {
-                                var updatedStock = initialStock - enteredQuantity;
-                                $('#stock_data1').text(updatedStock);
-                            }
-                    
-                            $('#qty1').val(enteredQuantity);
-                        });
-                    </script>
-                    
-
-                  <script>        
-                   
-        function reloadbill(vid) {
-console.log(vid);
-$.ajax({
-    url: "{% url 'get_vendor_data_bill' %}",
-    type: "GET",
-    dataType: "json",
-    data:{
-        id:vid
-    },
-    success: function(data) {
-        console.log(data,'hie')
-        var dropdow = $('#billno');
-        dropdow.empty();
-        $.each(data, function(key, value) {
-            dropdow.append($('<option></option>').attr('value', key).text(value).val(value));
-        });
-        
-    },
-    error: function(xhr, status, error) {
-        console.error(xhr.responseText);
-      
-    }
-    
-
-});
-}
-                   
-                   
-                                                                   </script>
+                  
                         <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='rate1'
                         class=' text-right rate form-control border-0  bg-transparent text-white' name='rate[]' value='0'
                         readonly>
@@ -863,34 +754,7 @@ $.ajax({
                       class=' text-right discount border-0 bg-transparent text-white form-control' name='desc[]'
                       value='0'>
                   </td> 
-                  <!--   <script>
-                    function updateTaxOptions(placeOfSupply) {
-                        var gstSelect = $('.tax-options');
-                        gstSelect.empty();
-                
-                        if (placeOfSupply === "Kerala") {
-                            gstSelect.append('<option value="0" hidden>Select</option>');
-                            gstSelect.append('<option value="0">00% GST(00%)</option>');
-                            gstSelect.append('<option value="3">03% GST(03%)</option>');
-                            gstSelect.append('<option value="5">05% GST(05%)</option>');
-                            gstSelect.append('<option value="12">12% GST(12%)</option>');
-                            gstSelect.append('<option value="18">18% GST(18%)</option>');
-                            gstSelect.append('<option value="28">28% GST(28%)</option>');
-                        } else {
-                            gstSelect.append('<option value="0" hidden>Select</option>');
-                            gstSelect.append('<option value="0">0.0% IGST(00%)</option>');
-                            gstSelect.append('<option value="3">03.0% IGST(03%)</option>');
-                            gstSelect.append('<option value="5">05.0% IGST(05%)</option>');
-                            gstSelect.append('<option value="12">12.0% IGST(12%)</option>');
-                            gstSelect.append('<option value="18">18.0% IGST(18%)</option>');
-                        }
-                    }
-                
-                    $('#srcofsupply').on('change', function () {
-                        var placeOfSupply = $(this).val();
-                        updateTaxOptions(placeOfSupply);
-                    });
-                </script>-->
+                  
                 
                     
                     
@@ -1053,7 +917,142 @@ $.ajax({
             </div>
           </div>
         </div>
+        <script>
+          $(document).ready(function() {
+              // Initialize Select2 for item dropdown
+              $('#item1').select2();
+      
+              // Update fields when source of supply or item changes
+              $('#srcofsupply, #item1').change(function() {
+                  updateFields();
+              });
+      
+              // Change event for tax dropdown
+              $('#tax1').change(function() {
+                  // Handle tax change here if needed
+                  var selectedTax = $(this).val();
+                  console.log('Selected tax:', selectedTax);
+              });
+          });
+      
+          function updateFields() {
+              var select = $('#item1').val();
+              var source = $('#srcofsupply').val();
+      
+              $.ajax({
+                  type: "GET",
+                  url: "{% url 'itemdatadebit' %}",
+                  data: {
+                      id: select,
+                      isd: source,
+                  },
+                  success: function(response) {
+                      if (response.error_flag === 1) {
+                          $('#errorLabel').text("Item is not present");
+                      } else {
+                          $('#errorLabel').text("");
+      
+                          var hsn = response.hsn;
+                          var rate = response.price;
+                          var fetchedTax = response.gst;
+      
+                          // Populate HSN and rate fields
+                          $('#hsn1').val(hsn);
+                          $('#rate1').val(rate);
+      
+                          // Update tax dropdown with fetched tax and an option to change it
+                          var taxDropdown = $('#tax1');
+                          taxDropdown.empty();
+      
+                          // Check source of supply and set tax accordingly
+                          if (source === "{{ company.state }}") {
+                              // If source is Kerala, use GST
+                              taxDropdown.append('<option value="' + fetchedTax + '" selected>' + fetchedTax + '</option>');
+                              
+                          taxDropdown.append('<option value="0"> GST(00%)</option>');
+                          taxDropdown.append('<option value="3"> GST 3(3%)</option>');
+                          taxDropdown.append('<option value="5">GST 5(5%)</option>');
+                          taxDropdown.append('<option value="12">GST 12(12%)</option>');
+                          taxDropdown.append('<option value="18"> GST 18(18%) </option>');
+                          taxDropdown.append('<option value="28">GST 28(28%) </option>');
+                          
+                          } else {
+                              // For other states, use IGST
+                              taxDropdown.append('<option value="' + fetchedTax + '" selected>' + fetchedTax + '</option>');
+                              taxDropdown.append('<option value="0">00% IGST(00%)</option>');
+                              taxDropdown.append('<option value="3">3% GST(3%)</option>');
+                              taxDropdown.append('<option value="5">5% IGST(5%)</option>');
+                              taxDropdown.append('<option value="12">12% IGST(12%)</option>');
+                              taxDropdown.append('<option value="18">18% IGST(18%) </option>');
+                              taxDropdown.append('<option value="28">28% IGST(28%) </option>');
+                          }
+      
+                          
 
+                    
+      
+                          // Trigger change event on tax dropdown to reflect changes
+                          taxDropdown.trigger('change');
+                      }
+                  },
+              });
+          }
+      </script>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    <script>
+          $(document).on('blur', '#qty1', function () {
+              var enteredQuantity = parseInt($('#qty1').val());
+      
+              if (enteredQuantity > 0) {
+                  var updatedStock = initialStock - enteredQuantity;
+                  $('#stock_data1').text(updatedStock);
+              }
+      
+              $('#qty1').val(enteredQuantity);
+          });
+      </script>
+      
+
+<!--    <script>        
+     
+function reloadbill(vid) {
+console.log(vid);
+$.ajax({
+url: "{% url 'get_vendor_data_bill' %}",
+type: "GET",
+dataType: "json",
+data:{
+id:vid
+},
+success: function(data) {
+console.log(data,'hie')
+var dropdow = $('#billno');
+dropdow.empty();
+$.each(data, function(key, value) {
+dropdow.append($('<option></option>').attr('value', key).text(value).val(value));
+});
+
+},
+error: function(xhr, status, error) {
+console.error(xhr.responseText);
+
+}
+
+
+});
+}
+     
+     
+                                                     </script>-->
         <div class="row border-bottom">
           <div class="col-md-8 d-flex flex-column  text-white mb-5">
             <label for="">Terms & Conditions</label>
