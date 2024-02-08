@@ -741,7 +741,12 @@
                         <td style="width: 17%;" class='text-center'>
                           <input style="font-size: 13px;" type='number' id='qty1' class='text-center qty form-control border-0 bg-transparent text-white' name='quantity[]' value='0'>
                           <input type="text" id="avl1" style="display: none;">
-                          <span class="text-warning" style="font-size: 10px;">Available Stock: <span id="stock_data1" class="stock_data text-warning" name='avlquantity'></span></span>
+                          <div style="display: flex; align-items: center;">
+                            <span class="text-warning" style="font-size: 10px;">Available Stock:</span>
+                            <input style="font-size: 9px; margin-left: 10px;" id="stock_data1" class="stock_data text-warning border-0 form-control bg-transparent text-right" name='avlquantity' readonly>
+                        </div>
+                        
+
                       </td>
                       
                   
@@ -770,7 +775,7 @@
                                 <option value=12 text={{ company.state }}>12% GST(12%)</option>
                                 <option value=18 text={{ company.state }}>18% GST(18%)</option>
                                 <option value=28 text={{ company.state }}>28% GST(28%)</option>
-                              
+                          
                                 <option id="ta5" value=0 text=" " hidden>Select</option>
                                 <option value=0 text=" ">0.0% IGST(00%)</option>
                                 <option value=3 text=" ">03.0% IGST(03%)</option>
@@ -778,7 +783,7 @@
                                 <option value=12 text=" ">12.0% IGST(12%)</option>
                                 <option value=18 text=" ">18.0% IGST(18%)</option>
                                 <option value=28 text=" ">28.0% IGST(28%)</option>
-                              
+                            
                           </select>
                         </td>
 
@@ -954,11 +959,14 @@
       
                           var hsn = response.hsn;
                           var rate = response.price;
+                          var qty = response.qty;
                           var fetchedTax = response.gst;
+                          console.log(qty, "qty")
       
-                          // Populate HSN and rate fields
+                          
                           $('#hsn1').val(hsn);
                           $('#rate1').val(rate);
+                          $('#stock_data1').val(qty);
       
                           // Update tax dropdown with fetched tax and an option to change it
                           var taxDropdown = $('#tax1');
@@ -980,7 +988,7 @@
                               // For other states, use IGST
                               taxDropdown.append('<option value="' + fetchedTax + '" selected>' + fetchedTax + '</option>');
                               taxDropdown.append('<option value="0">00% IGST(00%)</option>');
-                              taxDropdown.append('<option value="3">3% GST(3%)</option>');
+                              taxDropdown.append('<option value="3">3% IGST(3%)</option>');
                               taxDropdown.append('<option value="5">5% IGST(5%)</option>');
                               taxDropdown.append('<option value="12">12% IGST(12%)</option>');
                               taxDropdown.append('<option value="18">18% IGST(18%) </option>');
@@ -997,6 +1005,45 @@
                   },
               });
           }
+
+
+          $.ajax({
+            type: "GET",
+            url: "{% url 'itemdatadebit' %}",
+            data: {
+                id: select,
+                isd: source,
+            },
+            success: function(response) {
+                // Extract tax value from the response
+                var fetchedTax = response.tax;
+        
+                // Update the tax dropdown with the fetched tax value
+                $('#tax1').val(fetchedTax);
+        
+                // Determine whether the source of supply matches the company state
+                var isSameState = source === "{{ company.state }}";
+        
+                // Set the display of tr_igst, tr_cgst, and tr_sgst based on the source of supply
+                if (isSameState) {
+                    // If the source of supply matches the company state, hide tr_igst and display tr_cgst and tr_sgst
+                    document.getElementById("tr_igst").style.display = "none";
+                    document.getElementById("tr_cgst").style.display = "";
+                    document.getElementById("tr_sgst").style.display = "";
+                } else {
+                    // If the source of supply is different from the company state, hide tr_cgst and tr_sgst and display tr_igst
+                    document.getElementById("tr_igst").style.display = "";
+                    document.getElementById("tr_cgst").style.display = "none";
+                    document.getElementById("tr_sgst").style.display = "none";
+                }
+        
+                // Call the function to recalculate row amount, subtotal, and grand total
+                calculateRowAmount();
+                calculateSubtotal();
+                calculateGrandTotal();
+            },
+        });
+        
       </script>
       
       
@@ -1009,16 +1056,26 @@
       
       
     <script>
-          $(document).on('blur', '#qty1', function () {
-              var enteredQuantity = parseInt($('#qty1').val());
       
-              if (enteredQuantity > 0) {
-                  var updatedStock = initialStock - enteredQuantity;
-                  $('#stock_data1').text(updatedStock);
-              }
+      $(document).on('blur', '#qty1', function () {
+        initialStock = parseInt($('#stock_data1').val());
+          var enteredQuantity = parseInt($('#qty1').val());
       
-              $('#qty1').val(enteredQuantity);
-          });
+          if (isNaN(initialStock) || isNaN(enteredQuantity)) {
+              console.log("Either initialStock or enteredQuantity is not a number.");
+              return;
+          }
+      
+          if (enteredQuantity > 0) {
+              var updatedStock = initialStock - enteredQuantity;
+              console.log(updatedStock, "updated")
+              $('#stock_data1').val(updatedStock); // Use .val() instead of .text()
+          }
+      
+          $('#qty1').val(enteredQuantity);
+      });
+      
+    
       </script>
       
 
