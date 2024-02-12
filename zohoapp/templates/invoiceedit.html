@@ -417,13 +417,13 @@
               <thead>
 
                 <tr>
-                  <th>Item<a href="" data-toggle="modal" data-target="#newitem" class="text-capitalize">+ Item</a></th>
-                  <th class="text-right">HSN</th>
-                  <th class="text-right">Quantity</th>
-                  <th class="text-right">Rate</th>
-                  <th class="text-right">Discount</th>
-                  <th class="text-right">Tax</th>
-                  <th class="text-right">Amount</th>
+                  <th class="text-center" style="width: 11%; font-size: 10px;">Item<a href="" data-toggle="modal" data-target="#newitem" class="text-capitalize" style="width: 8%; font-size: 9px;">+ Item</a></th>
+                  <th class="text-center" style="width: 13%; font-size: 10px;">HSN</th>
+                  <th class="text-center" style="width: 13%; font-size: 10px;">Quantity</th>
+                  <th class="text-center" style="width: 13%; font-size: 10px;">Rate</th>
+                  <th class="text-center"style="width: 13%; font-size: 10px;">Discount</th>
+                  <th class="text-center" style="width: 13%; font-size: 10px;">Tax</th>
+                  <th class="text-center" style="width: 13%; font-size: 10px;">Amount</th>
                   <th></th>
                 </tr>
               </thead>
@@ -431,8 +431,8 @@
                 {% for i in est %}
                 <tr id="row{{forloop.counter}}">
                   
-                  <td>
-                    <div>
+                  <td class="text-center" style="width: 11%; font-size: 10px;">
+                    <div >
                      <!-- <select class='form-control border-0 bg-transparent text-white border-0 item_select itm'
                         name='item[]' id='item{{forloop.counter}}' onchange="itemfunction(this.id)">
                         <option selected value="{{i.product}}" hidden>{{i.product}}</option>
@@ -440,8 +440,8 @@
                         <option class="text-black" value="{{j.id}}">{{ j.Name }} </option>
                         {% endfor %}
                       </select>-->
-                      <select name='item[]' id="item1" class="form-control select2  text-right  "  >
-                        <option class="form-control select2  text-right " selected value="{{i.product}}">{{i.product}}</option>
+                      <select name='item[]' id="item1" class="form-control select2  text-center  "  >
+                        <option class="form-control select2  text-center " selected value="{{i.product}}">{{i.product}}</option>
                         {% for i in p %}
                             <option class="form-control select2  text-right  " value="{{ i.Name }}" data-tokens="{{ i.Name }}">
                                 {{ i.Name }}
@@ -458,21 +458,21 @@
 
 <!-- Include Select2 JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-                  <td class='text-right' style="width: 15%;">
+                  <td class='text-center' style="width: 14%;">
                     <input type='number' id='hsn{{forloop.counter}}'
-                      class=' text-right hsn form-control border-0 bg-transparent text-white' name='hsn[]' readonly
+                      class=' text-center hsn form-control border-0 bg-transparent text-white' name='hsn[]' readonly
                       value="{{i.hsn}}">
                   </td>
 
 
-                  <td style="width: 17%;" class='text-right'><input type='number' id='qty{{forloop.counter}}'
-                      class=' text-right qty form-control border-0 bg-transparent text-white' name='quantity[]'
+                  <td style="width: 12%;" class='text-center'><input type='number' id='qty{{forloop.counter}}'
+                      class=' text-center qty form-control border-0 bg-transparent text-white' name='quantity[]'
                       value='{{i.quantity}}' style="margin-top: 4vh;" onchange="qtychange(this.id)"><br>
-                      <span class="text-warning">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
+                      <span class="text-warning" style="width: 12%; font-size: 10px;">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
                       <span class="stock_warning text-danger"></span>
                   </td>
 
-                  <script>
+               <!--   <script>
                     $(document).ready(function () {
                       function qtychange(id_str) {
                         var id = id_str.split("qty")[1];
@@ -591,21 +591,21 @@
                   updateAvailableStock(row);
                 });
                 
-                  </script>
-                  <td style="width: 15%;" class='text-right'><input type='number' id='rate{{forloop.counter}}'
-                      class=' text-right rate form-control border-0 bg-transparent text-white' name='rate[]'
+                  </script>-->
+                  <td style="width: 12%;" class='text-center'><input type='number' id='rate{{forloop.counter}}'
+                      class=' text-center rate form-control border-0 bg-transparent text-white' name='rate[]'
                       value='{{i.rate}}' readonly>
                   </td>
-                  <td style="width: 10%;" class='text-right text-dark'><input type='number'
+                  <td style="width: 15%;" class='text-center text-dark'><input type='number'
                       id='discount{{forloop.counter}}'
-                      class=' text-right discount border-0 bg-transparent text-white form-control' name='discount[]'
+                      class=' text-center discount border-0 bg-transparent text-white form-control' name='discount[]'
                       value='{{i.discount}}'>
                   </td>
-                  <td style="width: 22%;" class='text-right '> <select name='tax[]' id='tax{{forloop.counter}}'
+                  <td style="width: 16%; font-size: 9px;" class='text-center '> <select style=" font-size: 14px;" name='tax[]' id='tax{{forloop.counter}}'
                       class='form-control border-0 bg-transparent text-white  text-right border-0 tax'
-                      onchange="toggleDateInput()">
-
-                      <optgroup class="text-center text-black" label="GST">
+                       onchange="updateFields()">
+                      <!-- onchange="toggleDateInput()"-->
+                      <optgroup style="width: 10%; font-size: 14px;" class="text-center text-black" label="GST">
                         <option value="{{i.tax}} " selected hidden>{{i.tax}}.0% GST({{i.tax}}%)</option>
                         <option class="text-black" value="0">0% GST(0%)</option>
                         <option class="text-black" value="3">3.0% GST(3%)</option>
@@ -614,8 +614,8 @@
                         <option class="text-black" value="18">18.0% GST(18%)</option>
                         <option class="text-black" value="28">28.0% GST(28%)</option>
                       </optgroup>
-                      <optgroup class="text-center text-black" label="IGST">
-                        <option value="{{i.tax}} " selected hidden>{{i.tax}}.0% IGST({{i.tax}}%)</option>
+                      <optgroup style="width: 10%; font-size: 14px;" class="text-center text-black" label="IGST">
+                        <option value="{{i.tax}} " style="width: 10%; font-size: 9px;" selected hidden>{{i.tax}} 0% IGST({{i.tax}}%)</option>
 
                         <option class="text-black" value="0">0% IGST(0%)</option>
                         <option class="text-black" value="3">3.0% IGST(3%)</option>
@@ -3337,151 +3337,99 @@
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer></script>
+
 <script>
+  $(document).on('blur', '#qty1', function () {
+    var initialStock = parseInt($('#stock_data1').val());
+    var enteredQuantity = parseInt($('#qty1').val());
+
+    if (isNaN(initialStock) || isNaN(enteredQuantity)) {
+        console.log("Either initialStock or enteredQuantity is not a number.");
+        return;
+    }
+
+    if (enteredQuantity > 0) {
+        var updatedStock = initialStock - enteredQuantity;
+        console.log(updatedStock, "updated")
+        $('#stock_data1').val(updatedStock); // Use .val() instead of .text()
+    }
+
+    $('#qty1').val(enteredQuantity);
+  });
+
   $(document).ready(function() {
-      // Initialize Select2 for item dropdown
-      $('#item1').select2();
+    // Initialize Select2 for item dropdown
+    $('#item1').select2();
 
-      // Update fields when source of supply or item changes
-      $('#srcofsupply, #item1').change(function() {
-          updateFields();
-      });
+    // Update fields when source of supply or item changes
+    $('#srcofsupply, #item1').change(function() {
+        updateFields();
+    });
 
-      // Change event for tax dropdown
-      $('#tax1').change(function() {
-          // Handle tax change here if needed
-          var selectedTax = $(this).val();
-          console.log('Selected tax:', selectedTax);
-      });
+    // Initial call to update fields when the page loads
+    updateFields();
   });
 
   function updateFields() {
-      var select = $('#item1').val();
-      var source = $('#srcofsupply').val();
+    var select = $('#item1').val();
+    var source = $('#srcofsupply').val();
 
-      $.ajax({
-          type: "GET",
-          url: "{% url 'itemdatadebit' %}",
-          data: {
-              id: select,
-              isd: source,
-          },
-          success: function(response) {
-              if (response.error_flag === 1) {
-                  $('#errorLabel').text("Item is not present");
-              } else {
-                  $('#errorLabel').text("");
+    $.ajax({
+        type: "GET",
+        url: "{% url 'itemdatadebit' %}",
+        data: {
+            id: select,
+            isd: source,
+        },
+        success: function(response) {
+            if (response && response.error_flag === 1) {
+                $('#errorLabel').text("Item is not present");
+            } else {
+                $('#errorLabel').text("");
 
-                  var hsn = response.hsn;
-                  var rate = response.price;
-                  var qty = response.qty;
-                  var fetchedTax = response.gst;
-                  console.log(qty, "qty")
+                // Update item details
+                $('#hsn1').val(response.hsn);
+                $('#rate1').val(response.price);
+                $('#stock_data1').val(response.qty);
 
-                  
-                  $('#hsn1').val(hsn);
-                  $('#rate1').val(rate);
-                  $('#stock_data1').val(qty);
+                // Determine the tax group label based on the source of supply
+                var taxGroupLabel;
+                if (source === "[KL]-Kerala") {
+                    taxGroupLabel = "GST"; // For Kerala, use GST tax group
+                } else {
+                    taxGroupLabel = "IGST"; // For other states, use IGST tax group
+                }
+                $('#taxGroupLabel').text(taxGroupLabel);
 
-                  // Update tax dropdown with fetched tax and an option to change it
-                  var taxDropdown = $('#tax1');
-                  taxDropdown.empty();
+                // Determine the tax options based on the source of supply
+                var taxOptions;
+                if (source === "[KL]-Kerala") {
+                    taxOptions = response.intrastate; // GST options for Kerala
+                } else {
+                    taxOptions = response.interstate; // IGST options for other states
+                }
 
-                  // Check source of supply and set tax accordingly
-                  if (source === "{{ company.state }}") {
-                      // If source is Kerala, use GST
-                      taxDropdown.append('<option value="' + fetchedTax + '" selected>' + fetchedTax + '</option>');
-                      
-                  taxDropdown.append('<option value="0"> GST(00%)</option>');
-                  taxDropdown.append('<option value="3"> GST 3(3%)</option>');
-                  taxDropdown.append('<option value="5">GST 5(5%)</option>');
-                  taxDropdown.append('<option value="12">GST 12(12%)</option>');
-                  taxDropdown.append('<option value="18"> GST 18(18%) </option>');
-                  taxDropdown.append('<option value="28">GST 28(28%) </option>');
-                  
-                  } else {
-                      // For other states, use IGST
-                      taxDropdown.append('<option value="' + fetchedTax + '" selected>' + fetchedTax + '</option>');
-                      taxDropdown.append('<option value="0">00% IGST(00%)</option>');
-                      taxDropdown.append('<option value="3">3% IGST(3%)</option>');
-                      taxDropdown.append('<option value="5">5% IGST(5%)</option>');
-                      taxDropdown.append('<option value="12">12% IGST(12%)</option>');
-                      taxDropdown.append('<option value="18">18% IGST(18%) </option>');
-                      taxDropdown.append('<option value="28">28% IGST(28%) </option>');
-                  }
-
-                  
-
-            
-
-                  // Trigger change event on tax dropdown to reflect changes
-                  taxDropdown.trigger('change');
-              }
-          },
-      });
-  }
-
-
-  $.ajax({
-    type: "GET",
-    url: "{% url 'itemdatadebit' %}",
-    data: {
-        id: select,
-        isd: source,
-    },
-    success: function(response) {
-        // Extract tax value from the response
-        var fetchedTax = response.tax;
-
-        // Update the tax dropdown with the fetched tax value
-        $('#tax1').val(fetchedTax);
-
-        // Determine whether the source of supply matches the company state
-        var isSameState = source === "{{ company.state }}";
-
-        // Set the display of tr_igst, tr_cgst, and tr_sgst based on the source of supply
-        if (isSameState) {
-            // If the source of supply matches the company state, hide tr_igst and display tr_cgst and tr_sgst
-            document.getElementById("tr_igst").style.display = "none";
-            document.getElementById("tr_cgst").style.display = "";
-            document.getElementById("tr_sgst").style.display = "";
-        } else {
-            // If the source of supply is different from the company state, hide tr_cgst and tr_sgst and display tr_igst
-            document.getElementById("tr_igst").style.display = "";
-            document.getElementById("tr_cgst").style.display = "none";
-            document.getElementById("tr_sgst").style.display = "none";
+                // Update tax options for the corresponding tax dropdown
+                var taxDropdownId = '#tax' + select;
+                $(taxDropdownId).empty();
+                taxOptions.forEach(function(option) {
+                    $(taxDropdownId).append('<option value="' + option.value + '">' + option.label + '</option>');
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error:", error);
+            // Handle error cases here
         }
-
-        // Call the function to recalculate row amount, subtotal, and grand total
-        calculateRowAmount();
-        calculateSubtotal();
-        calculateGrandTotal();
-    },
-});
+    });
+}
 
 </script>
 
-   
-<script>
-      
-  $(document).on('blur', '#qty1', function () {
-    initialStock = parseInt($('#stock_data1').val());
-      var enteredQuantity = parseInt($('#qty1').val());
-  
-      if (isNaN(initialStock) || isNaN(enteredQuantity)) {
-          console.log("Either initialStock or enteredQuantity is not a number.");
-          return;
-      }
-  
-      if (enteredQuantity > 0) {
-          var updatedStock = initialStock - enteredQuantity;
-          console.log(updatedStock, "updated")
-          $('#stock_data1').val(updatedStock); // Use .val() instead of .text()
-      }
-  
-      $('#qty1').val(enteredQuantity);
-  });
-  
 
-  </script>
+
+
+
+
+
 {% endblock %}

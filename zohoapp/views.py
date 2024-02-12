@@ -27750,14 +27750,18 @@ def itemdatadebit(request):
             qty = item.stock
             price = item.s_price
             print(cmp1.state, "dotstate")
-            if isd == cmp1.state:
+            '''if isd == cmp1.state:
                 
                 print(isd, "place in gst")
                 gst = item.intrastate
             else:
                 print("something")
-                gst = item.interstate
+                gst = item.interstate'''
             places = cmp1.state
+            intrastate=item.intrastate
+            interstate=item.interstate
+            print(intrastate, "intrastate")
+            print(interstate, "interstate")
 
             # Return the details for each item
             return JsonResponse({
@@ -27766,7 +27770,10 @@ def itemdatadebit(request):
                 'qty': qty,
                 'places': places,
                 'price': price,
-                'gst': gst,
+                'intrastate': intrastate,
+                'interstate': interstate,
+                
+                #'gst': gst,
                 
             })
     else:
