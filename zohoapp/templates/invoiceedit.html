@@ -2870,12 +2870,22 @@
       <tr id='row${rowCount}'>
         <td>
           <div>
-            <select class='form-control border-0 bg-transparent text-white  border-0 item_select itm' name='item[]' id='item${rowCount}' onchange="itemfunction(this.id)">
+          <!-- <select class='form-control border-0 bg-transparent text-white  border-0 item_select itm' name='item[]' id='item${rowCount}' onchange="itemfunction(this.id)">
               <option value=" " selected disabled hidden>Select Item</option>
               {% for i in p %}
                 <option class="text-black" value="{{i.id}}">{{ i.Name }}</option>
               {% endfor %}
-            </select>
+            </select>-->
+
+
+            <select name='item[]' id="item${rowCount}" class="form-control select2  text-center  "  >
+              <option class="form-control select2  text-center " selected value="{{i.product}}">{{i.product}}</option>
+              {% for i in p %}
+                  <option class="form-control select2  text-right  " value="{{ i.Name }}" data-tokens="{{ i.Name }}">
+                      {{ i.Name }}
+                  </option>
+              {% endfor %}
+          </select>
           </div>
         </td>
 
@@ -3337,7 +3347,6 @@
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer></script>
-
 <script>
   $(document).on('blur', '#qty1', function () {
     var initialStock = parseInt($('#stock_data1').val());
@@ -3358,12 +3367,25 @@
   });
 
   $(document).ready(function() {
+    var taxCounter = 1;
     // Initialize Select2 for item dropdown
-    $('#item1').select2();
+    $('#item' + taxCounter).select2();
 
     // Update fields when source of supply or item changes
-    $('#srcofsupply, #item1').change(function() {
+    $('#srcofsupply, #item'+taxCounter).change(function() {
         updateFields();
+    });
+
+    // Handle tax selection change
+    $(document).on('change', '.tax', function() {
+        var selectedTax = $(this).val();
+        console.log(selectedTax,"selectedTax"); // Check selected tax in the console
+
+        // Update the displayed tax value
+        $('#displayedTax').text(selectedTax);
+
+        // You can add any additional logic here if needed
+
     });
 
     // Initial call to update fields when the page loads
@@ -3371,8 +3393,10 @@
   });
 
   function updateFields() {
-    var select = $('#item1').val();
+    var taxCounter = 1;
+    var select = $('#item'+ taxCounter).val();
     var source = $('#srcofsupply').val();
+     
 
     $.ajax({
         type: "GET",
@@ -3401,6 +3425,8 @@
                 }
                 $('#taxGroupLabel').text(taxGroupLabel);
 
+                console.log(taxGroupLabel, "waha")
+
                 // Determine the tax options based on the source of supply
                 var taxOptions;
                 if (source === "[KL]-Kerala") {
@@ -3408,13 +3434,27 @@
                 } else {
                     taxOptions = response.interstate; // IGST options for other states
                 }
+                console.log(taxOptions, "saha")
 
                 // Update tax options for the corresponding tax dropdown
-                var taxDropdownId = '#tax' + select;
-                $(taxDropdownId).empty();
-                taxOptions.forEach(function(option) {
-                    $(taxDropdownId).append('<option value="' + option.value + '">' + option.label + '</option>');
-                });
+                var taxDropdownId = '#tax' + taxCounter; // Assuming select is the item number
+                $(taxDropdownId).empty(); // Clear existing options
+                
+                // Add fetched tax option if available
+                if (taxOptions) {
+                    $(taxDropdownId).append('<option value="' + taxOptions + '">' + taxOptions + '</option>');
+                }
+                
+                // Add fixed tax options
+                $(taxDropdownId).append('<option value="0"> (' + taxGroupLabel + ' - 0%)</option>');
+                $(taxDropdownId).append('<option value="3"> (' + taxGroupLabel + ' - 3%)</option>');
+                $(taxDropdownId).append('<option value="5"> (' + taxGroupLabel + ' - 5%)</option>');
+                $(taxDropdownId).append('<option value="12"> (' + taxGroupLabel + ' - 12%)</option>');
+                $(taxDropdownId).append('<option value="18"> (' + taxGroupLabel + ' - 18%)</option>');
+                $(taxDropdownId).append('<option value="28"> (' + taxGroupLabel + ' - 28%)</option>');
+
+                // Set styles for the dropdown
+                $(taxDropdownId).removeClass('bg-transparent text-white').addClass('bg-black text-white');
             }
         },
         error: function(xhr, status, error) {
@@ -3424,7 +3464,21 @@
     });
 }
 
+// Update fields when source of supply changes
+$('#srcofsupply').change(function() {
+    updateFields();
+});
+
+// Update fields when item changes
+$('#item' + taxCounter).change(function() {
+    updateFields();
+});
+
+// Trigger initial update
+updateFields();
+
 </script>
+
 
 
 
