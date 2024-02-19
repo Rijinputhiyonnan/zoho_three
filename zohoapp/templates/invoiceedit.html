@@ -467,7 +467,7 @@
 
 <!-- Include Select2 JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-                  <td class='text-center' style="width: 14%;">
+                  <td  style="width: 14%;">
                     <input style="width: 13vh;" type='number' id='hsn{{forloop.counter}}'
                       class=' text-center hsn form-control border-0 bg-transparent text-white' name='hsn[]' readonly
                       value="{{i.hsn}}">
@@ -2813,67 +2813,78 @@
   $(document).ready(function () {
     // Counter for row IDs
 
-    // Function to calculate the row amount
-    function calculateRowAmount(row) {
-      var qty = parseFloat(row.find('.qty').val());
-      var rate = parseFloat(row.find('.rate').val());
-      var tax = parseFloat(row.find('.tax').val());
-      var discount = parseFloat(row.find('.discount').val());
+  // Function to calculate the row amount
+function calculateRowAmount(row) {
+  console.log("Calculating row amount...");
+  var qty = parseFloat(row.find('.qty').val());
+  var rate = parseFloat(row.find('.rate').val());
+  var tax = parseFloat(row.find('.tax').val());
+  var discount = parseFloat(row.find('.discount').val());
 
-      var rowAmount = (qty * rate) - discount;
-      var taxAmount = (rowAmount * tax) / 100;
+  var rowAmount = (qty * rate) - discount;
+  var taxAmount = (rowAmount * tax) / 100;
 
-      row.find('.amount').val(rowAmount.toFixed(2));
-      row.find('.taxamount').val(taxAmount.toFixed(2));
+  row.find('.amount').val(rowAmount.toFixed(2));
+  row.find('.taxamount').val(taxAmount.toFixed(2));
 
-      return rowAmount;
-      console.log(rowAmount, "rowAmount")
-      calculateTaxAmount();
-    }
+  console.log("Row amount calculated:", rowAmount);
+  //return rowAmount;
+}
 
-    // Function to calculate the subtotal
-    function calculateSubtotal() {
-      var subtotal = 0;
-      $('#item_table tbody tr').each(function () {
-        subtotal += calculateRowAmount($(this));
-      });
-      $('#subtotal').val(subtotal.toFixed(2));
-    }
+// Function to calculate the subtotal
+function calculateSubtotal() {
+  console.log("Calculating subtotal...");
+  var subtotal = 0;
+  $('#item_table tbody tr').each(function () {
+    subtotal += calculateRowAmount($(this));
+    console.log(subtotal, "subtotal testing")
+  });
+ // $('#subtotal').val(subtotal.toFixed(2));
+ 
+ //const sub = document.getElementById("subtotal")
+ //sub.value = subtotal
+  console.log("Subtotal calculated:", subtotal);
+}
 
-    // Function to calculate the grand total
-    function calculateGrandTotal() {
-      var grandTotal = 0;
-      var totalTaxAmount = 0;
-      adjust = parseFloat(document.getElementById('adjust').value)
-      var advance = parseFloat(document.getElementById('advance').value)
+// Function to calculate the grand total
+function calculateGrandTotal() {
+  console.log("Calculating grand total...");
+  var grandTotal = 0;
+  var totalTaxAmount = 0;
+  adjust = parseFloat(document.getElementById('adjust').value)
+  var advance = parseFloat(document.getElementById('advance').value)
 
-      $('#item_table tbody tr').each(function () {
-        var rowAmount = calculateRowAmount($(this));
-        grandTotal += rowAmount;
-        var taxAmount = parseFloat($(this).find('.taxamount').val());
-        grandTotal += taxAmount;
-        totalTaxAmount += taxAmount;
-      });
-      var shippingCharges = parseFloat($('#shipping').val());
-      var adjust = parseFloat($('#adjust').val());
+  $('#item_table tbody tr').each(function () {
+    var rowAmount = calculateRowAmount($(this));
+    grandTotal += rowAmount;
+    var taxAmount = parseFloat($(this).find('.taxamount').val());
+    grandTotal += taxAmount;
+    totalTaxAmount += taxAmount;
+  });
+  var shippingCharges = parseFloat($('#shipping').val());
+  var adjust = parseFloat($('#adjust').val());
 
-      grandTotal += adjust;
-      grandTotal += shippingCharges;
+  grandTotal += adjust;
+  grandTotal += shippingCharges;
 
-      balance = grandTotal - advance
+  balance = grandTotal - advance
 
-      $('#grandtotal').val(grandTotal.toFixed(2));
-      $('#balance').val(balance.toFixed(2));
-      $('#total_taxamount').val(totalTaxAmount.toFixed(2));
-      $('#total_taxamount').val(totalTaxAmount.toFixed(2));
-    }
+  $('#grandtotal').val(grandTotal.toFixed(2));
+  $('#balance').val(balance.toFixed(2));
+  $('#total_taxamount').val(totalTaxAmount.toFixed(2));
+  $('#total_taxamount').val(totalTaxAmount.toFixed(2));
+  console.log("Grand total calculated:", grandTotal);
+}
 
-    $('#item_table').on('change', '.tax', function () {
-      var row = $(this).closest('tr');
-      calculateRowAmount(row);
-      calculateSubtotal();
-      calculateGrandTotal();
-    });
+$('#item_table').on('change', '.tax', function () {
+  console.log("Tax change detected...");
+  var row = $(this).closest('tr');
+  calculateRowAmount(row);
+  calculateSubtotal();
+  calculateGrandTotal();
+});    
+
+    
     var rowCount = 1;
 
     $('#add-row').click(function () {
@@ -2894,21 +2905,21 @@
                       </select>
                   </div>
               </td>
-              <td style="width: 15%;" class='text-right'>
+              <td style="width: 15%;">
                   <input style="width: 14vh; font-size: 15px;" type='number' id='hsn${rowCount}' class='text-right hsn form-control border-0 bg-transparent text-white' name='hsn[]' readonly>
               </td>
-              <td style="width: 17%;" class='text-right'>
+              <td style="width: 17%;" >
                   <input  style="width: 14vh; font-size: 15px;" type='number' id='qty${rowCount}' class='text-right border-0 bg-transparent text-white qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange(this.id)'><br>
                   <span class="text-warning">Available Stock : <span id="stock_data${rowCount}" class="stock_data text-warning"></span></span>
                   <span class="stock_warning text-danger"></span>
               </td>
-              <td style="width: 15%;" class='text-right'>
+              <td style="width: 15%;" >
                   <input  style="width: 14vh; font-size: 15px;" type='number' id='rate${rowCount}' class='text-right border-0 bg-transparent text-white rate form-control' name='rate[]' value='0' readonly>
               </td>
-              <td style="width: 10%;" class='text-right'>
+              <td style="width: 10%;">
                   <input type='number' id='discount${rowCount}' class='text-right border-0 bg-transparent text-white discount form-control' name='discount[]' value='0'>
               </td>
-              <td style="width: 22%;" class='text-right'>
+              <td style="width: 22%;" >
                   <select name='tax[]' id='tax${rowCount}' class='form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="toggleDateInput()">
                       <optgroup class="text-center text-black" label="GST">
                           <option class="text-black" value="0">0% GST(0%)</option>
@@ -2932,7 +2943,7 @@
               <td style="display: none;">
                   <input type="text" name='taxamount' id="taxamount${rowCount}" class="form-control border-0 bg-transparent text-white taxamount" />
               </td>
-              <td style="width: 15%;" class='text-right'>
+              <td style="width: 15%;" >
                   <input type='number' id='amount${rowCount}' class='text-right border-0 bg-transparent text-white form-control amount' name='amount[]' value='0.00' readonly>
               </td>
               <td class='text-center'>
@@ -3463,10 +3474,13 @@ function addNewRow() {
       var currentRowCount = $(this).attr('id').match(/\d+/)[0]; // Extract the row count from the ID
       calculateRowAmount($('#row' + currentRowCount)); // Recalculate amount for the current row
       console.log(calculateRowAmount, "calculateRowAmount");
-      calculateGrandTotal(); // Recalculate grand total for all rows
-      calculateSubtotal(); // Recalculate subtotal for all rows
-      calculateTaxAmount(); // Recalculate tax amounts for all rows
+     
   });
+  calculateGrandTotal(); // Recalculate grand total for all rows
+  console.log(calculateGrandTotal, "calculateGrandTotal");
+     
+  calculateSubtotal(); // Recalculate subtotal for all rows
+  calculateTaxAmount(); // Recalculate tax amounts for all rows
 }
 
 // Execute when the "Add Row" button is clicked
