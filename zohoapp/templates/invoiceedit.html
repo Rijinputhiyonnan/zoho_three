@@ -2809,7 +2809,7 @@
   });
 </script>
 <script>
-  var rowCount = "{{rowcount}}";
+ 
   $(document).ready(function () {
     // Counter for row IDs
 
@@ -2823,12 +2823,14 @@ function calculateRowAmount(row) {
 
   var rowAmount = (qty * rate) - discount;
   var taxAmount = (rowAmount * tax) / 100;
+  console.log("taxamount", taxAmount);
+  console.log("discount", );
 
   row.find('.amount').val(rowAmount.toFixed(2));
   row.find('.taxamount').val(taxAmount.toFixed(2));
 
   console.log("Row amount calculated:", rowAmount);
-  //return rowAmount;
+  return rowAmount;
 }
 
 // Function to calculate the subtotal
@@ -2839,10 +2841,7 @@ function calculateSubtotal() {
     subtotal += calculateRowAmount($(this));
     console.log(subtotal, "subtotal testing")
   });
- // $('#subtotal').val(subtotal.toFixed(2));
- 
- //const sub = document.getElementById("subtotal")
- //sub.value = subtotal
+  $('#subtotal').val(subtotal.toFixed(2));
   console.log("Subtotal calculated:", subtotal);
 }
 
@@ -3013,7 +3012,6 @@ $('#item_table').on('change', '.tax', function () {
     // Input change event for quantity, rate, and discount
     $('#item_table').on('input', '.qty, .rate, .discount,.tax', function () {
       var row = $(this).closest('tr');
-      calculateRowAmount(row);
       calculateSubtotal();
       calculateGrandTotal();
       toggleDateInput();
