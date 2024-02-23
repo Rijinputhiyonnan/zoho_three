@@ -2813,23 +2813,74 @@
   $(document).ready(function () {
     // Counter for row IDs
 
-  // Function to calculate the row amount
-function calculateRowAmount(row) {
+// Function to calculate the row amount
+/*function calculateRowAmount(row) {
   console.log("Calculating row amount...");
   var qty = parseFloat(row.find('.qty').val());
   var rate = parseFloat(row.find('.rate').val());
   var tax = parseFloat(row.find('.tax').val());
   var discount = parseFloat(row.find('.discount').val());
 
+  console.log("Quantity:", qty);
+  console.log("Rate:", rate);
+  console.log("Tax:", tax);
+  console.log("Discount:", discount);
+
+  if (isNaN(qty) || isNaN(rate) || isNaN(discount)) {
+    console.log("Invalid input detected. One or more values are NaN.");
+    return; // Exit calculation if any required input value is NaN
+  }
+
+  // Check if tax value is NaN, if so, set it to 0
+  if (isNaN(tax)) {
+    console.log("Tax value is NaN. Setting it to 0.");
+    tax = 0;
+  }
+
   var rowAmount = (qty * rate) - discount;
   var taxAmount = (rowAmount * tax) / 100;
-  console.log("taxamount", taxAmount);
-  console.log("discount", );
+
+  console.log("Row amount calculated:", rowAmount);
+  console.log("Tax amount calculated:", taxAmount);
 
   row.find('.amount').val(rowAmount.toFixed(2));
   row.find('.taxamount').val(taxAmount.toFixed(2));
 
-  console.log("Row amount calculated:", rowAmount);
+  return rowAmount;
+}*/
+// Function to calculate the row amount
+function calculateRowAmount(row) {
+  console.log("Calculating row amount for row:", row.index());
+
+  var qty = parseFloat(row.find('.qty').val());
+  console.log("Quantity for row", row.index(), ":", qty);
+
+  var rate = parseFloat(row.find('.rate').val());
+  console.log("Rate for row", row.index(), ":", rate);
+
+  var tax = parseFloat(row.find('.tax').val());
+  console.log("Tax for row", row.index(), ":", tax);
+
+  var discount = parseFloat(row.find('.discount').val());
+  console.log("Discount for row", row.index(), ":", discount);
+
+  if (isNaN(qty) || isNaN(rate) || isNaN(tax) || isNaN(discount)) {
+    console.log("Invalid input detected for row", row.index());
+    return; // Exit early if any value is NaN
+  }
+
+  var rowAmount = (qty * rate) - discount;
+  console.log("Row amount calculated for row", row.index(), ":", rowAmount);
+
+  var taxAmount = (rowAmount * tax) / 100;
+  console.log("Tax amount calculated for row", row.index(), ":", taxAmount);
+
+  row.find('.amount').val(rowAmount.toFixed(2));
+  row.find('.taxamount').val(taxAmount.toFixed(2));
+
+  console.log("Row amount set for row", row.index(), ":", rowAmount.toFixed(2));
+  console.log("Tax amount set for row", row.index(), ":", taxAmount.toFixed(2));
+
   return rowAmount;
 }
 
@@ -2839,7 +2890,6 @@ function calculateSubtotal() {
   var subtotal = 0;
   $('#item_table tbody tr').each(function () {
     subtotal += calculateRowAmount($(this));
-    console.log(subtotal, "subtotal testing")
   });
   $('#subtotal').val(subtotal.toFixed(2));
   console.log("Subtotal calculated:", subtotal);
@@ -2850,40 +2900,41 @@ function calculateGrandTotal() {
   console.log("Calculating grand total...");
   var grandTotal = 0;
   var totalTaxAmount = 0;
-  adjust = parseFloat(document.getElementById('adjust').value)
-  var advance = parseFloat(document.getElementById('advance').value)
+  var advance = parseFloat($('#advance').val());
 
   $('#item_table tbody tr').each(function () {
     var rowAmount = calculateRowAmount($(this));
     grandTotal += rowAmount;
+
     var taxAmount = parseFloat($(this).find('.taxamount').val());
     grandTotal += taxAmount;
     totalTaxAmount += taxAmount;
   });
+
   var shippingCharges = parseFloat($('#shipping').val());
   var adjust = parseFloat($('#adjust').val());
 
   grandTotal += adjust;
   grandTotal += shippingCharges;
 
-  balance = grandTotal - advance
+  var balance = grandTotal - advance;
 
   $('#grandtotal').val(grandTotal.toFixed(2));
   $('#balance').val(balance.toFixed(2));
   $('#total_taxamount').val(totalTaxAmount.toFixed(2));
-  $('#total_taxamount').val(totalTaxAmount.toFixed(2));
+
   console.log("Grand total calculated:", grandTotal);
 }
 
+// Event handler for changes in tax values
 $('#item_table').on('change', '.tax', function () {
   console.log("Tax change detected...");
   var row = $(this).closest('tr');
   calculateRowAmount(row);
   calculateSubtotal();
   calculateGrandTotal();
-});    
+});   
 
-    
     var rowCount = 1;
 
     $('#add-row').click(function () {
@@ -3270,7 +3321,7 @@ $('#item_table').on('change', '.tax', function () {
 
 
 
-  $(window).on('load', function () {
+ /* $(window).on('load', function () {
 
     function toggleDateInputs(rowIndex) {
       console.log(rowIndex);
@@ -3321,7 +3372,7 @@ $('#item_table').on('change', '.tax', function () {
       toggleDateInputs(i);
     }
 
-  });
+  });*/
 
 
 
@@ -3450,12 +3501,11 @@ function updateFields(rowCount) {
   });
 }
 
-
-
- // Function to extract row count from element ID
- function getId(element) {
+// Function to extract row count from element ID
+function getId(element) {
   return $(element).attr('id').match(/\d+/)[0]; // Extract the numeric part from the ID
 }
+
 // Function to add a new row
 function addNewRow() {
   rowCount++;
@@ -3474,13 +3524,15 @@ function addNewRow() {
       var currentRowCount = $(this).attr('id').match(/\d+/)[0]; // Extract the row count from the ID
       calculateRowAmount($('#row' + currentRowCount)); // Recalculate amount for the current row
       console.log(calculateRowAmount, "calculateRowAmount");
-     
   });
   calculateGrandTotal(); // Recalculate grand total for all rows
   console.log(calculateGrandTotal, "calculateGrandTotal");
-     
+
   calculateSubtotal(); // Recalculate subtotal for all rows
+  console.log(calculateSubtotal, "calculateSubtotal");
+
   calculateTaxAmount(); // Recalculate tax amounts for all rows
+  console.log(calculateTaxAmount, "calculateTaxAmount");
 }
 
 // Execute when the "Add Row" button is clicked
@@ -3524,7 +3576,7 @@ $('#srcofsupply').change(function() {
       updateFields(id); // Update fields based on the ID
   });
 });
-function calculateRowAmount2(row) {
+/*function calculateRowAmount2(row) {
   var quantity = parseFloat(row.find('.qty').val()); // Get the quantity from the input field in the row
   var rate = parseFloat(row.find('.rate').val()); // Get the rate from the input field in the row
   var amount = quantity * rate; // Calculate the amount
@@ -3532,7 +3584,7 @@ function calculateRowAmount2(row) {
   // Update the amount in the row
   row.find('.amount').text(amount.toFixed(2)); // Update the amount in the row
   console.log(amount, "amount")
-}
+}*/
 
 
 </script>
