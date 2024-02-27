@@ -2849,91 +2849,7 @@
   return rowAmount;
 }*/
 // Function to calculate the row amount
-function calculateRowAmount(row) {
-  console.log("Calculating row amount for row:", row.index());
 
-  var qty = parseFloat(row.find('.qty').val());
-  console.log("Quantity for row", row.index(), ":", qty);
-
-  var rate = parseFloat(row.find('.rate').val());
-  console.log("Rate for row", row.index(), ":", rate);
-
-  var tax = parseFloat(row.find('.tax').val());
-  console.log("Tax for row", row.index(), ":", tax);
-
-  var discount = parseFloat(row.find('.discount').val());
-  console.log("Discount for row", row.index(), ":", discount);
-
-  if (isNaN(qty) || isNaN(rate) || isNaN(tax) || isNaN(discount)) {
-    console.log("Invalid input detected for row", row.index());
-    return; // Exit early if any value is NaN
-  }
-
-  var rowAmount = (qty * rate) - discount;
-  console.log("Row amount calculated for row", row.index(), ":", rowAmount);
-
-  var taxAmount = (rowAmount * tax) / 100;
-  console.log("Tax amount calculated for row", row.index(), ":", taxAmount);
-
-  row.find('.amount').val(rowAmount.toFixed(2));
-  row.find('.taxamount').val(taxAmount.toFixed(2));
-
-  console.log("Row amount set for row", row.index(), ":", rowAmount.toFixed(2));
-  console.log("Tax amount set for row", row.index(), ":", taxAmount.toFixed(2));
-
-  return rowAmount;
-}
-
-// Function to calculate the subtotal
-function calculateSubtotal() {
-  console.log("Calculating subtotal...");
-  var subtotal = 0;
-  $('#item_table tbody tr').each(function () {
-    subtotal += calculateRowAmount($(this));
-  });
-  $('#subtotal').val(subtotal.toFixed(2));
-  console.log("Subtotal calculated:", subtotal);
-}
-
-// Function to calculate the grand total
-function calculateGrandTotal() {
-  console.log("Calculating grand total...");
-  var grandTotal = 0;
-  var totalTaxAmount = 0;
-  var advance = parseFloat($('#advance').val());
-
-  $('#item_table tbody tr').each(function () {
-    var rowAmount = calculateRowAmount($(this));
-    grandTotal += rowAmount;
-
-    var taxAmount = parseFloat($(this).find('.taxamount').val());
-    grandTotal += taxAmount;
-    totalTaxAmount += taxAmount;
-  });
-
-  var shippingCharges = parseFloat($('#shipping').val());
-  var adjust = parseFloat($('#adjust').val());
-
-  grandTotal += adjust;
-  grandTotal += shippingCharges;
-
-  var balance = grandTotal - advance;
-
-  $('#grandtotal').val(grandTotal.toFixed(2));
-  $('#balance').val(balance.toFixed(2));
-  $('#total_taxamount').val(totalTaxAmount.toFixed(2));
-
-  console.log("Grand total calculated:", grandTotal);
-}
-
-// Event handler for changes in tax values
-$('#item_table').on('change', '.tax', function () {
-  console.log("Tax change detected...");
-  var row = $(this).closest('tr');
-  calculateRowAmount(row);
-  calculateSubtotal();
-  calculateGrandTotal();
-});   
 
     var rowCount = 1;
 
@@ -3114,6 +3030,7 @@ $('#item_table').on('change', '.tax', function () {
       document.getElementById(`row${rowCount}`).querySelectorAll("label")[0].id = `ml${rowCount}`;
 
       var row = $(this).closest('tr');
+      
       calculateRowAmount(row);
       calculateSubtotal();
       calculateGrandTotal();
@@ -3508,6 +3425,7 @@ function getId(element) {
 
 // Function to add a new row
 function addNewRow() {
+  console.log(rowCount, "rowCount hai")
   rowCount++;
   var newRow = '<tr id="row' + rowCount + '">'; // Create HTML for the new row
   // Append the new row to the table body
@@ -3521,24 +3439,49 @@ function addNewRow() {
 
   // Recalculate amounts for all rows
   $('#item_table tbody tr').each(function () {
-      var currentRowCount = $(this).attr('id').match(/\d+/)[0]; // Extract the row count from the ID
-      calculateRowAmount($('#row' + currentRowCount)); // Recalculate amount for the current row
-      console.log(calculateRowAmount, "calculateRowAmount");
+    var currentRowCount = $(this).attr('id').match(/\d+/)[0]; // Extract the row count from the ID
+    console.log(currentRowCount, "currentRowCount")
+    if (currentRowCount <= rowCount) { // Ensure only existing rows are considered
+      var row = $('#row' + currentRowCount);
+      if (isValidRow(row)) { // Check if the row has valid inputs
+        calculateRowAmount(row); // Recalculate amount for the current row
+        console.log("Calculating row amount for row:", currentRowCount);
+      } else {
+        console.log("Invalid input detected for row", currentRowCount);
+      }
+    }
   });
+
   calculateGrandTotal(); // Recalculate grand total for all rows
-  console.log(calculateGrandTotal, "calculateGrandTotal");
+  console.log("Calculating grand total...");
 
   calculateSubtotal(); // Recalculate subtotal for all rows
-  console.log(calculateSubtotal, "calculateSubtotal");
+  console.log("Calculating subtotal...");
 
   calculateTaxAmount(); // Recalculate tax amounts for all rows
-  console.log(calculateTaxAmount, "calculateTaxAmount");
+  console.log("Calculating tax amount...");
+}
+
+// Function to check if a row has valid inputs
+function isValidRow(row) {
+  var qty = parseFloat(row.find('.qty').val());
+  var rate = parseFloat(row.find('.rate').val());
+  var tax = parseFloat(row.find('.tax').val());
+  var discount = parseFloat(row.find('.discount').val());
+
+  // Check if any of the inputs are NaN or undefined
+  if (isNaN(qty) || isNaN(rate) || isNaN(tax) || isNaN(discount)) {
+    return false;
+  }
+  return true;
 }
 
 // Execute when the "Add Row" button is clicked
 $('#add-row').click(function () {
   addNewRow(); // Add a new row
 });
+
+
 
 // Initial setup
 initializeSelect2(rowCount); // Initialize Select2 for the first item dropdown
@@ -3586,6 +3529,95 @@ $('#srcofsupply').change(function() {
   console.log(amount, "amount")
 }*/
 
+function calculateRowAmount(row) {
+  console.log("Calculating row amount for row:", row.index());
+
+  var qty = parseFloat(row.find('.qty').val());
+  console.log("Quantity for row", row.index(), ":", qty);
+
+  var rate = parseFloat(row.find('.rate').val());
+  console.log("Rate for row", row.index(), ":", rate);
+
+  var tax = parseFloat(row.find('.tax').val());
+  console.log("Tax for row", row.index(), ":", tax);
+
+  var discount = parseFloat(row.find('.discount').val());
+  console.log("Discount for row", row.index(), ":", discount);
+
+  if (isNaN(qty) || isNaN(rate) || isNaN(tax) || isNaN(discount)) {
+    console.log("Invalid input detected for row", row.index());
+    return; // Exit early if any value is NaN
+  }
+
+  var rowAmount = (qty * rate) - discount;
+  console.log("Row amount calculated for row", row.index(), ":", rowAmount);
+
+  var taxAmount = (rowAmount * tax) / 100;
+  console.log("Tax amount calculated for row", row.index(), ":", taxAmount);
+
+  row.find('.amount').val(rowAmount.toFixed(2));
+  row.find('.taxamount').val(taxAmount.toFixed(2));
+
+  console.log("Row amount set for row", row.index(), ":", rowAmount.toFixed(2));
+  console.log("Tax amount set for row", row.index(), ":", taxAmount.toFixed(2));
+
+  return rowAmount;
+}
+
+
+
+
+
+// Function to calculate the subtotal
+function calculateSubtotal() {
+  console.log("Calculating subtotal...");
+  var subtotal = 0;
+  $('#item_table tbody tr').each(function () {
+    subtotal += calculateRowAmount($(this));
+  });
+  $('#subtotal').val(subtotal.toFixed(2));
+  console.log("Subtotal calculated:", subtotal);
+}
+
+// Function to calculate the grand total
+function calculateGrandTotal() {
+  console.log("Calculating grand total...");
+  var grandTotal = 0;
+  var totalTaxAmount = 0;
+  var advance = parseFloat($('#advance').val());
+
+  $('#item_table tbody tr').each(function () {
+    var rowAmount = calculateRowAmount($(this));
+    grandTotal += rowAmount;
+
+    var taxAmount = parseFloat($(this).find('.taxamount').val());
+    grandTotal += taxAmount;
+    totalTaxAmount += taxAmount;
+  });
+
+  var shippingCharges = parseFloat($('#shipping').val());
+  var adjust = parseFloat($('#adjust').val());
+
+  grandTotal += adjust;
+  grandTotal += shippingCharges;
+
+  var balance = grandTotal - advance;
+
+  $('#grandtotal').val(grandTotal.toFixed(2));
+  $('#balance').val(balance.toFixed(2));
+  $('#total_taxamount').val(totalTaxAmount.toFixed(2));
+
+  console.log("Grand total calculated:", grandTotal);
+}
+
+// Event handler for changes in tax values
+$('#item_table').on('change', '.tax', function () {
+  console.log("Tax change detected...");
+  var row = $(this).closest('tr');
+  calculateRowAmount(row);
+  calculateSubtotal();
+  calculateGrandTotal();
+});   
 
 </script>
 
