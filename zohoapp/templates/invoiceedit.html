@@ -474,12 +474,57 @@
                   </td>
 
 
-                  <td style="width: 12%;" class=''><input type='number' id='qty{{forloop.counter}}'
-                      class=' qty form-control border-0 bg-transparent text-white' name='quantity[]'
-                      value='{{i.quantity}}' style="margin-top: 4vh;" onchange="qtychange(this.id)"><br>
-                      <span class="text-warning" style="width: 12%; font-size: 10px;">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
-                      <span class="stock_warning text-danger"></span>
-                  </td>
+                  <td style="width: 12%;" class=''>
+                    <input type='number' id='qty{{forloop.counter}}' class='qty form-control border-0 bg-transparent text-white' name='quantity[]' value='{{i.quantity}}' style="margin-top: 4vh;" onchange="qtychange(this.id)">
+                    <br>
+                    <span class="text-warning" style="width: 12%; font-size: 10px;">
+                        Available Stock : <input value="{{i.inv_stock}}" id="stock_data{{forloop.counter}}" class="stock_data text-warning"  style="background-color: #3b3b3b; width: 7vh; border: none;" name='stock[]'  readonly>
+                    </span>
+                    <span class="stock_warning text-danger"></span>
+                </td>
+                
+              <!--  <script>
+                    var stockInput = parseFloat($(`#stock_data{{forloop.counter}}`).val()); // Initialize stockInput with the correct value
+                
+                    // Function to handle quantity change
+                    function qtychange(id_str) {
+                        var id = id_str.split("qty")[1];
+                        var qtyInput = $(`#qty${id}`).val();
+                       
+                        console.log(stockInput, "stockInput");
+                        console.log(qtyInput, "qtyInput");
+                
+                        // Remove leading zeros from the input values
+                        var qty = parseFloat(qtyInput);
+                
+                        // Check if the input values are valid numbers after removing leading zeros
+                        if (!isNaN(qty) && !isNaN(stockInput) && qtyInput.trim() !== "") {
+                            console.log(stockInput, "stock"); // Now stockInput is defined
+                            console.log(qty, "qty");
+                
+                            if (qty > stockInput) {
+                                alert("Entered quantity is greater than available quantity");
+                                $(`#${id}`).val(''); // Clear the entered quantity
+                            } else {
+                                var remainingStock = stockInput - qty;
+                                $(`#stock_data${id}`).val(remainingStock);
+                                console.log(remainingStock, "remainingStock");
+                            }
+                        } else {
+                            // Handle invalid input (non-numeric)
+                            alert("Please enter numeric values for quantity and stock");
+                            $(`#${id}`).val(''); // Clear the entered quantity
+                        }
+                    }
+                
+                    // Bind the qtychange function to the input event of the quantity input field
+                    $(document).on('input', 'input[id^="qty"]', function() {
+                        qtychange(this.id);
+                    });
+                </script>-->
+                
+
+
 
                <!--   <script>
                     $(document).ready(function () {
@@ -1892,19 +1937,6 @@
 </script>
 
 
-<script>
-  function qtychange(id_str) {
-    id = id_str.split("item")[1]
-    var qty = $(`#${id}`).val();
-    var avl = document.getElementById(`stock_data${id}`).innerHTML;
-    if (parseInt(qty) > parseInt(avl)) {
-      alert("Entered quantity greater than available quantity");
-      location.reload();
-    }
-  }
-</script>
-
-
 
 <script>
 
@@ -2876,7 +2908,7 @@
               </td>
               <td style="width: 17%;" >
                   <input  style="width: 14vh; font-size: 15px;" type='number' id='qty${rowCount}' class='text-right border-0 bg-transparent text-white qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange(this.id)'><br>
-                  <span class="text-warning">Available Stock : <span id="stock_data${rowCount}" class="stock_data text-warning"></span></span>
+                  <span style=" font-size: 10px;" class="text-warning">Available Stock : <input id="stock_data${rowCount}" class="stock_data text-warning" style="background-color: #3b3b3b; width: 7vh; border: none; font-size: 10px;"  name='stock[]'  readonly></input></span>
                   <span class="stock_warning text-danger"></span>
               </td>
               <td style="width: 15%;" >
@@ -3355,68 +3387,112 @@
           });
       }
 
-    // Function to update fields based on dropdown ID
+   // Variable to store the initial stock value
+var initialStock = 0;
+
+// Function to update fields based on dropdown ID
 function updateFields(rowCount) {
-  var select = $('#item' + rowCount).val(); // Get the value of the item dropdown
-  var source = $('#srcofsupply').val(); // Get the value of the source of supply dropdown
+    var select = $('#item' + rowCount).val(); // Get the value of the item dropdown
+    var source = $('#srcofsupply').val(); // Get the value of the source of supply dropdown
 
-  // Perform an AJAX request to update fields based on the selected item and source of supply
-  $.ajax({
-      type: "GET",
-      url: "{% url 'itemdatadebit' %}", // URL for the AJAX request
-      data: {
-          id: select, // ID of the selected item
-          isd: source // Source of supply
-      },
-      success: function(response) {
-          // Handle the successful response from the server
-          if (response && response.error_flag === 1) {
-              $('#errorLabel').text("Item is not present"); // Display an error message if the item is not present
-          } else {
-              $('#errorLabel').text(""); // Clear any previous error message
+    // Perform an AJAX request to update fields based on the selected item and source of supply
+    $.ajax({
+        type: "GET",
+        url: "{% url 'itemdatadebit' %}", // URL for the AJAX request
+        data: {
+            id: select, // ID of the selected item
+            isd: source // Source of supply
+        },
+        success: function(response) {
+            // Handle the successful response from the server
+            if (response && response.error_flag === 1) {
+                $('#errorLabel').text("Item is not present"); // Display an error message if the item is not present
+            } else {
+                $('#errorLabel').text(""); // Clear any previous error message
 
-              // Update item details based on the response
-              $('#hsn' + rowCount).val(response.hsn); // Update HSN field
-              $('#rate' + rowCount).val(response.price); // Update rate field
-              $('#stock_data' + rowCount).val(response.qty); // Update stock data field
+                // Update item details based on the response
+                $('#hsn' + rowCount).val(response.hsn); // Update HSN field
+                $('#rate' + rowCount).val(response.price); // Update rate field
+                $('#stock_data' + rowCount).val(response.qty); // Update stock data field
+                console.log(response.qty, "stock");
 
-              // Determine the tax group label and options based on the source of supply
-              var taxGroupLabel, taxOptions;
-              if (source === "[KL]-Kerala") {
-                  taxGroupLabel = "GST"; // For Kerala, use GST tax group
-                  taxOptions = response.intrastate; // Use intrastate tax options
-              } else {
-                  taxGroupLabel = "IGST"; // For other states, use IGST tax group
-                  taxOptions = response.interstate; // Use interstate tax options
-              }
+                // Set the initial stock value
+                initialStock = parseInt(response.qty);
 
-              // Update tax group label
-              $('#taxGroupLabel').text(taxGroupLabel);
+                // Determine the tax group label and options based on the source of supply
+                var taxGroupLabel, taxOptions;
+                if (source === "[KL]-Kerala") {
+                    taxGroupLabel = "GST"; // For Kerala, use GST tax group
+                    taxOptions = response.intrastate; // Use intrastate tax options
+                } else {
+                    taxGroupLabel = "IGST"; // For other states, use IGST tax group
+                    taxOptions = response.interstate; // Use interstate tax options
+                }
 
-              // Update tax dropdown options
-              var taxDropdownId = '#tax' + rowCount;
-              $(taxDropdownId).empty(); // Clear existing options
-              if (taxOptions) {
-                  $(taxDropdownId).append('<option value="' + taxOptions + '">' + taxOptions + '</option>'); // Add fetched tax option
-              }
-              // Add fixed tax options
-              $(taxDropdownId).append('<option value="0"> (' + taxGroupLabel + ' - 0%)</option>');
-              $(taxDropdownId).append('<option value="3"> (' + taxGroupLabel + ' - 3%)</option>');
-              $(taxDropdownId).append('<option value="5"> (' + taxGroupLabel + ' - 5%)</option>');
-              $(taxDropdownId).append('<option value="12"> (' + taxGroupLabel + ' - 12%)</option>');
-              $(taxDropdownId).append('<option value="18"> (' + taxGroupLabel + ' - 18%)</option>');
-              $(taxDropdownId).append('<option value="28"> (' + taxGroupLabel + ' - 28%)</option>');
+                // Update tax group label
+                $('#taxGroupLabel').text(taxGroupLabel);
 
-              // Set styles for the dropdown
-              $(taxDropdownId).removeClass('bg-transparent text-white').addClass('bg-black text-white');
-          }
-      },
-      error: function(xhr, status, error) {
-          console.error("Error:", error);
-          // Handle error cases here
-      }
-  });
+                // Update tax dropdown options
+                var taxDropdownId = '#tax' + rowCount;
+                $(taxDropdownId).empty(); // Clear existing options
+                if (taxOptions) {
+                    $(taxDropdownId).append('<option value="' + taxOptions + '">' + taxOptions + '</option>'); // Add fetched tax option
+                }
+                // Add fixed tax options
+                $(taxDropdownId).append('<option value="0"> (' + taxGroupLabel + ' - 0%)</option>');
+                $(taxDropdownId).append('<option value="3"> (' + taxGroupLabel + ' - 3%)</option>');
+                $(taxDropdownId).append('<option value="5"> (' + taxGroupLabel + ' - 5%)</option>');
+                $(taxDropdownId).append('<option value="12"> (' + taxGroupLabel + ' - 12%)</option>');
+                $(taxDropdownId).append('<option value="18"> (' + taxGroupLabel + ' - 18%)</option>');
+                $(taxDropdownId).append('<option value="28"> (' + taxGroupLabel + ' - 28%)</option>');
+
+                // Set styles for the dropdown
+                $(taxDropdownId).removeClass('bg-transparent text-white').addClass('bg-black text-white');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error:", error);
+            // Handle error cases here
+        }
+    });
 }
+
+// Function to handle quantity change
+function qtychange(id_str) {
+    var id = id_str.split("qty")[1];
+    var qtyInput = $(`#qty${id}`).val();
+
+    console.log(initialStock, "initialStock");
+    console.log(qtyInput, "qtyInput");
+
+    // Remove leading zeros from the input values
+    var qty = parseFloat(qtyInput);
+
+    // Check if the input values are valid numbers after removing leading zeros
+    if (!isNaN(qty) && !isNaN(initialStock) && qtyInput.trim() !== "") {
+        console.log(initialStock, "initialStock");
+        console.log(qty, "qty");
+
+        if (qty > initialStock) {
+            alert("Entered quantity is greater than available quantity");
+            $(`#qty${id}`).val(''); // Clear the entered quantity
+        } else {
+            var remainingStock = initialStock - qty;
+            $(`#stock_data${id}`).val(remainingStock);
+            console.log(remainingStock, "remainingStock");
+        }
+    } else {
+        // Handle invalid input (non-numeric)
+        alert("Please enter numeric values for quantity and stock");
+        $(`#qty${id}`).val(''); // Clear the entered quantity
+    }
+}
+
+// Bind the qtychange function to the input event of the quantity input field
+$(document).on('input', 'input[id^="qty"]', function() {
+    qtychange(this.id);
+});
+
 
 // Function to extract row count from element ID
 function getId(element) {
@@ -3425,7 +3501,6 @@ function getId(element) {
 
 // Function to add a new row
 function addNewRow() {
-  console.log(rowCount, "rowCount hai")
   rowCount++;
   var newRow = '<tr id="row' + rowCount + '">'; // Create HTML for the new row
   // Append the new row to the table body
@@ -3439,17 +3514,16 @@ function addNewRow() {
 
   // Recalculate amounts for all rows
   $('#item_table tbody tr').each(function () {
-    var currentRowCount = $(this).attr('id').match(/\d+/)[0]; // Extract the row count from the ID
-    console.log(currentRowCount, "currentRowCount")
-    if (currentRowCount <= rowCount) { // Ensure only existing rows are considered
-      var row = $('#row' + currentRowCount);
-      if (isValidRow(row)) { // Check if the row has valid inputs
-        calculateRowAmount(row); // Recalculate amount for the current row
-        console.log("Calculating row amount for row:", currentRowCount);
-      } else {
-        console.log("Invalid input detected for row", currentRowCount);
+      var currentRowCount = parseInt($(this).attr('id').match(/\d+/)[0]); // Extract the row count from the ID
+      if (!isNaN(currentRowCount) && currentRowCount <= rowCount) { // Ensure only existing rows are considered
+          var row = $('#row' + currentRowCount);
+          if (isValidRow(row)) { // Check if the row has valid inputs
+              calculateRowAmount(row); // Recalculate amount for the current row
+              console.log("Calculating row amount for row:", currentRowCount);
+          } else {
+              console.log("Invalid input detected for row", currentRowCount);
+          }
       }
-    }
   });
 
   calculateGrandTotal(); // Recalculate grand total for all rows
@@ -3469,17 +3543,30 @@ function isValidRow(row) {
   var tax = parseFloat(row.find('.tax').val());
   var discount = parseFloat(row.find('.discount').val());
 
+  // Set NaN values to 0
+  qty = isNaN(qty) ? 0 : qty;
+  rate = isNaN(rate) ? 0 : rate;
+  tax = isNaN(tax) ? 0 : tax;
+  discount = isNaN(discount) ? 0 : discount;
+
   // Check if any of the inputs are NaN or undefined
   if (isNaN(qty) || isNaN(rate) || isNaN(tax) || isNaN(discount)) {
-    return false;
+      return false;
   }
   return true;
 }
+
+
 
 // Execute when the "Add Row" button is clicked
 $('#add-row').click(function () {
   addNewRow(); // Add a new row
 });
+
+// Initial setup
+var rowCount = $('#item_table tbody tr').length; // Initialize rowCount based on existing rows
+initializeSelect2(rowCount); // Initialize Select2 for the first item dropdown
+handleChangeEvents(); // Handle change events for source of supply and item
 
 
 
@@ -3528,13 +3615,13 @@ $('#srcofsupply').change(function() {
   row.find('.amount').text(amount.toFixed(2)); // Update the amount in the row
   console.log(amount, "amount")
 }*/
-
+// Function to calculate row amount
 function calculateRowAmount(row) {
   console.log("Calculating row amount for row:", row.index());
 
   var qty = parseFloat(row.find('.qty').val());
   console.log("Quantity for row", row.index(), ":", qty);
-
+  console.log("Quantity entered");
   var rate = parseFloat(row.find('.rate').val());
   console.log("Rate for row", row.index(), ":", rate);
 
@@ -3544,10 +3631,11 @@ function calculateRowAmount(row) {
   var discount = parseFloat(row.find('.discount').val());
   console.log("Discount for row", row.index(), ":", discount);
 
-  if (isNaN(qty) || isNaN(rate) || isNaN(tax) || isNaN(discount)) {
-    console.log("Invalid input detected for row", row.index());
-    return; // Exit early if any value is NaN
-  }
+  // Set NaN values to 0
+  qty = isNaN(qty) ? 0 : qty;
+  rate = isNaN(rate) ? 0 : rate;
+  tax = isNaN(tax) ? 0 : tax;
+  discount = isNaN(discount) ? 0 : discount;
 
   var rowAmount = (qty * rate) - discount;
   console.log("Row amount calculated for row", row.index(), ":", rowAmount);
@@ -3564,11 +3652,7 @@ function calculateRowAmount(row) {
   return rowAmount;
 }
 
-
-
-
-
-// Function to calculate the subtotal
+// Function to calculate subtotal
 function calculateSubtotal() {
   console.log("Calculating subtotal...");
   var subtotal = 0;
@@ -3579,7 +3663,7 @@ function calculateSubtotal() {
   console.log("Subtotal calculated:", subtotal);
 }
 
-// Function to calculate the grand total
+// Function to calculate grand total
 function calculateGrandTotal() {
   console.log("Calculating grand total...");
   var grandTotal = 0;
@@ -3591,6 +3675,7 @@ function calculateGrandTotal() {
     grandTotal += rowAmount;
 
     var taxAmount = parseFloat($(this).find('.taxamount').val());
+    taxAmount = isNaN(taxAmount) ? 0 : taxAmount; // Set NaN values to 0
     grandTotal += taxAmount;
     totalTaxAmount += taxAmount;
   });
@@ -3617,7 +3702,12 @@ $('#item_table').on('change', '.tax', function () {
   calculateRowAmount(row);
   calculateSubtotal();
   calculateGrandTotal();
-});   
+});
+
+// Execute when the "Add Row" button is clicked
+$('#add-row').click(function () {
+  addNewRow(); // Add a new row
+});
 
 </script>
 

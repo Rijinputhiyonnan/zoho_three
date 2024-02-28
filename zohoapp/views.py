@@ -26782,7 +26782,7 @@ def edited_prod(request, id):
         
 
         invoic.save()
-        
+        p.stock=request.POST.get('payment_method', "")
         if invp:
             invp.payment_method = request.POST.get('payment_method', "")
             if invp.payment_method == 'cash':
@@ -26810,6 +26810,8 @@ def edited_prod(request, id):
         est_items.tax = [float(x) for x in est_items.tax1]
         est_items.amount1 = request.POST.getlist('amount[]')
         est_items.amount = [float(x) for x in est_items.amount1]    
+        est_items.stock1 = request.POST.getlist('stock[]')
+        est_items.stock = [float(x) for x in est_items.stock1]   
 
             
         
@@ -26818,12 +26820,12 @@ def edited_prod(request, id):
 
         
 
-        if len(est_items.item) == len(est_items.hsn) ==  len(est_items.quantity) == len(est_items.rate) == len(est_items.discount) == len(est_items.tax) == len(est_items.amount):
-                mapped = zip(est_items.item,est_items.hsn, est_items.quantity, est_items.rate, est_items.discount, est_items.tax, est_items.amount)
+        if len(est_items.item) == len(est_items.hsn) ==  len(est_items.quantity) == len(est_items.rate) == len(est_items.discount) == len(est_items.tax) == len(est_items.amount)  == len(est_items.stock):
+                mapped = zip(est_items.item,est_items.hsn, est_items.quantity, est_items.rate, est_items.discount, est_items.tax, est_items.amount, est_items.stock)
                 mapped = list(mapped)
                 for element in mapped:
                     created = invoice_item.objects.create(
-                        inv=estimate, product=element[0], hsn=element[1], quantity=element[2], rate=element[3], discount=element[4], tax=element[5], total=element[6])
+                        inv=estimate, product=element[0], hsn=element[1], quantity=element[2], rate=element[3], discount=element[4], tax=element[5], total=element[6], inv_stock=element[7])
         return redirect('invoice_overview', id)
             
 

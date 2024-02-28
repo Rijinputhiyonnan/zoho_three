@@ -1902,6 +1902,8 @@ class invoice_item(models.Model):
     total = models.FloatField()  
     discount = models.FloatField(null=True, blank=True)
     rate = models.TextField(max_length=255)
+    
+    inv_stock=models.IntegerField(blank=True,null=True,default=0) # updation 28-02
     inv = models.ForeignKey(invoice, on_delete=models.CASCADE)   
     
     
