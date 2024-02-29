@@ -26782,7 +26782,7 @@ def edited_prod(request, id):
         
 
         invoic.save()
-        p.stock=request.POST.get('payment_method', "")
+        
         if invp:
             invp.payment_method = request.POST.get('payment_method', "")
             if invp.payment_method == 'cash':
@@ -26807,7 +26807,10 @@ def edited_prod(request, id):
         est_items.discount1 = request.POST.getlist('discount[]')
         est_items.discount = [float(x) for x in est_items.discount1]
         est_items.tax1 = request.POST.getlist('tax[]')
-        est_items.tax = [float(x) for x in est_items.tax1]
+
+    # Filter out non-numeric characters and convert to float
+        est_items.tax = [float(''.join(filter(str.isdigit, x))) for x in est_items.tax1]
+
         est_items.amount1 = request.POST.getlist('amount[]')
         est_items.amount = [float(x) for x in est_items.amount1]    
         est_items.stock1 = request.POST.getlist('stock[]')
