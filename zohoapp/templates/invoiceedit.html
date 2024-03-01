@@ -418,11 +418,11 @@
 
 
 
-
+       <!-- onclick='toggleDateInput(),toggleDateInputs()'-->
 
         <div class="row mt-2">
           <div class="col-md-12 table-responsive-md mt-3">
-            <table class="table table-bordered " id="item_table" onclick='toggleDateInput(),toggleDateInputs()'>
+            <table class="table table-bordered " id="item_table" >
               <thead>
 
                 <tr>
@@ -449,7 +449,7 @@
                         <option class="text-black" value="{{j.id}}">{{ j.Name }} </option>
                         {% endfor %}
                       </select>-->
-                      <select name='item[]' id="item1" class="form-control select2    "  style="width: 18vh; font-size: 15px; " >
+                      <select  name='item[]' id="item1{{i.id}}" class="form-control select2  extra  "  style="width: 18vh; font-size: 15px; "  onchange = "changewithitem(this,`{{i.id}}`)">
                         <option class="form-control select2  text-center " style="padding-bottom: 7vh;  "  selected value="{{i.product}}">{{i.product}}</option>
                         {% for i in p %}
                             <option class="form-control select2  text-right  " value="{{ i.Name }}" data-tokens="{{ i.Name }}">
@@ -648,7 +648,7 @@
                 });
                 
                   </script>-->
-                  <td style="width: 12%;" class='text-center'><input type='number' style="width: 15vh;" id='rate{{forloop.counter}}'
+                  <td style="width: 12%;" class='text-center'><input type='number' style="width: 15vh;" id='rate{{i.id}}'
                       class=' text-center rate form-control border-0 bg-transparent text-white' name='rate[]'
                       value='{{i.rate}}' readonly>
                   </td>
@@ -659,7 +659,7 @@
                   </td>
                   <td style="width: 16%; font-size: 9px;" class='text-center '> <select style=" font-size: 14px; width: 15vh;" name='tax[]' id='tax{{forloop.counter}}'
                       class='form-control border-0 bg-transparent text-white  text-right border-0 tax'
-                       onchange="updateFields()">
+                       onchange="updateFields(this,`{{i.id}}`)">
                       <!-- onchange="toggleDateInput()"-->
                       <optgroup style="width: 10%; font-size: 14px;" class="text-center text-black" label="GST">
                         <option value="{{i.tax}} " selected hidden>{{i.tax}}.0% GST({{i.tax}}%)</option>
@@ -3322,18 +3322,116 @@
 
   })
 
+    $(document).ready(function() {
+  $("#item1").select2();
+      $(".extra").each(function(){
+        var id = $(this).attr("id");
+        $("#"+id).select2();
+      })
 
-
+});
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer></script>
 <script>
-  // Define a blur event handler for elements with IDs starting with "qty"
-  $(document).on('blur', '[id^="qty"]', function () {
-  });
 
+
+
+</script>
+  <script>
+ function changewithitem(a,b){
+        var id = a.value
+        console.log(id, "changewithitem_id")
+        updateFields(id);
+        
+      }
+    var initialStock =0;  
+// Function to update fields based on dropdown ID
+
+function updateFields(rowCount) {
+  
+  var select = rowCount// Get the value of the item dropdown
+  console.log(select, "select test")
+  var source = $('#srcofsupply').val(); // Get the value of the source of supply dropdown
+
+  // Perform an AJAX request to update fields based on the selected item and source of supply
+  $.ajax({
+      type: "GET",
+      url: "{% url 'itemdatadebit' %}", // URL for the AJAX request
+      data: {
+          id: select, // ID of the selected item
+          isd: source // Source of supply
+      },
+      success: function(response) {
+          // Handle the successful response from the server
+          if (response && response.error_flag === 1) {
+              $('#errorLabel').text("Item is not present"); // Display an error message if the item is not present
+          } else {
+              $('#errorLabel').text(""); // Clear any previous error message
+
+              // Update item details based on the response
+              $('#hsn' + rowCount).val(response.hsn); // Update HSN field
+              data1 = response.price;
+              console.log(data1, "data1")
+              document.getElementById(`rate${rowCount}`).value=data1;
+              document.getElementById(`rate${rowCount}`)=m;
+              console.log(m, "mmmmm")
+
+              $(`#rate${rowCount}`).val(data1); // Update rate field
+
+              
+              $('#stock_data' + rowCount).val(response.qty); // Update stock data field
+              console.log(response.qty, "stock");
+
+              // Set the initial stock value
+              initialStock = parseInt(response.qty);
+
+              // Determine the tax group label and options based on the source of supply
+              var taxGroupLabel, taxOptions;
+              if (source === "[KL]-Kerala") {
+                  taxGroupLabel = "GST"; // For Kerala, use GST tax group
+                  taxOptions = response.intrastate; // Use intrastate tax options
+              } else {
+                  taxGroupLabel = "IGST"; // For other states, use IGST tax group
+                  taxOptions = response.interstate; // Use interstate tax options
+              }
+
+              // Update tax group label
+              $('#taxGroupLabel').text(taxGroupLabel);
+
+              // Update tax dropdown options
+              var taxDropdownId = '#tax' + rowCount;
+              $(taxDropdownId).empty(); // Clear existing options
+              if (taxOptions) {
+                  $(taxDropdownId).append('<option value="' + taxOptions + '">' + taxOptions + '</option>'); // Add fetched tax option
+              }
+              // Add fixed tax options
+              $(taxDropdownId).append('<option value="0"> (' + taxGroupLabel + ' - 0%)</option>');
+              $(taxDropdownId).append('<option value="3"> (' + taxGroupLabel + ' - 3%)</option>');
+              $(taxDropdownId).append('<option value="5"> (' + taxGroupLabel + ' - 5%)</option>');
+              $(taxDropdownId).append('<option value="12"> (' + taxGroupLabel + ' - 12%)</option>');
+              $(taxDropdownId).append('<option value="18"> (' + taxGroupLabel + ' - 18%)</option>');
+              $(taxDropdownId).append('<option value="28"> (' + taxGroupLabel + ' - 28%)</option>');
+
+              // Set styles for the dropdown
+              $(taxDropdownId).removeClass('bg-transparent text-white').addClass('bg-black text-white');
+          }
+      },
+      error: function(xhr, status, error) {
+          console.error("Error:", error);
+          // Handle error cases here
+      }
+  });
+}
+    </script>
+  <script>
+    $(document).on('blur', '[id^="qty"]', function () {
+    });
   // Execute when the document is ready
-  $(document).ready(function() {
-      var rowCount = 1; // Initialize rowCount to 1
+
+
+
+
+     /* var rowCount = 1; // Initialize rowCount to 1
 
       // Function to initialize Select2 for item dropdown
       function initializeSelect2(rowCount) {
@@ -3341,86 +3439,23 @@
           // This function initializes the Select2 plugin for the item dropdown identified by the current rowCount
           // Add CSS to center the text
         $('#item' + rowCount).next('.select2-container').find('.select2-selection__rendered').css('text-align', 'center');
-      }
+      }*/
+
+    
+     
 
       // Function to handle change events for source of supply and item
-      function handleChangeEvents() {
+    /*  function handleChangeEvents() {
           // Execute when the source of supply or item changes
           $('[id^="srcofsupply"], [id^="item"]').change(function() {
               var id = getId(this); // Get the ID of the changed element
               updateFields(id); // Update fields based on the ID
           });
-      }
+      }*/
 
    // Variable to store the initial stock value
 var initialStock = 0;
 
-// Function to update fields based on dropdown ID
-function updateFields(rowCount) {
-    var select = $('#item' + rowCount).val(); // Get the value of the item dropdown
-    var source = $('#srcofsupply').val(); // Get the value of the source of supply dropdown
-
-    // Perform an AJAX request to update fields based on the selected item and source of supply
-    $.ajax({
-        type: "GET",
-        url: "{% url 'itemdatadebit' %}", // URL for the AJAX request
-        data: {
-            id: select, // ID of the selected item
-            isd: source // Source of supply
-        },
-        success: function(response) {
-            // Handle the successful response from the server
-            if (response && response.error_flag === 1) {
-                $('#errorLabel').text("Item is not present"); // Display an error message if the item is not present
-            } else {
-                $('#errorLabel').text(""); // Clear any previous error message
-
-                // Update item details based on the response
-                $('#hsn' + rowCount).val(response.hsn); // Update HSN field
-                $('#rate' + rowCount).val(response.price); // Update rate field
-                $('#stock_data' + rowCount).val(response.qty); // Update stock data field
-                console.log(response.qty, "stock");
-
-                // Set the initial stock value
-                initialStock = parseInt(response.qty);
-
-                // Determine the tax group label and options based on the source of supply
-                var taxGroupLabel, taxOptions;
-                if (source === "[KL]-Kerala") {
-                    taxGroupLabel = "GST"; // For Kerala, use GST tax group
-                    taxOptions = response.intrastate; // Use intrastate tax options
-                } else {
-                    taxGroupLabel = "IGST"; // For other states, use IGST tax group
-                    taxOptions = response.interstate; // Use interstate tax options
-                }
-
-                // Update tax group label
-                $('#taxGroupLabel').text(taxGroupLabel);
-
-                // Update tax dropdown options
-                var taxDropdownId = '#tax' + rowCount;
-                $(taxDropdownId).empty(); // Clear existing options
-                if (taxOptions) {
-                    $(taxDropdownId).append('<option value="' + taxOptions + '">' + taxOptions + '</option>'); // Add fetched tax option
-                }
-                // Add fixed tax options
-                $(taxDropdownId).append('<option value="0"> (' + taxGroupLabel + ' - 0%)</option>');
-                $(taxDropdownId).append('<option value="3"> (' + taxGroupLabel + ' - 3%)</option>');
-                $(taxDropdownId).append('<option value="5"> (' + taxGroupLabel + ' - 5%)</option>');
-                $(taxDropdownId).append('<option value="12"> (' + taxGroupLabel + ' - 12%)</option>');
-                $(taxDropdownId).append('<option value="18"> (' + taxGroupLabel + ' - 18%)</option>');
-                $(taxDropdownId).append('<option value="28"> (' + taxGroupLabel + ' - 28%)</option>');
-
-                // Set styles for the dropdown
-                $(taxDropdownId).removeClass('bg-transparent text-white').addClass('bg-black text-white');
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error("Error:", error);
-            // Handle error cases here
-        }
-    });
-}
 
 // Function to handle quantity change
 function qtychange(id_str) {
@@ -3682,97 +3717,6 @@ $('#add-row').click(function () {
 
 
 
-$(document).ready(function() {
-  // Function to initialize Select2 for a given row
-  function initializeSelect2(row) {
-      row.find('select').select2({
-          // Your Select2 configuration options here
-          // For example:
-          placeholder: "Select an option",
-          allowClear: true
-      });
-  }
-
-  // Initialize Select2 for saved rows
-  $('#item_table_body').find('.saved-row').each(function() {
-      initializeSelect2($(this));
-  });
-
-  // Add event handler for adding a new row
-  $('#add-row').click(function() {
-      // Your code to add a new row here
-      var rowCount = $('#item_table_body').find('tr').length + 1; // Get the total number of rows and increment by 1 for the new row
-
-      var newRowHtml = `
-      <tr id='row${rowCount}'>
-        <td>
-            <div>
-                <select name='item[]' id="item${rowCount}" class="form-control select2 "  style="width: 18vh; font-size: 15px;">
-                    <option class="form-control select2 text-center" selected value="{{i.product}}">{{i.product}}</option>
-                    {% for i in p %}
-                        <option class="form-control select2 text-right" value="{{ i.Name }}" data-tokens="{{ i.Name }}">
-                            {{ i.Name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-        </td>
-        <td style="width: 15%;">
-            <input style="width: 14vh; font-size: 15px;" type='number' id='hsn${rowCount}' class='text-right hsn form-control border-0 bg-transparent text-white' name='hsn[]' readonly>
-        </td>
-        <td style="width: 17%;" >
-            <input  style="width: 14vh; font-size: 15px;" type='number' id='qty${rowCount}' class='text-right border-0 bg-transparent text-white qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange(this.id)'><br>
-            <span style=" font-size: 10px;" class="text-warning">Available Stock : <input id="stock_data${rowCount}" class="stock_data text-warning" style="background-color: #3b3b3b; width: 7vh; border: none; font-size: 10px;"  name='stock[]'  readonly></input></span>
-            <span class="stock_warning text-danger"></span>
-        </td>
-        <td style="width: 15%;" >
-            <input  style="width: 14vh; font-size: 15px;" type='number' id='rate${rowCount}' class='text-right border-0 bg-transparent text-white rate form-control' name='rate[]' value='0' readonly>
-        </td>
-        <td style="width: 10%;">
-            <input type='number' id='discount${rowCount}' class='text-right border-0 bg-transparent text-white discount form-control' name='discount[]' value='0'>
-        </td>
-        <td style="width: 22%;" >
-            <select name='tax[]' id='tax${rowCount}' class='form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="toggleDateInput()">
-                <optgroup class="text-center text-black" label="GST">
-                    <option class="text-black" value="0">0% GST(0%)</option>
-                    <option class="text-black" value="3">3.0% GST(3%)</option>
-                    <option class="text-black" value="5">5.0% GST(5%)</option>
-                    <option class="text-black" value="12">12.0% GST(12%)</option>
-                    <option class="text-black" value="18">18.0% GST(18%)</option>
-                    <option class="text-black" value="28">28.0% GST(28%)</option>
-                </optgroup>
-                <optgroup class="text-center text-black" label="IGST">
-                    <option class="text-black" value="0">0% IGST(0%)</option>
-                    <option class="text-black" value="3">3.0% IGST(3%)</option>
-                    <option class="text-black" value="5">5.0% IGST(5%)</option>
-                    <option class="text-black" value="12">12.0% IGST(12%)</option>
-                    <option class="text-black" value="18">18.0% IGST(18%)</option>
-                    <option class="text-black" value="28">28.0% IGST(28%)</option>
-                </optgroup>
-            </select>
-            <label id="ml${rowCount}" class="text-warning" style="display: none;"></label>
-        </td>
-        <td style="display: none;">
-            <input type="text" name='taxamount' id="taxamount${rowCount}" class="form-control border-0 bg-transparent text-white taxamount" />
-        </td>
-        <td style="width: 15%;" >
-            <input type='number' id='amount${rowCount}' class='text-right border-0 bg-transparent text-white form-control amount' name='amount[]' value='0.00' readonly>
-        </td>
-        <td class='text-center'>
-            <button type='button' id='del_btn${rowCount}' class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row' style='width:30px'>X</button> <br><br>
-            <button type='button' class='btn btn-transparent text-primary btn-sm btn-outline-primary rounded-circle clone-row' data-row='${rowCount}' style='width:30px'><i class="fa fa-clone"></i></button>
-        </td>
-    </tr>
-      `; // Create HTML for the new row
-
-      $('#item_table_body').append(newRowHtml); // Append the new row HTML to the table body
-
-      // Initialize Select2 for the newly added row
-      var newRow = $('#item_table_body').find('tr.new-row:last-child'); // Get the newly added row
-      initializeSelect2(newRow);
-      newRow.removeClass('new-row').addClass('saved-row'); // Update the class to indicate that the row is saved
-  });
-});
 
 
 
