@@ -183,6 +183,7 @@
     </div>
   </div>
   <div>
+
     <div class="card radius-15 p-5">
       <form action="{% url 'edited_prod' invoice.id %}" class="mt-2 mb-4" method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -449,7 +450,7 @@
                         <option class="text-black" value="{{j.id}}">{{ j.Name }} </option>
                         {% endfor %}
                       </select>-->
-                      <select  name='item[]' id="item1{{i.id}}" class="form-control select2  extra  "  style="width: 18vh; font-size: 15px; "  onchange = "changewithitem(this,`{{i.id}}`)">
+                      <select  name='item[]' id="item{{forloop.counter}}" class="form-control select2  extra  "  style="width: 18vh; font-size: 15px; "  onchange = "changewithitem(this,`{{i.id}}`)">
                         <option class="form-control select2  text-center " style="padding-bottom: 7vh;  "  selected value="{{i.product}}">{{i.product}}</option>
                         {% for i in p %}
                             <option class="form-control select2  text-right  " value="{{ i.Name }}" data-tokens="{{ i.Name }}">
@@ -648,7 +649,7 @@
                 });
                 
                   </script>-->
-                  <td style="width: 12%;" class='text-center'><input type='number' style="width: 15vh;" id='rate{{i.id}}'
+                  <td style="width: 12%;" class='text-center'><input type='number' style="width: 15vh;" id='rate{{forloop.counter}}'
                       class=' text-center rate form-control border-0 bg-transparent text-white' name='rate[]'
                       value='{{i.rate}}' readonly>
                   </td>
@@ -685,7 +686,7 @@
 
                   </td>
                   <td style="display: none;">
-                    <input type="text" name='taxamount' id="taxamount1" class=" taxamount text-dark" />
+                    <input type="text" name='taxamount' id="taxamount{{forloop.counter}}" class=" taxamount text-dark" />
                   </td>
                   <td style="width: 55%;" class='text-right'><input style="width: 16vh;" type='number' id='amount{{forloop.counter}}'
                       class=' text-right form-control amount border-0 bg-transparent text-white' name='amount[]'
@@ -2851,6 +2852,7 @@
     var rowCount = 1;
 
     $('#add-row').click(function () {
+      var rowCount = $("#item_table tbody tr").length;
       rowCount++; // Increment row counter
       console.log("New row added. Row count: " + rowCount);
       
@@ -2858,7 +2860,7 @@
           <tr id='row${rowCount}'>
               <td>
                   <div>
-                      <select name='item[]' id="item${rowCount}" class="form-control select2 "  style="width: 18vh; font-size: 15px;">
+                      <select name='item[]' id="item${rowCount}" class="form-control select2 "  style="width: 18vh; font-size: 15px;"   >
                           <option class="form-control select2 text-center" selected value="{{i.product}}">{{i.product}}</option>
                           {% for i in p %}
                               <option class="form-control select2 text-right" value="{{ i.Name }}" data-tokens="{{ i.Name }}">
@@ -3340,14 +3342,16 @@
   <script>
  function changewithitem(a,b){
         var id = a.value
+        var rowId = (a.id).slice(4)
         console.log(id, "changewithitem_id")
-        updateFields(id);
+        console.log('rowIdd',rowId)
+        updateFields(id, rowId);
         
       }
     var initialStock =0;  
 // Function to update fields based on dropdown ID
 
-function updateFields(rowCount) {
+function updateFields(rowCount, rowId) {
   
   var select = rowCount// Get the value of the item dropdown
   console.log(select, "select test")
@@ -3369,17 +3373,17 @@ function updateFields(rowCount) {
               $('#errorLabel').text(""); // Clear any previous error message
 
               // Update item details based on the response
-              $('#hsn' + rowCount).val(response.hsn); // Update HSN field
+              $('#hsn' + rowId).val(response.hsn); // Update HSN field
               data1 = response.price;
               console.log(data1, "data1")
-              document.getElementById(`rate${rowCount}`).value=data1;
-              document.getElementById(`rate${rowCount}`)=m;
-              console.log(m, "mmmmm")
+              document.getElementById(`rate${rowId}`).value=data1;
+              gstTax  = extractTax(response.interstate)
+              igstTax  = extractTax(response.intrastate)
 
-              $(`#rate${rowCount}`).val(data1); // Update rate field
+              $(`#rate${rowId}`).val(data1); // Update rate field
 
               
-              $('#stock_data' + rowCount).val(response.qty); // Update stock data field
+              $('#stock_data' + rowId).val(response.qty); // Update stock data field
               console.log(response.qty, "stock");
 
               // Set the initial stock value
@@ -3387,7 +3391,7 @@ function updateFields(rowCount) {
 
               // Determine the tax group label and options based on the source of supply
               var taxGroupLabel, taxOptions;
-              if (source === "[KL]-Kerala") {
+              if (source === response.places) {
                   taxGroupLabel = "GST"; // For Kerala, use GST tax group
                   taxOptions = response.intrastate; // Use intrastate tax options
               } else {
@@ -3399,7 +3403,7 @@ function updateFields(rowCount) {
               $('#taxGroupLabel').text(taxGroupLabel);
 
               // Update tax dropdown options
-              var taxDropdownId = '#tax' + rowCount;
+              var taxDropdownId = '#tax' + rowId;
               $(taxDropdownId).empty(); // Clear existing options
               if (taxOptions) {
                   $(taxDropdownId).append('<option value="' + taxOptions + '">' + taxOptions + '</option>'); // Add fetched tax option
@@ -3421,6 +3425,22 @@ function updateFields(rowCount) {
           // Handle error cases here
       }
   });
+}
+
+function extractTax(tax){
+
+  var match = tax.match(/\[(\d+)%\]/);
+
+  if (match) {
+
+    var percentageValue = match[1];
+
+
+    percentageValue = parseInt(percentageValue, 10);
+
+    return percentageValue;
+  }
+
 }
     </script>
   <script>
