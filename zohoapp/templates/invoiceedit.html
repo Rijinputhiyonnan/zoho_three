@@ -2980,7 +2980,7 @@
       var row = $(this).closest('tr');
       calculateSubtotal();
       calculateGrandTotal();
-      toggleDateInput();
+      //toggleDateInput();
       calculateTaxAmount();
     });
 
@@ -3340,21 +3340,25 @@
 
 </script>
   <script>
- function changewithitem(a,b){
-        var id = a.value
-        var rowId = (a.id).slice(4)
-        console.log(id, "changewithitem_id")
-        console.log('rowIdd',rowId)
-        updateFields(id, rowId);
-        
-      }
+    function changewithitem(a, itemId) {
+      var id = a.value;
+      var rowId = a.id.slice(4); // Extract the row number from the select element's ID
+      console.log(id, "changewithitem_id");
+      console.log('rowId', rowId);
+      console.log('itemId', itemId);
+      updateFields(id, rowId, itemId); // Pass itemId to the updateFields function
+  }
     var initialStock =0;  
 // Function to update fields based on dropdown ID
 
-function updateFields(rowCount, rowId) {
-  
-  var select = rowCount// Get the value of the item dropdown
-  console.log(select, "select test")
+
+
+
+
+
+function updateFields(rowCount, rowId, itemId) {
+  var select = rowCount; // Get the value of the item dropdown
+  console.log(select, "select test");
   var source = $('#srcofsupply').val(); // Get the value of the source of supply dropdown
 
   // Perform an AJAX request to update fields based on the selected item and source of supply
@@ -3365,7 +3369,7 @@ function updateFields(rowCount, rowId) {
           id: select, // ID of the selected item
           isd: source // Source of supply
       },
-      success: function(response) {
+      success: function (response) {
           // Handle the successful response from the server
           if (response && response.error_flag === 1) {
               $('#errorLabel').text("Item is not present"); // Display an error message if the item is not present
@@ -3375,14 +3379,13 @@ function updateFields(rowCount, rowId) {
               // Update item details based on the response
               $('#hsn' + rowId).val(response.hsn); // Update HSN field
               data1 = response.price;
-              console.log(data1, "data1")
-              document.getElementById(`rate${rowId}`).value=data1;
-              gstTax  = extractTax(response.interstate)
-              igstTax  = extractTax(response.intrastate)
+              console.log(data1, "data1");
+              document.getElementById(`rate${rowId}`).value = data1;
+              gstTax = extractTax(response.interstate);
+              igstTax = extractTax(response.intrastate);
 
               $(`#rate${rowId}`).val(data1); // Update rate field
 
-              
               $('#stock_data' + rowId).val(response.qty); // Update stock data field
               console.log(response.qty, "stock");
 
@@ -3418,14 +3421,62 @@ function updateFields(rowCount, rowId) {
 
               // Set styles for the dropdown
               $(taxDropdownId).removeClass('bg-transparent text-white').addClass('bg-black text-white');
+
+              // Recalculate row amount after updating fields
+              calculateRowAmount($('#row' + `${rowId}`));
+
+
+              // Function to calculate row amount
+function calculateRowAmount(row) {
+  // Log a message to indicate that the function is being called
+  console.log("Calculating row amount for row:", row.index());
+
+  // Retrieve quantity, rate, tax, and discount values from the row
+  var qty = parseFloat(row.find('.qty').val());
+  var rate = parseFloat(row.find('.rate').val());
+  var tax = parseFloat(row.find('.tax').val());
+  var discount = parseFloat(row.find('.discount').val());
+
+  // Set default values to 0 if NaN (Not-a-Number) is encountered
+  qty = isNaN(qty) ? 0 : qty;
+  rate = isNaN(rate) ? 0 : rate;
+  tax = isNaN(tax) ? 0 : tax;
+  discount = isNaN(discount) ? 0 : discount;
+
+  // Calculate the row amount
+  var rowAmount = (qty * rate) - discount;
+
+
+  console.log( rowAmount, "rowAmount")
+
+  console.log( rate, "rate")
+  console.log( qty, "qty")
+  console.log( discount, "discount")
+
+  // Calculate the tax amount
+  var taxAmount = (rowAmount * tax) / 100;
+
+  // Update the row amount and tax amount fields in the row
+  row.find('.amount').val(rowAmount.toFixed(2));
+  row.find('.taxamount').val(taxAmount.toFixed(2));
+
+  // Log messages to indicate the calculated amounts
+  console.log("Row amount calculated for row  jkjji", row.index(), ":", rowAmount.toFixed(2));
+  console.log("Tax amount calculated for row  hjh", row.index(), ":", taxAmount.toFixed(2));
+
+  // Return the calculated row amount
+  return rowAmount;
+}
+
           }
       },
-      error: function(xhr, status, error) {
+      error: function (xhr, status, error) {
           console.error("Error:", error);
           // Handle error cases here
       }
   });
 }
+
 
 function extractTax(tax){
 
@@ -3641,7 +3692,7 @@ $('#srcofsupply').change(function() {
   console.log(amount, "amount")
 }*/
 // Function to calculate row amount
-function calculateRowAmount(row) {
+/*function calculateRowAmount(row) {
   console.log("Calculating row amount for row:", row.index());
 
   var qty = parseFloat(row.find('.qty').val());
@@ -3732,8 +3783,110 @@ $('#item_table').on('change', '.tax', function () {
 // Execute when the "Add Row" button is clicked
 $('#add-row').click(function () {
   addNewRow(); // Add a new row
+});*/
+
+// Function to calculate row amount
+function calculateRowAmount(row) {
+  // Log a message to indicate that the function is being called
+  console.log("Calculating row amount for row:", row.index());
+
+  // Retrieve quantity, rate, tax, and discount values from the row
+  var qty = parseFloat(row.find('.qty').val());
+  var rate = parseFloat(row.find('.rate').val());
+  var tax = parseFloat(row.find('.tax').val());
+  var discount = parseFloat(row.find('.discount').val());
+
+  // Set default values to 0 if NaN (Not-a-Number) is encountered
+  qty = isNaN(qty) ? 0 : qty;
+  rate = isNaN(rate) ? 0 : rate;
+  tax = isNaN(tax) ? 0 : tax;
+  discount = isNaN(discount) ? 0 : discount;
+
+  // Calculate the row amount
+  var rowAmount = (qty * rate) - discount;
+
+  // Calculate the tax amount
+  var taxAmount = (rowAmount * tax) / 100;
+
+  // Update the row amount and tax amount fields in the row
+  row.find('.amount').val(rowAmount.toFixed(2));
+  row.find('.taxamount').val(taxAmount.toFixed(2));
+
+  // Log messages to indicate the calculated amounts
+  console.log("Row amount calculated for row", row.index(), ":", rowAmount.toFixed(2));
+  console.log("Tax amount calculated for row", row.index(), ":", taxAmount.toFixed(2));
+
+  // Return the calculated row amount
+  return rowAmount;
+}
+
+// Function to calculate subtotal
+function calculateSubtotal() {
+  console.log("Calculating subtotal...");
+  var subtotal = 0;
+  // Iterate over each row in the item table
+  $('#item_table tbody tr').each(function () {
+      // Calculate the row amount and add it to the subtotal
+      subtotal += calculateRowAmount($(this));
+  });
+  // Update the subtotal field with the calculated value
+  $('#subtotal').val(subtotal.toFixed(2));
+  console.log("Subtotal calculated:", subtotal);
+}
+
+// Function to calculate grand total
+function calculateGrandTotal() {
+  console.log("Calculating grand total...");
+  var grandTotal = 0;
+  var totalTaxAmount = 0;
+  var advance = parseFloat($('#advance').val());
+
+  // Iterate over each row in the item table
+  $('#item_table tbody tr').each(function () {
+      // Calculate the row amount and tax amount for the row
+      var rowAmount = calculateRowAmount($(this));
+      grandTotal += rowAmount;
+
+      // Retrieve the tax amount from the row and add it to the grand total
+      var taxAmount = parseFloat($(this).find('.taxamount').val());
+      taxAmount = isNaN(taxAmount) ? 0 : taxAmount;
+      grandTotal += taxAmount;
+      totalTaxAmount += taxAmount;
+  });
+
+  // Retrieve shipping charges and adjustment values
+  var shippingCharges = parseFloat($('#shipping').val());
+  var adjust = parseFloat($('#adjust').val());
+
+  // Add shipping charges and adjustment to the grand total
+  grandTotal += adjust;
+  grandTotal += shippingCharges;
+
+  // Calculate the balance
+  var balance = grandTotal - advance;
+
+  // Update the grand total, balance, and total tax amount fields
+  $('#grandtotal').val(grandTotal.toFixed(2));
+  $('#balance').val(balance.toFixed(2));
+  $('#total_taxamount').val(totalTaxAmount.toFixed(2));
+
+  console.log("Grand total calculated:", grandTotal);
+}
+
+// Event handler for changes in tax values
+$('#item_table').on('change', '.tax', function () {
+  console.log("Tax change detected...");
+  // Calculate row amount, subtotal, and grand total when tax value changes
+  calculateRowAmount($(this).closest('tr'));
+  calculateSubtotal();
+  calculateGrandTotal();
 });
 
+// Execute when the "Add Row" button is clicked
+$('#add-row').click(function () {
+  // Add a new row
+  addNewRow();
+});
 
 
 
