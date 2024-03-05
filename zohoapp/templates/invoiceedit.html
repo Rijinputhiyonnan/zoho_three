@@ -2846,77 +2846,77 @@
   
  
   $(document).ready(function () {
-
-
-
     var rowCount = 1;
 
     $('#add-row').click(function () {
-      var rowCount = $("#item_table tbody tr").length;
-      rowCount++; // Increment row counter
-      console.log("New row added. Row count: " + rowCount);
-      
-      var newRow = `
-          <tr id='row${rowCount}'>
-              <td>
-                  <div>
-                      <select name='item[]' id="item${rowCount}" class="form-control select2 "  style="width: 18vh; font-size: 15px;"   >
-                          <option class="form-control select2 text-center" selected value="{{i.product}}">{{i.product}}</option>
-                          {% for i in p %}
-                              <option class="form-control select2 text-right" value="{{ i.Name }}" data-tokens="{{ i.Name }}">
-                                  {{ i.Name }}
-                              </option>
-                          {% endfor %}
-                      </select>
-                  </div>
-              </td>
-              <td style="width: 15%;">
-                  <input style="width: 14vh; font-size: 15px;" type='number' id='hsn${rowCount}' class='text-right hsn form-control border-0 bg-transparent text-white' name='hsn[]' readonly>
-              </td>
-              <td style="width: 17%;" >
-                  <input  style="width: 14vh; font-size: 15px;" type='number' id='qty${rowCount}' class='text-right border-0 bg-transparent text-white qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange(this.id)'><br>
-                  <span style=" font-size: 10px;" class="text-warning">Available Stock : <input id="stock_data${rowCount}" class="stock_data text-warning" style="background-color: #3b3b3b; width: 7vh; border: none; font-size: 10px;"  name='stock[]'  readonly></input></span>
-                  <span class="stock_warning text-danger"></span>
-              </td>
-              <td style="width: 15%;" >
-                  <input  style="width: 14vh; font-size: 15px;" type='number' id='rate${rowCount}' class='text-right border-0 bg-transparent text-white rate form-control' name='rate[]' value='0' readonly>
-              </td>
-              <td style="width: 10%;">
-                  <input type='number' id='discount${rowCount}' class='text-right border-0 bg-transparent text-white discount form-control' name='discount[]' value='0'>
-              </td>
-              <td style="width: 22%;" >
-                  <select name='tax[]' id='tax${rowCount}' class='form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="toggleDateInput()">
-                      <optgroup class="text-center text-black" label="GST">
-                          <option class="text-black" value="0">0% GST(0%)</option>
-                          <option class="text-black" value="3">3.0% GST(3%)</option>
-                          <option class="text-black" value="5">5.0% GST(5%)</option>
-                          <option class="text-black" value="12">12.0% GST(12%)</option>
-                          <option class="text-black" value="18">18.0% GST(18%)</option>
-                          <option class="text-black" value="28">28.0% GST(28%)</option>
-                      </optgroup>
-                      <optgroup class="text-center text-black" label="IGST">
-                          <option class="text-black" value="0">0% IGST(0%)</option>
-                          <option class="text-black" value="3">3.0% IGST(3%)</option>
-                          <option class="text-black" value="5">5.0% IGST(5%)</option>
-                          <option class="text-black" value="12">12.0% IGST(12%)</option>
-                          <option class="text-black" value="18">18.0% IGST(18%)</option>
-                          <option class="text-black" value="28">28.0% IGST(28%)</option>
-                      </optgroup>
-                  </select>
-                  <label id="ml${rowCount}" class="text-warning" style="display: none;"></label>
-              </td>
-              <td style="display: none;">
-                  <input type="text" name='taxamount' id="taxamount${rowCount}" class="form-control border-0 bg-transparent text-white taxamount" />
-              </td>
-              <td style="width: 15%;" >
-                  <input type='number' id='amount${rowCount}' class='text-right border-0 bg-transparent text-white form-control amount' name='amount[]' value='0.00' readonly>
-              </td>
-              <td class='text-center'>
-                  <button type='button' id='del_btn${rowCount}' class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row' style='width:30px'>X</button> <br><br>
-                  <button type='button' class='btn btn-transparent text-primary btn-sm btn-outline-primary rounded-circle clone-row' data-row='${rowCount}' style='width:30px'><i class="fa fa-clone"></i></button>
-              </td>
-          </tr>
-      `;
+        var rowCount = $("#item_table tbody tr").length;
+        rowCount++; // Increment row counter
+        console.log("New row added. Row count: " + rowCount);
+        
+        var newRow = `
+            <tr id='row${rowCount}'>
+                <td>
+                    <div>
+                        <select name='item[]' id="item${rowCount}" class="form-control select2" style="width: 18vh; font-size: 15px;" onchange="changewithitem(this,'{{i.id}}')">
+                            <option class="form-control select2 text-center" selected value="{{i.product}}">{{i.product}}</option>
+                            {% for i in p %}
+                                <option class="form-control select2 text-right" value="{{ i.Name }}" data-tokens="{{ i.Name }}">
+                                    {{ i.Name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </td>
+                <td style="width: 15%;">
+                    <input style="width: 14vh; font-size: 15px;" type='number' id='hsn${rowCount}' class='text-right hsn form-control border-0 bg-transparent text-white' name='hsn[]' readonly>
+                </td>
+                <td style="width: 17%;">
+                    <input style="width: 14vh; font-size: 15px;" type='number' id='qty${rowCount}' class='text-right border-0 bg-transparent text-white qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange(this.id)'><br>
+                    <span style="font-size: 10px;" class="text-warning">Available Stock : <input id="stock_data${rowCount}" class="stock_data text-warning" style="background-color: #3b3b3b; width: 7vh; border: none; font-size: 10px;" name='stock[]' readonly></input></span>
+                    <span class="stock_warning text-danger"></span>
+                </td>
+                <td style="width: 15%;">
+                    <input style="width: 14vh; font-size: 15px;" type='number' id='rate${rowCount}' class='text-right border-0 bg-transparent text-white rate form-control' name='rate[]' value='0' readonly>
+                </td>
+                <td style="width: 10%;">
+                    <input type='number' id='discount${rowCount}' class='text-right border-0 bg-transparent text-white discount form-control' name='discount[]' value='0'>
+                </td>
+                <td style="width: 22%;">
+                    <select name='tax[]' id='tax${rowCount}' class='form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="toggleDateInput()">
+                        <optgroup class="text-center text-black" label="GST">
+                            <option class="text-black" value="0">0% GST(0%)</option>
+                            <option class="text-black" value="3">3.0% GST(3%)</option>
+                            <option class="text-black" value="5">5.0% GST(5%)</option>
+                            <option class="text-black" value="12">12.0% GST(12%)</option>
+                            <option class="text-black" value="18">18.0% GST(18%)</option>
+                            <option class="text-black" value="28">28.0% GST(28%)</option>
+                        </optgroup>
+                        <optgroup class="text-center text-black" label="IGST">
+                            <option class="text-black" value="0">0% IGST(0%)</option>
+                            <option class="text-black" value="3">3.0% IGST(3%)</option>
+                            <option class="text-black" value="5">5.0% IGST(5%)</option>
+                            <option class="text-black" value="12">12.0% IGST(12%)</option>
+                            <option class="text-black" value="18">18.0% IGST(18%)</option>
+                            <option class="text-black" value="28">28.0% IGST(28%)</option>
+                        </optgroup>
+                    </select>
+                    <label id="ml${rowCount}" class="text-warning" style="display: none;"></label>
+                </td>
+                <td style="display: none;">
+                    <input type="text" name='taxamount' id="taxamount${rowCount}" class="form-control border-0 bg-transparent text-white taxamount" />
+                </td>
+                <td style="width: 15%;">
+                    <input type='number' id='amount${rowCount}' class='text-right border-0 bg-transparent text-white form-control amount' name='amount[]' value='0.00' readonly>
+                </td>
+                <td class='text-center'>
+                    <button type='button' id='del_btn${rowCount}' class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row' style='width:30px'>X</button> <br><br>
+                    <button type='button' class='btn btn-transparent text-primary btn-sm btn-outline-primary rounded-circle clone-row' data-row='${rowCount}' style='width:30px'><i class="fa fa-clone"></i></button>
+                </td>
+            </tr>
+        `;
+
+
+
       
       $('#item_table tbody').append(newRow);
       console.log("New row added. Row count: " + rowCount);
