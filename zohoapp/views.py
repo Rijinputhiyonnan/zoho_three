@@ -27744,7 +27744,7 @@ def itemdatadebit(request):
 
     # Use filter() to get all items for the user
     items = AddItem.objects.filter(user=user, Name=id)
-    
+    #cust = customer.objects.get(user=user)
     # Check if there are items
     if items.exists():
         # Iterate through each item
@@ -27763,12 +27763,15 @@ def itemdatadebit(request):
                 print("something")
                 gst = item.interstate'''
             places = cmp1.state
+            
+            print(places,"place of the company")
             intrastate=item.intrastate
             interstate=item.interstate
             print(intrastate, "intrastate")
             print(interstate, "interstate")
-
-            # Return the details for each item
+            #source=cust.placeofsupply
+            
+            # Return the details fo
             return JsonResponse({
                 "status": "not",
                 'hsn': hsn,
@@ -27777,6 +27780,7 @@ def itemdatadebit(request):
                 'price': price,
                 'intrastate': intrastate,
                 'interstate': interstate,
+                
                 
                 #'gst': gst,
                 

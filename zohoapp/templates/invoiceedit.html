@@ -247,13 +247,15 @@
             <input type="text" class="form-control bg-light text-dark" id="cx_gst" name="gst_number" readonly>
           </div>
         </div>
+       <!-- onclick="toggleDateInput()"-->
+
         <div class="row mt-2">
           <div class="col-md-3">
             <label>Source of Supply*</label>
           </div>
 
           <div class="col-md-6">
-            <select name="place_of_supply" id="srcofsupply" onclick="toggleDateInput()" onselect="calculateTaxAmount()"
+            <select name="place_of_supply" id="srcofsupply"  onselect="calculateTaxAmount()"
               class="form-control bg-light text-dark">
               <option selected value="{{invoice.customer.placeofsupply}}">{{invoice.customer.placeofsupply}}</option>
               <option value="[AN]-Andaman and Nicobar Islads">[AN] Andaman and Nicobar Islads</option>
@@ -658,11 +660,12 @@
                       class=' text-center discount border-0 bg-transparent text-white form-control' name='discount[]'
                       value='{{i.discount}}'>
                   </td>
-                  <td style="width: 16%; font-size: 9px;" class='text-center '> <select style=" font-size: 14px; width: 15vh;" name='tax[]' id='tax{{forloop.counter}}'
-                      class='form-control border-0 bg-transparent text-white  text-right border-0 tax'
-                       onchange="updateFields(this,`{{i.id}}`)">
+                  <td style="width: 16%; font-size: 9px;" class='text-center '> 
+                    <select style=" font-size: 14px; width: 15vh;" name='tax[]' id='tax{{forloop.counter}}'
+                      class='label-gst form-control border-0 bg-transparent text-white  text-right border-0 tax'
+                       onchange="updateFields(this,`{{i.id}}`)"    label="GST">
                       <!-- onchange="toggleDateInput()"-->
-                      <optgroup style="width: 10%; font-size: 14px;" class="text-center text-black" label="GST">
+                   <!--   <optgroup style="width: 10%; font-size: 14px;" class="text-center text-black" label="GST">-->
                         <option value="{{i.tax}} " selected hidden>{{i.tax}}.0% GST({{i.tax}}%)</option>
                         <option class="text-black" value="0">0% GST(0%)</option>
                         <option class="text-black" value="3">3.0% GST(3%)</option>
@@ -670,8 +673,13 @@
                         <option class="text-black" value="12">12.0% GST(12%)</option>
                         <option class="text-black" value="18">18.0% GST(18%)</option>
                         <option class="text-black" value="28">28.0% GST(28%)</option>
-                      </optgroup>
-                      <optgroup style="width: 10%; font-size: 14px;" class="text-center text-black" label="IGST">
+                        <!--   </optgroup>--> 
+                      </select>
+
+                      <select style=" font-size: 14px; width: 15vh;" name='tax[]' id='tax{{forloop.counter}}'
+                      class='label-igst form-control border-0 bg-transparent text-white  text-right border-0 tax'
+                       onchange="updateFields(this,`{{i.id}}`)"  label="IGST">
+                    <!-- <optgroup style="width: 10%; font-size: 14px;" class="text-center text-black" label="IGST">--> 
                         <option value="{{i.tax}} " style="width: 10%; font-size: 9px;" selected hidden>{{i.tax}} 0% IGST({{i.tax}}%)</option>
 
                         <option class="text-black" value="0">0% IGST(0%)</option>
@@ -680,7 +688,7 @@
                         <option class="text-black" value="12">12.0% IGST(12%)</option>
                         <option class="text-black" value="18">18.0% IGST(18%)</option>
                         <option class="text-black" value="28">28.0% IGST(28%)</option>
-                      </optgroup>
+                         <!--  </optgroup>--> 
                     </select>
                     <label id="ml{{forloop.counter}}" class="text-warning" style="display: none;"></label>
 
@@ -713,7 +721,7 @@
 
             <label for="">Customer Notes</label>
             <textarea name="customer_note" id="" cols="8" rows="13"
-              placeholder=" Will be Displayed on the Purchase Order">{{invoice.cxnote}}</textarea>
+              placeholder=" Will be Displayed on the Invoice">{{invoice.cxnote}}</textarea>
           </div>
           <div class="col-sm-6 mt-4 container-fulid">
             <table class=" table  text-whitem container-fulid" style="background-color: rgba(58, 57, 57, 0.8);">
@@ -2882,24 +2890,25 @@
                     <input type='number' id='discount${rowCount}' class='text-right border-0 bg-transparent text-white discount form-control' name='discount[]' value='0'>
                 </td>
                 <td style="width: 22%;">
-                    <select name='tax[]' id='tax${rowCount}' class='form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="toggleDateInput()">
-                        <optgroup class="text-center text-black" label="GST">
+               <select name='tax[]' id='tax${rowCount}' class=' label-gst form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="toggleDateInput()">
+                        
                             <option class="text-black" value="0">0% GST(0%)</option>
                             <option class="text-black" value="3">3.0% GST(3%)</option>
                             <option class="text-black" value="5">5.0% GST(5%)</option>
                             <option class="text-black" value="12">12.0% GST(12%)</option>
                             <option class="text-black" value="18">18.0% GST(18%)</option>
                             <option class="text-black" value="28">28.0% GST(28%)</option>
-                        </optgroup>
-                        <optgroup class="text-center text-black" label="IGST">
+                        </select>
+                        <select name='tax[]' id='tax${rowCount}' class=' label-igst form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="toggleDateInput()">
                             <option class="text-black" value="0">0% IGST(0%)</option>
                             <option class="text-black" value="3">3.0% IGST(3%)</option>
                             <option class="text-black" value="5">5.0% IGST(5%)</option>
                             <option class="text-black" value="12">12.0% IGST(12%)</option>
                             <option class="text-black" value="18">18.0% IGST(18%)</option>
                             <option class="text-black" value="28">28.0% IGST(28%)</option>
-                        </optgroup>
+                    
                     </select>
+                    
                     <label id="ml${rowCount}" class="text-warning" style="display: none;"></label>
                 </td>
                 <td style="display: none;">
@@ -3357,73 +3366,131 @@
 
 
 function updateFields(rowCount, rowId, itemId) {
-  var select = rowCount; // Get the value of the item dropdown
+  var select = rowCount; 
   console.log(select, "select test");
-  var source = $('#srcofsupply').val(); // Get the value of the source of supply dropdown
-
-  // Perform an AJAX request to update fields based on the selected item and source of supply
+  var source = $('#srcofsupply').val(); 
   $.ajax({
       type: "GET",
-      url: "{% url 'itemdatadebit' %}", // URL for the AJAX request
+      url: "{% url 'itemdatadebit' %}", 
       data: {
-          id: select, // ID of the selected item
-          isd: source // Source of supply
+          id: select, 
+          isd: source 
       },
       success: function (response) {
-          // Handle the successful response from the server
           if (response && response.error_flag === 1) {
-              $('#errorLabel').text("Item is not present"); // Display an error message if the item is not present
+              $('#errorLabel').text("Item is not present"); 
           } else {
-              $('#errorLabel').text(""); // Clear any previous error message
+              $('#errorLabel').text(""); 
 
-              // Update item details based on the response
-              $('#hsn' + rowId).val(response.hsn); // Update HSN field
-              data1 = response.price;
+              $('#hsn' + rowId).val(response.hsn); 
+              var data1 = response.price;
               console.log(data1, "data1");
               document.getElementById(`rate${rowId}`).value = data1;
-              gstTax = extractTax(response.interstate);
-              igstTax = extractTax(response.intrastate);
 
-              $(`#rate${rowId}`).val(data1); // Update rate field
-
-              $('#stock_data' + rowId).val(response.qty); // Update stock data field
+              $('#stock_data' + rowId).val(response.qty); 
               console.log(response.qty, "stock");
 
-              // Set the initial stock value
               initialStock = parseInt(response.qty);
 
-              // Determine the tax group label and options based on the source of supply
-              var taxGroupLabel, taxOptions;
-              if (source === response.places) {
-                  taxGroupLabel = "GST"; // For Kerala, use GST tax group
-                  taxOptions = response.intrastate; // Use intrastate tax options
+              // Set display property based on the source and place
+               
+              if (source === '[KL]-Kerala') {
+                  $('.label-gst').show();
+                  $('.label-igst').hide();
+                  // Select the appropriate option in the GST select element
+                  $('.label-gst').val(response.intrastate).change();
               } else {
-                  taxGroupLabel = "IGST"; // For other states, use IGST tax group
-                  taxOptions = response.interstate; // Use interstate tax options
+                  $('.label-gst').hide();
+                  $('.label-igst').show();
+                  // Select the appropriate option in the IGST select element
+                  $('.label-igst').val(response.interstate).change();
               }
 
-              // Update tax group label
-              $('#taxGroupLabel').text(taxGroupLabel);
-
-              // Update tax dropdown options
-              var taxDropdownId = '#tax' + rowId;
-              $(taxDropdownId).empty(); // Clear existing options
-              if (taxOptions) {
-                  $(taxDropdownId).append('<option value="' + taxOptions + '">' + taxOptions + '</option>'); // Add fetched tax option
-              }
-              // Add fixed tax options
-              $(taxDropdownId).append('<option value="0"> (' + taxGroupLabel + ' - 0%)</option>');
-              $(taxDropdownId).append('<option value="3"> (' + taxGroupLabel + ' - 3%)</option>');
-              $(taxDropdownId).append('<option value="5"> (' + taxGroupLabel + ' - 5%)</option>');
-              $(taxDropdownId).append('<option value="12"> (' + taxGroupLabel + ' - 12%)</option>');
-              $(taxDropdownId).append('<option value="18"> (' + taxGroupLabel + ' - 18%)</option>');
-              $(taxDropdownId).append('<option value="28"> (' + taxGroupLabel + ' - 28%)</option>');
-
-              // Set styles for the dropdown
-              $(taxDropdownId).removeClass('bg-transparent text-white').addClass('bg-black text-white');
+             
 
               // Recalculate row amount after updating fields
               calculateRowAmount($('#row' + `${rowId}`));
+mno = ($('#row' + `${rowId}`))
+console.log(mno, "mno make")
+
+
+
+
+
+
+// Function to calculate subtotal
+function calculateSubtotal() {
+  console.log("Calculating subtotal...");
+  var subtotal = 0;
+  // Iterate over each row in the item table
+  $('#item_table tbody tr').each(function () {
+      // Calculate the row amount and add it to the subtotal
+      subtotal += calculateRowAmount($(this));
+  });
+  // Update the subtotal field with the calculated value
+  $('#subtotal').val(subtotal.toFixed(2));
+  console.log("Subtotal calculated:", subtotal);
+}
+
+// Function to calculate grand total
+function calculateGrandTotal() {
+  console.log("Calculating grand total...");
+  var grandTotal = 0;
+  var totalTaxAmount = 0;
+  var advance = parseFloat($('#advance').val());
+
+  // Iterate over each row in the item table
+  $('#item_table tbody tr').each(function () {
+      // Calculate the row amount and tax amount for the row
+      var rowAmount = calculateRowAmount($(this));
+      grandTotal += rowAmount;
+
+      // Retrieve the tax amount from the row and add it to the grand total
+      var taxAmount = parseFloat($(this).find('.taxamount').val());
+      taxAmount = isNaN(taxAmount) ? 0 : taxAmount;
+      grandTotal += taxAmount;
+      totalTaxAmount += taxAmount;
+  });
+
+  // Retrieve shipping charges and adjustment values
+  var shippingCharges = parseFloat($('#shipping').val());
+  var adjust = parseFloat($('#adjust').val());
+
+  // Add shipping charges and adjustment to the grand total
+  grandTotal += adjust;
+  grandTotal += shippingCharges;
+
+  // Calculate the balance
+  var balance = grandTotal - advance;
+
+  // Update the grand total, balance, and total tax amount fields
+  $('#grandtotal').val(grandTotal.toFixed(2));
+  $('#balance').val(balance.toFixed(2));
+  $('#total_taxamount').val(totalTaxAmount.toFixed(2));
+
+  console.log("Grand total calculated:", grandTotal);
+}
+
+// Event handler for changes in tax values
+$('#item_table').on('change', '.tax', function () {
+  console.log("Tax change detected...");
+  // Calculate row amount, subtotal, and grand total when tax value changes
+  calculateRowAmount($(this).closest('tr'));
+  calculateSubtotal();
+  calculateGrandTotal();
+});
+
+// Execute when the "Add Row" button is clicked
+$('#add-row').click(function () {
+  // Add a new row
+  addNewRow();
+});
+
+
+
+
+
+
 
 
               // Function to calculate row amount
@@ -3455,7 +3522,8 @@ function calculateRowAmount(row) {
 
   // Calculate the tax amount
   var taxAmount = (rowAmount * tax) / 100;
-
+  console.log( taxAmount, "taxAmount")
+  console.log( tax, "tax")
   // Update the row amount and tax amount fields in the row
   row.find('.amount').val(rowAmount.toFixed(2));
   row.find('.taxamount').val(taxAmount.toFixed(2));
