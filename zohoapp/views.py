@@ -27744,7 +27744,7 @@ def itemdatadebit(request):
 
     # Use filter() to get all items for the user
     items = AddItem.objects.filter(user=user, Name=id)
-    #cust = customer.objects.get(user=user)
+    
     # Check if there are items
     if items.exists():
         # Iterate through each item
@@ -27755,23 +27755,27 @@ def itemdatadebit(request):
             qty = item.stock
             price = item.s_price
             print(cmp1.state, "dotstate")
-            '''if isd == cmp1.state:
-                
-                print(isd, "place in gst")
-                gst = item.intrastate
-            else:
-                print("something")
-                gst = item.interstate'''
+
             places = cmp1.state
             
             print(places,"place of the company")
             intrastate=item.intrastate
             interstate=item.interstate
+            
+            
+            item_gst=item.intrastate
+            item_igst=item.interstate
+            
             print(intrastate, "intrastate")
             print(interstate, "interstate")
-            #source=cust.placeofsupply
-            
-            # Return the details fo
+            source="Kerala"
+            print(source, "source of supply")
+
+           
+            gst_options = item_gst
+            igst_options = item_igst
+           
+            # Return the details
             return JsonResponse({
                 "status": "not",
                 'hsn': hsn,
@@ -27780,16 +27784,16 @@ def itemdatadebit(request):
                 'price': price,
                 'intrastate': intrastate,
                 'interstate': interstate,
-                
-                
-                #'gst': gst,
-                
+                'source': source,
+                'gst_options': gst_options,
+                'igst_options': igst_options,
             })
     else:
         return JsonResponse({
             "status": "error",
             'error_flag': 1,
         })
+
 
   
 
@@ -27828,4 +27832,44 @@ def get_vendor_data_bill(request):
     print('options', options)
 
     return JsonResponse(options, safe=False)
+
+
+
+
+def itemdata_invoice(request):
+    cur_user = request.user.id
+    user = User.objects.get(id=cur_user)
+    company = company_details.objects.get(user = user)
+    id = request.GET.get('id')
+    cust = request.GET.get('cust')
+    cus=customer.objects.get(id=cust)
+
+    try:
+        
+        item = AddItem.objects.get(id=id)
+        item_id=item.id
+        rate = item.s_price
+        place=company.state
+        gst = item.intrastate
+        igst = item.interstate
+        desc=item.s_desc
+        mail=cus.customerEmail
+        stock=item.stock
+        hsn=item.hsn
+
+        place_of_supply = customer.objects.get(id=cust).placeofsupply
+        return JsonResponse({'item':item_id,"status":" not",'mail':mail,'desc':desc,'place':place,'rate':rate,'pos':place_of_supply,'gst':gst,'igst':igst,
+                            'stock':stock,'hsn':hsn})
+    except AddItem.DoesNotExist:
+        rate = 0
+        place=''
+        gst = 0
+        igst = 0
+        desc=0
+        mail=''
+        stock=0
+        hsn=0
+        place_of_supply = customer.objects.get(id=cust).placeofsupply
+        return JsonResponse({"status":" not",'mail':mail,'desc':desc,'place':place,'rate':rate,'pos':place_of_supply,'gst':gst,'igst':igst,
+                            'stock':stock,'hsn':hsn})
     

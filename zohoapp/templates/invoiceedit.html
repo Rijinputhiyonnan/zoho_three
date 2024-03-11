@@ -3363,8 +3363,6 @@
 
 
 
-
-
 function updateFields(rowCount, rowId, itemId) {
   var select = rowCount; 
   console.log(select, "select test");
@@ -3393,20 +3391,17 @@ function updateFields(rowCount, rowId, itemId) {
               initialStock = parseInt(response.qty);
 
               // Set display property based on the source and place
-               
-              if (source === '[KL]-Kerala') {
+              if (source === 'Kerala') {
                   $('.label-gst').show();
                   $('.label-igst').hide();
-                  // Select the appropriate option in the GST select element
-                  $('.label-gst').val(response.intrastate).change();
+                  // Set the options in the GST dropdown
+                  $('.label-gst').html(response.tax_options);
               } else {
                   $('.label-gst').hide();
                   $('.label-igst').show();
-                  // Select the appropriate option in the IGST select element
-                  $('.label-igst').val(response.interstate).change();
+                  // Set the options in the IGST dropdown
+                  $('.label-igst').html(response.tax_options);
               }
-
-             
 
               // Recalculate row amount after updating fields
               calculateRowAmount($('#row' + `${rowId}`));

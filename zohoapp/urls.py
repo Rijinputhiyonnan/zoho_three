@@ -1235,6 +1235,11 @@ urlpatterns = [
     path('import_inventory_listout_page', views.import_inventory_listout_page, name='import_inventory_listout_page'),
     path('get_items_list/', views.get_items_list, name='get_items_list'),
     path('itemdatadebit',views.itemdatadebit,name='itemdatadebit'),
+    
+    
+    #latest
+    
+    path('itemdata_invoice',views.itemdata_invoice,name='itemdata_invoice'),
   
 
     

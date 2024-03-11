@@ -3,53 +3,31 @@
 {% load static %}
 {% load tz %}
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- Your script comes after the jQuery inclusion -->
+<script src="path/to/your/script.js"></script>
+<!-- Include jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- Include jQuery Cookie plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+<!-- Your other scripts go here -->
+<script src="path/to/misc.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- Include Select2 JavaScript -->
-    
+
+
 
 
 
 <!-- <link rel="stylesheet" href="{% static 'assets/css/style.css' %}"> -->
-<style>
-  /* Style the Select2 dropdown */
-  .select2-container {
-      width: 100%;
-  }
 
-  .select2-container .select2-selection--single {
-      height: 38px;
-  }
-
-  .select2-container--default .select2-selection--single .select2-selection__rendered {
-      line-height: 38px;
-  }
-
-  .select2-container--default .select2-selection--single .select2-selection__arrow {
-      height: 38px;
-  }
-
-  .select2-container--default .select2-selection--single .select2-selection__rendered {
-      color: #555;
-      font-size: 16px;
-  }
-
-  .select2-container--default .select2-selection--single {
-      border: 1px solid #ced4da;
-      border-radius: .25rem;
-  }
-
-  .select2-container--default .select2-selection--single:focus {
-      border-color: #80bdff;
-      outline: 0;
-  }
-
-  .select2-container--default .select2-selection--single .select2-selection__arrow b {
-      border-color: #555 transparent transparent transparent;
-  }
-</style>
 <style>
   .modal {
     z-index: 9999;
@@ -165,9 +143,77 @@
   #pay_term option {
     color: black;
   }
+
+
+
+.drop_hovers{
+  background-color: transparent;
+  }
+  .drop_hovers:hover
+  {
+    background-color: rgb(0, 149, 255);
+    color: rgb(255, 255, 255);
+  }
+  ::-webkit-scrollbar{
+  display: none;
+  }
+  #custom_dropdowns{
+  display: none;
+  }
+
+
+
+
+
+  .custom-dropdown {
+    position: relative;
+    display: inline-block;
+    width: 90%;
+    
+   
+}
+
+.dropdown-input {
+    padding: 4vh;
+    width: 40%;
+    border: 1vh solid #010101;
+    border-radius: 2vh;
+    color: black;
+}
+
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 90%;
+    border: .5vh solid #161616;
+    border-top: none;
+    border-radius: 2vh 2vh 2vh 2vh;
+    background-color: #f1fefe;
+    max-height: 30vh;
+    overflow-y: scroll;
+    display: none;
+}
+
+.dropdown-item {
+    padding: 1vh;
+    color: black;
+}
+
+.dropdown-item:hover {
+    background-color: #014889;
+    color: white;
+}
+
+
+.dropdown-input_item {
+  background-color: #3b3b3b;
+  color: white;
+}
+
+
+
 </style>
-
-
 <style>
   /* Customize the background color of the entire row */
   td {
@@ -205,59 +251,16 @@
   color: white !important;
 }
 
-
-
-
 </style>
 
 
 
-<style>
-  /* Customize the background color of the entire row */
-  td {
-    background-color: #4daaff;
-    color: white;
-  }
-  
-  /* Customize the background color of the dropdown menu */
-  .select2-container--default .select2-dropdown {
-    background-color: #3b3b3b;
-    color: white;
-  }
-  
-  /* Customize the background color of the upper portion of the dropdown menu */
-  .select2-container--default .select2-dropdown .select2-search {
-    background-color: #3b3b3b;
-    color: #3b3b3b;
-  }
-  
-  /* Customize the background color of the selected option */
-  .form-control.select2.text-right.hsn.border-0,
-  .select2-container--default .select2-selection--single {
-    background-color: #3b3b3b !important;
-    color: #da3d7b !important;
-  }
-  
-  /* Customize the color of the dropdown arrow */
-  .select2-container--default .select2-selection__arrow b {
-    border-color: #3b3b3b;
-  }
-
-
-  /* Customize the text color of the selected option */
-.select2-selection__rendered {
-  color: white !important;
-}
-
-
-
-
-</style>
 <div class="container-fulid containerprof">
   <div class="card " style="width: 100%;">
     <div class="card-body">
       <div class="card-title">
-        <h2 class="mb-0 text-uppercase text-right"> NEW INVOICE</h2>
+        <h2 class="mb-0 text-uppercase text-right"> New
+          Invoice</h2>
         {% for message in messages %}
         <div class="alert alert-success">
           <a class="close" href="#" data-dismiss="alert">x</a>
@@ -276,34 +279,210 @@
           <div class="col-md-3">
             <label>Customer Name *</label>
           </div>
-          <div class="col-md-6 d-flex">
-
-
-            <select name="cx_name" id="customer_sel" class="form-control bg-light text-dark" style="width: 91%;"
-              required onselect="toggleDateInput()">
-              <option value="" hidden selected>Select Customer</option>
-              {% for cust in c %}
-              <option value="{{cust.id}}" data-pos="{{cust.placeofsupply}}" id="crt_cust">{{cust.customerName}}</option>
-              {% endfor %}
-            </select>
-
-
-            <a data-toggle="modal" data-target="#newcustomer" class="btn"
-              style="background-color: chocolate; color: black; height: 80%; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
+          
+          <div class="col-md-6">
+          
+                <div class="custom-dropdown"  style="height: 9vh;"> 
+                    <input type="text" id="employee_id"  name="cx_name" hidden>
+                    <input type="text" class="dropdown-input" placeholder="Select Customer">
+                    <div class="dropdown-list" id="employee">
+                        {% for payroll in c %}
+                       
+                            <div class="dropdown-item"
+                                data-value="{{ payroll.id }}" data-name = "{{ payroll.title }} {{ payroll.customerName }} {{ payroll.last_name }}"
+                                data-email="{{ payroll.customerEmail }}"
+                                data-address="{{ payroll.Address1 }}"
+                                data-GSTTreatment="{{ payroll.GSTTreatment }}"
+                                data-GSTN="{{ payroll.GSTIN }}"
+                                data-placeofsupply="{{ payroll.placeofsupply }}"
+                                data-joindate="{{ payroll.joindate | date:'Y-m-d' }}" >{{ payroll.title }} {{ payroll.customerName }} {{ payroll.last_name }}</div>
+                    
+                        {% endfor %}
+                    </div>
+                </div>
+            <a data-toggle="modal" data-target="#newcustomer" class="btn  p-2 fs-5 fw-bolder ms-2" style="background-color: chocolate; color: black; height: 80%; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
           </div>
         </div>
 
-        <div class="row mt-2">
+        <script>
+          document.addEventListener('DOMContentLoaded', function () {
+              var input = document.querySelector('.dropdown-input');
+              var dropdownList = document.querySelector('#employee');
+      
+              input.addEventListener('focus', function () {
+                  dropdownList.style.display = 'block';
+              });
+      
+              document.addEventListener('mousedown', function (event) {
+                  if (!event.target.closest('.custom-dropdown')) {
+                      dropdownList.style.display = 'none';
+                  }
+              });
+      
+              dropdownList.addEventListener('click', function (event) {
+                  if (event.target.classList.contains('dropdown-item')) {
+                      input.value = event.target.textContent;
+                      dropdownList.style.display = 'none';
+                      fillEmployeeDetails();
+                      clearErrorMessage();
+                  }
+              });
+      
+              input.addEventListener('input', function () {
+                  var filterValue = input.value.toLowerCase();
+                  var items = dropdownList.querySelectorAll('.dropdown-item');
+      
+                  items.forEach(function (item) {
+                      var itemText = item.textContent.toLowerCase();
+                      if (itemText.includes(filterValue)) {
+                          item.style.display = 'block';
+                      } else {
+                          item.style.display = 'none';
+                      }
+                  });
+              });
+          });
+
+
+          function fillEmployeeDetails() {
+            var input = document.querySelector('.dropdown-input');
+            var selectedValue = input.value;
+            var selectedItem = document.querySelector('.dropdown-item[data-name="' + selectedValue + '"]');
+            
+            var value = selectedItem.getAttribute("data-value");
+            var email = selectedItem.getAttribute("data-email");
+            var address = selectedItem.getAttribute("data-address");
+            var treatment = selectedItem.getAttribute("data-GSTTreatment");
+            var GSTNumber = selectedItem.getAttribute("data-GSTN");
+            var placeofsupply = selectedItem.getAttribute("data-placeofsupply");
+            var joinDate = selectedItem.getAttribute("data-joindate");
+            
+            // Set values to corresponding fields
+            $("#cx_mail").val(email);
+            $("#cx_address").val(address);
+            $("#srcofsupply").val(placeofsupply);
+            $("#cx_treat").val(treatment);
+            $("#treatmentdiv").show();
+            
+            // Show/Hide GST Number and label based on GST treatment
+            if (treatment === "Unregistered Business-not Registered under GST" || treatment === "Overseas- Persons with who you do import or exports of supplies outside india") {
+                $("#cx_gst").val("").hide();
+                $("#gstdiv").hide();
+            } else {
+                $("#cx_gst").val(GSTNumber).show();
+                $("#gstdiv").show();
+            }
+            
+            $("#joindate").val(joinDate);
+            $("#employee_id").val(value);
+        }
+        
+    
+      </script>
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+        <script>
+          $(document).ready(function () {
+            var date = new Date().toISOString().split('T')[0];
+            $('#date1').val(date);
+          });
+        
+          $('#customer_list').on('click', function () {
+            $('#custom_dropdowns').toggle();
+          });
+        
+          $('#custom_dropdowns').on('click', function () {
+            $('#custom_dropdowns').toggle();
+            $('#custom_dropdowns p').each(function () {
+              $(this).show();
+            });
+          });
+        
+          $('.drop_hovers').on('click', function () {
+            $('#customer_list').val($(this).text());
+            $('#customer_value').val($(this).next('span').text());
+          });
+        
+          $(document).ready(function () {
+            $('#customer_value').val('');
+          });
+        
+          $('#customer_list').on('keyup', function () {
+            var textInput = $(this).val().toLowerCase();
+            $('#custom_dropdowns p').each(function () {
+              if (($(this).text().toLowerCase().indexOf(textInput)) > -1) {
+                $(this).show();
+              } else {
+                $(this).hide();
+              }
+            });
+          });
+        
+          $(document).on('change', '#customer_sel', function () {
+            var customer = $('#customer_sel').val();
+            $.ajax({
+              type: "GET",
+              url: "{% url 'customerdata' %}",
+              data: { id: customer },
+              success: function (response) {
+                console.log('Ajax success:', response);
+                document.getElementById('cx_mail').value = response.customerEmail;
+                document.getElementById('cx_address').value = response.Address1; 
+                document.getElementById('cx_gst_treat').value = response.GSTTreatment;
+                document.getElementById('cx_gst_number').value = response.GSTIN;
+        
+                if (response.Address1) {
+                  document.getElementById('cx_addressdiv').style.display = "block";
+                } else {
+                  document.getElementById('cx_addressdiv').style.display = "none";
+                }
+        
+                if (response.GSTIN) {
+                  document.getElementById('gstdiv').style.display = "block";
+                } else {
+                  document.getElementById('gstdiv').style.display = "none";
+                }
+        
+                if (response.GSTTreatment) {
+                  document.getElementById('treatmentdiv').style.display = "block";
+                } else {
+                  document.getElementById('treatmentdiv').style.display = "none";
+                }
+        
+                var selectElement = document.getElementById("srcofsupply");
+                for (var i = 0; i < selectElement.options.length; i++) {
+                  if (selectElement.options[i].value === response.place) {
+                    selectElement.options[i].selected = true;
+                    break;
+                  }
+                }
+                // Add any additional logic related to selectElement here
+              },
+              error: function (error) {
+                console.log('Ajax error:', error);
+              }
+            });
+          });
+
+
+
+
+          
+        </script>
+        
+        
+
+      <div class="row mt-2">
           <div class="col-md-3">
             <label for="">Customer Mail</label>
           </div>
 
           <div class="col-md-6">
-            <input type="email" class="form-control bg-light text-dark" id="cx_mail" name="cx_mail" readonly>
+            <input type="email" class="form-control bg-light text-dark" id="cx_mail" name="customer_email" readonly>
           </div>
         </div>
 
-        <div class="row mt-2" id="cx_addressdiv" style="display: none;">
+        <div class="row mt-2" >
           <div class="col-md-3">
             <label for="">Billing Address</label>
           </div>
@@ -317,14 +496,14 @@
         <div class="row mt-2" id="treatmentdiv" style="display:none;">
           <div class="col-md-9 d-flex">
             <label for="" style="width: 52%;">GST Treatment</label>
-            <input type="text" class="form-control bg-light text-dark" id="cx_treat" name="cx_treat" readonly>
+            <input type="text" class="form-control bg-light text-dark" id="cx_treat" name="gst_treatment" readonly>
           </div>
         </div>
 
         <div class="row mt-2" id="gstdiv" style="display:none;">
           <div class="col-md-9 d-flex">
             <label for="" style="width: 52%;">GST Number</label>
-            <input type="text" class="form-control bg-light text-dark" id="cx_gst" name="cx_gst" readonly>
+            <input type="text" class="form-control bg-light text-dark" id="cx_gst" name="gst_number" readonly>
           </div>
         </div>
 
@@ -334,9 +513,11 @@
           </div>
 
           <div class="col-md-6">
-            <select name="srcofsupply" id="srcofsupply" onchange="toggleDateInput()" onselect="calculateTaxAmount()"
-              class="form-control bg-light text-dark">
+            <input hidden value="{{company.state}}" id="cmpstate">
+            <select name="place_of_supply" id="srcofsupply" onchange="toggleDateInput()" onselect="calculateTaxAmount()"
+              class="form-control bg-light text-dark ply">
               <option value=""></option>
+              <option value="{{ company.state }}" selected> {{ company.state }}</option>
               <option value="[AN]-Andaman and Nicobar Islads">[AN] Andaman and Nicobar Islads</option>
               <option value="[AD]-Andhra Pradhesh">[AD] Andhra Pradhesh</option>
               <option value="[AR]-Arunachal Pradesh">[AR] Arunachal Pradesh</option>
@@ -354,7 +535,7 @@
               <option value="[JK]-Jammu and Kashmir">[JK] Jammu and Kashmir</option>
               <option value="[JH]-Jharkhand">[JH] Jharkhand</option>
               <option value="[KA]-Karnataka">[KA] Karnataka</option>
-              <option value="[KL]-Kerala">[KL] Kerala</option>
+            <option value="[KL]-Kerala">[KL] Kerala</option>
               <option value="[LA]-Ladakh">[LA] Ladakh</option>
               <option value="[LD]-Lakshadweep">[LD] Lakshadweep</option>
               <option value="[MP]-Madhya Pradesh">[MP] Madhya Pradesh</option>
@@ -379,6 +560,7 @@
           </div>
         </div>
 
+    
 
 
         <div class="row mt-2">
@@ -387,8 +569,8 @@
           </div>
 
           <div class="col-md-6">
-            <input type="text" class="form-control bg-light text-dark" id="prof_name" name="sale_no"
-              value="{{remaining_characters}}" required>
+            <input type="text" class="form-control bg-light text-dark" id="prof_name" name="inv_no"
+                placeholder="{{count}}" required>
             <label id="order_label" style="display: none;"></label>
           </div>
         </div>
@@ -410,7 +592,7 @@
           </div>
 
           <div class="col-md-6">
-            <input type="date" class="form-control bg-light text-dark" id="date1" name="sa_date">
+            <input type="date" class="form-control bg-light text-dark" id="date1" name="inv_date">
           </div>
         </div>
 
@@ -420,7 +602,7 @@
           </div>
 
           <div class="col-md-6">
-            <input type="date" class="form-control bg-light text-dark" id="date2" name="sh_date" readonly required>
+            <input type="date" class="form-control bg-light text-dark" id="date2" name="due_date" readonly required>
           </div>
         </div>
 
@@ -428,13 +610,14 @@
           <div class="col-md-3">
             <label for="date2">Payment Terms</label>
           </div>
-
           <div class="col-md-6">
             <div class="d-flex">
               <select class="form-control bg-light text-dark" id="pay_term" name="term" required>
                 <option value="" hidden>Select Payment Term</option>
-                {% for p in pay %}
-                <option value="{{p.id}}">{{p.Terms}}</option>
+                {% for p in payments %}
+                <option value="{{p.id}}" >{{p.Terms}}</option>
+                
+                
                 {% endfor %}
               </select>
               <a data-toggle="modal" data-target="#newpayment" class="btn" id="termadd">+</a>
@@ -449,13 +632,14 @@
 
           <div class="col-md-6">
             <div class="d-flex">
-              <select class="form-control bg-light text-dark my-select" id="pay_method" name="method" required>
+              <select class="form-control bg-light text-dark my-select" id="pay_method" name="payment_method" required>
                 <option value="" hidden>Select Payment Method</option>
                 <option value="cash">Cash</option>
                 <option value="cheque">Cheque</option>
                 <option value="upi">UPI</option>
                 {% for item in banks %}
-                <option value="{{item.name}}">{{item.name}}</option>
+                <option value="{{item.name}}" >{{item.name}}</option>
+
                 {% endfor %}
               </select>
             </div>
@@ -468,7 +652,7 @@
           </div>
 
           <div class="col-md-6">
-            <input type="text" class="form-control text-black" name="cheque_id" id="cheque_id"
+            <input type="text" class="form-control text-black" name="cheque_number" id="cheque_id"
               placeholder="Enter Cheque Number">
           </div>
         </div>
@@ -485,11 +669,11 @@
 
         <div class="row mt-2" id="bnkdiv" style="display: none;">
           <div class="col-md-3">
-            <label for="date2">Bank Account</label>
+            <label for="date2">Bank Account Number</label>
           </div>
 
           <div class="col-md-6">
-            <input type="text" class="form-control text-black" name="bnk_id" id="bnk_id" readonly>
+            <input type="text" class="form-control text-black" name="bank_name" id="bnk_id" readonly>
           </div>
         </div>
 
@@ -500,89 +684,123 @@
           <div class="col-md-12 mt-3">
             <table class="table table-bordered table-responsive" id="item_table" onclick='toggleDateInput()'>
               <thead>
-                <tr>
-                  <th>Item<a href="" data-toggle="modal" data-target="#newitem" class="text-capitalize">+ Item</a></th>
-                  <th class="text-right">HSN</th>
-                  <th class="text-right">Quantity</th>
-                  <th class="text-right">Rate</th>
-                  <th class="text-right">Discount</th>
-                  <th class="text-right">Tax</th>
-                  <th class="text-right">Amount</th>
-                  <th></th>
+                <tr >
+                  <th class="text-center">#</th>
+                  <th  class="text-center" style="width: 10vh; font-size: 10px; padding-right: 1px; margin-right: 1px;" style="font-size: 10px;">Item<a href="" data-toggle="modal" data-target="#newitem" class="text-capitalize">+new</a></th>
+
+                  <th class="text-center" style="width: 15%; font-size: 10px;">HSN</th>
+
+                  <th  class="text-center" style="font-size: 10px;">Quantity</th>
+                  <th class="text-center" style="font-size: 10px;">Rate</th>
+                  <th class="text-center" style="font-size: 10px;">Discount</th>
+                  <th class="text-center" style="font-size: 10px;">Tax</th>
+                  <th class="text-center"style="font-size: 10px;">Amount</th>
+                  <th>  </th>
                 </tr>
               </thead>
-              <tbody id="item_table_body">
-                <tr id="row1">
-                  <td>
-                 <!-- <select class="form-control border-0 bg-transparent text-white item_select itm itemselect" name="item[]" id="item1">
-                      <option value="" selected hidden>Select Item</option>
-                      {% for i in items %}
-                      <option class="text-black" value="{{ i.id }}">{{ i.Name }}</option>
-                      {% endfor %}
+             
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+
+<!-- Include Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
 
-                       onchange = "changewithitem(this,`{{i.id}}`)"
-                  </select>-->  
 
-                  <select name='item[]' id="item1" class="form-control select2 extra border-0 bg-transparent text-white item_select itm itemselect" style="width: 18vh; font-size: 15px;">
-                    <option class="form-control select2 text-center" selected value="{{i.product}}">{{i.product}}</option>
-                    {% for i in p %}
-                    <option class="form-control select2 text-right" value="{{ i.id }}" data-tokens="{{ i.Name }}">
-                        {{ i.Name }}
-                    </option>
-                    {% endfor %}
-                </select>
-                
-           
 
-                  <td style="width: 15%;" class='text-right'>
-                    <input type='number' id='hsn1'
-                      class=' text-right hsn border-0 form-control bg-transparent text-white' name='hsn[]' readonly>
-                  </td>
-                  <td style="width: 17%;" class='text-right'>
-                    <input type='number' id='qty1'
-                      class=' text-right qty form-control border-0 bg-transparent text-white' name='quantity[]'
-                      value='0' onchange="qtychange(this.id)">
+                  <tbody id="item_table_body">
+                    <tr id='addr0'>
+                        <td>1</td>
+                        <td style="width: 10%;" >
+                            <div class="d-flex " style=" font-size: 10px;" class='text-center'>
 
-                  </td>
-                  <td style="width: 15%;" class='text-right'><input type='number' id='rate1'
-                      class=' text-right rate form-control border-0  bg-transparent text-white' name='rate[]' value='0'
-                      readonly>
-                  </td>
-                  <td style="width: 10%;" class='text-right text-dark'><input type='number' id='discount1'
+
+                                <select name='item[]' id="item1" class="form-control select2  text-right  "  >
+                                    <option class="form-control select2  text-right " selected>Choose..</option>
+                                    {% for i in items %}
+                                        <option class="form-control select2  text-right  " value="{{ i.Name }}" data-tokens="{{ i.Name }}">
+                                            {{ i.Name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+
+                               
+
+
+
+                            </div>
+                            <div id="errorLabel" style="color: red;"></div>
+                        </td>
+                        <td style="width: 15%; font-size: 10px;" class='text-center' >
+                          <input style="font-size: 13px;" type='number' id='hsn1'
+                            class=' text-right hsn border-0 form-control bg-transparent text-white' name='hsn[]' readonly>
+                        </td>
+                        <td style="width: 17%;" class='text-center'>
+                          <input style="font-size: 13px;" type='number' id='qty1' class='text-center qty form-control border-0 bg-transparent text-white' name='quantity[]' value='0'>
+                          <input type="text" id="avl1" style="display: none;">
+                          <div style="display: flex; align-items: center;">
+                            <span class="text-warning" style="font-size: 10px;">Available Stock:</span>
+                            <input style="font-size: 9px; margin-left: 10px;" id="stock_data1" class="stock_data text-warning border-0 form-control bg-transparent text-right" name='avlquantity' readonly>
+                        </div>
+                        
+
+                      </td>
+                      
+                  
+                        <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='rate1'
+                        class=' text-right rate form-control border-0  bg-transparent text-white' name='rate[]' value='0'
+                        readonly>
+                    </td>
+                        
+                    <td style="width: 10%;" class='text-center text-dark'><input style="font-size: 13px;" type='number' id='discount1'
                       class=' text-right discount border-0 bg-transparent text-white form-control' name='desc[]'
                       value='0'>
-                  </td>
-                  <td style="width: 22%;" class='text-right '> <select name='tax[]' id='tax1'
-                      class='form-control border-0 bg-transparent text-white text-right border-0 tax'
-                      onselect="toggleDateInput()">
-                      <optgroup class="text-center text-black" label="GST">
-                        <option class="text-black" value="0">0% GST(0%)</option>
-                        <option class="text-black" value="3">3.0% GST(3%)</option>
-                        <option class="text-black" value="5">5.0% GST(5%)</option>
-                        <option class="text-black" value="12">12.0% GST(12%)</option>
-                        <option class="text-black" value="18">18.0% GST(18%)</option>
-                        <option class="text-black" value="28">28.0% GST(28%)</option>
-                      </optgroup>
-                      <optgroup class="text-center text-black" label="IGST">
-                        <option class="text-black" value="0">0% IGST(0%)</option>
-                        <option class="text-black" value="3">3.0% IGST(3%)</option>
-                        <option class="text-black" value="5">5.0% IGST(5%)</option>
-                        <option class="text-black" value="12">12.0% IGST(12%)</option>
-                        <option class="text-black" value="18">18.0% IGST(18%)</option>
-                        <option class="text-black" value="28">28.0% IGST(28%)</option>
-                      </optgroup>
-                    </select>
-                    <label id="ml1" class="text-warning" style="display: none;"></label>
-                  </td>
-                  <td style="display: none;">
-                    <input type="text" name='taxamount' id="taxamount1"
-                      class=" taxamount border-0 bg-transparent text-white" />
-                  </td>
-                  <td style="width: 15%;" class='text-right'><input type='number' id='amount1'
-                      class=' text-right form-control amount border-0 bg-transparent text-white' name='amount[]'
-                      value='0.00' readonly>
-                  </td>
+                  </td> 
+                  
+                
+                    
+                    
+                        <td  style="width: 15%;" class='text-center'>
+                          <!--  <input type="text" name='taxs' id="taxs" placeholder='Enter Unit Price'
+                            class="text-right discount border-0 bg-transparent text-white form-control" onchange="taxchange(this)" step="0.00" min="0" hidden >-->
+                            <select name='tax[]' id="tax1" class="text-right tax discount border-0 form-control tax-options" style="background-color: #3b3b3b;">
+                             
+                                <option id="ta1" value=0 text={{ company.state }} hidden>Select</option>
+                                <option value=0 text={{ company.state }}>00% GST(00%)</option>
+                                <option value=3 text={{ company.state }}>03% GST(03%)</option>
+                                <option value=5 text={{ company.state }}>05% GST(05%)</option>
+                                <option value=12 text={{ company.state }}>12% GST(12%)</option>
+                                <option value=18 text={{ company.state }}>18% GST(18%)</option>
+                                <option value=28 text={{ company.state }}>28% GST(28%)</option>
+                          
+                                <option id="ta5" value=0 text=" " hidden>Select</option>
+                                <option value=0 text=" ">0.0% IGST(00%)</option>
+                                <option value=3 text=" ">03.0% IGST(03%)</option>
+                                <option value=5 text=" ">05.0% IGST(05%)</option>
+                                <option value=12 text=" ">12.0% IGST(12%)</option>
+                                <option value=18 text=" ">18.0% IGST(18%)</option>
+                                <option value=28 text=" ">28.0% IGST(28%)</option>
+                            
+                          </select>
+                        </td>
+
+
+                        
+                  
+
+                        <td style="display: none;">
+                          <input type="text" name='taxamount' id="taxamount1"
+                            class=" taxamount border-0 bg-transparent text-white" />
+                        </td>
+                        <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='amount1'
+                            class=' text-center form-control amount border-0 bg-transparent text-white' name='amount[]'
+                            value='0.00' readonly>
+                        </td>
+                  
+
                   <td class='text-center'>
                     <button type='button' id='del_btn1'
                       class='btn  btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row'
@@ -664,7 +882,7 @@
                 <td></td>
                 <td>
                   <input type="number" class="form-control  bg-transparent border-0  text-light" id="adjust" value="0"
-                    name="adjust" style="text-align: right;">
+                    name="adjustment_charge" style="text-align: right;">
                 </td>
               </tr>
               <tr>
@@ -686,7 +904,7 @@
                 <tr>
                   <td>Advance Paid</td>
                   <td></td>
-                  <td><input type="number" id="advance" name="advance" step="any" value="0.00"
+                  <td><input type="number" id="advance" name="paid_amount" step="any" value="0.00"
                       class="form-control bg-transparent border-0 text-right advance text-white"
                       style="text-align: right;"></td>
                 </tr>
@@ -704,7 +922,194 @@
             </div>
           </div>
         </div>
+        <script>
+          $(document).ready(function() {
+              // Initialize Select2 for item dropdown
+              $('#item1').select2();
+      
+              // Update fields when source of supply or item changes
+              $('#srcofsupply, #item1').change(function() {
+                  updateFields();
+              });
+      
+              // Change event for tax dropdown
+              $('#tax1').change(function() {
+                  // Handle tax change here if needed
+                  var selectedTax = $(this).val();
+                  console.log('Selected tax:', selectedTax);
+              });
+          });
+      
+          function updateFields() {
+              var select = $('#item1').val();
+              var source = $('#srcofsupply').val();
+      
+              $.ajax({
+                  type: "GET",
+                  url: "{% url 'itemdatadebit' %}",
+                  data: {
+                      id: select,
+                      isd: source,
+                  },
+                  success: function(response) {
+                      if (response.error_flag === 1) {
+                          $('#errorLabel').text("Item is not present");
+                      } else {
+                          $('#errorLabel').text("");
+      
+                          var hsn = response.hsn;
+                          var rate = response.price;
+                          var qty = response.qty;
+                          var fetchedTax = response.gst;
+                          console.log(qty, "qty")
+      
+                          
+                          $('#hsn1').val(hsn);
+                          $('#rate1').val(rate);
+                          $('#stock_data1').val(qty);
+      
+                          // Update tax dropdown with fetched tax and an option to change it
+                          var taxDropdown = $('#tax1');
+                          taxDropdown.empty();
+      
+                          // Check source of supply and set tax accordingly
+                          if (source === "{{ company.state }}") {
+                              // If source is Kerala, use GST
+                              taxDropdown.append('<option value="' + fetchedTax + '" selected>' + fetchedTax + '</option>');
+                              
+                          taxDropdown.append('<option value="0"> GST(00%)</option>');
+                          taxDropdown.append('<option value="3"> GST 3(3%)</option>');
+                          taxDropdown.append('<option value="5">GST 5(5%)</option>');
+                          taxDropdown.append('<option value="12">GST 12(12%)</option>');
+                          taxDropdown.append('<option value="18"> GST 18(18%) </option>');
+                          taxDropdown.append('<option value="28">GST 28(28%) </option>');
+                          
+                          } else {
+                              // For other states, use IGST
+                              taxDropdown.append('<option value="' + fetchedTax + '" selected>' + fetchedTax + '</option>');
+                              taxDropdown.append('<option value="0">00% IGST(00%)</option>');
+                              taxDropdown.append('<option value="3">3% IGST(3%)</option>');
+                              taxDropdown.append('<option value="5">5% IGST(5%)</option>');
+                              taxDropdown.append('<option value="12">12% IGST(12%)</option>');
+                              taxDropdown.append('<option value="18">18% IGST(18%) </option>');
+                              taxDropdown.append('<option value="28">28% IGST(28%) </option>');
+                          }
+      
+                          
 
+                    
+      
+                          // Trigger change event on tax dropdown to reflect changes
+                          taxDropdown.trigger('change');
+                      }
+                  },
+              });
+          }
+
+
+          $.ajax({
+            type: "GET",
+            url: "{% url 'itemdatadebit' %}",
+            data: {
+                id: select,
+                isd: source,
+            },
+            success: function(response) {
+                // Extract tax value from the response
+                var fetchedTax = response.tax;
+        
+                // Update the tax dropdown with the fetched tax value
+                $('#tax1').val(fetchedTax);
+        
+                // Determine whether the source of supply matches the company state
+                var isSameState = source === "{{ company.state }}";
+        
+                // Set the display of tr_igst, tr_cgst, and tr_sgst based on the source of supply
+                if (isSameState) {
+                    // If the source of supply matches the company state, hide tr_igst and display tr_cgst and tr_sgst
+                    document.getElementById("tr_igst").style.display = "none";
+                    document.getElementById("tr_cgst").style.display = "";
+                    document.getElementById("tr_sgst").style.display = "";
+                } else {
+                    // If the source of supply is different from the company state, hide tr_cgst and tr_sgst and display tr_igst
+                    document.getElementById("tr_igst").style.display = "";
+                    document.getElementById("tr_cgst").style.display = "none";
+                    document.getElementById("tr_sgst").style.display = "none";
+                }
+        
+                // Call the function to recalculate row amount, subtotal, and grand total
+                calculateRowAmount();
+                calculateSubtotal();
+                calculateGrandTotal();
+            },
+        });
+        
+      </script>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    <script>
+      
+      $(document).on('blur', '#qty1', function () {
+        initialStock = parseInt($('#stock_data1').val());
+          var enteredQuantity = parseInt($('#qty1').val());
+      
+          if (isNaN(initialStock) || isNaN(enteredQuantity)) {
+              console.log("Either initialStock or enteredQuantity is not a number.");
+              return;
+          }
+      
+          if (enteredQuantity > 0) {
+              var updatedStock = initialStock - enteredQuantity;
+              console.log(updatedStock, "updated")
+              $('#stock_data1').val(updatedStock); // Use .val() instead of .text()
+          }
+      
+          $('#qty1').val(enteredQuantity);
+      });
+      
+    
+      </script>
+      
+
+<!--    <script>        
+     
+function reloadbill(vid) {
+console.log(vid);
+$.ajax({
+url: "{% url 'get_vendor_data_bill' %}",
+type: "GET",
+dataType: "json",
+data:{
+id:vid
+},
+success: function(data) {
+console.log(data,'hie')
+var dropdow = $('#billno');
+dropdow.empty();
+$.each(data, function(key, value) {
+dropdow.append($('<option></option>').attr('value', key).text(value).val(value));
+});
+
+},
+error: function(xhr, status, error) {
+console.error(xhr.responseText);
+
+}
+
+
+});
+}
+     
+     
+                                                     </script>-->
         <div class="row border-bottom">
           <div class="col-md-8 d-flex flex-column  text-white mb-5">
             <label for="">Terms & Conditions</label>
@@ -725,9 +1130,6 @@
           <input style="width: 150px; background-color: chocolate;" class="btn mt-2" type="reset" value="Cancel">
         </div>
       </form>
-
-
-
 
       <!-- payment modal -->
       <div class="modal fade" id="newpayment">
@@ -768,12 +1170,6 @@
           </div>
         </div>
       </div>
-
-
-
-
-
-
 
       <!-- customer modal -->
       <div class="modal fade" id="newcustomer">
@@ -1061,7 +1457,7 @@
                     <div class="col-md-6 mt-2">
                       <div class="d-flex">
                         <select class="form-control bg-light text-dark" id="c_terms" name="c_terms" required>
-                          {% for p in pay %}
+                          {% for p in payments %}
                           <option value="{{p.Terms}} {{p.id}}">{{p.Terms}}</option>
                           {% endfor %}
                         </select>
@@ -1368,7 +1764,7 @@
                       <div class="d-flex">
                         <select class="form-control bg-light text-dark" id="item_units" name="item_units" required>
                           <option value="" hidden>Select Unit</option>
-                          {% for u in unit %}
+                          {% for u in units %}
                           <option value="{{u.id}}">{{u.unit}}</option>
                           {% endfor %}
                         </select>
@@ -1519,6 +1915,8 @@
                     <div class="col-md-4">
                       <input type="text" name="sell_desc" class="form-control bg-light text-dark" id="sell_desc">
                     </div>
+                    
+                    
 
                     <div class="col-md-2">
                       <label for="cost_desc">Description</label>
@@ -1526,8 +1924,18 @@
                     <div class="col-md-4 ">
                       <input type="text" name="cost_desc" class="form-control bg-light text-dark" id="cost_desc">
                     </div>
+                    <div class="row mt-2">
+                      <div class="col-md-2">
+                        <label for="min_stock">Minimum Stock to maintain </label>
+                      </div>
+                      <div class="col-md-4">
+                        <input type="number" name="minimum_stock" class="form-control bg-light text-dark" id="minimum_stock">
+                        <br>
+                      </div>
 
                   </div> <br>
+                  
+                    
 
                   <div class="col-md-5">
                     <input type="checkbox" id="track" onclick="trackinventory()"> Track Inventory for this item
@@ -1864,16 +2272,16 @@
   $(document).ready(function () {
     $("#prof_name").keyup(function () {
       var x = $('#prof_name').val();
-      reford = "{{reference}}"
+      reford = "{{count}}"
       if (reford != '01') {
         if (reford != x) {
           document.getElementById("order_label").style.display = "block"
           document.getElementById("order_label").style.color = "yellow"
-          document.getElementById("order_label").innerHTML = "Sale Order is not Continuous"
+          document.getElementById("order_label").innerHTML = "Invoice Number is not Continuous"
         } else {
           document.getElementById("order_label").style.display = "block"
           document.getElementById("order_label").style.color = "green"
-          document.getElementById("order_label").innerHTML = "Sale Order is now Continuous"
+          document.getElementById("order_label").innerHTML = "Invoice Number is now Continuous"
         }
       }
     });
@@ -2397,7 +2805,7 @@
     $.ajax({
 
       type: 'POST',
-      url: "{% url 'purchase_item' %}",
+      url: "{% url 'invoice_item_in_modal' %}",
 
       data: {
         type: itemtype,
@@ -2412,6 +2820,9 @@
         cost_acc: $("#cost_acc").val(),
         sell_desc: $("#sell_desc").val(),
         cost_desc: $("#cost_desc").val(),
+
+        min_stock: $("#minimum_stock").val(),
+        
         active_type: active_type,
         invasset: $("#invasset").val(),
         opening_stock: $("#opening_stock").val(),
@@ -2431,7 +2842,7 @@
 
   function reloadItem() {
     $.ajax({
-      url: "{% url 'purchase_item_dropdown' %}",
+      url: "{% url 'invoice_item_in_dropdown' %}",
       type: "GET",
       dataType: "json",
       data: $(this).serialize(),
@@ -2693,56 +3104,72 @@
       calculateGrandTotal();
     });
 
+   
+ 
     $('#add-row').click(function () {
       rowCount++; // Increment row counter
       console.log()
       var newRow = `
       <tr id='row${rowCount}'>
+        <td class="text-light">${rowCount}</td>
         <td >
-          <div>
-            <select class='form-control border-0 bg-transparent text-white  border-0 item_select itm' name='item[]' id='item${rowCount}' onchange="itemfunction(this.id)">
-              <option value=" " selected disabled hidden>Select Item</option>
-              {% for i in itm %}
-                <option  class="text-black" value="{{i.id}}">{{ i.Name }}</option>
-              {% endfor %}
-            </select>
-          </div>
+          <div class="custom-dropdown"  style="height: 8vh;"> 
+            <input type="text" id="item${rowCount}"  hidden>
+            <input style="font-size: 13px;" type="text" class="dropdown-input_item" name="item[]"  placeholder="Select item">
+          
+              <div class="dropdown-list" style="font-size: 13px;" id="item_one${rowCount}">
+                {% for p in items %}
+               
+                    <div class="dropdown-item"
+                        data-value="{{ p.id }}" data-name = " {{ p.Name }} "
+                        data-hsn="{{ p.hsn }}"
+                        data-rate="{{ p.s_price }}"
+                        data-intrastate="{{ p.intrastate }}"
+    data-interstate="{{ p.interstate }}"
+    data-stock="{{ p.stock }}"
+                      >{{ p.title }} {{ p.Name }} {{ p.last_name }}</div>
+            
+                {% endfor %}
+            </div>
+        </div>
         </td>
 
       
         <td style="width: 15%;" class='text-right'>
-          <input type='number' id='hsn${rowCount}' class=' text-right hsn form-control border-0 bg-transparent text-white' name='hsn[]' readonly>
+          <input style="font-size: 13px;" type='number' id='hsn${rowCount}' class=' text-right hsn form-control border-0 bg-transparent text-white' name='hsn[]' readonly>
         </td>
         
         <td style="width: 17%;" class='text-right'>
-          <input type='number' id='qty${rowCount}' class='text-right border-0 bg-transparent text-white qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange(this.id)'><br>
+          <input  style="font-size: 13px;"type='number' id='qty${rowCount}' class='text-center border-0 bg-transparent text-white qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange(this.id)'><br>
+          <span class="text-warning" style="font-size: 10px;">Available Stock : <span style="font-size: 10px;" id="stock_data${rowCount}" class="stock_data text-warning"></span></span>
+          <span class="stock_warning text-danger"></span>
         </td>
         
         <td style="width: 15%;" class='text-right'>
-          <input type='number' id='rate${rowCount}' class='text-right border-0 bg-transparent text-white rate form-control' name='rate[]' value='0' readonly>
+          <input style="font-size: 13px;" type='number' id='rate${rowCount}' class='text-right border-0 bg-transparent text-white rate form-control' name='rate[]' value='0' readonly>
         </td>
         
         <td style="width: 10%;" class='text-right'>
-          <input type='number' id='discount${rowCount}' class='text-right border-0 bg-transparent text-white discount form-control' name='desc[]' value='0'>
+          <input style="font-size: 13px;" type='number' id='discount${rowCount}' class='text-right border-0 bg-transparent text-white discount form-control' name='desc[]' value='0'>
         </td>
         
         <td style="width: 22%;" class='text-right'>
-          <select name='tax[]'  id='tax${rowCount}' class='form-control border-0 bg-transparent text-white text-right border-0 tax' onselect="toggleDateInput()">
+          <select name='tax[]' style="font-size: 13px;" id='tax${rowCount}' class='form-control border-0 bg-transparent text-white text-right border-0 tax' onselect="toggleDateInput()">
             <optgroup class="text-center text-black" label="GST">
-                            <option class="text-black" value="0">0% GST(0%)</option>
-                            <option class="text-black" value="3">3.0% GST(3%)</option>
-                            <option class="text-black" value="5">5.0% GST(5%)</option>
-                            <option class="text-black" value="12">12.0% GST(12%)</option>
-                            <option class="text-black" value="18">18.0% GST(18%)</option>
-                            <option class="text-black" value="28">28.0% GST(28%)</option>
+                            <option class="text-black" value="0">0% GST</option>
+                            <option class="text-black" value="3">3% GST</option>
+                            <option class="text-black" value="5">5% GST</option>
+                            <option class="text-black" value="12">12% GST</option>
+                            <option class="text-black" value="18">18% GST</option>
+                            <option class="text-black" value="28">28% GST</option>
                           </optgroup>
                           <optgroup  class="text-center textblack" label="IGST">
-                            <option class="text-black" value="0">0% IGST(0%)</option>
-                            <option class="text-black" value="3">3.0% IGST(3%)</option>
-                            <option class="text-black" value="5">5.0% IGST(5%)</option>
-                            <option class="text-black" value="12">12.0% IGST(12%)</option>
-                            <option class="text-black" value="18">18.0% IGST(18%)</option>
-                            <option class="text-black" value="28">28.0% IGST(28%)</option>             
+                            <option class="text-black" value="0">0% IGST</option>
+                            <option class="text-black" value="3">3% IGST</option>
+                            <option class="text-black" value="5">5% IGST</option>
+                            <option class="text-black" value="12">12% IGST</option>
+                            <option class="text-black" value="18">18% IGST</option>
+                            <option class="text-black" value="28">28% IGST</option>             
                             </optgroup>
           </select>
           <label id="ml${rowCount}" class="text-warning" style="display: none;">dcx dffcd</label>
@@ -2754,7 +3181,7 @@
         </td>
         
         <td style="width: 15%;" class='text-right'>
-          <input type='number' id='amount${rowCount}' class='text-right border-0 bg-transparent text-white form-control amount' name='amount[]' value='0.00' readonly>
+          <input style="font-size: 13px;" type='number' id='amount${rowCount}' class='text-right border-0 bg-transparent text-white form-control amount' name='amount[]' value='0.00' readonly>
         </td>
         
         <td class='text-center'>
@@ -2765,6 +3192,7 @@
       </tr>
     `;
       $('#item_table tbody').append(newRow);
+      initializeRow($(`#row${rowCount}`));
       toggleDateInput();
       calculateSubtotal();
       calculateGrandTotal();
@@ -2894,23 +3322,20 @@
   var oxy_gst;
   var oxy_igst;
 
-  function itemfunction(id) {
-    //console.log("Received ID:", id_str);
-   // id = id_str.split("item")[1]
+  function itemfunction(id_str) {
+    id = id_str.split("item")[1]
 
 
     select = $(`#item${id}`).val();
     customer = $('#customer_sel').val();
     $.ajax({
       type: "GET",
-      url: "{% url 'itemdata_invoice' %}",
+      url: "{% url 'itemdata' %}",
       data: {
         id: select,
         cust: customer
       },
       success: function (response) {
-
-        
         data = response.rate
         data1 = response.gst
         data2 = response.igst
@@ -3229,55 +3654,829 @@
 
 </script>
 
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer></script>
 
-<script>
-  $(document).ready(function() {
-    // Loop through each select element with the class 'extra' and initialize select2
-    $(".extra").each(function() {
-        var id = $(this).attr("id").replace("item", ""); // Get the ID of the row
 
-        console.log(id, "id in the top")
-        $("#" + $(this).attr("id")).select2(); // Initialize select2 for the current row
 
-        // Event listener for select2 select event
-        $("#" + $(this).attr("id")).on("select2:select", function(e) {
-            var selectedId = $(this).val(); // Get the ID of the selected element
-            console.log(selectedId, "selectedId");
-            var customerId = $('#customer_sel').val(); // Get the customer ID from your form
 
-            // Make AJAX call to fetch item data
-            $.ajax({
-                type: "GET",
-                url: "{% url 'itemdata_invoice' %}",
-                data: {
-                    id: selectedId, // Pass the selected item ID
-                    cust: customerId
-                },
-                success: function(response) {
-                  var itemdata_one=response.item
-                  console.log(itemdata_one, "itemdata one")
-                    // Handle the response data
-                    console.log(response,  "response of AJAX call");
-                    // Call the itemfunction with the received data
-                    itemfunction(id);
-                    var k = itemfunction(id);
-                    console.log(k, "koajodjo");
-                },
-                error: function(xhr, status, error) {
-                    // Handle errors
-                    console.error(xhr.responseText);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ <!--    <script>
+               
+                    
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                      for (let i = 1; i <= rowCount; i++) {
+                          let qtyInput = document.getElementById(`qty${i}`);
+                  
+                          qtyInput.addEventListener('input', function () {
+                              updateAvailableStock(i);
+                          });
+                  
+                          qtyInput.addEventListener('keydown', function (event) {
+                              if (event.key === 'Enter') {
+                                  updateAvailableStock(i);
+                              }
+                          });
+                  
+                          let input = document.getElementById(`row${i}`).getElementsByClassName('dropdown-input_item')[0];
+                          let dropdownList = document.getElementById(`item_one${i}`);
+                  
+                          input.addEventListener('focus', function () {
+                              dropdownList.style.display = 'block';
+                          });
+                  
+                          document.addEventListener('mousedown', function (event) {
+                              if (!event.target.closest(`#row${i} .custom-dropdown`)) {
+                                  dropdownList.style.display = 'none';
+                              }
+                          });
+                  
+                          dropdownList.addEventListener('click', function (event) {
+                              if (event.target.classList.contains('dropdown-item')) {
+                                  input.value = event.target.textContent;
+                                  dropdownList.style.display = 'none';
+                                  fillItemDetails(i);
+                              }
+                          });
+                  
+                          input.addEventListener('input', function () {
+                              let filterValue = input.value.toLowerCase();
+                              let items = dropdownList.querySelectorAll('.dropdown-item');
+                  
+                              items.forEach(function (item) {
+                                  let itemText = item.textContent.toLowerCase();
+                                  item.style.display = itemText.includes(filterValue) ? 'block' : 'none';
+                              });
+                          });
+                      }
+                  });
+                  
+                  function updateAvailableStock(rowNumber) {
+                      var qtyInput = document.getElementById(`qty${rowNumber}`);
+                      var stockData = parseInt(document.getElementById(`stock_data${rowNumber}`).innerText);
+                      var availableStockSpan = document.getElementById(`avl${rowNumber}`);
+                      var quantity = parseInt(qtyInput.value);
+                      var availableStock = stockData - quantity;
+                  
+                      if (availableStock >= 0) {
+                          availableStockSpan.innerText = availableStock;
+                          document.getElementById(`avl${rowNumber}`).value = availableStock;
+                      } else {
+                          alert('Quantity entered exceeds available stock!');
+                          qtyInput.value = stockData;
+                          availableStockSpan.innerText = 0;
+                          document.getElementById(`avl${rowNumber}`).value = 0;
+                      }
+                  }
+                  
+                  
+                  
+                  
+                  
+                  
+                  function fillItemDetails(rowNumber) {
+                      var row = $('#row' + rowNumber);
+                      var input = row.find('.dropdown-input_item');
+                      var selectedItem = row.find('.dropdown-item[data-name="' + input.val() + '"]');
+                      
+                      var hsn = selectedItem.attr("data-hsn") || "";
+                      var rate = selectedItem.attr("data-rate") || "";
+                      var intrastate = selectedItem.attr("data-intrastate") || "";
+                      var interstate = selectedItem.attr("data-interstate") || "";
+                      var stockData = selectedItem.attr("data-stock") || "";
+                  
+                      var placeOfSupply = $("#srcofsupply" + rowNumber).val();
+                      var tax = placeOfSupply === "[KL]Kerala" ? selectedItem.attr("data-intrastate") : selectedItem.attr("data-interstate");
+                      var numericTax = tax.match(/\d+/);
+                  
+                      $("#hsn" + rowNumber).val(hsn);
+                      $("#rate" + rowNumber).val(rate);
+                      $("#tax" + rowNumber).val(numericTax);
+                  
+                      var stockInput = $("#stock_data" + rowNumber);
+                      var qtyInput = $("#qty" + rowNumber);
+                      var availableStock = parseInt(stockData) - parseInt(qtyInput.val());
+                  
+                      stockInput.text(Math.max(availableStock, 0));
+                      $("#avl" + rowNumber).val(Math.max(availableStock, 0));
+                  
+                      updateAvailableStock(rowNumber); // Call changeqty after updating the necessary fields
+                  }
+                  
+                  
+                
+             
+                  
+
+
+
+                  document.addEventListener('DOMContentLoaded', function () {
+                    for (let i = 1; i <= rowCount; i++) {
+                        // Add event listener for source of supply changes
+                        let sourceOfSupplySelect = document.getElementById(`srcofsupply${i}`);
+                        sourceOfSupplySelect.addEventListener('change', function () {
+                            updateTaxOptions(i);
+                        });
+                    }
+                });
+                
+                function updateTaxOptions(rowNumber) {
+                    let sourceOfSupplySelect = document.getElementById(`srcofsupply${rowNumber}`);
+                    let taxSelect = document.getElementById(`tax${rowNumber}`);
+                    let gstGroup = document.getElementById(`gst-group${rowNumber}`);
+                    let igstGroup = document.getElementById(`igst-group${rowNumber}`);
+                
+                    // Clear previous options
+                    gstGroup.innerHTML = '';
+                    igstGroup.innerHTML = '';
+                
+                    let sourceOfSupply = sourceOfSupplySelect.value.trim(); // Trim to remove leading/trailing spaces
+                
+                    if (sourceOfSupply === "[KL] Kerala") {
+                        // Display GST options
+                        gstGroup.innerHTML = `
+                            <option class="text-black" value="0">0% GST</option>
+                            <option class="text-black" value="3">3% GST</option>
+                            <option class="text-black" value="5">5% GST</option>
+                            <option class="text-black" value="12">12% GST</option>
+                            <option class="text-black" value="18">18% GST</option>
+                            <option class="text-black" value="28">28% GST</option>
+                        `;
+                    } else {
+                        // Display IGST options
+                        igstGroup.innerHTML = `
+                            <option class="text-black" value="0">0% IGST</option>
+                            <option class="text-black" value="3">3% IGST</option>
+                            <option class="text-black" value="5">5% IGST</option>
+                            <option class="text-black" value="12">12% IGST</option>
+                            <option class="text-black" value="18">18% IGST</option>
+                            <option class="text-black" value="28">28% IGST</option>
+                        `;
+                    }
                 }
-            });
-        });
-    });
+                
+
+</script>       
+               
+                
+                  
+ <script>       
+                    
+
+$(document).ready(function () {
+  // Add event listener to the place of supply dropdown
+  $('#srcofsupply').change(function () {
+      updateTaxGroupAndLabel();
+  });
 });
 
+function updateTaxGroupAndLabel() {
+  // Get the current place of supply
+  var placeOfSupply = $("#srcofsupply").val();
+
+  // Determine tax group based on place of supply
+  var taxGroupId;
+  if (placeOfSupply === "[KL]-Kerala") {
+      taxGroupId = "igst-group";
+  } else {
+      taxGroupId = "gst-group";
+  }
+
+  // Update tax group
+  updateTaxGroup(taxGroupId);
+}
+
+function updateTaxGroup(taxGroupId) {
+  // Update the id attribute of the tax dropdown based on the place of supply
+  var taxDropdown = document.getElementById('tax1');
+  var gstOptgroup = taxDropdown.querySelector('optgroup[label="GST"]');
+  var igstOptgroup = taxDropdown.querySelector('optgroup[label="IGST"]');
+
+  gstOptgroup.id = (taxGroupId === "gst-group") ? "tax-group" : "";
+  igstOptgroup.id = (taxGroupId === "igst-group") ? "tax-group" : "";
+}
+
+
+
+
+
+function fillItemDetails2(row) {
+  var input = row.find('.dropdown-input_item');
+  var selectedValue = input.val();
+  var selectedItem = row.find('.dropdown-item[data-name="' + selectedValue + '"]');
+  
+  var value = selectedItem.attr("data-value");
+  var hsn = selectedItem.attr("data-hsn");
+  var rate = selectedItem.attr("data-rate");
+  var interstateTax = selectedItem.attr("data-interstate");
+  var intrastateTax = selectedItem.attr("data-intrastate");
+  var stockData = selectedItem.attr("data-stock") ;
+  
+  // Set values to corresponding fields for the specific row
+  row.find('.hsn').val(hsn);
+  row.find('.rate').val(rate);
+  row.find('.stock_data').val(stockData);
+  
+  // Determine place of supply for the row
+  var placeOfSupply = row.find('.srcofsupply').val();
+  
+  // Set tax based on place of supply
+  var selectedTax = (placeOfSupply === "[KL]-Kerala") ? intrastateTax : interstateTax;
+  var numericTax = selectedTax.match(/\d+/);
+  row.find('.tax').val(numericTax);
+  
+  // Set treatment based on place of supply
+  row.find('.cx_treat').val((placeOfSupply === "[KL]-Kerala") ? "SGST/CGST" : "IGST");
+  
+  
+ 
+  row.find('.item1').val(value);
+
+  
+
+  // Additional code for updating available stock
+  updateAvailableStock2(row);
+
+  
+}
+function updateAvailableStock2(row) {
+  var quantity = parseInt(row.find('.qty').val()) || 0;
+  var availableStock = parseInt(row.find('.stock_data').text()) || 0;
+
+  // Update Available Stock span
+  row.find('.stock_data').text(availableStock - quantity);
+
+  // Display a warning message if the entered quantity is greater than available stock
+  var stockWarning = row.find('.stock_warning');
+  if (quantity > availableStock) {
+      stockWarning.text("Entered quantity greater than available quantity").css('color', 'red');
+  } else {
+      stockWarning.text('').css('color', ''); // Reset the warning message
+  }
+}
+                  
+                  
+
+                  function initializeRow(row) {
+                    var id = row.attr("id").replace("row", "");
+                    var dropdownList = row.find(`#item_one${id}`);
+                  
+                    row.find('.dropdown-input_item').on('focus', function () {
+                      dropdownList.show();
+                    });
+                  
+                    $(document).on('mousedown', function (event) {
+                      if (!$(event.target).closest(`#row${id} .custom-dropdown`).length) {
+                        dropdownList.hide();
+                      }
+                    });
+                  
+                    dropdownList.on('click', '.dropdown-item', function (event) {
+                      var input = row.find('.dropdown-input_item');
+                      input.val($(this).text());
+                      dropdownList.hide();
+                      fillItemDetails2(row);  
+                      clearErrorMessage();
+                    });
+                  
+                    row.find('.dropdown-input_item').on('input', function () {
+                      var filterValue = $(this).val().toLowerCase();
+                      var items = dropdownList.find('.dropdown-item');
+                  
+                      items.each(function () {
+                        var itemText = $(this).text().toLowerCase();
+                        if (itemText.includes(filterValue)) {
+                          $(this).show();
+                        } else {
+                          $(this).hide();
+                        }
+                      });
+                    });
+                  
+                  
+                  }
+                  
+               
+              
+              
+                </script>
+                 <!-- <script>
+                    function changeqty(id) {
+                      var id_val = id.slice(3);
+                      var qty = parseFloat(document.getElementById(id).value);
+                      var avl_val = parseFloat(document.getElementById(`avl${id_val}`).innerText);
+                  
+                      if (isNaN(qty) || isNaN(avl_val)) {
+                          console.error("Invalid numeric value for available stock or quantity");
+                          return;
+                      }
+                  
+                      if (qty > avl_val) {
+                          alert("Quantity Greater than Available Quantity");
+                          document.getElementById(id).value = 0;
+                          document.getElementById(`item_one${id_val}`).value = '';
+                          document.getElementById(`tax1${id_val}`).value = '';
+                          document.getElementById(`tax2${id_val}`).value = '';
+                          document.getElementById(`disc${id_val}`).value = 0;
+                          document.getElementById(`taxamount${id_val}`).value = 0;
+                          document.getElementById(`total${id_val}`).value = 0;
+                          calc();
+                      } else {
+                          document.getElementById(`stock_data${id_val}`).textContent = avl_val - qty;
+                      }
+                  }
+                  
+
+
+
+
+
+                    
+    $(document).on('change', '.item_one',function(){ 
+                
+      var n = $(this).attr("id").slice(7);
+      $.ajax({
+      url: "{% url 'invoice_item_table' %}",
+      type : 'GET',
+      data:{
+          id : $(this).val(),
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+      
+      success: function(response) {
+          data = response.hsn
+          data2 = response.qty
+          data3 = response.price
+          data4 = response.gst
+          data5 = response.sgst
+
+          // console.log(data)
+          // console.log(data2)
+          // console.log(data3)
+          document.getElementById('hsn'+n).value = data;
+          document.getElementById('avl' + n).innerHTML = response.minimum_stock;
+
+
+          document.getElementById('stock_data'+n).innerHTML = data2;
+          document.getElementById('unit'+n).value = data3;
+          var bc = document.getElementById("srcofsupply").value;
+          var compstate = document.getElementById("cmpstate").value;
+          if (bc == compstate ) {
+              $(".seltax").removeClass('d-flex');
+              $(".seltax").addClass('d-none');
+              $(".inter_tax").removeClass('d-flex');
+              $(".inter_tax").addClass('d-none');
+              $(".intra_tax").removeClass('d-none');
+              $(".intra_tax").addClass('d-flex');
+              if (data4 != ' '){
+                  document.getElementById('tax1'+n).value = data4;
+                  document.getElementById('tax_percent'+n).value = data4;
+              }else{
+                  document.getElementById('tax1'+n).value = 0;
+                  document.getElementById('tax_percent'+n).value = 0;
+              }
+              
+              
+              
+          } else {
+              $(".seltax").removeClass('d-flex');
+              $(".seltax").addClass('d-none');
+              $(".intra_tax").removeClass('d-flex');
+              $(".intra_tax").addClass('d-none');
+              $(".inter_tax").removeClass('d-none');
+              $(".inter_tax").addClass('d-flex');
+              if(data5 != ' '){
+                  document.getElementById('tax2'+n).value = data5;
+                  document.getElementById('tax_percent'+n).value = data5;
+              }else{
+                  document.getElementById('tax2'+n).value = 0;
+                  document.getElementById('tax_percent'+n).value = 0;
+              }
+
+          }
+      },
+      });
+      
+
+  });
+                </script>-->
+                
+             <!--     <script>
+
+                    
+
+
+                  //  function updateAvailableStock(row) {
+                      var selectedItem = row.find(".dropdown-input_item").val();
+                      var quantity = parseInt(row.find(".qty").val());
+                    
+                      console.log("Selected Item: " + selectedItem); // Debugging statement
+                    
+                      // Use AJAX to fetch the actual available stock from the server
+                      $.ajax({
+                        type: 'GET',
+                        url: "{% url 'get_invoice_item_details' %}",
+                        data: { id: selectedItem },
+                        dataType: 'json',
+                        success: function (response) {
+                          console.log("Response from server: " + JSON.stringify(response)); // Debugging statement
+                          
+                          // Check if the response contains the 'stock' property
+                          if ('stock' in response) {
+                            var availableStock = parseInt(response.stock);
+                    
+                            // Update Available Stock span
+                            row.find(".stock_data").text(availableStock - quantity);
+                    
+                            // Display a warning message if the entered quantity is greater than available stock
+                            var stockWarning = row.find(".stock_warning");
+                            if (quantity > availableStock) {
+                              stockWarning.text("Entered quantity greater than available quantity").css('color', 'red');
+                            } else {
+                              stockWarning.text('').css('color', ''); // Reset the warning message
+                            }
+                          } else {
+                            console.log('Error: Response does not contain the expected stock property.');
+                          }
+                        },
+                        error: function () {
+                          console.log('Error fetching item data.');
+                        },
+                      });
+                    }
+                    
+                      
+                      // Event handler for changes in quantity and item selection
+                      $(document).on('change input', '.qty, .dropdown-input_item', function () {
+                        var row = $(this).closest('tr');
+                        updateAvailableStock(row);
+                      });
+                      
+                      // Function to fetch item data using AJAX
+                     // function fetchItemData(selectedItem, row) {
+                       // $.ajax({
+                          type: 'GET',
+                          url: "{% url 'get_invoice_item_details' %}",
+                          data: { id: selectedItem },
+                          dataType: 'json',
+                          success: function (response) {
+                            row.find(".hsn").val(response.hsn);
+                            row.find(".rate").val(response.rate);
+                            row.find(".stock_data").text(response.stock);
+                            //updateAvailableStock(row);
+                          },
+                          error: function () {
+                            console.log('Error fetching item data.');
+                          },
+                        });
+                      }
+                      
+                      // Event handler for changes in item selection
+                      $(document).on('change', '.dropdown-input_item', function () {
+                        var selectedItem = $(this).val();
+                        var row = $(this).closest('tr');
+                        fetchItemData(selectedItem, row);
+                      });
+                      
+                      // Add event handler for changes in quantity
+                      $(document).on('change', '.qty', function () {
+                        var row = $(this).closest('tr');
+                        updateAvailableStock(row);
+                      });
+                      
+                      // Adding the new AJAX request
+var itemId = encodeURIComponent("thorium"); // Encode the item ID
+var url = "/get_invoice_item_details/?id=" + itemId;
+
+$.ajax({
+    url: url,
+    type: 'GET',
+    success: function(data) {
+        // Handle success (update UI, etc.)
+        console.log('Success:', data);
+    },
+    error: function(xhr, status, error) {
+        // Handle error (log details to the console)
+        console.error('Error:', xhr, status, error);
+    }
+});
+                      
+                    
+                      
+
+
+                
+                  </script>-->
+
+                  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer></script>
+
+
+                  <!--<script>
+  $(document).ready(function() {
+    // Initialize Select2 on your dropdown input
+    $('.dropdown-input_item').select2();
+
+    // Function to fetch item details (HSN, rate, tax) based on the selected item
+    function fillItemDetails(rowNumber) {
+      let itemInput = $(`#item${rowNumber}`);
+      let hsnElement = $(`#hsn${rowNumber}`);
+      let rateElement = $(`#rate${rowNumber}`);
+      let taxElement = $(`#tax${rowNumber}`);
+      let availableStockElement = $(`#stock_data${rowNumber}`);
+
+      let selectedItem = itemInput.val();
+
+      $.ajax({
+        url: '/get_item_details_invoice/',
+        method: 'GET',
+        data: { item: encodeURIComponent(selectedItem) },
+        success: function(data) {
+          hsnElement.val(data.hsn);
+          rateElement.val(data.rate);
+          taxElement.val(data.tax);
+          availableStockElement.val(data.availableStock);
+        },
+        error: function(xhr, status, error) {
+          alert(`Failed to fetch item details. Status: ${status}, Error: ${error}`);
+        }
+      });
+    }
+
+    // Function to update available stock when quantity is entered
+    function updateAvailableStock(rowNumber) {
+      let quantityInput = $(`#qty${rowNumber}`);
+      let availableStockElement = $(`#stock_data${rowNumber}`);
+      let quantity = parseFloat(quantityInput.val()) || 0;
+      let availableStock = parseFloat(availableStockElement.val()) || 0;
+
+      if (quantity > availableStock) {
+        alert('Quantity cannot be greater than available stock');
+        // Reset quantity to available stock
+        quantityInput.val(availableStock.toFixed(2));
+        quantity = availableStock;
+      }
+
+      // Update available stock after deduction
+      availableStockElement.val((availableStock - quantity).toFixed(2));
+    }
+
+    // Function to update tax type based on place of supply
+    function updateTaxType() {
+      let placeOfSupplyDropdown = $('#srcofsupply');
+      let selectedPlaceOfSupply = placeOfSupplyDropdown.val();
+      let taxTypeElement = $('#taxTypeDisplay');
+
+      // Default tax type
+      let taxType = 'Default Tax Type';
+
+      // Check if the selected place of supply is Kerala
+      if (selectedPlaceOfSupply === 'KL') {
+        taxType = 'GST'; // Update with your GST tax type
+      } else {
+        taxType = 'IGST'; // Update with your IGST tax type
+      }
+
+      // Update the tax type element with the new tax type
+      taxTypeElement.text('Tax Type: ' + taxType);
+    }
+
+    // Add event listener for place of supply dropdown change
+    $('#srcofsupply').on('change', updateTaxType);
+
+    // Document ready event listener
+    $(document).on('DOMContentLoaded', function() {
+      let rowCount = 1; // Set the initial row count
+
+      for (let i = 1; i <= rowCount; i++) {
+        let qtyInput = $(`#qty${i}`);
+        let input = $(`#item${i}`);
+
+        qtyInput.on('input', function() {
+          updateAvailableStock(i);
+        });
+
+        qtyInput.on('keydown', function(event) {
+          if (event.key === 'Enter') {
+            updateAvailableStock(i);
+          }
+        });
+
+        input.on('change', function() {
+          fillItemDetails(i);
+        });
+      }
+    });
+  });
 </script>
 
 
 
+                
 
+            
+                  <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='rate1'
+                      class=' text-right rate form-control border-0  bg-transparent text-white' name='rate[]' value='0'
+                      readonly>
+                  </td>
+                  <td style="width: 10%;" class='text-center text-dark'><input style="font-size: 13px;" type='number' id='discount1'
+                      class=' text-right discount border-0 bg-transparent text-white form-control' name='desc[]'
+                      value='0'>
+                  </td>
+                  <td style="width: 22%;" class='text-center ' style="font-size: 13px;"> 
+                    <input hidden value="{{company.state}}" id="cmpstate">
+                      <input type="text"  id="select_tax" placeholder="Tax Rate" class="form-control seltax d-flex">
+                      <select name='tax[]' id="tax11" class="form-control tax intra_tax d-none" onchange="taxchange(this.id)">
+               <select name='tax[]' id='tax1'
+                        class='form-control border-0 bg-transparent text-white text-center border-0 tax'
+                        onselect="toggleDateInput()" style="font-size: 13px;">
+                        <optgroup id="gst-group" class="text-center text-black" label="GST">
+                            <option class="text-black" value="0">0% GST</option>
+                            <option class="text-black" value="3">3% GST</option>
+                            <option class="text-black" value="5">5% GST</option>
+                            <option class="text-black" value="12">12% GST</option>
+                            <option class="text-black" value="18">18% GST</option>
+                            <option class="text-black" value="28">28% GST</option>
+                        </select>
+                     <optgroup id="igst-group" class="text-center text-black" label="IGST">
+                          <select name='tax2[]' id="tax21" class="form-control tax inter_tax d-none " onchange="taxchange(this.id)">
+                            <option class="text-black" value="0">0% IGST</option>
+                            <option class="text-black" value="3">3% IGST</option>
+                            <option class="text-black" value="5">5% IGST</option>
+                            <option class="text-black" value="12">12% IGST</option>
+                            <option class="text-black" value="18">18% IGST</option>
+                            <option class="text-black" value="28">28% IGST</option>
+                        
+                    </select>
+                    <label id="ml1" class="text-warning" style="display: none;"></label>
+                </td>
+                
+                  </td>
+                  <td style="display: none;">
+                    <input type="text" name='taxamount' id="taxamount1"
+                      class=" taxamount border-0 bg-transparent text-white" />
+                  </td>
+                  <td style="width: 15%;" class='text-center'><input style="font-size: 13px;" type='number' id='amount1'
+                      class=' text-center form-control amount border-0 bg-transparent text-white' name='amount[]'
+                      value='0.00' readonly>
+                  </td>-->
+  <!--  <tbody id="item_table_body">
+                <tr id="row1">
+                  <td class="text-white text-center" style="font-size: 10px;">1</td>
+                  <td style="font-size: 13px;" class="text-center">
+                 <div class="custom-dropdown" style="height: 8vh;"> 
+                      <input type="text" class="dropdown-input_item" id="item1" name="item[]" placeholder="Select item">
+                      <div class="dropdown-list" id="item_one1">
+                        {% for p in items %}
+                          <div class="dropdown-item"
+                            data-value="{{ p.id }}" data-name="{{ p.Name }}"
+                            data-hsn="{{ p.hsn }}" data-rate="{{ p.s_price }}"
+                            data-intrastate="{{ p.intrastate }}" data-interstate="{{ p.interstate }}"
+                            data-stock="{{ p.stock }}">
+                            {{ p.title }} {{ p.Name }} {{ p.last_name }}
+                          </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                    <select name='items[]' id="product" class="form-control select2">
+                      <option selected>Choose..</option>
+                      {% for i in items %}
+                          <option value="{{ i.Name }}" data-tokens="{{ i.Name }}">
+                              {{ i.Name }}
+                          </option>
+                      {% endfor %}
+                  </select>
+
+ 
+
+
+
+                  <a class="btn btn-outline-secondary ml-1" role="button" data-target="#newitem" data-toggle="modal">+</a> 
+              </div>
+              <div id="errorLabel" style="color: red;"></div>
+          </td>
+          <td>
+              <input type="text" name='hsn[]' id="hsn1" placeholder='HSN'
+              class="form-control hsn"/>
+          </td>
+          <td>
+              <input type="number" name='quantitys'   style='margin-top:21px' placeholder='Enter Qty' id="quantitys" class="form-control quty"   hidden>
+              <input type="number" name='anotherQuantityInput'   style='margin-top:21px' placeholder='Enter Qty' id="anotherQuantityInput" value="0" class="form-control quty" hidden >
+              <input type="number" name='quantity[]' oninput="qtychange1(this)"  style='margin-top:21px' placeholder='Enter Qty' id="qty1" class="form-control qty" step=0 min=0 >
+                      <div><span>Available Qty :</span> <span id="qtyspan"class='text-muted'></span></div>
+          </td> 
+          
+          
+           
+  <script>
+      $('.select2').select2();
+      console.log('hi')
+      $(document).on('change', '#product', function () {
+     
+          console.log('hhhhh')
+         var select = $('#product').val();
+         var vid = $('#billno').val();
+         console.log('hhhhh',vid,select)
+         $.ajax({
+             type: "GET",
+             url: "{% url 'itemdatadebit' %}",
+             data: {
+                 id: select,
+                 vid: vid
+             },
+             success: function (response) {
+              console.log(response,'res')
+              
+                 if (response.error_flag === 1) {
+                     // Show error message in a label
+                     $('#errorLabel').text("Item is not purchased for this bill number");
+                 }else {
+                     // Remove the error message if error_flag is zero
+                     $('#errorLabel').text("");
+                 }
+                     // Update the HTML elements based on the response
+                     var data = response.hsn;
+                     var data2 =  response.qty;
+
+                     console.log(data2,'data2')
+                     var data3 = response.price;
+                     var data4 = response.gst;
+                     var data5 = response.sgst;
+                     var data6 = response.quty;
+                     var data7 =response.taxs;
+                     console.log(data7);
+                
+                     document.getElementById('hsn1').value = data; 
+     
+         
+     
+                     document.getElementById('qtyspan').innerHTML = data2 ;
+                     document.getElementById('unit1').value = data3;
+                     document.getElementById('taxs').value = data7;
+                     document.getElementById('quantitys').value = data6;
+
+                     var place = 'Kerala'
+                    
+                     if (place == '{{ cmp1.state }}') {
+
+                         document.getElementById('ta1').value = data4;
+                         
+                         
+                     }
+                     else{
+                      document.getElementById('ta5').value = data5;
+                     }
+                     
+             
+             },
+             
+         });
+     });
+     
+
+     
+     
+</script>
+                    
+                  </td>
+                  
+
+
+                 
+                  <td style="width: 15%; font-size: 10px;" class='text-center' >
+                    <input style="font-size: 13px;" type='number' id='hsn1'
+                      class=' text-right hsn border-0 form-control bg-transparent text-white' name='hsn[]' readonly>
+                  </td>
+                  <td style="width: 17%;" class='text-center'>
+                    <input style="font-size: 13px;" type='number' id='qty1' class='text-center qty form-control border-0 bg-transparent text-white' name='quantity[]' value='0'>
+                    <input type="text" id="avl1" style="display: none;">
+                    <span class="text-warning" style="font-size: 10px;">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>
+                    
+                  </td>
 {% endblock %}
