@@ -7,6 +7,9 @@
 
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <!-- Include Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
     <!-- Include Select2 JavaScript -->
     
 
@@ -2888,8 +2891,16 @@
 
 </script>
 
-<script>
+<!-- Include jQuery (required by Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<!-- Include Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<script>
+  $(document).ready(function () {
+    // Initialize Select2 Plugin
+    $('.select2').select2();
   var companyState;
   var oxy_gst;
   var oxy_igst;
@@ -3224,16 +3235,18 @@
   // Add event listeners to update tax amounts when subtotal or shipping changes
   document.getElementById("subtotal").addEventListener("input", calculateTaxAmount);
   document.getElementById("shipping").addEventListener("input", calculateTaxAmount);
-
+});
 
 
 </script>
-
+<!--
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer></script>
 
 <script>
+
+  
   $(document).ready(function() {
     // Loop through each select element with the class 'extra' and initialize select2
     $(".extra").each(function() {
@@ -3241,6 +3254,8 @@
 
         console.log(id, "id in the top")
         $("#" + $(this).attr("id")).select2(); // Initialize select2 for the current row
+        var t=$("#" + $(this).attr("id")).select2(); 
+        
 
         // Event listener for select2 select event
         $("#" + $(this).attr("id")).on("select2:select", function(e) {
@@ -3260,11 +3275,11 @@
                   var itemdata_one=response.item
                   console.log(itemdata_one, "itemdata one")
                     // Handle the response data
-                    console.log(response,  "response of AJAX call");
+                    console.log(itemdata_one,  "response of AJAX call");
                     // Call the itemfunction with the received data
-                    itemfunction(id);
-                    var k = itemfunction(id);
-                    console.log(k, "koajodjo");
+                    itemfunction(itemdata_one);
+                    var k = itemfunction(itemdata_one);
+                    console.log(itemdata_one, "itemfuntion output");
                 },
                 error: function(xhr, status, error) {
                     // Handle errors
@@ -3275,7 +3290,7 @@
     });
 });
 
-</script>
+</script>-->
 
 
 
