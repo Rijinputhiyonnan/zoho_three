@@ -7,10 +7,12 @@
 
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <!-- Include Select2 CSS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-
-    <!-- Include Select2 JavaScript -->
+    <!-- Include Select2 JavaScript           <select class='form-control border-0 bg-transparent text-white  border-0 item_select itm' name='item[]' id='item${rowCount}' onchange="itemfunction(this.id)">
+              <option value=" " selected disabled hidden>Select Item</option>
+              {% for i in itm %}
+                <option  class="text-black" value="{{i.id}}">{{ i.Name }}</option>
+              {% endfor %}
+            </select>-->
     
 
 
@@ -280,16 +282,26 @@
             <label>Customer Name *</label>
           </div>
           <div class="col-md-6 d-flex">
+           <!-- onselect="toggleDateInput()"-->
 
-
-            <select name="cx_name" id="customer_sel" class="form-control bg-light text-dark" style="width: 91%;"
-              required onselect="toggleDateInput()">
-              <option value="" hidden selected>Select Customer</option>
+            <select name="cx_name" id="customer_sel" class="form-control bg-light text-dark  " style="width: 91%;"
+              required >
+            
+              <option value=""  selected>Select Customer</option>
               {% for cust in c %}
               <option value="{{cust.id}}" data-pos="{{cust.placeofsupply}}" id="crt_cust">{{cust.customerName}}</option>
               {% endfor %}
             </select>
 
+
+            <!-- Include jQuery (required by Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+
+<!-- Include Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer></script>
 
             <a data-toggle="modal" data-target="#newcustomer" class="btn"
               style="background-color: chocolate; color: black; height: 80%; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
@@ -499,6 +511,7 @@
         <div id="demo">
           <p></p>
         </div>
+      <!--  onclick='toggleDateInput()'-->
         <div class="row mt-2">
           <div class="col-md-12 mt-3">
             <table class="table table-bordered table-responsive" id="item_table" onclick='toggleDateInput()'>
@@ -527,10 +540,10 @@
                        onchange = "changewithitem(this,`{{i.id}}`)"
                   </select>-->  
 
-                  <select name='item[]' id="item1" class="form-control select2 extra border-0 bg-transparent text-white item_select itm itemselect" style="width: 18vh; font-size: 15px;">
-                    <option class="form-control select2 text-center" selected value="{{i.product}}">{{i.product}}</option>
+                  <select name='item[]' id="item1" class="form-control select2 extra border-0 bg-transparent text-white item_select itm itemselect" style="width: 18vh; font-size: 15px;" onchange="itemfunction('item1')">
+                    <option class="form-control text-center" selected value="{{i.product}}">{{i.product}}</option>
                     {% for i in p %}
-                    <option class="form-control select2 text-right" value="{{ i.id }}" data-tokens="{{ i.Name }}">
+                    <option class="form-control  text-right" value="{{ i.id }}" data-tokens="{{ i.Name }}">
                         {{ i.Name }}
                     </option>
                     {% endfor %}
@@ -2506,6 +2519,15 @@
 
 </script>
 <script>
+ 
+
+
+            $(document).ready(function() {
+              $('.customer_selection').select2()
+            })
+          
+
+
   $(document).on('change', '#customer_sel', function () {
     var customer = $('#customer_sel').val();
     $.ajax({
@@ -2697,18 +2719,24 @@
     });
 
     $('#add-row').click(function () {
+
+      
       rowCount++; // Increment row counter
       console.log()
       var newRow = `
       <tr id='row${rowCount}'>
         <td >
           <div>
-            <select class='form-control border-0 bg-transparent text-white  border-0 item_select itm' name='item[]' id='item${rowCount}' onchange="itemfunction(this.id)">
-              <option value=" " selected disabled hidden>Select Item</option>
-              {% for i in itm %}
-                <option  class="text-black" value="{{i.id}}">{{ i.Name }}</option>
+      
+
+            <select name='item[]' id="item${rowCount}" class="form-control select2 extra border-0 bg-transparent text-white item_select itm itemselect" style="width: 18vh; font-size: 15px;"  onchange="itemfunction('item${rowCount}')">
+              <option class="form-control select2 text-center" selected value="{{i.product}}">{{i.product}}</option>
+              {% for i in p %}
+              <option class="form-control select2 text-right" value="{{ i.id }}" data-tokens="{{ i.Name }}">
+                  {{ i.Name }}
+              </option>
               {% endfor %}
-            </select>
+          </select>
           </div>
         </td>
 
@@ -2768,6 +2796,7 @@
       </tr>
     `;
       $('#item_table tbody').append(newRow);
+      $('#item' + rowCount).select2();
       toggleDateInput();
       calculateSubtotal();
       calculateGrandTotal();
@@ -2891,23 +2920,27 @@
 
 </script>
 
-<!-- Include jQuery (required by Select2) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Include Select2 JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
 <script>
-  $(document).ready(function () {
-    // Initialize Select2 Plugin
-    $('.select2').select2();
-  var companyState;
-  var oxy_gst;
-  var oxy_igst;
+ 
+  $(document).ready(function() {
+$('.select2').select2()
 
-  function itemfunction(id) {
-    //console.log("Received ID:", id_str);
-   // id = id_str.split("item")[1]
+  })
+
+
+
+    // Variable declarations
+    var companyState;
+    var oxy_gst;
+    var oxy_igst;
+
+ 
+  function itemfunction(id_str) {
+    console.log("Received ID:", id_str);
+   const id = id_str.split("item")[1]
+   console.log(id, "id o")
 
 
     select = $(`#item${id}`).val();
@@ -2920,17 +2953,18 @@
         cust: customer
       },
       success: function (response) {
-
-        
-        data = response.rate
-        data1 = response.gst
-        data2 = response.igst
-        data3 = response.pos
-        data4 = response.place
-        stock = response.stock
-        hsn = response.hsn
-        oxy_gst = data1
-        oxy_igst = data2
+console.log(response, "response")
+       
+        const data = response.rate
+        const data1 = response.gst
+        const data2 = response.igst
+        const data3 = response.pos
+        const data4 = response.place
+        const stock = response.stock
+        const hsn = response.hsn
+        console.log(hsn, "hsn")
+        const oxy_gst = data1
+        const oxy_igst = data2
         document.getElementById(`hsn${id}`).value = hsn
         document.getElementById(`rate${id}`).value = data
 
@@ -3029,6 +3063,7 @@
         }
         document.getElementById(`tigst${id}`).innerHTML = data2 + ' % IGST';
         document.getElementById(`tigst${id}`).value = data2
+    
       }
     });
 
@@ -3235,14 +3270,12 @@
   // Add event listeners to update tax amounts when subtotal or shipping changes
   document.getElementById("subtotal").addEventListener("input", calculateTaxAmount);
   document.getElementById("shipping").addEventListener("input", calculateTaxAmount);
-});
+
 
 
 </script>
+
 <!--
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer></script>
 
 <script>
 
@@ -3258,7 +3291,7 @@
         
 
         // Event listener for select2 select event
-        $("#" + $(this).attr("id")).on("select2:select", function(e) {
+        $("#" + $(this).attr("id")).on('change', function(e) {
             var selectedId = $(this).val(); // Get the ID of the selected element
             console.log(selectedId, "selectedId");
             var customerId = $('#customer_sel').val(); // Get the customer ID from your form
@@ -3291,8 +3324,16 @@
 });
 
 </script>-->
+<!--
+<script>
+$(document).ready(function() {
+  $("#item${rowCount}").select2();
+      $(".extra").each(function(){
+        var id = $(this).attr("id");
+        $("#"+id).select2();
+      })
 
-
-
-
+});
+</script>
+-->
 {% endblock %}
