@@ -2,9 +2,22 @@
 {% block content %}
 {% load static %}
 {% load tz %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-<!-- <link rel="stylesheet" href="{% static 'assets/css/style.css' %}"> -->
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Include Select2 JavaScript           <select class='form-control border-0 bg-transparent text-white  border-0 item_select itm' name='item[]' id='item${rowCount}' onchange="itemfunction(this.id)">
+              <option value=" " selected disabled hidden>Select Item</option>
+              {% for i in itm %}
+                <option  class="text-black" value="{{i.id}}">{{ i.Name }}</option>
+              {% endfor %}
+            </select>-->
+    
+
+
+
+<!-- <link rel="stylesheet" href="{% static 'assets/css/style.css' %}"> -->
 
 <style>
   .modal {
@@ -27,7 +40,6 @@
     display: inline-block;
   }
 
-
   .row:after {
     content: "";
     display: table;
@@ -47,7 +59,6 @@
     select,
     textarea {
       width: 100%;
-
     }
   }
 
@@ -75,7 +86,6 @@
     margin-left: 100px;
   }
 
-
   ::-webkit-scrollbar {
     width: 5px;
   }
@@ -100,7 +110,6 @@
     width: 80%;
   }
 
-
   #item_table {
     background-color: rgba(58, 57, 57, 0.8);
   }
@@ -114,65 +123,71 @@
     color: black;
   }
 
+  #termadd {
+    background-color: chocolate;
+    color: black;
+    margin-left: 2vh;
+    font-size: large;
+    padding-top: 1vh;
+  }
 
   #pay_term option {
     color: black;
   }
 </style>
-
 <style>
-  /* Customize the background color of the entire row */
-  td {
-    background-color: #4daaff;
-    color: white;
+ 
+  
+  /* Customize the width of the Select2 container for the select2 class */
+  .select2-container--default.select2 .select2-selection--single {
+    /* width: 66vh !important;  Adjust the width as needed */
+      height: 5vh !important; /* Adjust the height as needed */
+
+      
+  }
+
+  
+  /* Change the background color of the selected option for the select2 class */
+  .select2-container--default.select2 .select2-selection--single {
+      background-color: #fefcfd !important;
+      color: #5b112f !important;
   }
   
-  /* Customize the background color of the dropdown menu */
-  .select2-container--default .select2-dropdown {
-    background-color: #3b3b3b;
-    color: white;
+
+  
+
+  
+  /* For itemselect class */
+  .select2-container--default.itemselect .select2-selection--single .select2-selection__rendered {
+      color: white !important; /* White text color */
+      text-align: left !important; /* Left alignment */
   }
   
-  /* Customize the background color of the upper portion of the dropdown menu */
-  .select2-container--default .select2-dropdown .select2-search {
-    background-color: #3b3b3b;
-    color: #3b3b3b;
+  .select2-container--default.itemselect .select2-dropdown {
+      background-color: #3b3b3b; /* Dark background color for dropdown */
+      color: white; /* White text color for dropdown */
   }
   
-  /* Customize the background color of the selected option */
-  .form-control.select2.text-right.hsn.border-0,
-  .select2-container--default .select2-selection--single {
-    background-color: #3b3b3b !important;
-    color: #da3d7b !important;
+  /* For customer_selection class */
+  .select2-container--default.customer_selection .select2-selection--single .select2-selection__rendered {
+      color: black !important; /* Black text color */
+      text-align: left !important; /* Left alignment */
   }
   
-  /* Customize the color of the dropdown arrow */
-  .select2-container--default .select2-selection__arrow b {
-    border-color: #3b3b3b;
+  .select2-container--default.customer_selection .select2-dropdown {
+      background-color: white; /* White background color for dropdown */
+      color: black; /* Black text color for dropdown */
   }
-
-
-  /* Customize the text color of the selected option */
-.select2-selection__rendered {
-  color: white !important;
-}
-
-
-
-
+  
 </style>
- <!-- <select class='form-control border-0 bg-transparent text-white  border-0 item_select itm' name='item[]' id='item${rowCount}' onchange="itemfunction(this.id)">
-              <option value=" " selected disabled hidden>Select Item</option>
-              {% for i in p %}
-                <option class="text-black" value="{{i.id}}">{{ i.Name }}</option>
-              {% endfor %}
-            </select>-->
-<div class="container-fulid containerprof">
 
-  <div class="card radius-15" style="width: 100%;">
+
+
+<div class="container-fulid containerprof">
+  <div class="card " style="width: 100%;">
     <div class="card-body">
       <div class="card-title">
-        <h2 class="mb-0 text-uppercase text-right"> Edit Invoice</h2>
+        <h2 class="mb-0 text-uppercase text-right"> EDIT INVOICE</h2>
         {% for message in messages %}
         <div class="alert alert-success">
           <a class="close" href="#" data-dismiss="alert">x</a>
@@ -184,43 +199,54 @@
   </div>
   <div>
 
-    <div class="card radius-15 p-5">
-      <form action="{% url 'edited_prod' invoice.id %}" class="mt-2 mb-4" method="post" enctype="multipart/form-data">
+    <div class="card  p-5">
+      <form action="{% url  'edited_prod' invoice.id  %}" class="mt-2 mb-4" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="row">
           <div class="col-md-3">
-            
             <label>Customer Name *</label>
           </div>
-          
           <div class="col-md-6 d-flex">
-            <select name="cx_name" id="customer_sel" class="form-control bg-light text-dark">
-              <option selected value="{{invoice.customer.id}}">{{invoice.customer.customerName}}</option>
+           <!-- onselect="toggleDateInput()"           data-pos="{{cust.placeofsupply}}" id="crt_cust"-->
 
+            <select name="cx_name" id="customer_sel" class="form-control bg-light text-dark customer_selection select2 " style="width: 91%;"
+              required >
+            
+             
+              <option selected value="{{invoice.customer.id}}">{{invoice.customer.customerName}}</option>
               {% for cust in c %}
               {% if cust.customerName != invoice.customer.customerName %}
-              <option value="{{cust.id}}" data-pos="{{cust.placeofsupply}}" id="crt_cust">{{cust.customerName}}</option>
+              <option value="{{cust.id}}" data-pos="{{cust.placeofsupply}}"  >{{cust.customerName}}</option>
               {% endif %}
-              {% endfor %}
-
+              {% endfor %} 
             </select>
+
+
+            <!-- Include jQuery (required by Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include Select2 CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+
+<!-- Include Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer></script>
+
             <a data-toggle="modal" data-target="#newcustomer" class="btn"
               style="background-color: chocolate; color: black; height: 80%; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
           </div>
         </div>
+
         <div class="row mt-2">
           <div class="col-md-3">
             <label for="">Customer Mail</label>
           </div>
 
           <div class="col-md-6">
-            <input type="email" class="form-control bg-light text-dark" id="cx_mail" name="customer_email"
-              value="{{invoice.customer.customerEmail}}" readonly>
+            <input type="email" class="form-control bg-light text-dark" id="cx_mail" name="cx_mail" value="{{invoice.customer.customerEmail}}" readonly>
           </div>
         </div>
-        {% if invoice.customer.Address1 %}
 
-        <div class="row mt-2" id="adressdidid">
+        <div class="row mt-2" id="cx_addressdiv" style="display: none;">
           <div class="col-md-3">
             <label for="">Billing Address</label>
           </div>
@@ -230,24 +256,20 @@
               style="height: auto;">{{invoice.customer.Address1}}</textarea>
           </div>
         </div>
-        {% endif %}
 
-
-        <div class="row mt-2" id="treatmentdiv">
+        <div class="row mt-2" id="treatmentdiv" style="display:none;">
           <div class="col-md-9 d-flex">
             <label for="" style="width: 52%;">GST Treatment</label>
-            <input type="text" class="form-control bg-light text-dark" id="cx_treat" name="gst_treatment" readonly
-              value="{{invoice.customer.GSTTreatment}}">
+            <input type="text" class="form-control bg-light text-dark" id="cx_treat" name="cx_treat"value="{{invoice.customer.GSTTreatment}}" readonly>
           </div>
         </div>
 
         <div class="row mt-2" id="gstdiv" style="display:none;">
           <div class="col-md-9 d-flex">
             <label for="" style="width: 52%;">GST Number</label>
-            <input type="text" class="form-control bg-light text-dark" id="cx_gst" name="gst_number" readonly>
+            <input type="text" class="form-control bg-light text-dark" id="cx_gst" name="cx_gst" value="{{invoice.customer.GSTIN}}" readonly>
           </div>
         </div>
-       <!-- onclick="toggleDateInput()"-->
 
         <div class="row mt-2">
           <div class="col-md-3">
@@ -255,12 +277,12 @@
           </div>
 
           <div class="col-md-6">
-            <select name="place_of_supply" id="srcofsupply"  onselect="calculateTaxAmount()"
+            <select name="srcofsupply" id="srcofsupply" onchange="toggleDateInput()" onselect="calculateTaxAmount()"
               class="form-control bg-light text-dark">
               <option selected value="{{invoice.customer.placeofsupply}}">{{invoice.customer.placeofsupply}}</option>
               <option value="[AN]-Andaman and Nicobar Islads">[AN] Andaman and Nicobar Islads</option>
-              <option value="[AD]-Andhra Predhesh">[AD] Andhra Predhesh</option>
-              <option value="[AR]-Arunachal Predesh">[AR] Arunachal Predesh</option>
+              <option value="[AD]-Andhra Pradhesh">[AD] Andhra Pradhesh</option>
+              <option value="[AR]-Arunachal Pradesh">[AR] Arunachal Pradesh</option>
               <option value="[AS]-Assam">[AS] Assam</option>
               <option value="[BR]-Bihar">[BR] Bihar</option>
               <option value="[CH]-Chandigarh">[CH] Chandigarh</option>
@@ -271,14 +293,14 @@
               <option value="[GA]-Goa">[GA] Goa</option>
               <option value="[GJ]-Gujarat">[GJ] Gujarat</option>
               <option value="[HR]-Haryana">[HR] Haryana</option>
-              <option value="[HP]-Himachal Predesh">[HP] Himachal Predesh</option>
+              <option value="[HP]-Himachal Pradesh">[HP] Himachal Pradesh</option>
               <option value="[JK]-Jammu and Kashmir">[JK] Jammu and Kashmir</option>
               <option value="[JH]-Jharkhand">[JH] Jharkhand</option>
               <option value="[KA]-Karnataka">[KA] Karnataka</option>
               <option value="[KL]-Kerala">[KL] Kerala</option>
               <option value="[LA]-Ladakh">[LA] Ladakh</option>
               <option value="[LD]-Lakshadweep">[LD] Lakshadweep</option>
-              <option value="[MP]-Madhya Predesh">[MP] Madhya Predesh</option>
+              <option value="[MP]-Madhya Pradesh">[MP] Madhya Pradesh</option>
               <option value="[MH]-Maharashtra">[MH] Maharashtra</option>
               <option value="[MN]-Manipur">[MN] Manipur</option>
               <option value="[ML]-Meghalaya">[ML] Meghalaya</option>
@@ -292,89 +314,87 @@
               <option value="[TN]-Tamil Nadu">[TN] Tamil Nadu</option>
               <option value="[TS]-Telangana">[TS] Telangana</option>
               <option value="[TR]-Tripura">[TR] Tripura</option>
-              <option value="[UP]-Uttar Predesh">[UP] Uttar Predesh</option>
+              <option value="[UP]-Uttar Pradesh">[UP] Uttar Pradesh</option>
               <option value="[UK]-Uttarakhand">[UK] Uttarakhand</option>
               <option value="[WB]-West Bengal">[WB] West Bengal</option>
               <option value="[OT]-Other Territory">[OT] Other Territory</option>
             </select>
-
           </div>
         </div>
 
+
+
         <div class="row mt-2">
           <div class="col-md-3">
-            <label for="prof_name">Invoice No.</label>
+            <label for="prof_name">Invoice#*</label>
           </div>
 
           <div class="col-md-6">
-            <input type="text" class="form-control bg-light text-dark" value="{{invoice.invoice_no}}" id="prof_name"
-              name="inv_no">
+            <input type="text" class="form-control bg-light text-dark" id="prof_name" name="inv_no"
+            placeholder="{{count}}" value="{{invoice.invoice_no}}" required>
             <label id="order_label" style="display: none;"></label>
           </div>
         </div>
 
         <div class="row mt-2">
           <div class="col-md-3">
-            <label for="">Reference</label>
+            <label for="prof_name">Reference</label>
           </div>
 
           <div class="col-md-6">
-            <input type="text" class="form-control bg-light text-dark" id="ref" name="ord_no" value="{{invoice.reference}}"
+            <input type="text" class="form-control bg-light text-dark" id="ref" name="ord_no"  value="{{invoice.reference}}"
               readonly>
           </div>
         </div>
 
         <div class="row mt-2">
           <div class="col-md-3">
-            <label for="date1"> Invoice Date</label>
+            <label for="date1">Invoice Date</label>
           </div>
+
           <div class="col-md-6">
-            <input type="date" class="form-control bg-light text-dark" id="date1" name="inv_date"
-              value="{{invoice.inv_date|date:'Y-m-d'}}">
+            <input type="date" class="form-control bg-light text-dark" id="date1" name="inv_date"  value="{{invoice.inv_date|date:'Y-m-d'}}">
           </div>
         </div>
+
         <div class="row mt-2">
           <div class="col-md-3">
             <label for="date2">Expiry Date</label>
           </div>
-          <div class="col-md-6">
-            <input type="date" class="form-control bg-light text-dark" id="date2" name="due_date"
-              value="{{invoice.due_date|date:'Y-m-d'}}" readonly>
-          </div>
 
+          <div class="col-md-6">
+            <input type="date" class="form-control bg-light text-dark" id="date2" name="due_date" readonly   value="{{invoice.due_date|date:'Y-m-d'}}" required>
+          </div>
         </div>
 
         <div class="row mt-2">
           <div class="col-md-3">
             <label for="date2">Payment Terms</label>
           </div>
+
           <div class="col-md-6">
             <div class="d-flex">
-              <select class="form-control bg-light text-dark my-select" id="pay_term" name="inv_term">
+              <select class="form-control bg-light text-dark" id="pay_term" name="term" required>
                 <option selected value="{{terms.id}}">{{terms.Terms}}</option>
                 {% for p in payments %}
                 {% if p.Terms != invoice.terms.Terms %}
-
                 <option value="{{p.id}}">{{p.Terms}}</option>
                 {% endif %}
                 {% endfor %}
-
               </select>
-              <a href="" data-toggle="modal" data-target="#newpayment" class="btn"
-                style="background-color: chocolate; color: black; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
-
+              <a data-toggle="modal" data-target="#newpayment" class="btn" id="termadd">+</a>
             </div>
-
           </div>
         </div>
-        {% for invp in invpay %}
+
         <div class="row mt-2">
           <div class="col-md-3">
             <label for="date2">Payment Method</label>
           </div>
+
           <div class="col-md-6">
             <div class="d-flex">
-              <select class="form-control bg-light text-dark my-select" id="pay_method" name="payment_method">
+              <select class="form-control bg-light text-dark my-select" id="pay_method" name="payment_method" required>
                 <option value="{{invp.payment_method}}" selected hidden>{{invp.payment_method}}</option>
                 <option value="cash">Cash</option>
                 <option value="cheque">Cheque</option>
@@ -389,11 +409,12 @@
 
         <div class="row mt-2" id="chequediv" style="display: none;">
           <div class="col-md-3">
-            <label for="date2">Cheque ID</label>
+            <label for="date2">Cheque Number</label>
           </div>
+
           <div class="col-md-6">
             <input type="text" class="form-control text-black" name="cheque_number" id="cheque_id"
-              value="{{invp.cheque_number}}">
+              placeholder="Enter Cheque Number" value="{{invp.cheque_number}}">
           </div>
         </div>
 
@@ -401,8 +422,9 @@
           <div class="col-md-3">
             <label for="date2">UPI ID</label>
           </div>
+
           <div class="col-md-6">
-            <input type="text" class="form-control text-black" name="upi_id" id="upi_id" value="{{invp.upi_id}}">
+            <input type="text" class="form-control text-black" name="upi_id" id="upi_id" placeholder="Enter UPI ID"  value="{{invp.upi_id}}">
           </div>
         </div>
 
@@ -410,326 +432,153 @@
           <div class="col-md-3">
             <label for="date2">Bank Account</label>
           </div>
+
           <div class="col-md-6">
             <input type="text" class="form-control text-black" name="bank_name" id="bnk_id" readonly>
           </div>
         </div>
 
-
-
-        {% endfor %}
-
-
-
-       <!-- onclick='toggleDateInput(),toggleDateInputs()'-->
-
+        <div id="demo">
+          <p></p>
+        </div>
+      <!--  onclick='toggleDateInput()'-->
         <div class="row mt-2">
-          <div class="col-md-12 table-responsive-md mt-3">
-            <table class="table table-bordered " id="item_table" >
+          <div class="col-md-12 mt-3">
+            <table class="table table-bordered table-responsive" id="item_table" onclick='toggleDateInput()'>
               <thead>
-
                 <tr>
-                  <th class="text-center" style="width: 11%; font-size: 10px;">Item<a href="" data-toggle="modal" data-target="#newitem" class="text-capitalize" style="width: 8%; font-size: 9px;">+ Item</a></th>
-                  <th class="text-center" style="width: 13%; font-size: 10px;">HSN</th>
-                  <th class="text-center" style="width: 13%; font-size: 10px;">Quantity</th>
-                  <th class="text-center" style="width: 13%; font-size: 10px;">Rate</th>
-                  <th class="text-center"style="width: 13%; font-size: 10px;">Discount</th>
-                  <th class="text-center" style="width: 13%; font-size: 10px;">Tax</th>
-                  <th class="text-center" style="width: 13%; font-size: 10px;">Amount</th>
+                  <th></th>
+                  <th>Item<a href="" data-toggle="modal" data-target="#newitem" class="text-capitalize">+ Item</a></th>
+                  <th class="text-right">HSN</th>
+                  <th class="text-right">Quantity</th>
+                  <th class="text-right">Rate</th>
+                  <th class="text-right">Discount</th>
+                  <th class="text-right">Tax</th>
+                  <th class="text-right">Amount</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody id="item_table_body">
-                {% for i in est %}
-                <tr id="row{{forloop.counter}}">
-                  
-                  <td class="" style="width: 1vh; font-size: 10px;">
-                    <div >
-                     <!-- <select class='form-control border-0 bg-transparent text-white border-0 item_select itm'
-                        name='item[]' id='item{{forloop.counter}}' onchange="itemfunction(this.id)">
-                        <option selected value="{{i.product}}" hidden>{{i.product}}</option>
-                        {% for j in p %}
-                        <option class="text-black" value="{{j.id}}">{{ j.Name }} </option>
-                        {% endfor %}
-                      </select>-->
-                      <select  name='item[]' id="item{{forloop.counter}}" class="form-control select2  extra  "  style="width: 18vh; font-size: 15px; "  onchange = "changewithitem(this,`{{i.id}}`)">
-                        <option class="form-control select2  text-center " style="padding-bottom: 7vh;  "  selected value="{{i.product}}">{{i.product}}</option>
-                        {% for i in p %}
-                            <option class="form-control select2  text-right  " value="{{ i.Name }}" data-tokens="{{ i.Name }}">
-                                {{ i.Name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                  </div>
+                <tr id="row1">
+                  <td class="text-white">  {{forloop.counter}} </td>
+                  <td>
+                 <!-- <select class="form-control border-0 bg-transparent text-white item_select itm itemselect" name="item[]" id="item1">
+                      <option value="" selected hidden>Select Item</option>
+                      {% for i in items %}
+                      <option class="text-black" value="{{ i.id }}">{{ i.Name }}</option>
+                      {% endfor %}
+
+
+                       onchange = "changewithitem(this,`{{i.id}}`)"
+                  </select>-->  
+
+                  <select name='item[]' id="item1" class="form-control select2 extra border-0 bg-dark text-white item_select itm itemselect"  style="width: 18vh; font-size: 15px; background-color: #555;" onchange="itemfunction('item1')">
+                    {% for i in p %}
+                    <option  selected value="{{i.product}}" >{{i.product}}  </option>
+                    <option class="form-control text-center"  value="{{i.product}}">{{i.product}}</option>
+                    
+                    <option class="form-control  text-right" value="{{ i.Name }}" data-tokens="{{ i.Name }}">
+                        {{ i.Name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                
+           
+
+                  <td style="width: 15%;" class='text-right'>
+                    <input type='number' id='hsn1'
+                      class=' text-right hsn border-0 form-control bg-white text-dark' name='hsn[]' value="{{i.hsn}}" readonly>
                   </td>
-                  <!-- Include jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+                  <td style="width: 17%;" class='text-right'>
+                    <input type='number' id='qty1'
+                      class=' text-right qty form-control border-0 bg-white text-dark' name='quantity[]'
+                      value='0' onchange="qtychange(this.id)">
 
-<!-- Include Select2 CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
 
-<!-- Include Select2 JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-                  <td  style="width: 14%;">
-                    <input style="width: 13vh;" type='number' id='hsn{{forloop.counter}}'
-                      class=' text-center hsn form-control border-0 bg-transparent text-white' name='hsn[]' readonly
-                      value="{{i.hsn}}">
+                      <input type="text" id="avl1" style="display: none;">
+                      <div style="display: flex; align-items: center;">
+                        <span class="text-warning" style="font-size: 10px;">Available Stock:</span>
+                        <input style="font-size: 9px; margin-left: 10px;" id="stock_data1" class="stock_data text-warning border-0 form-control bg-transparent text-right" name='avlquantity' readonly>
+                    </div>
+
                   </td>
 
-
-                  <td style="width: 12%;" class=''>
-                    <input type='number' id='qty{{forloop.counter}}' class='qty form-control border-0 bg-transparent text-white' name='quantity[]' value='{{i.quantity}}' style="margin-top: 4vh;" onchange="qtychange(this.id)">
-                    <br>
-                    <span class="text-warning" style="width: 12%; font-size: 10px;">
-                        Available Stock : <input value="{{i.inv_stock}}" id="stock_data{{forloop.counter}}" class="stock_data text-warning"  style="background-color: #3b3b3b; width: 7vh; border: none;" name='stock[]'  readonly>
-                    </span>
-                    <span class="stock_warning text-danger"></span>
-                </td>
-                
-              <!--  <script>
-                    var stockInput = parseFloat($(`#stock_data{{forloop.counter}}`).val()); // Initialize stockInput with the correct value
-                
-                    // Function to handle quantity change
-                    function qtychange(id_str) {
-                        var id = id_str.split("qty")[1];
-                        var qtyInput = $(`#qty${id}`).val();
-                       
-                        console.log(stockInput, "stockInput");
-                        console.log(qtyInput, "qtyInput");
-                
-                        // Remove leading zeros from the input values
-                        var qty = parseFloat(qtyInput);
-                
-                        // Check if the input values are valid numbers after removing leading zeros
-                        if (!isNaN(qty) && !isNaN(stockInput) && qtyInput.trim() !== "") {
-                            console.log(stockInput, "stock"); // Now stockInput is defined
-                            console.log(qty, "qty");
-                
-                            if (qty > stockInput) {
-                                alert("Entered quantity is greater than available quantity");
-                                $(`#${id}`).val(''); // Clear the entered quantity
-                            } else {
-                                var remainingStock = stockInput - qty;
-                                $(`#stock_data${id}`).val(remainingStock);
-                                console.log(remainingStock, "remainingStock");
-                            }
-                        } else {
-                            // Handle invalid input (non-numeric)
-                            alert("Please enter numeric values for quantity and stock");
-                            $(`#${id}`).val(''); // Clear the entered quantity
-                        }
-                    }
-                
-                    // Bind the qtychange function to the input event of the quantity input field
-                    $(document).on('input', 'input[id^="qty"]', function() {
-                        qtychange(this.id);
-                    });
-                </script>-->
-                
-
-
-
-               <!--   <script>
-                    $(document).ready(function () {
-                      function qtychange(id_str) {
-                        var id = id_str.split("qty")[1];
-                        var qty = $(`#qty${id}`).val();
-                        
-                        // Assuming you have a way to uniquely identify the selected item, e.g., using a dropdown with id 'itemSelect'
-                        var selectedItem = $("#itemSelect option:selected").val();
-                        var avl = $(`#stock_data${id}`).text();
-                  
-                        console.log('Qty:', qty);
-                        console.log('Available:', avl);
-                  
-                        if (parseInt(qty) > parseInt(avl)) {
-                          $(".stock_warning").text("Entered quantity greater than available quantity");
-                          // Optionally, you can add a delay and then clear the warning message
-                          // setTimeout(function() { $(".stock_warning").text(""); }, 3000);
-                        } else {
-                          $(".stock_warning").text(""); // Clear the warning message if quantity is within limits
-                        }
-                      }
-                    });
-                  </script>
-                  
-                  <script>
-                  function fetchItemData(selectedItem, row) {
-                    $.ajax({
-                        type: 'GET',
-                        url: "{% url 'get_invoice_item_details' %}",
-                        data: {
-                            id: selectedItem
-                        },
-                        dataType: 'json',
-                        success: function (response) {
-                            // Update the HSN and rate fields in the current row with the fetched data
-                            row.find(".hsn").val(response.hsn);
-                            row.find(".rate").val(response.rate);
-                            row.find(".stock_data").text(response.stock);  // Add this line to update available stock
-                        },
-                        error: function () {
-                            // Handle errors if the data cannot be fetched or the item doesn't exist
-                            console.log('Error fetching item data.');
-                            // You can display an error message to the user if needed.
-                        },
-                    });
-                }
-                
-                // Add event handler for changes in item selection
-                $(document).on('change', '.item_select', function () {
-                    var selectedItem = $(this).val();
-                    var row = $(this).closest('tr');
-                    fetchItemData(selectedItem, row);
-                });
-                
-                
-                // Add event handler for changes in item selection
-                $(document).on('change', '.item_select', function () {
-                  var selectedItem = $(this).val();
-                  var row = $(this).closest('tr');
-                  
-                  $.ajax({
-                    type: 'GET',
-                    url: "{% url 'get_invoice_item_details' %}",
-                    data: {
-                      id: selectedItem
-                    },
-                    dataType: 'json',
-                    success: function (response) {
-                      // Update the HSN and rate fields in the current row with the fetched data
-                      row.find(".hsn").val(response.hsn);
-                      row.find(".rate").val(response.rate);
-                
-                      // Trigger the updateAvailableStock function after fetching item details
-                      updateAvailableStock(row);
-                    },
-                    error: function () {
-                      // Handle errors if the data cannot be fetched or the item doesn't exist
-                      console.log('Error fetching item data.');
-                     
-                    },
-                  });
-                
-                })
-                
-                // Function to update Available Stock and display warning message if necessary
-                function updateAvailableStock(row) {
-                  var selectedItem = row.find(".item_select").val();
-                  var quantity = parseInt(row.find(".quantity").val());
-                  var availableStock = parseInt(row.find(".stock_data").text());
-                
-                  if (isNaN(quantity) || isNaN(availableStock)) {
-                    // Handle invalid input (non-numeric values)
-                    return;
-                  }
-                
-                  // Update Available Stock span
-                  row.find(".stock_data").text(availableStock - quantity);
-                
-                  // Display a warning message if the entered quantity is greater than available stock
-                  if (quantity > availableStock) {
-                    row.find(".stock_warning").text("Entered quantity greater than available quantity").css('color', 'red');
-                  } else {
-                    row.find(".stock_warning").text('').css('color', ''); // Reset the warning message
-                  }
-                }
-                
-                // Add event handler for changes in item selection
-                $(document).on('change', '.item_select', function () {
-                  var selectedItem = $(this).val();
-                  var row = $(this).closest('tr');
-                  fetchItemData(selectedItem, row);
-                });
-
-
-                
-                // Add event handler for changes in quantity
-                $(document).on('change', '.quantity', function () {
-                  var row = $(this).closest('tr');
-                  updateAvailableStock(row);
-                });
-                
-                  </script>-->
-                  <td style="width: 12%;" class='text-center'><input type='number' style="width: 15vh;" id='rate{{forloop.counter}}'
-                      class=' text-center rate form-control border-0 bg-transparent text-white' name='rate[]'
-                      value='{{i.rate}}' readonly>
+                 
+                  <td style="width: 15%;" class='text-right'><input type='number' id='rate1'
+                      class=' text-right rate form-control border-0 bg-white text-dark' name='rate[]' value='0'
+                      readonly>
                   </td>
-                  <td style="width: 15%;" class='text-center text-dark'><input type='number' style="width: 15vh;"
-                      id='discount{{forloop.counter}}'
-                      class=' text-center discount border-0 bg-transparent text-white form-control' name='discount[]'
-                      value='{{i.discount}}'>
+                  <td style="width: 10%;" class='text-right text-dark'><input type='number' id='discount1'
+                      class=' text-right discount border-0bg-white text-dark form-control' name='desc[]'
+                      value='0'>
                   </td>
-                  <td style="width: 16%; font-size: 9px;" class='text-center '> 
-                    <select style=" font-size: 14px; width: 15vh;" name='tax[]' id='tax{{forloop.counter}}'
-                      class='label-gst form-control border-0 bg-transparent text-white  text-right border-0 tax'
-                       onchange="updateFields(this,`{{i.id}}`)"    label="GST">
-                      <!-- onchange="toggleDateInput()"-->
-                   <!--   <optgroup style="width: 10%; font-size: 14px;" class="text-center text-black" label="GST">-->
-                        <option value="{{i.tax}} " selected hidden>{{i.tax}}.0% GST({{i.tax}}%)</option>
+                  <td style="width: 22%;" class='text-right '> <select name='tax[]' id='tax1'
+                      class='form-control border-0 bg-white text-dark text-right border-0 tax'
+                      onselect="toggleDateInput()">
+                     <!----> <optgroup class="text-center text-black" label="GST" >
                         <option class="text-black" value="0">0% GST(0%)</option>
                         <option class="text-black" value="3">3.0% GST(3%)</option>
                         <option class="text-black" value="5">5.0% GST(5%)</option>
                         <option class="text-black" value="12">12.0% GST(12%)</option>
                         <option class="text-black" value="18">18.0% GST(18%)</option>
                         <option class="text-black" value="28">28.0% GST(28%)</option>
-                        <!--   </optgroup>--> 
-                      </select>
-
-                      <select style=" font-size: 14px; width: 15vh;" name='tax[]' id='tax{{forloop.counter}}'
-                      class='label-igst form-control border-0 bg-transparent text-white  text-right border-0 tax'
-                       onchange="updateFields(this,`{{i.id}}`)"  label="IGST">
-                    <!-- <optgroup style="width: 10%; font-size: 14px;" class="text-center text-black" label="IGST">--> 
-                        <option value="{{i.tax}} " style="width: 10%; font-size: 9px;" selected hidden>{{i.tax}} 0% IGST({{i.tax}}%)</option>
-
+                      </optgroup>
+                      <optgroup class="text-center text-black" label="IGST">
                         <option class="text-black" value="0">0% IGST(0%)</option>
                         <option class="text-black" value="3">3.0% IGST(3%)</option>
                         <option class="text-black" value="5">5.0% IGST(5%)</option>
                         <option class="text-black" value="12">12.0% IGST(12%)</option>
                         <option class="text-black" value="18">18.0% IGST(18%)</option>
                         <option class="text-black" value="28">28.0% IGST(28%)</option>
-                         <!--  </optgroup>--> 
+                      </optgroup>
                     </select>
-                    <label id="ml{{forloop.counter}}" class="text-warning" style="display: none;"></label>
-
+                    <label id="ml1" class="text-warning" style="display: none;"></label>
                   </td>
                   <td style="display: none;">
-                    <input type="text" name='taxamount' id="taxamount{{forloop.counter}}" class=" taxamount text-dark" />
+                    <input type="text" name='taxamount' id="taxamount1"
+                      class=" taxamount border-0 bg-transparent text-white" />
                   </td>
-                  <td style="width: 55%;" class='text-right'><input style="width: 16vh;" type='number' id='amount{{forloop.counter}}'
-                      class=' text-right form-control amount border-0 bg-transparent text-white' name='amount[]'
-                      value='{{i.total}}' readonly></td>
-                  <td class='text-center'><button type='button' id='del_btn1'
-                      class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row'
-                      style='width:30px'>X</button><br><br>
+                  <td style="width: 15%;" class='text-right'><input type='number' id='amount1'
+                      class=' text-right form-control amount border-0 bg-white text-dark' name='amount[]'
+                      value='0.00' readonly>
+                  </td>
+                  <td class='text-center'>
+                    <button type='button' id='del_btn1'
+                      class='btn  btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row'
+                      style='width:30px'>
+                      X
+                    </button>
+                    <br><br>
                     <button type='button'
-                      class='btn btn-transparent text-primary btn-sm btn-outline-primary rounded-circle clone-row'
-                      data-row=1 style='width:30px'><i class="fa fa-clone"></i>
+                      class='btn  btn-transparent text-primary btn-sm btn-outline-primary rounded-circle clone-row'
+                      data-row=1 style='width:30px'>
+                      <i class="fa fa-clone"></i>
                     </button>
                   </td>
                 </tr>
-                {% endfor %}
               </tbody>
-            </table><br>
+            </table>
+            <br>
             <button type="button" class="btn btn-sm text-white" style="background-color: rgb(210, 132, 30);"
-              id="add-row">Add another line</button>
+              id="add-row">
+              Add another line
+            </button>
           </div>
         </div>
-
         <div class="row border-bottom pb-5">
           <div class="col-sm-5 d-flex flex-column mt-auto">
-
             <label for="">Customer Notes</label>
             <textarea name="customer_note" id="" cols="8" rows="13"
-              placeholder=" Will be Displayed on the Invoice">{{invoice.cxnote}}</textarea>
+              placeholder=" Will be Displayed on the Purchase Order"></textarea>
           </div>
-          <div class="col-sm-6 mt-4 container-fulid">
-            <table class=" table  text-whitem container-fulid" style="background-color: rgba(58, 57, 57, 0.8);">
+          <div class="col-sm-6 mt-4">
+            <table class=" table  text-white" style="background-color: rgba(58, 57, 57, 0.8);">
               <tr>
                 <td>Sub Total</td>
                 <td></td>
                 <td><input type="number" id="subtotal" name="subtotal" step="any" value="0.00"
-                    class="form-control bg-transparent border-0  text-white" style="text-align:right;" readonly></td>
+                    class="form-control bg-transparent border-0 text-right subtotal text-white"
+                    style="text-align: right;" readonly></td>
               </tr>
               <tr style="display: none;" id="tr_igst">
                 <td>IGST</td>
@@ -742,8 +591,8 @@
                 <td>CGST</td>
                 <td></td>
                 <td><input type="number" id='cgst' name="cgst" step="any" value="0.00"
-                    class="form-control bg-transparent border-0 text-right cgst text-white" style="text-align: right;">
-                </td>
+                    class="form-control bg-transparent border-0 text-right cgst text-white" style="text-align: right;"
+                    readonly></td>
               </tr>
               <tr style="display: none;" id="tr_sgst">
                 <td>SGST</td>
@@ -761,23 +610,26 @@
               </tr>
               <tr>
                 <td>Shipping Charges</td>
-
-                <td><input type="hidden" id="shipping_charge" step="any" value="0.0"
+                <td><input type="hidden" id="shipping_charge" step="any" value="0.00"
                     class="form-control bg-transparent border-0 text-right shipping_charge  "
                     style="text-align: right;"></td>
-                <td><input type="number" class="form-control  bg-transparent border-0  text-light" id="shipping"
-                    value="{{invoice.shipping_charge}}" name="shipping_charge" style="text-align: right;"> </td>
+                <td>
+                  <input type="number" class="form-control  bg-transparent border-0  text-light" id="shipping" value="0"
+                    name="shipping_charge" style="text-align: right;">
+                </td>
               </tr>
               <tr>
                 <td>Adjustment</td>
                 <td></td>
-                <td><input type="number" class="form-control  bg-transparent border-0  text-light" id="adjust"
-                    value="{{invoice.adjustment}}" name="adjustment_charge" style="text-align: right;"> </td>
+                <td>
+                  <input type="number" class="form-control  bg-transparent border-0  text-light" id="adjust" value="0"
+                    name="adjustment_charge" style="text-align: right;">
+                </td>
               </tr>
               <tr>
                 <td></td>
                 <td></td>
-                <td> </td>
+                <td></td>
               </tr>
               <tr>
                 <th>Total ( &#x20B9; )</th>
@@ -787,19 +639,21 @@
                     style="text-align: right;" readonly></th>
               </tr>
             </table>
+
             <div class="col-sm-12 mt-4">
               <table class=" table  text-white" style="background-color: rgba(58, 57, 57, 0.8);">
                 <tr>
                   <td>Advance Paid</td>
                   <td></td>
-                  <td><input type="number" id="advance" name="paid_amount" step="any"
+                  <td><input type="number" id="advance" name="advance" step="any" value="0.00"
                       class="form-control bg-transparent border-0 text-right advance text-white"
-                      style="text-align: right;" value="{{invoice.paid_amount}}"></td>
+                      style="text-align: right;"></td>
                 </tr>
                 <tr>
                   <td>Balance</td>
                   <td></td>
-                  <td><input type="number" id='balance' name="balance" step="any" value="0.00"
+                  <td>
+                    <input type="number" id='balance' name="balance" step="any" value="0.00"
                       class="form-control bg-transparent border-0 text-right balance  text-white"
                       style="text-align: right;" readonly>
                     <div style="color: red; display: none;" id="advancediv">Advance is greater than Total</div>
@@ -811,39 +665,30 @@
         </div>
 
         <div class="row border-bottom">
-          <div class="col-md-8 d-flex flex-column text-white mb-5">
+          <div class="col-md-8 d-flex flex-column  text-white mb-5">
             <label for="">Terms & Conditions</label>
             <textarea name="ter_cond" id="" cols="20" rows="7"
               placeholder=" Enter the terms & conditions of your business to be displayed in your transaction."></textarea>
           </div>
           <div class="col-md-4 mt-5 text-center rounded" style="background-color: rgba(32, 35, 37); height: 26vh;">
             <label class="text-white" for="">Attach File(s) to Purchase</label><br>
-
-
             <input id="file-upload" class="form-control bg-light text-dark" type="file" name="file">
-
-
-
           </div>
         </div>
+
         <div class="row mt-5 mb-3">
-
-
-          <input style="width: 150px; margin-right: 1vh; background-color: chocolate;" type="submit" class="btn mt-2"
-            value="Edit" name="Draft">
+          <input style="width: 150px;margin-right: 1vh; background-color: chocolate;" type="submit" class="btn mt-2"
+            value="Draft" name="Draft">
+          <input style="width: 150px;margin-right: 1vh; background-color: chocolate;" type="submit" class="btn mt-2"
+            value="Save" name="Save">
           <input style="width: 150px; background-color: chocolate;" class="btn mt-2" type="reset" value="Cancel">
-
-
-
         </div>
       </form>
 
 
 
+
       <!-- payment modal -->
-
-
-
       <div class="modal fade" id="newpayment">
         <div class="modal-dialog">
           <div class="modal-content" style="background-color: #202325;">
@@ -862,7 +707,6 @@
                       style="background-color: #191c24; color: white;">
                   </div>
                   {% endfor %}
-
                   <div class="col-6">
                     <input type="text" name="terms" class="form-control" placeholder="Terms"
                       style="background-color: #191c24;">
@@ -876,22 +720,21 @@
               <div class="form-row mt-3">
                 <div class="col-12 text-right">
                   <button type="button" class="btn add-term-row" style="background-color: chocolate;">Add New</button>
-                  <input type="submit" class="btn btn-success" value="submit" id="payment">
+                  <input type="submit" class="btn btn-success" value="Submit" id="payment">
                 </div>
               </div>
             </form>
-
-
-
           </div>
         </div>
       </div>
 
 
 
+
+
+
+
       <!-- customer modal -->
-
-
       <div class="modal fade" id="newcustomer">
         <div class="modal-dialog modal-xl">
           <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
@@ -904,7 +747,6 @@
             <div class="modal-body" style="background: rgb(32, 35, 37);">
               <div class="card p-3 m-3">
                 <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalCustomer">
-
                   <div class="row mt-2">
                     <div class="col-md-3 mt-2">
                       <label for="">Customer Type</label><br>
@@ -953,7 +795,6 @@
                       <input type="text" class="form-control bg-light text-dark" id="clname" name="clastname">
                     </div>
                   </div>
-
                   <div class="row mt-2">
                     <div class="col-md-3 mt-2">
                       <label for="ccompany">Company Name</label>
@@ -962,7 +803,6 @@
                       <input type="text" class="form-control bg-light text-dark" id="ccompany" name="ccompany_name">
                     </div>
                   </div>
-
                   <div class="row mt-2">
                     <div class="col-md-3 mt-2">
                       <label for="cemail">Customer Email</label>
@@ -972,7 +812,6 @@
                         placeholder="example@gmail.com" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$">
                     </div>
                   </div>
-
                   <div class="row mt-2">
                     <div class="col-md-3 mt-2">
                       <label for="email">Customer Phone</label>
@@ -986,8 +825,6 @@
                         placeholder="Personal Number" maxlength="10" name="cp_mobile">
                     </div>
                   </div>
-
-
                   <hr>
                   <center>
                     <h4 class="text-uppercase mb-3"><b>Other Details</b></h4>
@@ -1010,8 +847,6 @@
                         placeholder="www.example.com" name="twitter">
                     </div>
                   </div>
-
-
                   <div class="row mt-2">
                     <div class="col-md-3 mt-2">
                       <label for="website">Website</label>
@@ -1021,7 +856,6 @@
                         placeholder="www.example.com" name="website">
                     </div>
                   </div>
-
                   <div class="row mt-2">
                     <div class="col-md-3 mt-2">
                       <label for="cskype">Skype name/Number</label>
@@ -1030,7 +864,6 @@
                       <input type="text" class="form-control bg-light text-dark" id="cskype" name="cskype">
                     </div>
                   </div>
-
                   <div class="row mt-2">
                     <div class="col-md-3 mt-2">
                       <label for="c_desg">Designation</label>
@@ -1039,7 +872,6 @@
                       <input type="text" class="form-control bg-light text-dark" id="c_desg" name="c_desg">
                     </div>
                   </div>
-
                   <div class="row mt-2">
                     <div class="col-md-3 mt-2">
                       <label for="c_dpt">Department</label>
@@ -1048,7 +880,6 @@
                       <input type="text" class="form-control bg-light text-dark" id="c_dpt" name="c_dpt">
                     </div>
                   </div>
-
                   <div class="row mt-2">
                     <div class="col-md-3 mt-2">
                       <label for="c_gsttype" style="color:rgb(190, 88, 88);">GST Treatment *</label>
@@ -1072,29 +903,26 @@
                       </select>
                     </div>
                   </div>
-
                   <div class="row gstrow d-none">
                     <div class="col-md-3 mt-2">
                       <label id="glbl" style="color:rgb(190, 88, 88);">GSTIN/UIN *</label>
                     </div>
                     <div class="col-md-6 mt-2">
-                      <input type="text" class="form-control text-black" id="c_gstin" name="c_gstin"
+                      <input type="text" class="form-control text-dark" id="c_gstin" name="c_gstin"
                         placeholder="29APPCK7465F1Z1">
                       <label id="gst_label" style="display: none;"></label>
                     </div>
                   </div>
-
                   <div class="row">
                     <div class="col-md-3 mt-2">
-                      <label for="v_pan">PAN Number</label>
+                      <label for="c_pan">PAN Number</label>
                     </div>
                     <div class="col-md-6 mt-2">
-                      <input type="text" class="form-control text-black" id="c_pan" name="c_pan"
+                      <input type="text" class="form-control text-dark" id="c_pan" name="c_pan"
                         placeholder="APPCK7465F">
                       <label id="pan_label" style="display: none;"></label>
                     </div>
                   </div>
-
                   <div class="row mt-2">
                     <div class="col-md-3 mt-2">
                       <label for="" style="color: rgb(190, 88, 88);">Place of Supply *</label>
@@ -1102,44 +930,44 @@
                     <div class="col-md-6 mt-2">
                       <select class="form-control bg-light text-dark" id="placesupply" name="placesupply">
                         <option value="Nill" hidden></option>
-                        <option value="[AN] Andaman and Nicobar Islads">[AN] Andaman and Nicobar Islads</option>
-                        <option value="[AD] Andhra Predhesh">[AD] Andhra Predhesh</option>
-                        <option value="[AR] Arunachal Predesh">[AR] Arunachal Predesh</option>
-                        <option value="[AS] Assam">[AS] Assam</option>
-                        <option value="[BR] Bihar">[BR] Bihar</option>
-                        <option value="[CH] Chandigarh">[CH] Chandigarh</option>
-                        <option value="[CG] Chhattisgarh">[CG] Chhattisgarh</option>
-                        <option value="[DNH] Dadra and Nagar Haveli">[DNH] Dadra and Nagar Haveli</option>
-                        <option value="[DD] Damn anad Diu">[DD] Damn anad Diu</option>
-                        <option value="[DL] Delhi">[DL] Delhi</option>
-                        <option value="[GA] Goa">[GA] Goa</option>
-                        <option value="[GJ] Gujarat">[GJ] Gujarat</option>
-                        <option value="[HR] Haryana">[HR] Haryana</option>
-                        <option value="[HP] Himachal Predesh">[HP] Himachal Predesh</option>
-                        <option value="[JK] Jammu and Kashmir">[JK] Jammu and Kashmir</option>
-                        <option value="[JH] Jharkhand">[JH] Jharkhand</option>
-                        <option value="[KA] Karnataka">[KA] Karnataka</option>
-                        <option value="[KL] Kerala">[KL] Kerala</option>
-                        <option value="[LA] Ladakh">[LA] Ladakh</option>
-                        <option value="[LD] Lakshadweep">[LD] Lakshadweep</option>
-                        <option value="[MP] Madhya Predesh">[MP] Madhya Predesh</option>
-                        <option value="[MH] Maharashtra">[MH] Maharashtra</option>
-                        <option value="[MN] Manipur">[MN] Manipur</option>
-                        <option value="[ML] Meghalaya">[ML] Meghalaya</option>
-                        <option value="[MZ] Mizoram">[MZ] Mizoram</option>
-                        <option value="[NL] Nagaland">[NL] Nagaland</option>
-                        <option value="[OD] Odisha">[OD] Odisha</option>
-                        <option value="[PY] Puducherry">[PY] Puducherry</option>
-                        <option value="[PB] Punjab">[PB] Punjab</option>
-                        <option value="[RJ] Rajasthan">[RJ] Rajasthan</option>
-                        <option value="[SK] Sikkim">[SK] Sikkim</option>
-                        <option value="[TN] Tamil Nadu">[TN] Tamil Nadu</option>
-                        <option value="[TS] Telangana">[TS] Telangana</option>
-                        <option value="[TR] Tripura">[TR] Tripura</option>
-                        <option value="[UP] Uttar Predesh">[UP] Uttar Predesh</option>
-                        <option value="[UK] Uttarakhand">[UK] Uttarakhand</option>
-                        <option value="[WB] West Bengal">[WB] West Bengal</option>
-                        <option value="[OT] Other Territory">[OT] Other Territory</option>
+                        <option value="[AN]-Andaman and Nicobar Islads">[AN] Andaman and Nicobar Islads</option>
+                        <option value="[AD]-Andhra Pradhesh">[AD] Andhra Pradhesh</option>
+                        <option value="[AR]-Arunachal Pradesh">[AR] Arunachal Pradesh</option>
+                        <option value="[AS]-Assam">[AS] Assam</option>
+                        <option value="[BR]-Bihar">[BR] Bihar</option>
+                        <option value="[CH]-Chandigarh">[CH] Chandigarh</option>
+                        <option value="[CG]-Chhattisgarh">[CG] Chhattisgarh</option>
+                        <option value="[DNH]-Dadra and Nagar Haveli">[DNH] Dadra and Nagar Haveli</option>
+                        <option value="[DD]-Damn anad Diu">[DD] Damn anad Diu</option>
+                        <option value="[DL]-Delhi">[DL] Delhi</option>
+                        <option value="[GA]-Goa">[GA] Goa</option>
+                        <option value="[GJ]-Gujarat">[GJ] Gujarat</option>
+                        <option value="[HR]-Haryana">[HR] Haryana</option>
+                        <option value="[HP]-Himachal Pradesh">[HP] Himachal Pradesh</option>
+                        <option value="[JK]-Jammu and Kashmir">[JK] Jammu and Kashmir</option>
+                        <option value="[JH]-Jharkhand">[JH] Jharkhand</option>
+                        <option value="[KA]-Karnataka">[KA] Karnataka</option>
+                        <option value="[KL]-Kerala">[KL] Kerala</option>
+                        <option value="[LA]-Ladakh">[LA] Ladakh</option>
+                        <option value="[LD]-Lakshadweep">[LD] Lakshadweep</option>
+                        <option value="[MP]-Madhya Pradesh">[MP] Madhya Pradesh</option>
+                        <option value="[MH]-Maharashtra">[MH] Maharashtra</option>
+                        <option value="[MN]-Manipur">[MN] Manipur</option>
+                        <option value="[ML]-Meghalaya">[ML] Meghalaya</option>
+                        <option value="[MZ]-Mizoram">[MZ] Mizoram</option>
+                        <option value="[NL]-Nagaland">[NL] Nagaland</option>
+                        <option value="[OD]-Odisha">[OD] Odisha</option>
+                        <option value="[PY]-Puducherry">[PY] Puducherry</option>
+                        <option value="[PB]-Punjab">[PB] Punjab</option>
+                        <option value="[RJ]-Rajasthan">[RJ] Rajasthan</option>
+                        <option value="[SK]-Sikkim">[SK] Sikkim</option>
+                        <option value="[TN]-Tamil Nadu">[TN] Tamil Nadu</option>
+                        <option value="[TS]-Telangana">[TS] Telangana</option>
+                        <option value="[TR]-Tripura">[TR] Tripura</option>
+                        <option value="[UP]-Uttar Pradesh">[UP] Uttar Pradesh</option>
+                        <option value="[UK]-Uttarakhand">[UK] Uttarakhand</option>
+                        <option value="[WB]-West Bengal">[WB] West Bengal</option>
+                        <option value="[OT]-Other Territory">[OT] Other Territory</option>
                       </select>
                     </div>
                   </div>
@@ -1161,7 +989,6 @@
                     </div>
                   </div>
                   <hr>
-
                   <div class="row mt-2">
                     <div class="col-md-3 mt-2">
                       <label for="c_curn">Currency </label>
@@ -1173,7 +1000,6 @@
                       </select>
                     </div>
                   </div>
-
                   <div class="row mt-2">
                     <div class="col-md-3 mt-2">
                       <label for="c_open">Opening Balance</label>
@@ -1187,7 +1013,6 @@
                       <input type="text" class="form-control bg-light text-dark" id="c_open" name="c_open">
                     </div>
                   </div>
-
                   <div class="row mt-2">
                     <div class="col-md-3 mt-2">
                       <label for="c_terms">Payment Terms</label>
@@ -1195,7 +1020,6 @@
                     <div class="col-md-6 mt-2">
                       <div class="d-flex">
                         <select class="form-control bg-light text-dark" id="c_terms" name="c_terms" required>
-
                           {% for p in pay %}
                           <option value="{{p.Terms}} {{p.id}}">{{p.Terms}}</option>
                           {% endfor %}
@@ -1203,10 +1027,7 @@
                       </div>
                     </div>
                   </div>
-
-
                   <hr>
-
                   <div class="row">
                     <div class="col-md-6 mt-5 text-center text-uppercase">
                       <h4 class="mb-0">Billing Address</h4>
@@ -1222,7 +1043,6 @@
                       <label for="voka" style="color: #909091;">Same As Billing Address</label>
                     </div>
                   </div>
-
                   <div class="row mt-5">
                     <div class="col-md-1">
                       <label for="cstreet">Address</label>
@@ -1239,9 +1059,7 @@
                       <textarea class="form-control bg-light text-dark street" id="csstreet" name="vsstreet"></textarea>
                     </div>
                     <div class="col-md-1"></div>
-
                   </div>
-
                   <div class="row mt-2">
                     <div class="col-md-1">
                       <label for="ccity">City</label>
@@ -1262,7 +1080,6 @@
                     <div class="col-md-1">
                     </div>
                   </div>
-
                   <div class="row mt-2">
                     <div class="col-md-1">
                       <label for="cstate">State</label>
@@ -1271,10 +1088,9 @@
                       <select type="text" class="form-control bg-light text-dark" id="cstate" name="vstate">
                         <option value="" selected hidden>Choose</option>
                         <option value="None Of This">None Of This</option>
-                        <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islads
-                        </option>
-                        <option value="Andhra Predhesh">Andhra Predhesh</option>
-                        <option value="Arunachal Predesh">Arunachal Predesh</option>
+                        <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islads</option>
+                        <option value="Andhra Pradhesh">Andhra Pradhesh</option>
+                        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
                         <option value="Assam">Assam</option>
                         <option value="Bihar">Bihar</option>
                         <option value="Chandigarh">Chandigarh</option>
@@ -1285,14 +1101,14 @@
                         <option value="Goa">Goa</option>
                         <option value="Gujarat">Gujarat</option>
                         <option value="Haryana">Haryana</option>
-                        <option value="Himachal Predesh">Himachal Predesh</option>
+                        <option value="Himachal Pradesh">Himachal Pradesh</option>
                         <option value="Jammu and Kashmir">Jammu and Kashmir</option>
                         <option value="Jharkhand">Jharkhand</option>
                         <option value="Karnataka">Karnataka</option>
                         <option value="Kerala">Kerala</option>
                         <option value="Ladakh">Ladakh</option>
                         <option value="Lakshadweep">Lakshadweep</option>
-                        <option value="Madhya Predesh">Madhya Predesh</option>
+                        <option value="Madhya Pradesh">Madhya Pradesh</option>
                         <option value="Maharashtra">Maharashtra</option>
                         <option value="Manipur">Manipur</option>
                         <option value="Meghalaya">Meghalaya</option>
@@ -1306,14 +1122,13 @@
                         <option value="Tamil Nadu">Tamil Nadu</option>
                         <option value="Telangana">Telangana</option>
                         <option value="Tripura">Tripura</option>
-                        <option value="Uttar Predesh">Uttar Predesh</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
                         <option value="Uttarakhand">Uttarakhand</option>
                         <option value="West Bengal">West Bengal</option>
                         <option value="Other Territory">Other Territory</option>
                       </select>
                     </div>
                     <div class="col-md-1"></div>
-
                     <div class="col-md-1">
                       <label for="csstate">State</label>
                     </div>
@@ -1321,10 +1136,9 @@
                       <select type="text" class="form-control bg-light text-dark" id="csstate" name="vsstate">
                         <option value="" selected hidden>Choose</option>
                         <option value="None Of This">None Of This</option>
-                        <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islads
-                        </option>
-                        <option value="Andhra Predhesh">Andhra Predhesh</option>
-                        <option value="Arunachal Predesh">Arunachal Predesh</option>
+                        <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islads</option>
+                        <option value="Andhra Pradhesh">Andhra Pradhesh</option>
+                        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
                         <option value="Assam">Assam</option>
                         <option value="Bihar">Bihar</option>
                         <option value="Chandigarh">Chandigarh</option>
@@ -1335,14 +1149,14 @@
                         <option value="Goa">Goa</option>
                         <option value="Gujarat">Gujarat</option>
                         <option value="Haryana">Haryana</option>
-                        <option value="Himachal Predesh">Himachal Predesh</option>
+                        <option value="Himachal Pradesh">Himachal Pradesh</option>
                         <option value="Jammu and Kashmir">Jammu and Kashmir</option>
                         <option value="Jharkhand">Jharkhand</option>
                         <option value="Karnataka">Karnataka</option>
                         <option value="Kerala">Kerala</option>
                         <option value="Ladakh">Ladakh</option>
                         <option value="Lakshadweep">Lakshadweep</option>
-                        <option value="Madhya Predesh">Madhya Predesh</option>
+                        <option value="Madhya Pradesh">Madhya Pradesh</option>
                         <option value="Maharashtra">Maharashtra</option>
                         <option value="Manipur">Manipur</option>
                         <option value="Meghalaya">Meghalaya</option>
@@ -1356,17 +1170,14 @@
                         <option value="Tamil Nadu">Tamil Nadu</option>
                         <option value="Telangana">Telangana</option>
                         <option value="Tripura">Tripura</option>
-                        <option value="Uttar Predesh">Uttar Predesh</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
                         <option value="Uttarakhand">Uttarakhand</option>
                         <option value="West Bengal">West Bengal</option>
                         <option value="Other Territory">Other Territory</option>
                       </select>
                     </div>
-
                     <div class="col-md-1"></div>
-
                   </div>
-
                   <div class="row mt-2">
                     <div class="col-md-1">
                       <label for="ccountry">Country</label>
@@ -1376,7 +1187,6 @@
                         placeholder="Country">
                     </div>
                     <div class="col-md-1"></div>
-
                     <div class="col-md-1">
                       <label for="cscountry">Country</label>
                     </div>
@@ -1385,11 +1195,8 @@
                         placeholder="Country">
                     </div>
                     <div class="col-md-1 "></div>
-
                   </div>
-
                   <div class="row mt-2">
-
                     <div class="col-md-1">
                       <label for="cpincode">Pincode</label>
                     </div>
@@ -1398,7 +1205,6 @@
                         maxlength="6" placeholder="PIN Code">
                     </div>
                     <div class="col-md-1"></div>
-
                     <div class="col-md-1">
                       <label for="cspincode">Pincode</label>
                     </div>
@@ -1407,11 +1213,8 @@
                         maxlength="6" placeholder="PIN Code">
                     </div>
                     <div class="col-md-1"></div>
-
                   </div>
-
                   <div class="row mt-2">
-
                     <div class="col-md-1">
                       <label for="cphone">Phone</label>
                     </div>
@@ -1420,7 +1223,6 @@
                         placeholder="Phone">
                     </div>
                     <div class="col-md-1"></div>
-
                     <div class="col-md-1">
                       <label for="csphone">Phone</label>
                     </div>
@@ -1429,11 +1231,8 @@
                         placeholder="Phone">
                     </div>
                     <div class="col-md-1"></div>
-
                   </div>
-
                   <div class="row mt-2">
-
                     <div class="col-md-1">
                       <label for="cfax">Fax</label>
                     </div>
@@ -1442,7 +1241,6 @@
                         placeholder="FAX">
                     </div>
                     <div class="col-md-1"></div>
-
                     <div class="col-md-1">
                       <label for="csfax">Fax</label>
                     </div>
@@ -1451,9 +1249,7 @@
                         placeholder="FAX">
                     </div>
                     <div class="col-md-1"></div>
-
                   </div>
-
                   <div class="row mt-2">
                     <div class="col-md-6">
                       <input type="checkbox" value="" id="invalidCheck" name="invalidCheck" required>
@@ -1466,9 +1262,9 @@
                     <div class="col-md-4">
                       <div class="d-flex">
                         <button class="btn save_btn rounded-pill text-grey w-50 my-4 mx-3" type="submit"
-                          data-dismiss="modal" id="customersave">Submit
+                          data-dismiss="modal" id="customersave">
+                          Submit
                         </button>
-
                         <button type="button" class="close btn save_btn rounded-pill text-grey w-50 my-4"
                           data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">Cancel</span>
@@ -1503,7 +1299,7 @@
                     <div class="col-md-3 mr-0">
                       <label class="col-form-label p-0">Type</label>
                     </div>
-                    <div class="col-md-5 ml-0 d-flex">
+                    <div class="col-md-6 ml-0 d-flex">
                       <div class="radio_opt mx-5 ">
                         <input type="radio" id="item_type1" name="radioOption" value="Goods">
                         <label for="option1">Goods</label>
@@ -1552,7 +1348,7 @@
                   </div>
 
                   <div class="row mt-2">
-                    <div class="col-md-3 ">
+                    <div class="col-md-3">
                       <label for="c_tax" style="color: rgb(190, 88, 88);">Tax Preference * </label>
                     </div>
                     <div class="col-md-6">
@@ -1578,6 +1374,7 @@
                         <option value="" hidden>Select GST</option>
 
                         <option value="GST0[0%]">GST0[0%]</option>
+                        <option value="GST3[3%]">GST3[3%]</option>
                         <option value="GST5[5%]">GST5[5%]</option>
                         <option value="GST12[12%]">GST12[12%]</option>
                         <option value="GST18[18%]">GST18[18%]</option>
@@ -1594,6 +1391,7 @@
                         <option value="" hidden>Select GST</option>
 
                         <option value="IGST0[0%]">IGST0[0%]</option>
+                        <option value="GST3[3%]">GST3[3%]</option>
                         <option value="IGST5[5%]">IGST5[5%]</option>
                         <option value="IGST12[12%]">IGST12[12%]</option>
                         <option value="IGST18[18%]">IGST18[18%]]</option>
@@ -1618,6 +1416,7 @@
                   </div>
 
                   <div class="row mt-4">
+
                     <div class="col-md-6">
                       <div class="input-group mb-2">
                         <label for="sell_price" style="margin-right:3vh;">Selling Price *</label>
@@ -1663,9 +1462,6 @@
                     <div class="col-md-4">
                       <select name="cost_acc" class="form-control bg-light text-dark" id="cost_acc">
                         <option value="" hidden>Select Account</option>
-
-
-
                         <option value="" disabled class="btn btn-dark text-white"><b>PURCHASE</b></option>
                         {% for p in purchase %}
                         <option value="{{p.id}}">{{ p.Account_name }}</option>
@@ -1690,7 +1486,7 @@
                       <input type="text" name="cost_desc" class="form-control bg-light text-dark" id="cost_desc">
                     </div>
 
-                  </div>
+                  </div> <br>
 
                   <div class="col-md-5">
                     <input type="checkbox" id="track" onclick="trackinventory()"> Track Inventory for this item
@@ -1749,7 +1545,6 @@
                       </div>
                     </div>
                   </div>
-
 
                   <div class="row mt-3">
                     <div class="col-md-6">
@@ -1815,6 +1610,7 @@
                         <button class="btn save_btn rounded-pill text-grey w-50 my-4 mx-3" type="submit"
                           data-dismiss="modal" id="unitSave">Save
                         </button>
+
 
 
                         <button type="button" class="close btn save_btn rounded-pill text-grey w-50 my-4"
@@ -1892,6 +1688,10 @@
       </div>
 
 
+      <!-- end of modal -->
+
+
+
 
     </div>
   </div>
@@ -1899,95 +1699,9 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
-<script>
-  /* $(document).ready(function () {
-     var customer = $('#customer_sel').val();
-     $.ajax({
-       type: "GET",
-       url: "{% url 'customerdata' %}",
-       data: {
-         id: customer
-       },
-       success: function (response) {
-         data_gst = response.gstno
-         gsttreat = response.gsttreat
-         if (data_gst == "") {
-           document.getElementById('gstdiv').style.display = "none"
-           document.getElementById('treatmentdiv').style.display = "block"
-           document.getElementById('cx_treat').value = gsttreat
-         } else {
-           document.getElementById('gstdiv').style.display = "block"
-           document.getElementById('treatmentdiv').style.display = "block"
-           document.getElementById('cx_gst').value = data_gst
-           document.getElementById('cx_treat').value = gsttreat
-         }
-       }
-     });
-   });*/
-</script>
-
-<script>
-  function trackinventory() {
-    $("#trackdiv1").toggle();
-    $("#trackdiv2").toggle();
-    $("#trackdiv3").toggle();
-    $("#trackdiv4").toggle();
-    document.getElementById("invasset").value = "0"
-    document.getElementById("opening_stock").value = 0
-    document.getElementById("opening_stock_unit").value = 0
-    document.getElementById("active").checked = false
-    document.getElementById("nonactive").checked = false
-  }
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
 
-
-<script>
-
-
-  $(document).ready(function () {
-    var x = $('#pay_method').val();
-    if (x === 'cash') {
-      $('#chequediv').hide()
-      $('#bnkdiv').hide()
-      $('#upidiv').hide()
-      document.getElementById('cheque_id').value = null
-      document.getElementById('upi_id').value = null
-    } else if (x === 'cheque') {
-      $('#chequediv').show()
-      $('#bnkdiv').hide()
-      $('#upidiv').hide()
-      document.getElementById('upi_id').value = null
-    } else if (x === 'upi') {
-      $('#upidiv').show()
-      $('#bnkdiv').hide()
-      $('#chequediv').hide()
-      document.getElementById('cheque_id').value = null
-    } else {
-      $('#bnkdiv').show()
-      $('#chequediv').hide()
-      $('#upidiv').hide()
-      document.getElementById('cheque_id').value = null
-      document.getElementById('upi_id').value = null
-
-      $.ajax({
-        type: "GET",
-        url: "{% url 'bankdata' %}",
-        data: {
-          id: x,
-        },
-        success: function (response) {
-          data = response.bank
-          document.getElementById('cheque_id').value = null
-          document.getElementById('upi_id').value = null
-          document.getElementById("bnk_id").value = data
-        }
-      });
-    }
-  })
-
-</script>
 
 <script>
   $(document).ready(function () {
@@ -2030,6 +1744,35 @@
     });
   });
 </script>
+
+
+<script>
+  function trackinventory() {
+    $("#trackdiv1").toggle();
+    $("#trackdiv2").toggle();
+    $("#trackdiv3").toggle();
+    $("#trackdiv4").toggle();
+    document.getElementById("invasset").value = "0"
+    document.getElementById("opening_stock").value = 0
+    document.getElementById("opening_stock_unit").value = 0
+    document.getElementById("active").checked = false
+    document.getElementById("nonactive").checked = false
+  }
+</script>
+
+<script>
+
+  function qtychange(id_str) {
+    id = id_str.split("item")[1]
+    var qty = $(`#qty${id}`).val();
+    var avl = document.getElementById(`stock_data${id}`).innerHTML;
+    if (parseInt(qty) > parseInt(avl)) {
+      alert("Entered quantity greater than available quantity");
+      location.reload();
+    }
+  }     
+</script>
+
 
 <script>
   $(document).ready(function () {
@@ -2077,90 +1820,25 @@
 </script>
 
 <script>
-
-  $(document).on('change', '#date1', function () {
-    var term = $('#pay_term').val();
-    $.ajax({
-      type: "GET",
-      url: "{% url 'termdata' %}",
-      data: {
-        id: term
-      },
-      success: function (response) {
-        days = response.days
-        order_date = new Date(document.getElementById("date1").value)
-        if (!isNaN(order_date.getTime())) {
-          // Calculate the new date by adding 20 days
-          const endDate = new Date(order_date);
-          endDate.setDate(endDate.getDate() + days);
-
-          // Format the new date as YYYY-MM-DD
-          const formattedDate = endDate.toISOString().split("T")[0];
-
-          // Set the result in the second input
-          document.getElementById("date2").value = formattedDate;
-        } else {
-          alert("Please enter a valid date.");
-        }
-
-      }
-    });
-  });
-</script>
-
-<script>
-  $(document).on('change', '#pay_term', function () {
-    var term = $('#pay_term').val();
-    $.ajax({
-      type: "GET",
-      url: "{% url 'termdata' %}",
-      data: {
-        id: term
-      },
-      success: function (response) {
-        days = response.days
-        order_date = new Date(document.getElementById("date1").value)
-        if (!isNaN(order_date.getTime())) {
-          // Calculate the new date by adding 20 days
-          const endDate = new Date(order_date);
-          endDate.setDate(endDate.getDate() + days);
-
-          // Format the new date as YYYY-MM-DD
-          const formattedDate = endDate.toISOString().split("T")[0];
-
-          // Set the result in the second input
-          document.getElementById("date2").value = formattedDate;
-        } else {
-          alert("Please enter a valid date.");
-        }
-
-      }
-    });
-  });
-</script>
-
-<script>
   $(document).ready(function () {
-    var y = $('#prof_name').val();
-    $("#prof_name").change(function () {
+    $("#prof_name").keyup(function () {
       var x = $('#prof_name').val();
-      reford = "{{reford}}"
-      if (parseInt(reford) != parseInt(x.slice(3,))) {
-        document.getElementById("order_label").style.display = "block"
-        document.getElementById("order_label").style.color = "red"
-        document.getElementById("order_label").innerHTML = "Sale Order is not Continuous"
-      }
-      if (parseInt(reford) == parseInt(x.slice(3,))) {
-        document.getElementById("order_label").style.color = "green"
-        document.getElementById("order_label").innerHTML = "Sale Order is Continuous"
-      }
-      if (y === x) {
-        document.getElementById("order_label").style.color = "green"
-        document.getElementById("order_label").innerHTML = "Sale Order is Continuous"
+      reford = "{{reference}}"
+      if (reford != '01') {
+        if (reford != x) {
+          document.getElementById("order_label").style.display = "block"
+          document.getElementById("order_label").style.color = "yellow"
+          document.getElementById("order_label").innerHTML = "Invoice Number is not Continuous"
+        } else {
+          document.getElementById("order_label").style.display = "block"
+          document.getElementById("order_label").style.color = "green"
+          document.getElementById("order_label").innerHTML = "Invoice Number is now Continuous"
+        }
       }
     });
   });
 </script>
+
 
 <script>
 
@@ -2234,7 +1912,6 @@
 </script>
 
 <script>
-  
 
   $(document).ready(function () {
     $("#cfname, #clname").change(function () {
@@ -2246,17 +1923,20 @@
   $(document).ready(function () {
     $("#c_gsttype").change(function () {
       var x = $('#c_gsttype').val();
-      // console.log(x)
+      console.log(x)
       if (x == "Unregistered Business-not Registered under GST") {
         $(".gstrow").addClass('d-none');
+
 
       }
       else if (x == 'Overseas- Persons with who you do import or exports of supplies outside india') {
         $(".gstrow").addClass('d-none');
+        console.log('poor')
       }
       else {
         $(".gstrow").removeClass('d-none');
         $(".gstrow").addClass('d-flex');
+
       }
 
     });
@@ -2276,7 +1956,7 @@
       }
       else {
         gst_label.style.color = "green";
-        gst_label.innerHTML = "valid GST Number.";
+        gst_label.innerHTML = "Valid GST Number.";
 
       }
     });
@@ -2294,34 +1974,14 @@
       }
       else {
         pan_label.style.color = "green";
-        pan_label.innerHTML = "valid PAN Number.";
+        pan_label.innerHTML = "Valid PAN Number.";
 
       }
     });
   });
 
 
-  function addressSame() {
-    var chkbtn = document.getElementById('vokay');
-    if (chkbtn.checked == true) {
-      document.getElementById('vsstreet').value = document.getElementById('vstreet').value;
-      document.getElementById('vscity').value = document.getElementById('vcity').value;
-      document.getElementById('vspincode').value = document.getElementById('vpincode').value;
-      document.getElementById('vscountry').value = document.getElementById('vcountry').value;
-      document.getElementById('vsstate').value = document.getElementById('vstate').value;
-      document.getElementById('vsphone').value = document.getElementById('vphone').value;
-      document.getElementById('vsfax').value = document.getElementById('vfax').value;
-    }
-    else {
-      document.getElementById('vsstreet').value = '';
-      document.getElementById('vscity').value = '';
-      document.getElementById('vsstate').value = '';
-      document.getElementById('vspincode').value = '';
-      document.getElementById('vscountry').value = '';
-      document.getElementById('vsphone').value = '';
-      document.getElementById('vsfax').value = '';
-    }
-  }
+
 
 
 
@@ -2350,14 +2010,22 @@
 
   //---payment terms
 
+  $(document).on("click", "#termadd", function () {
+
+  });
+
+
 
   $(document).on("click", "#payment", function () {
     var array1 = [];
     var array2 = [];
+    array1.length = 0;
+    array2.length = 0;
     $("input:text[name=terms]").each(function () {
       array1.push($(this).val());
 
     });
+
     $("input:text[name=days]").each(function () {
       array2.push($(this).val());
     });
@@ -2378,15 +2046,16 @@
         $(".modal-backdrop").remove();
         data = response.pay_term;
         data2 = response.pay_id;
+        console.log(data);
+        console.log(data2);
         const pay = document.getElementById("pay_term");
-        console.log(pay)
         const termsField = document.createElement('option');
         termsField.innerHTML = data;
         termsField.value = data2;
         pay.appendChild(termsField);
+
         document.getElementById("modalForm").reset();
         reloadterms();
-
 
         // Iterate through the data and create options
       },
@@ -2438,7 +2107,7 @@
           select.remove(0);
         }
 
-        for (let i = 0; i < term_data.length; i++) {
+        for (let i = 0; i < day_id.length; i++) {
           // Create a new option element
           let newOption = document.createElement("option");
           newOption.text = term_data[i];
@@ -2449,7 +2118,7 @@
 
           var dropdow = $('#pay_term');
 
-          dropdow.append($('<option value="" hidden>Select Payment Term</option>'));
+          dropdow.append($('<option value="term" hidden>Select Payment Term</option>'));
         }
       },
       error: function (xhr, status, error) {
@@ -2536,35 +2205,34 @@
         document.getElementById("modalCustomer").reset();
         location.reload();
         location.reload();
-
         //reloadcustomer();
 
       },
     });
   });
 
-  /* function reloadcustomer() {
- 
-     $.ajax({
-       url: "{% url 'customer_dropdown_sales' %}",
-       type: "GET",
-       dataType: "json",
-       data: $(this).serialize(),
-       csrfmiddlewaretoken: '{{ csrf_token }}',
- 
-       success: function (data) {
-         var dropdow = $('#customer_sel');
-         dropdow.empty();
-         dropdow.append($('<option value="" hidden selected></option>'));
-         $.each(data, function (key, value) {
-           dropdow.append($('<option></option>').attr('value', key).text(value).val(key));
-         });
-       },
-       error: function (xhr, status, error) {
-         console.error(xhr.responseText);
-       }
-     });
-   }*/
+  /*function reloadcustomer() {
+
+    $.ajax({
+      url: "{% url 'customer_dropdown_sales' %}",
+      type: "GET",
+      dataType: "json",
+      data: $(this).serialize(),
+      csrfmiddlewaretoken: '{{ csrf_token }}',
+
+      success: function (data) {
+        var dropdow = $('#customer_sel');
+        dropdown.empty();
+        dropdow.append($('<option value="" hidden selected></option>'));
+        $.each(data, function (key, value) {
+          dropdow.append($('<option></option>').attr('value', key).text(value).val(key));
+        });
+      },
+      error: function (xhr, status, error) {
+        console.error(xhr.responseText);
+      }
+    });
+  }*/
 
 
 
@@ -2614,6 +2282,7 @@
 
 
 
+
   $(document).ready(function () {
     $("#item-tax1").click(function () {
       //  console.log($("#item_units").val().split(' ')[0]);
@@ -2642,9 +2311,8 @@
     });
   });
 
-
   $(document).ready(function () {
-    $("#hsn").change(function () {
+    $("#hsn").keyup(function () {
       var x = String($('#hsn').val());
       if (x.length != 6) {
         document.getElementById("hsn_war").style.display = "block"
@@ -2657,8 +2325,6 @@
       }
     });
   });
-
-
 
   $(document).on("click", "#itemSave", function () {
 
@@ -2690,14 +2356,13 @@
     $.ajax({
 
       type: 'POST',
-      url: "{% url 'invoice_item_in_modal' %}",
+      url: "{% url 'purchase_item' %}",
 
       data: {
         type: itemtype,
         name: $("#item_name").val(),
         unit: $("#item_units").val(),
         hsn: $("#hsn").val(),
-        stock: $("#stock").val(),
         inter: inter,
         intra: intra,
         sell_price: $("#sell_price").val(),
@@ -2706,7 +2371,6 @@
         cost_acc: $("#cost_acc").val(),
         sell_desc: $("#sell_desc").val(),
         cost_desc: $("#cost_desc").val(),
-        min_stock: $("#min_stock").val(),
         active_type: active_type,
         invasset: $("#invasset").val(),
         opening_stock: $("#opening_stock").val(),
@@ -2726,7 +2390,7 @@
 
   function reloadItem() {
     $.ajax({
-      url: "{% url 'invoice_item_in_dropdown' %}",
+      url: "{% url 'purchase_item_dropdown' %}",
       type: "GET",
       dataType: "json",
       data: $(this).serialize(),
@@ -2797,10 +2461,19 @@
   }
 
 </script>
-
 <script>
-  $(document).on('change', '#customer_sel', function () {
+ 
+
+
+            $(document).ready(function() {
+              $('.customer_selection').select2({tags:true} )
+            })
+          
+
+            $(document).ready(function() {
+  $('#customer_sel').change( function () {
     var customer = $('#customer_sel').val();
+    console.log(customer, "cu")
     $.ajax({
       type: "GET",
       url: "{% url 'customerdata' %}",
@@ -2808,133 +2481,285 @@
         id: customer
       },
       success: function (response) {
+
+        console.log(response, "response")
         data7 = response.email
-        gst = response.gstno
-        treat = response.gsttreat
+        data_gst = response.gstno
+        place = response.place
+        gsttreat = response.gsttreat
         billingaddress = response.billingAddress
-        console.log(billingaddress)
         document.getElementById('cx_mail').value = data7
-        document.getElementById('cx_treat').value = treat
+        document.getElementById('cx_address').value = billingaddress
+
         var expr = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
-
-        if (billingaddress === `,,,` || billingaddress === "") {
-          document.getElementById('adressdidid').style.display = "none";
-
-        } else {
-          document.getElementById('adressdidid').style.display = "flex";
-          document.getElementById('cx_address').value = billingaddress;
+        if (billingaddress === "" || billingaddress === ",,,") {
+          document.getElementById('cx_addressdiv').style.display = "none"
+        }
+        else {
+          document.getElementById('cx_addressdiv').style.display = ""
 
         }
-        if (!expr.test(gst) || gst === " ") {
+        if (!expr.test(data_gst)) {
           document.getElementById('gstdiv').style.display = "none"
+          document.getElementById('treatmentdiv').style.display = "block"
+          document.getElementById('cx_treat').value = gsttreat
         } else {
           document.getElementById('gstdiv').style.display = "block"
-          document.getElementById('cx_gst').value = gst
+          document.getElementById('treatmentdiv').style.display = "block"
+          document.getElementById('cx_gst').value = data_gst
+          document.getElementById('cx_treat').value = gsttreat
+        }
+
+        var selectElement = document.getElementById("srcofsupply");
+
+        // Loop through the options to find the one you want to select
+        for (var i = 0; i < selectElement.options.length; i++) {
+          if (selectElement.options[i].value === place) {
+
+            // Set the selected attribute of the desired option to true
+            selectElement.selectedIndex = i;
+            break; // Exit the loop once the option is selected
+          }
+
+        }
+        $(document).ready(function () {
+
+          for (var i = 1; i <= rowCount; i++) {
+            // Generate table row
+            // ...
+
+            // Call toggleDateInput function for each row
+            toggleDateInput(i);
+          }
+        });
+      }
+    });
+  });
+})
+</script>
+<script>
+
+  $(document).on('change', '#date1', function () {
+    var term = $('#pay_term').val();
+    $.ajax({
+      type: "GET",
+      url: "{% url 'termdata' %}",
+      data: {
+        id: term
+      },
+      success: function (response) {
+        days = response.days;
+        order_date = moment(document.getElementById("date1").value);
+        if (order_date.isValid()) {
+          // Calculate the new date by adding the number of days
+          const endDate = moment(order_date).add(days, 'days');
+          // Format the new date as YYYY-MM-DD
+          const formattedDate = endDate.format("YYYY-MM-DD");
+          // Set the result in the second input
+          document.getElementById("date2").value = formattedDate;
+        } else {
+          alert("Please enter a valid date.");
+        }
+      }
+    });
+  });
+
+</script>
+
+<script>
+
+  $(document).ready(function () {
+    var currentDate = moment().format("YYYY-MM-DD");
+    document.getElementById("date1").value = currentDate;
+  });
+
+
+  $(document).on('change', '#pay_term', function () {
+    var term = $('#pay_term').val();
+    $.ajax({
+      type: "GET",
+      url: "{% url 'termdata' %}",
+      data: {
+        id: term
+      },
+      success: function (response) {
+        days = response.days
+        var orderDate = moment(document.getElementById("date1").value);
+        if (orderDate.isValid()) {
+          var endDate = orderDate.add(days, 'days');
+          var formattedDate = endDate.format("YYYY-MM-DD");
+          document.getElementById("date2").value = formattedDate;
+        } else {
+          alert("Please enter a valid date.");
         }
 
       }
     });
   });
-
-  $(document).ready(function () {
-    var x = $("#cx_address").val();
-    if (x === ',,,' || x === "") {
-      $("#adressdidid").hide();
-    } else {
-      $("#adressdidid").show();
-    }
-  });
 </script>
+
 <script>
-  
- 
+  var rowCount = 1;
   $(document).ready(function () {
-    var rowCount = 1;
+    // Counter for row IDs
+
+    // Function to calculate the row amount
+    function calculateRowAmount(row) {
+      var qty = parseFloat(row.find('.qty').val());
+      var rate = parseFloat(row.find('.rate').val());
+      var tax = parseFloat(row.find('.tax').val());
+      var discount = parseFloat(row.find('.discount').val());
+
+      var rowAmount = (qty * rate) - discount;
+      var taxAmount = (rowAmount * tax) / 100;
+
+      row.find('.amount').val(rowAmount.toFixed(2));
+      row.find('.taxamount').val(taxAmount.toFixed(2));
+
+      return rowAmount;
+    }
+    calculateTaxAmount();
+
+
+    // Function to calculate the subtotal
+    function calculateSubtotal() {
+      var subtotal = 0;
+      $('#item_table tbody tr').each(function () {
+        subtotal += calculateRowAmount($(this));
+      });
+      $('#subtotal').val(subtotal.toFixed(2));
+    }
+
+    // Function to calculate the grand total
+    function calculateGrandTotal() {
+      var grandTotal = 0;
+      var totalTaxAmount = 0;
+      adjust = parseFloat(document.getElementById('adjust').value)
+      advance = parseFloat(document.getElementById('advance').value)
+
+      $('#item_table tbody tr').each(function () {
+        var rowAmount = calculateRowAmount($(this));
+        grandTotal += rowAmount;
+        var taxAmount = parseFloat($(this).find('.taxamount').val());
+        grandTotal += taxAmount;
+        totalTaxAmount += taxAmount;
+      });
+      var shippingCharges = parseFloat($('#shipping').val());
+      var adjust = parseFloat($('#adjust').val());
+      grandTotal += shippingCharges;
+      grandTotal += adjust
+
+      balance = grandTotal - advance
+
+      $('#grandtotal').val(grandTotal.toFixed(2));
+      $('#balance').val(balance.toFixed(2));
+      $('#total_taxamount').val(totalTaxAmount.toFixed(2));
+    }
+
+    $('#item_table').on('change', '.tax,.rate', function () {
+      var row = $(this).closest('tr');
+      calculateRowAmount(row);
+      calculateSubtotal();
+      calculateGrandTotal();
+    });
 
     $('#add-row').click(function () {
-        var rowCount = $("#item_table tbody tr").length;
+
+      var newRow;
+    do {
         rowCount++; // Increment row counter
-        console.log("New row added. Row count: " + rowCount);
+        newRow = $(`#row${rowCount}`);
+    } while (newRow.length > 0);
+
+    console.log();
+    newRow = `
+      <tr id='row${rowCount}'>
         
-        var newRow = `
-            <tr id='row${rowCount}'>
-                <td>
-                    <div>
-                        <select name='item[]' id="item${rowCount}" class="form-control select2" style="width: 18vh; font-size: 15px;" onchange="changewithitem(this,'{{i.id}}')">
-                            <option class="form-control select2 text-center" selected value="{{i.product}}">{{i.product}}</option>
-                            {% for i in p %}
-                                <option class="form-control select2 text-right" value="{{ i.Name }}" data-tokens="{{ i.Name }}">
-                                    {{ i.Name }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </td>
-                <td style="width: 15%;">
-                    <input style="width: 14vh; font-size: 15px;" type='number' id='hsn${rowCount}' class='text-right hsn form-control border-0 bg-transparent text-white' name='hsn[]' readonly>
-                </td>
-                <td style="width: 17%;">
-                    <input style="width: 14vh; font-size: 15px;" type='number' id='qty${rowCount}' class='text-right border-0 bg-transparent text-white qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange(this.id)'><br>
-                    <span style="font-size: 10px;" class="text-warning">Available Stock : <input id="stock_data${rowCount}" class="stock_data text-warning" style="background-color: #3b3b3b; width: 7vh; border: none; font-size: 10px;" name='stock[]' readonly></input></span>
-                    <span class="stock_warning text-danger"></span>
-                </td>
-                <td style="width: 15%;">
-                    <input style="width: 14vh; font-size: 15px;" type='number' id='rate${rowCount}' class='text-right border-0 bg-transparent text-white rate form-control' name='rate[]' value='0' readonly>
-                </td>
-                <td style="width: 10%;">
-                    <input type='number' id='discount${rowCount}' class='text-right border-0 bg-transparent text-white discount form-control' name='discount[]' value='0'>
-                </td>
-                <td style="width: 22%;">
-               <select name='tax[]' id='tax${rowCount}' class=' label-gst form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="toggleDateInput()">
-                        
+        <td class="text-light">${rowCount}</td>
+        <td >
+          <div>
+      
+
+            <select name='item[]' id="item${rowCount}" class="form-control select2 extra border-0 bg-transparent text-white item_select itm itemselect" style="width: 18vh; font-size: 15px;"  onchange="itemfunction('item${rowCount}')">
+              <option id="selectitem"  >Select Items </option>
+              <option class="form-control select2 text-center"  value="{{i.Name}}">{{i.product}}</option>
+              {% for i in p %}
+              <option class="form-control select2 text-right" value="{{ i.Name }}" data-tokens="{{ i.Name }}">
+                  {{ i.Name }}
+              </option>
+              {% endfor %}
+          </select>
+          </div>
+        </td>
+
+      
+        <td style="width: 15%;" class='text-right'>
+          <input type='number' id='hsn${rowCount}' class=' text-right hsn form-control border-0 bg-white text-dark' name='hsn[]' readonly>
+        </td>
+        
+        <td style="width: 17%;" class='text-right'>
+          <input type='number' id='qty${rowCount}' class='text-right border-0 bg-white text-dark qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange(this.id)'><br>
+          <input type="text" id="avl1" style="display: none;">
+          <div style="display: flex; align-items: center;">
+            <span class="text-warning" style="font-size: 10px;">Available Stock:</span>
+            <input style="font-size: 9px; margin-left: 10px;" id='stock_data${rowCount}' class="stock_data text-warning border-0 form-control bg-transparent text-right" name='avlquantity' readonly>
+        </div>
+
+        </td>
+        
+        <td style="width: 15%;" class='text-right'>
+          <input type='number' id='rate${rowCount}' class='text-right border-0 bg-white text-dark rate form-control' name='rate[]' value='0' readonly>
+        </td>
+        
+        <td style="width: 10%;" class='text-right'>
+          <input type='number' id='discount${rowCount}' class='text-right border-0 bg-white text-dark discount form-control' name='desc[]' value='0'>
+        </td>
+        
+        <td style="width: 22%;" class='text-right'>
+          <select name='tax[]'  id='tax${rowCount}' class='form-control border-0 bg-white text-dark text-right border-0 tax' onselect="toggleDateInput()">
+            <optgroup class="text-center text-black" label="GST">
                             <option class="text-black" value="0">0% GST(0%)</option>
                             <option class="text-black" value="3">3.0% GST(3%)</option>
                             <option class="text-black" value="5">5.0% GST(5%)</option>
                             <option class="text-black" value="12">12.0% GST(12%)</option>
                             <option class="text-black" value="18">18.0% GST(18%)</option>
                             <option class="text-black" value="28">28.0% GST(28%)</option>
-                        </select>
-                        <select name='tax[]' id='tax${rowCount}' class=' label-igst form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="toggleDateInput()">
+                          </optgroup>
+                          <optgroup  class="text-center textblack" label="IGST">
                             <option class="text-black" value="0">0% IGST(0%)</option>
                             <option class="text-black" value="3">3.0% IGST(3%)</option>
                             <option class="text-black" value="5">5.0% IGST(5%)</option>
                             <option class="text-black" value="12">12.0% IGST(12%)</option>
                             <option class="text-black" value="18">18.0% IGST(18%)</option>
-                            <option class="text-black" value="28">28.0% IGST(28%)</option>
-                    
-                    </select>
-                    
-                    <label id="ml${rowCount}" class="text-warning" style="display: none;"></label>
-                </td>
-                <td style="display: none;">
-                    <input type="text" name='taxamount' id="taxamount${rowCount}" class="form-control border-0 bg-transparent text-white taxamount" />
-                </td>
-                <td style="width: 15%;">
-                    <input type='number' id='amount${rowCount}' class='text-right border-0 bg-transparent text-white form-control amount' name='amount[]' value='0.00' readonly>
-                </td>
-                <td class='text-center'>
-                    <button type='button' id='del_btn${rowCount}' class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row' style='width:30px'>X</button> <br><br>
-                    <button type='button' class='btn btn-transparent text-primary btn-sm btn-outline-primary rounded-circle clone-row' data-row='${rowCount}' style='width:30px'><i class="fa fa-clone"></i></button>
-                </td>
-            </tr>
-        `;
+                            <option class="text-black" value="28">28.0% IGST(28%)</option>             
+                            </optgroup>
+          </select>
+          <label id="ml${rowCount}" class="text-warning" style="display: none;">dcx dffcd</label>
 
-
-
-      
+        </td>
+        
+        <td style=" display: none;">
+          <input type="text" name='taxamount' id="taxamount${rowCount}" class="form-control border-0 bg-transparent text-white taxamount" />
+        </td>
+        
+        <td style="width: 15%;" class='text-right'>
+          <input type='number' id='amount${rowCount}' class='text-right border-0 bg-white text-dark form-control amount' name='amount[]' value='0.00' readonly>
+        </td>
+        
+        <td class='text-center'>
+          <button type='button' id='del_btn${rowCount}' class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row' style='width:30px'>X</button><br><br>
+        <button type='button' class='btn btn-transparent text-primary btn-sm btn-outline-primary rounded-circle clone-row' data-row='${rowCount}' style='width:30px'><i class="fa fa-clone"></i>
+</button>
+      </td>
+      </tr>
+    `;
       $('#item_table tbody').append(newRow);
-      console.log("New row added. Row count: " + rowCount);
-      console.log("Initializing Select2 for item" + rowCount);
-      
-      $('#item' + rowCount).select2(); // Initialize Select2 for the newly added item dropdown
-      // Debug statement
-    console.log("Select2 initialized for item" + rowCount);
-      toggleDateInput(); // If this function is defined elsewhere in your code
-      calculateSubtotal(); // If this function is defined elsewhere in your code
-      calculateGrandTotal(); // If this function is defined elsewhere in your code
-  });
-  
+      $('#item' + rowCount).select2();
+      toggleDateInput();
+      calculateSubtotal();
+      calculateGrandTotal();
+    });
     $('#item_table').on('click', '.delete-row', function () {
 
       $(this).closest('tr').remove();
@@ -2942,6 +2767,7 @@
       calculateSubtotal();
       calculateGrandTotal();
       calculateTaxAmount();
+      rowCount--;
     });
     $('#srcofsupply').on('change', function () {
       var row = $(this).closest('tr');
@@ -2980,14 +2806,7 @@
       toggleDateInput();
       calculateTaxAmount();
     });
-    // Input change event for quantity, rate, and discount
-    $('#item_table').on('input', '.qty, .rate, .discount,.tax', function () {
-      var row = $(this).closest('tr');
-      calculateSubtotal();
-      calculateGrandTotal();
-      //toggleDateInput();
-      calculateTaxAmount();
-    });
+
 
     $('#shipping').on('input', function () {
       calculateGrandTotal();
@@ -3003,6 +2822,9 @@
     });
 
 
+
+
+
     // Event handler for clone button
     $('#item_table').on('click', '.clone-row', function () {
 
@@ -3011,6 +2833,7 @@
       var clonedRow = row.clone(); // Clone the current row
       var newRowId = 'row' + rowCount; // Generate a new ID for the cloned row
       clonedRow.attr('id', newRowId); // Set the new ID for the cloned row
+
 
       // Clone the options for tax, account, and item
       var currentItem = row.find('.item_select').val();
@@ -3034,36 +2857,380 @@
       document.getElementById(`row${rowCount}`).querySelectorAll("label")[0].id = `ml${rowCount}`;
 
       var row = $(this).closest('tr');
-      
       calculateRowAmount(row);
       calculateSubtotal();
       calculateGrandTotal();
-      toggleDateInput();
       calculateTaxAmount();
       toggleDateInput();
     });
 
 
-
-
-    
+    // Input change event for quantity, rate, and discount
+    $('#item_table').on('input', '.qty, .rate, .discount,.tax', function () {
+      var row = $(this).closest('tr');
+      calculateRowAmount(row);
+      calculateSubtotal();
+      calculateGrandTotal();
+      toggleDateInput();
+      calculateTaxAmount();
+    });
 
   });
-  function calculateTaxAmount() {
+
+
+</script>
+
+
+
+<script>
+ 
+  $(document).ready(function() {
+$('.itemselect').select2()
+
+  })
+
+
+
+    // Variable declarations
+    var companyState;
+    var oxy_gst;
+    var oxy_igst;
+
+ 
+  function itemfunction(id_str) {
+    console.log("Received ID:", id_str);
+   const id = id_str.split("item")[1]
+   console.log(id, "id o")
+
+
+    select = $(`#item${id}`).val();
+    customer = $('#customer_sel').val();
+    $.ajax({
+      type: "GET",
+      url: "{% url 'itemdata_invoice' %}",
+      data: {
+        id: select,
+        cust: customer
+      },
+      success: function (response) {
+console.log(response, "response")
+       
+        const data = response.rate
+        const data1 = response.gst
+        const data2 = response.igst
+        const data3 = response.pos
+        const data4 = response.place
+        const stock = response.stock
+        const hsn = response.hsn
+        console.log(hsn, "hsn")
+        const oxy_gst = data1
+        const oxy_igst = data2
+        document.getElementById(`hsn${id}`).value = hsn
+        document.getElementById(`rate${id}`).value = data
+        
+
+        toggleDateInput(id, oxy_igst, oxy_gst);
+
+
+        var rate = parseFloat(data);
+        var qty = parseFloat($(`#qty${id}`).val());
+        var tax = parseFloat($(`#tax${id}`).val());
+        var discount = parseFloat($(`#discount${id}`).val());
+        var rowAmount = (qty * rate) - discount;
+        var taxAmount = (rowAmount * tax) / 100;
+        $(`#amount${id}`).val(rowAmount.toFixed(2));
+        $(`#taxamount${id}`).val(taxAmount.toFixed(2));
+        $(`#stock_data${id}`).val(stock.toFixed(2));
+     
+
+       
+        $(document).on('blur', `#qty${id}`, function () {
+          initialStock = stock
+            var enteredQuantity = parseInt($(`#qty${id}`).val());
+        
+            if (isNaN(initialStock) || isNaN(enteredQuantity)) {
+                console.log("Either initialStock or enteredQuantity is not a number.");
+                return;
+            }
+        
+            if (enteredQuantity > 0) {
+                var updatedStock = initialStock - enteredQuantity;
+                console.log(updatedStock, "updated")
+                $(`#stock_data${id}`).val(updatedStock); // Use .val() instead of .text()
+                if (updatedStock < 0) {
+                  
+                    // If entered quantity is not greater than 0, display a message
+                    alert("Please enter a quantity less than stock.");}
+            }
+        
+            $(`#qty${id}`).val(enteredQuantity);
+        });
+  
+        
+        
+        var subtotal = 0;
+        item_table_rows = document.getElementById('item_table_body').querySelectorAll('tr')
+        for (let i = 1; i <= item_table_rows.length; i++) {
+          subtotal += parseFloat($(`#amount${id}`).val())
+        }
+        document.getElementById("subtotal").value = parseFloat(subtotal.toFixed(2))
+
+        var grandTotal = 0;
+        var totalTaxAmount = 0;
+        adjust = parseFloat(document.getElementById('adjust').value)
+        advance = parseFloat(document.getElementById('advance').value)
+        for (let i = 1; i <= item_table_rows.length; i++) {
+          var rowAmount = parseFloat($(`#amount${id}`).val());
+          grandTotal += rowAmount;
+          var taxAmount = parseFloat($(`#taxamount${id}`).val())
+          grandTotal += taxAmount;
+          totalTaxAmount += taxAmount;
+        }
+        var shippingCharges = parseFloat($('#shipping').val());
+        var adjust = parseFloat($('#adjust').val());
+        grandTotal += shippingCharges;
+        grandTotal += adjust
+        balance = grandTotal - advance
+        $('#grandtotal').val(grandTotal.toFixed(2));
+        $('#balance').val(balance.toFixed(2));
+        $('#total_taxamount').val(totalTaxAmount.toFixed(2));
+
+
+        var checkbox = document.getElementById("srcofsupply").value;
+        var srcofsupply = checkbox; // Replace with the actual value of srcofsupply
+
+
+        // Find the index of the hyphen
+        var index = srcofsupply.indexOf("-");
+
+        // Remove the first letters before the hyphen
+        var result = srcofsupply.substring(index + 1);
+
+        companyState = data4; // Replace with the actual value of company state
+        calculateTaxAmount();
+        var subtotal = parseFloat(document.getElementById("subtotal").value);
+        var shipping = parseFloat(document.getElementById("shipping").value);
+        var tax = parseFloat(document.getElementById("total_taxamount").value);
+        adjust = parseFloat(document.getElementById('adjust').value)
+        advance = parseFloat(document.getElementById('advance').value)
+        var tax_rate = 0.0; // Default tax rate for IGST
+        var total_taxamount = tax;
+        var cgst = 0.00;
+        var sgst = 0.00;
+        var igst = 0.00;
+        if (result === companyState) {
+          cgst = total_taxamount / 2;
+          sgst = total_taxamount / 2;
+        } else {
+          igst = tax;
+        }
+        document.getElementById("cgst").value = cgst.toFixed(2);
+        document.getElementById("sgst").value = sgst.toFixed(2);
+        document.getElementById("igst").value = igst.toFixed(2);
+        if (result === companyState) {
+          document.getElementById("tr_igst").style.display = "none";
+          document.getElementById("tr_cgst").style.display = "";
+          document.getElementById("tr_sgst").style.display = "";
+        } else {
+          document.getElementById("tr_igst").style.display = "";
+          document.getElementById("tr_cgst").style.display = "none";
+          document.getElementById("tr_sgst").style.display = "none";
+        }
+        document.getElementById("total_taxamount").value = total_taxamount.toFixed(2);
+        var grandtotal = subtotal + total_taxamount + shipping + adjust;
+        // Calculate and display the difference
+        balance = grandtotal - advance
+        document.getElementById("grandtotal").value = grandtotal.toFixed(2);
+        document.getElementById("balance").value = balance.toFixed(2);
+
+        const number= extractNumber(data2)
+        console.log(number, "mmm")
+        if (data3 === 'Kerala') {
+          console.log(data3, "data3")
+          //document.getElementById(`tgst${id}`).innerHTML = data1 + ' % GST';
+          
+        
+          document.getElementById(`tax${id}`).value = data1
+        }else {
+          console.log(data3, "else")
+ // document.getElementById(`tigst${id}`).innerHTML = data2 + ' % IGST';
+        
+ const select= document.getElementById(`tax${id}`).children[1].children 
+ for(let i=0; i<select.length; i++){
+  if (select[i].value===number){
+    document.getElementById(`tax${id}`).selectedIndex=i
+    break
+
+  }
+
+ }
+ console.log(select, "slect")
+
+        }
+      
+    
+      }
+    });
+
+
+  }
+  function extractNumber(squareBracketString) {
+    var regex = /\[(\d+[^[\]]*)\]/; // Matches one or more digits inside square brackets
+    var match = regex.exec(squareBracketString); // Searches the input string for a match
+
+    if (match && match[1]) {
+      var extractedNumber = match[1].replace(/%/g, ""); // Removes all occurrences of "%" symbol
+      return extractedNumber; // Returns the captured number inside the square brackets without "%"
+    } else {
+      return null; // Returns null if no match is found
+    }
+  }
+
+  function toggleDateInput(rowIndex) {
+
     var checkbox = document.getElementById("srcofsupply");
     var vale = checkbox.value;
     // Find the index of the hyphen
     var index = vale.indexOf("-");
     // Remove the first letters before the hyphen
     var result = vale.substring(index + 1);
-    var c_state = "{{company.state}}"; // Replace with the actual value of srcofsupply
+    console.log(result);
+
+    var c_state = '{{company.state}}';
+    console.log(c_state);
+
+    var gst = oxy_gst;
+    var igst = oxy_igst;
+
+   
+
+    var extractedGST = extractNumber(gst);
+    var extractedIGST = extractNumber(igst);
+    var taxElement = $('#tax' + rowIndex);
+    tax_value = $('#tax' + rowIndex).val();
+    var labelElement = $('#ml' + rowIndex);
+
+
+    if (result === c_state) {
+      taxElement.find('optgroup[label="GST"]').show();
+      taxElement.find('optgroup[label="IGST"]').hide();
+      var select = document.getElementById(`tax${rowIndex}`);
+      var gstOptgroup = taxElement.find('optgroup[label="GST"]');
+      var gstOptions = gstOptgroup.find('option');
+
+
+      for (var j = 0; j < gstOptions.length; j++) {
+        if (gstOptions[j].value === extractedGST) {
+          select.selectedIndex = gstOptions[j].index; // Set selectedIndex to the index of the matched option
+          // Add event listener for the change event
+          select.addEventListener('change', function () {
+            // Check if the selected index is different from the default selected index
+            if (select.selectedIndex !== gstOptions[j].index) {
+              // Show a message after manual selection
+              labelElement.text('Invalid Tax Rate*');
+              labelElement.css('display', 'block');
+            }
+            else {
+              labelElement.text('');
+              labelElement.css('display', 'none');
+
+            }
+          });
+          break;
+        }
+      }
+
+
+
+    } else {
+      taxElement.find('optgroup[label="GST"]').hide();
+      taxElement.find('optgroup[label="IGST"]').show();
+      var select = document.getElementById(`tax${rowIndex}`);
+      var igstOptgroup = taxElement.find('optgroup[label="IGST"]');
+      var igstOptions = igstOptgroup.find('option');
+
+      for (var j = 0; j < igstOptions.length; j++) {
+        if (igstOptions[j].value === extractedIGST) {
+          select.selectedIndex = igstOptions[j].index; // Set selectedIndex to the index of the matched option
+          // Add event listener for the change event
+          select.addEventListener('change', function () {
+            // Check if the selected index is different from the default selected index
+            if (select.selectedIndex !== igstOptions[j].index) {
+              // Show a message after manual selection;
+              labelElement.text('Invalid Tax Rate*');
+              labelElement.css('display', 'block');
+            }
+            else {
+              labelElement.text('');
+              labelElement.css('display', 'none');
+            }
+          });
+          break;
+        }
+
+      }
+
+
+    }
+  }
+
+
+  for (var i = 1; i <= rowCount; i++) {
+    // Generate table row
+    // ...
+
+    // Call toggleDateInput function for each row
+    toggleDateInput(i);
+
+  }
+  $(document).ready(function () {
+    $('#srcofsupply').on('change', function () {
+      //var x = $(this).val();
+      //console.log(x);
+      for (var i = 1; i <= rowCount; i++) {
+        // Generate table row
+        // ...
+
+        // Call toggleDateInput function for each row
+        toggleDateInput(i);
+      }
+    });
+  });
+
+
+  $(document).ready(function () {
+
+    for (var i = 1; i <= rowCount; i++) {
+      // Generate table row
+      // ...
+
+      // Call toggleDateInput function for each row
+      toggleDateInput(i);
+    }
+  });
+
+
+
+
+
+
+
+
+  function calculateTaxAmount() {
+    var checkbox = document.getElementById("srcofsupply");
+    var vale = checkbox.value;
+    // Find the index of the hyphen
+    var index = vale.indexOf("-");
+
+    // Remove the first letters before the hyphen
+    var result = vale.substring(index + 1);
+    var c_state = companyState;
 
     var subtotal = parseFloat(document.getElementById("subtotal").value);
     var shipping = parseFloat(document.getElementById("shipping").value);
     var tax = parseFloat(document.getElementById("total_taxamount").value);
     adjust = parseFloat(document.getElementById('adjust').value)
     advance = parseFloat(document.getElementById('advance').value)
-
     var tax_rate = 0.0; // Default tax rate for IGST
 
 
@@ -3110,235 +3277,62 @@
   document.getElementById("shipping").addEventListener("input", calculateTaxAmount);
 
 
-  
 
 </script>
+
 <!--
 
 <script>
 
-  var oxy_gst;
-  var oxy_igst;
+  
+  $(document).ready(function() {
+    // Loop through each select element with the class 'extra' and initialize select2
+    $(".extra").each(function() {
+        var id = $(this).attr("id").replace("item", ""); // Get the ID of the row
 
-  function itemfunction(id_str) {
-    id = id_str.split("item")[1]
+        console.log(id, "id in the top")
+        $("#" + $(this).attr("id")).select2(); // Initialize select2 for the current row
+        var t=$("#" + $(this).attr("id")).select2(); 
+        
 
-    select = $(`#item${id}`).val();
-    customer = $('#customer_sel').val();
-    $.ajax({
-      type: "GET",
-      url: "{% url 'itemdata' %}",
-      data: {
-        id: select,
-        cust: customer
-      },
-      success: function (response) {
-        data = response.rate
-        data1 = response.gst
-        data2 = response.igst
-        data3 = response.pos
-        data4 = response.place
-        stock = response.stock
-        hsn = response.hsn
-        oxy_gst = data1
-        oxy_igst = data2
-        document.getElementById(`hsn${id}`).value = hsn
-        document.getElementById(`rate${id}`).value = data
-        toggleDateInput(id, oxy_gst, oxy_igst)
-      }
+        // Event listener for select2 select event
+        $("#" + $(this).attr("id")).on('change', function(e) {
+            var selectedId = $(this).val(); // Get the ID of the selected element
+            console.log(selectedId, "selectedId");
+            var customerId = $('#customer_sel').val(); // Get the customer ID from your form
+
+            // Make AJAX call to fetch item data
+            $.ajax({
+                type: "GET",
+                url: "{% url 'itemdata_invoice' %}",
+                data: {
+                    id: selectedId, // Pass the selected item ID
+                    cust: customerId
+                },
+                success: function(response) {
+                  var itemdata_one=response.item
+                  console.log(itemdata_one, "itemdata one")
+                    // Handle the response data
+                    console.log(itemdata_one,  "response of AJAX call");
+                    // Call the itemfunction with the received data
+                    itemfunction(itemdata_one);
+                    var k = itemfunction(itemdata_one);
+                    console.log(itemdata_one, "itemfuntion output");
+                },
+                error: function(xhr, status, error) {
+                    // Handle errors
+                    console.error(xhr.responseText);
+                }
+            });
+        });
     });
-  }
+});
 
-
-  function toggleDateInput(rowIndex) {
-    var checkbox = document.getElementById("srcofsupply");
-    var vale = checkbox.value;
-    // Find the index of the hyphen
-    var index = vale.indexOf("-");
-    // Remove the first letters before the hyphen
-    var result = vale.substring(index + 1);
-    var c_state = "{{company.state}}";
-    var gst = oxy_gst;
-    var igst = oxy_igst;
-
-    function extractNumber(squareBracketString) {
-      var regex = /\[(\d+[^[\]]*)\]/; // Matches one or more digits inside square brackets
-      var match = regex.exec(squareBracketString); // Searches the input string for a match
-
-      if (match && match[1]) {
-        var extractedNumber = match[1].replace(/%/g, ""); // Removes all occurrences of "%" symbol
-        return extractedNumber; // Returns the captured number inside the square brackets without "%"
-      } else {
-        return null; // Returns null if no match is found
-      }
-    }
-
-    var extractedGST = extractNumber(gst);
-    var extractedIGST = extractNumber(igst);
-    var taxElement = $('#tax' + rowIndex);
-    tax_value = $('#tax' + rowIndex).val();
-    var labelElement = $('#ml' + rowIndex);
-
-
-    if (result === c_state) {
-      taxElement.find('optgroup[label="GST"]').show();
-      taxElement.find('optgroup[label="IGST"]').hide();
-      var select = document.getElementById(`tax${rowIndex}`);
-      var gstOptgroup = taxElement.find('optgroup[label="GST"]');
-      var gstOptions = gstOptgroup.find('option');
-
-      for (var j = 0; j < gstOptions.length; j++) {
-        if (gstOptions[j].value === extractedGST) {
-          select.selectedIndex = gstOptions[j].index; // Set selectedIndex to the index of the matched option
-          select.addEventListener('change', function () {
-            // Check if the selected index is different from the default selected index
-            if (select.selectedIndex !== gstOptions[j].index) {
-              // Show a message after manual selection
-              labelElement.text('Invalid Tax Rate*');
-              labelElement.css('display', 'block');
-            }
-            else {
-              labelElement.text('');
-              labelElement.css('display', 'none');
-
-            }
-          });
-          break;
-        }
-      }
-    } else {
-      taxElement.find('optgroup[label="GST"]').hide();
-      taxElement.find('optgroup[label="IGST"]').show();
-      var select = document.getElementById(`tax${rowIndex}`);
-      var igstOptgroup = taxElement.find('optgroup[label="IGST"]');
-      var igstOptions = igstOptgroup.find('option');
-
-      for (var j = 0; j < igstOptions.length; j++) {
-        if (igstOptions[j].value === extractedIGST) {
-          select.selectedIndex = igstOptions[j].index; // Set selectedIndex to the index of the matched option
-          select.addEventListener('change', function () {
-            // Check if the selected index is different from the default selected index
-            if (select.selectedIndex !== igstOptions[j].index) {
-              // Show a message after manual selection;
-              labelElement.text('Invalid Tax Rate*');
-              labelElement.css('display', 'block');
-            }
-            else {
-              labelElement.text('');
-              labelElement.css('display', 'none');
-
-            }
-          });
-          break;
-        }
-
-      }
-    }
-
-  }
-
-  $('#srcofsupply').on('change', function () {
-    for (var i = 1; i <= rowCount; i++) {
-      // Generate table row
-      // ...
-
-      // Call toggleDateInput function for each row
-      toggleDateInput(i);
-    }
-  });
-
-
-
-
- /* $(window).on('load', function () {
-
-    function toggleDateInputs(rowIndex) {
-      console.log(rowIndex);
-      var checkbox = document.getElementById("srcofsupply");
-      var vale = checkbox.value;
-      // Find the index of the hyphen
-      var index = vale.indexOf("-");
-      // Remove the first letters before the hyphen
-      var result = vale.substring(index + 1);
-      var c_state = "{{company.state}}";
-      console.log(result);
-      console.log(c_state);
-
-
-      var taxElement = $('#tax' + rowIndex);
-
-      if (result === c_state) {
-        taxElement.find('optgroup[label="GST"]').show();
-        taxElement.find('optgroup[label="IGST"]').hide();
-        var select = document.getElementById(`tax${rowIndex}`);
-        var gstOptgroup = taxElement.find('optgroup[label="GST"]');
-        var gstOptions = gstOptgroup.find('option');
-
-        for (var j = 0; j < gstOptions.length; j++) {
-          select.selectedIndex = gstOptions[0].index; // Set selectedIndex to the index of the matched option
-          break;
-        }
-      } else {
-        taxElement.find('optgroup[label="GST"]').hide();
-        taxElement.find('optgroup[label="IGST"]').show();
-        var select = document.getElementById(`tax${rowIndex}`);
-        var igstOptgroup = taxElement.find('optgroup[label="IGST"]');
-        var igstOptions = igstOptgroup.find('option');
-        for (var j = 0; j < igstOptions.length; j++) {
-          select.selectedIndex = igstOptions[0].index; // Set selectedIndex to the index of the matched option
-          break;
-        }
-      }
-    }
-
-    var r = document.querySelectorAll('#item_table tbody tr');
-    var rr = r.length;
-    for (var i = 1; i <= rr; i++) {
-      // Generate table row
-      // ...
-
-      // Call toggleDateInput function for each row
-      toggleDateInputs(i);
-    }
-
-  });*/
-
-
-
-
-
-</script>
-
+</script>-->
+<!--
 <script>
-
-  $(document).ready(function () {
-    item_table_rows = document.getElementById('item_table_body').querySelectorAll('tr')
-
-    for (let i = 1; i <= item_table_rows.length; i++) {
-      select1 = $(`#item${i}`).val();
-      customer1 = $('#customer_sel').val();
-      $.ajax({
-        type: "GET",
-        url: "{% url 'itemdata' %}",
-        data: {
-          id: select1,
-          cust: customer1
-        },
-        success: function (response) {
-          stock = response.stock
-          hsn = response.hsn
-          document.getElementById(`hsn${i}`).value = hsn
-          document.getElementById(`stock_data${i}`).innerHTML = stock
-        }
-      });
-    }
-
-
-
-  })
-
-    $(document).ready(function() {
-  $("#item1").select2();
+$(document).ready(function() {
+  $("#item${rowCount}").select2();
       $(".extra").each(function(){
         var id = $(this).attr("id");
         $("#"+id).select2();
@@ -3346,626 +3340,5 @@
 
 });
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer></script>
-<script>
-
-
-
-</script>
-  <script>
-    function changewithitem(a, itemId) {
-      var id = a.value;
-      var rowId = a.id.slice(4); // Extract the row number from the select element's ID
-      console.log(id, "changewithitem_id");
-      console.log('rowId', rowId);
-      console.log('itemId', itemId);
-      updateFields(id, rowId, itemId); // Pass itemId to the updateFields function
-  }
-    var initialStock =0;  
-// Function to update fields based on dropdown ID
-
-
-
-
-function updateFields(rowCount, rowId, itemId) {
-  var select = rowCount; 
-  console.log(select, "select test");
-  var source = $('#srcofsupply').val(); 
-  $.ajax({
-      type: "GET",
-      url: "{% url 'itemdatadebit' %}", 
-      data: {
-          id: select, 
-          isd: source 
-      },
-      success: function (response) {
-          if (response && response.error_flag === 1) {
-              $('#errorLabel').text("Item is not present"); 
-          } else {
-              $('#errorLabel').text(""); 
-
-              $('#hsn' + rowId).val(response.hsn); 
-              var data1 = response.price;
-              console.log(data1, "data1");
-              document.getElementById(`rate${rowId}`).value = data1;
-
-              $('#stock_data' + rowId).val(response.qty); 
-              console.log(response.qty, "stock");
-
-              initialStock = parseInt(response.qty);
-
-              // Set display property based on the source and place
-              if (source === 'Kerala') {
-                  $('.label-gst').show();
-                  $('.label-igst').hide();
-                  // Set the options in the GST dropdown
-                  $('.label-gst').html(response.tax_options);
-              } else {
-                  $('.label-gst').hide();
-                  $('.label-igst').show();
-                  // Set the options in the IGST dropdown
-                  $('.label-igst').html(response.tax_options);
-              }
-
-              // Recalculate row amount after updating fields
-              calculateRowAmount($('#row' + `${rowId}`));
-mno = ($('#row' + `${rowId}`))
-console.log(mno, "mno make")
-
-
-
-
-
-
-// Function to calculate subtotal
-function calculateSubtotal() {
-  console.log("Calculating subtotal...");
-  var subtotal = 0;
-  // Iterate over each row in the item table
-  $('#item_table tbody tr').each(function () {
-      // Calculate the row amount and add it to the subtotal
-      subtotal += calculateRowAmount($(this));
-  });
-  // Update the subtotal field with the calculated value
-  $('#subtotal').val(subtotal.toFixed(2));
-  console.log("Subtotal calculated:", subtotal);
-}
-
-// Function to calculate grand total
-function calculateGrandTotal() {
-  console.log("Calculating grand total...");
-  var grandTotal = 0;
-  var totalTaxAmount = 0;
-  var advance = parseFloat($('#advance').val());
-
-  // Iterate over each row in the item table
-  $('#item_table tbody tr').each(function () {
-      // Calculate the row amount and tax amount for the row
-      var rowAmount = calculateRowAmount($(this));
-      grandTotal += rowAmount;
-
-      // Retrieve the tax amount from the row and add it to the grand total
-      var taxAmount = parseFloat($(this).find('.taxamount').val());
-      taxAmount = isNaN(taxAmount) ? 0 : taxAmount;
-      grandTotal += taxAmount;
-      totalTaxAmount += taxAmount;
-  });
-
-  // Retrieve shipping charges and adjustment values
-  var shippingCharges = parseFloat($('#shipping').val());
-  var adjust = parseFloat($('#adjust').val());
-
-  // Add shipping charges and adjustment to the grand total
-  grandTotal += adjust;
-  grandTotal += shippingCharges;
-
-  // Calculate the balance
-  var balance = grandTotal - advance;
-
-  // Update the grand total, balance, and total tax amount fields
-  $('#grandtotal').val(grandTotal.toFixed(2));
-  $('#balance').val(balance.toFixed(2));
-  $('#total_taxamount').val(totalTaxAmount.toFixed(2));
-
-  console.log("Grand total calculated:", grandTotal);
-}
-
-// Event handler for changes in tax values
-$('#item_table').on('change', '.tax', function () {
-  console.log("Tax change detected...");
-  // Calculate row amount, subtotal, and grand total when tax value changes
-  calculateRowAmount($(this).closest('tr'));
-  calculateSubtotal();
-  calculateGrandTotal();
-});
-
-// Execute when the "Add Row" button is clicked
-$('#add-row').click(function () {
-  // Add a new row
-  addNewRow();
-});
-
-
-
-
-
-
-
-
-              // Function to calculate row amount
-function calculateRowAmount(row) {
-  // Log a message to indicate that the function is being called
-  console.log("Calculating row amount for row:", row.index());
-
-  // Retrieve quantity, rate, tax, and discount values from the row
-  var qty = parseFloat(row.find('.qty').val());
-  var rate = parseFloat(row.find('.rate').val());
-  var tax = parseFloat(row.find('.tax').val());
-  var discount = parseFloat(row.find('.discount').val());
-
-  // Set default values to 0 if NaN (Not-a-Number) is encountered
-  qty = isNaN(qty) ? 0 : qty;
-  rate = isNaN(rate) ? 0 : rate;
-  tax = isNaN(tax) ? 0 : tax;
-  discount = isNaN(discount) ? 0 : discount;
-
-  // Calculate the row amount
-  var rowAmount = (qty * rate) - discount;
-
-
-  console.log( rowAmount, "rowAmount")
-
-  console.log( rate, "rate")
-  console.log( qty, "qty")
-  console.log( discount, "discount")
-
-  // Calculate the tax amount
-  var taxAmount = (rowAmount * tax) / 100;
-  console.log( taxAmount, "taxAmount")
-  console.log( tax, "tax")
-  // Update the row amount and tax amount fields in the row
-  row.find('.amount').val(rowAmount.toFixed(2));
-  row.find('.taxamount').val(taxAmount.toFixed(2));
-
-  // Log messages to indicate the calculated amounts
-  console.log("Row amount calculated for row  jkjji", row.index(), ":", rowAmount.toFixed(2));
-  console.log("Tax amount calculated for row  hjh", row.index(), ":", taxAmount.toFixed(2));
-
-  // Return the calculated row amount
-  return rowAmount;
-}
-
-          }
-      },
-      error: function (xhr, status, error) {
-          console.error("Error:", error);
-          // Handle error cases here
-      }
-  });
-}
-
-
-function extractTax(tax){
-
-  var match = tax.match(/\[(\d+)%\]/);
-
-  if (match) {
-
-    var percentageValue = match[1];
-
-
-    percentageValue = parseInt(percentageValue, 10);
-
-    return percentageValue;
-  }
-
-}
-    </script>
-  <script>
-    $(document).on('blur', '[id^="qty"]', function () {
-    });
-  // Execute when the document is ready
-
-
-
-
-     /* var rowCount = 1; // Initialize rowCount to 1
-
-      // Function to initialize Select2 for item dropdown
-      function initializeSelect2(rowCount) {
-          $('#item' + rowCount).select2(); // Initialize Select2 for the item dropdown with the current rowCount
-          // This function initializes the Select2 plugin for the item dropdown identified by the current rowCount
-          // Add CSS to center the text
-        $('#item' + rowCount).next('.select2-container').find('.select2-selection__rendered').css('text-align', 'center');
-      }*/
-
-    
-     
-
-      // Function to handle change events for source of supply and item
-    /*  function handleChangeEvents() {
-          // Execute when the source of supply or item changes
-          $('[id^="srcofsupply"], [id^="item"]').change(function() {
-              var id = getId(this); // Get the ID of the changed element
-              updateFields(id); // Update fields based on the ID
-          });
-      }*/
-
-   // Variable to store the initial stock value
-var initialStock = 0;
-
-
-// Function to handle quantity change
-function qtychange(id_str) {
-    var id = id_str.split("qty")[1];
-    var qtyInput = $(`#qty${id}`).val();
-
-    console.log(initialStock, "initialStock");
-    console.log(qtyInput, "qtyInput");
-
-    // Remove leading zeros from the input values
-    var qty = parseFloat(qtyInput);
-
-    // Check if the input values are valid numbers after removing leading zeros
-    if (!isNaN(qty) && !isNaN(initialStock) && qtyInput.trim() !== "") {
-        console.log(initialStock, "initialStock");
-        console.log(qty, "qty");
-
-        if (qty > initialStock) {
-            alert("Entered quantity is greater than available quantity");
-            $(`#qty${id}`).val(''); // Clear the entered quantity
-        } else {
-            var remainingStock = initialStock - qty;
-            $(`#stock_data${id}`).val(remainingStock);
-            console.log(remainingStock, "remainingStock");
-        }
-    } else {
-        // Handle invalid input (non-numeric)
-        alert("Please enter numeric values for quantity and stock");
-        $(`#qty${id}`).val(''); // Clear the entered quantity
-    }
-}
-
-// Bind the qtychange function to the input event of the quantity input field
-$(document).on('input', 'input[id^="qty"]', function() {
-    qtychange(this.id);
-});
-
-
-// Function to extract row count from element ID
-function getId(element) {
-  return $(element).attr('id').match(/\d+/)[0]; // Extract the numeric part from the ID
-}
-
-// Function to add a new row
-function addNewRow() {
-  rowCount++;
-  var newRow = '<tr id="row' + rowCount + '">'; // Create HTML for the new row
-  // Append the new row to the table body
-  $('#item_table tbody').append(newRow);
-
-  // Initialize Select2 for the new item dropdown
-  initializeSelect2(rowCount);
-
-  // Update fields when source of supply or item changes
-  handleChangeEvents();
-
-  // Recalculate amounts for all rows
-  $('#item_table tbody tr').each(function () {
-      var currentRowCount = parseInt($(this).attr('id').match(/\d+/)[0]); // Extract the row count from the ID
-      if (!isNaN(currentRowCount) && currentRowCount <= rowCount) { // Ensure only existing rows are considered
-          var row = $('#row' + currentRowCount);
-          if (isValidRow(row)) { // Check if the row has valid inputs
-              calculateRowAmount(row); // Recalculate amount for the current row
-              console.log("Calculating row amount for row:", currentRowCount);
-          } else {
-              console.log("Invalid input detected for row", currentRowCount);
-          }
-      }
-  });
-
-  calculateGrandTotal(); // Recalculate grand total for all rows
-  console.log("Calculating grand total...");
-
-  calculateSubtotal(); // Recalculate subtotal for all rows
-  console.log("Calculating subtotal...");
-
-  calculateTaxAmount(); // Recalculate tax amounts for all rows
-  console.log("Calculating tax amount...");
-  initializeSelect2ForNewRow(rowCount);
-}
-// Function to initialize Select2 for newly added row
-function initializeSelect2ForNewRow(rowCount) {
-  var selector = '#row' + rowCount + ' .item'; // Assuming the class of the item dropdown is "item"
-  $(selector).select2(); // Initialize Select2 for the newly added row
-}
-// Function to check if a row has valid inputs
-function isValidRow(row) {
-  var qty = parseFloat(row.find('.qty').val());
-  var rate = parseFloat(row.find('.rate').val());
-  var tax = parseFloat(row.find('.tax').val());
-  var discount = parseFloat(row.find('.discount').val());
-
-  // Set NaN values to 0
-  qty = isNaN(qty) ? 0 : qty;
-  rate = isNaN(rate) ? 0 : rate;
-  tax = isNaN(tax) ? 0 : tax;
-  discount = isNaN(discount) ? 0 : discount;
-
-  // Check if any of the inputs are NaN or undefined
-  if (isNaN(qty) || isNaN(rate) || isNaN(tax) || isNaN(discount)) {
-      return false;
-  }
-  return true;
-}
-
-
-
-// Execute when the "Add Row" button is clicked
-$('#add-row').click(function () {
-  addNewRow(); // Add a new row
-});
-
-// Initial setup
-var rowCount = $('#item_table tbody tr').length; // Initialize rowCount based on existing rows
-initializeSelect2(rowCount); // Initialize Select2 for the first item dropdown
-handleChangeEvents(); // Handle change events for source of supply and item
-
-
-
-// Initial setup
-initializeSelect2(rowCount); // Initialize Select2 for the first item dropdown
-handleChangeEvents(); // Handle change events for source of supply and item
-});
-  // Function to handle change events for source of supply
-$('#srcofsupply').change(function() {
-  var source = $(this).val(); // Get the value of the selected source of supply
-
-  // Determine the tax group label based on the source of supply
-  var taxGroupLabel = (source === "[KL]-Kerala") ? "GST" : "IGST";
-  $('#taxGroupLabel').text(taxGroupLabel); // Update tax group label
-
-  // Determine the tax options based on the source of supply
-  var taxOptions = (source === "[KL]-Kerala") ? "intrastate" : "interstate";
-
-  // Update tax dropdown options for all rows
-  $('[id^="tax"]').each(function() {
-      var taxDropdownId = '#' + $(this).attr('id');
-      $(taxDropdownId).empty(); // Clear existing options
-      var taxGroupLabel = (source === "[KL]-Kerala") ? "GST" : "IGST";
-      $(taxDropdownId).append('<option value="' + taxOptions + '">' + taxGroupLabel + '</option>'); // Add tax option
-      // Add fixed tax options
-      $(taxDropdownId).append('<option value="0"> (' + taxGroupLabel + ' - 0%)</option>');
-      $(taxDropdownId).append('<option value="3"> (' + taxGroupLabel + ' - 3%)</option>');
-      $(taxDropdownId).append('<option value="5"> (' + taxGroupLabel + ' - 5%)</option>');
-      $(taxDropdownId).append('<option value="12"> (' + taxGroupLabel + ' - 12%)</option>');
-      $(taxDropdownId).append('<option value="18"> (' + taxGroupLabel + ' - 18%)</option>');
-      $(taxDropdownId).append('<option value="28"> (' + taxGroupLabel + ' - 28%)</option>');
-  });
-
-  // Update fields for all rows
-  $('[id^="item"]').each(function() {
-      var id = getId(this); // Get the ID of the item dropdown
-      updateFields(id); // Update fields based on the ID
-  });
-});
-/*function calculateRowAmount2(row) {
-  var quantity = parseFloat(row.find('.qty').val()); // Get the quantity from the input field in the row
-  var rate = parseFloat(row.find('.rate').val()); // Get the rate from the input field in the row
-  var amount = quantity * rate; // Calculate the amount
-
-  // Update the amount in the row
-  row.find('.amount').text(amount.toFixed(2)); // Update the amount in the row
-  console.log(amount, "amount")
-}*/
-// Function to calculate row amount
-/*function calculateRowAmount(row) {
-  console.log("Calculating row amount for row:", row.index());
-
-  var qty = parseFloat(row.find('.qty').val());
-  console.log("Quantity for row", row.index(), ":", qty);
-  console.log("Quantity entered");
-  var rate = parseFloat(row.find('.rate').val());
-  console.log("Rate for row", row.index(), ":", rate);
-
-  var tax = parseFloat(row.find('.tax').val());
-  console.log("Tax for row", row.index(), ":", tax);
-
-  var discount = parseFloat(row.find('.discount').val());
-  console.log("Discount for row", row.index(), ":", discount);
-
-  // Set NaN values to 0
-  qty = isNaN(qty) ? 0 : qty;
-  rate = isNaN(rate) ? 0 : rate;
-  tax = isNaN(tax) ? 0 : tax;
-  discount = isNaN(discount) ? 0 : discount;
-
-  var rowAmount = (qty * rate) - discount;
-  console.log("Row amount calculated for row", row.index(), ":", rowAmount);
-
-  var taxAmount = (rowAmount * tax) / 100;
-  console.log("Tax amount calculated for row", row.index(), ":", taxAmount);
-
-  row.find('.amount').val(rowAmount.toFixed(2));
-  row.find('.taxamount').val(taxAmount.toFixed(2));
-
-  console.log("Row amount set for row", row.index(), ":", rowAmount.toFixed(2));
-  console.log("Tax amount set for row", row.index(), ":", taxAmount.toFixed(2));
-
-  return rowAmount;
-}
-
-// Function to calculate subtotal
-function calculateSubtotal() {
-  console.log("Calculating subtotal...");
-  var subtotal = 0;
-  $('#item_table tbody tr').each(function () {
-    subtotal += calculateRowAmount($(this));
-  });
-  $('#subtotal').val(subtotal.toFixed(2));
-  console.log("Subtotal calculated:", subtotal);
-}
-
-// Function to calculate grand total
-function calculateGrandTotal() {
-  console.log("Calculating grand total...");
-  var grandTotal = 0;
-  var totalTaxAmount = 0;
-  var advance = parseFloat($('#advance').val());
-
-  $('#item_table tbody tr').each(function () {
-    var rowAmount = calculateRowAmount($(this));
-    grandTotal += rowAmount;
-
-    var taxAmount = parseFloat($(this).find('.taxamount').val());
-    taxAmount = isNaN(taxAmount) ? 0 : taxAmount; // Set NaN values to 0
-    grandTotal += taxAmount;
-    totalTaxAmount += taxAmount;
-  });
-
-  var shippingCharges = parseFloat($('#shipping').val());
-  var adjust = parseFloat($('#adjust').val());
-
-  grandTotal += adjust;
-  grandTotal += shippingCharges;
-
-  var balance = grandTotal - advance;
-
-  $('#grandtotal').val(grandTotal.toFixed(2));
-  $('#balance').val(balance.toFixed(2));
-  $('#total_taxamount').val(totalTaxAmount.toFixed(2));
-
-  console.log("Grand total calculated:", grandTotal);
-}
-
-// Event handler for changes in tax values
-$('#item_table').on('change', '.tax', function () {
-  console.log("Tax change detected...");
-  var row = $(this).closest('tr');
-  calculateRowAmount(row);
-  calculateSubtotal();
-  calculateGrandTotal();
-});
-
-// Execute when the "Add Row" button is clicked
-$('#add-row').click(function () {
-  addNewRow(); // Add a new row
-});*/
-
-// Function to calculate row amount
-function calculateRowAmount(row) {
-  // Log a message to indicate that the function is being called
-  console.log("Calculating row amount for row:", row.index());
-
-  // Retrieve quantity, rate, tax, and discount values from the row
-  var qty = parseFloat(row.find('.qty').val());
-  var rate = parseFloat(row.find('.rate').val());
-  var tax = parseFloat(row.find('.tax').val());
-  var discount = parseFloat(row.find('.discount').val());
-
-  // Set default values to 0 if NaN (Not-a-Number) is encountered
-  qty = isNaN(qty) ? 0 : qty;
-  rate = isNaN(rate) ? 0 : rate;
-  tax = isNaN(tax) ? 0 : tax;
-  discount = isNaN(discount) ? 0 : discount;
-
-  // Calculate the row amount
-  var rowAmount = (qty * rate) - discount;
-
-  // Calculate the tax amount
-  var taxAmount = (rowAmount * tax) / 100;
-
-  // Update the row amount and tax amount fields in the row
-  row.find('.amount').val(rowAmount.toFixed(2));
-  row.find('.taxamount').val(taxAmount.toFixed(2));
-
-  // Log messages to indicate the calculated amounts
-  console.log("Row amount calculated for row", row.index(), ":", rowAmount.toFixed(2));
-  console.log("Tax amount calculated for row", row.index(), ":", taxAmount.toFixed(2));
-
-  // Return the calculated row amount
-  return rowAmount;
-}
-
-// Function to calculate subtotal
-function calculateSubtotal() {
-  console.log("Calculating subtotal...");
-  var subtotal = 0;
-  // Iterate over each row in the item table
-  $('#item_table tbody tr').each(function () {
-      // Calculate the row amount and add it to the subtotal
-      subtotal += calculateRowAmount($(this));
-  });
-  // Update the subtotal field with the calculated value
-  $('#subtotal').val(subtotal.toFixed(2));
-  console.log("Subtotal calculated:", subtotal);
-}
-
-// Function to calculate grand total
-function calculateGrandTotal() {
-  console.log("Calculating grand total...");
-  var grandTotal = 0;
-  var totalTaxAmount = 0;
-  var advance = parseFloat($('#advance').val());
-
-  // Iterate over each row in the item table
-  $('#item_table tbody tr').each(function () {
-      // Calculate the row amount and tax amount for the row
-      var rowAmount = calculateRowAmount($(this));
-      grandTotal += rowAmount;
-
-      // Retrieve the tax amount from the row and add it to the grand total
-      var taxAmount = parseFloat($(this).find('.taxamount').val());
-      taxAmount = isNaN(taxAmount) ? 0 : taxAmount;
-      grandTotal += taxAmount;
-      totalTaxAmount += taxAmount;
-  });
-
-  // Retrieve shipping charges and adjustment values
-  var shippingCharges = parseFloat($('#shipping').val());
-  var adjust = parseFloat($('#adjust').val());
-
-  // Add shipping charges and adjustment to the grand total
-  grandTotal += adjust;
-  grandTotal += shippingCharges;
-
-  // Calculate the balance
-  var balance = grandTotal - advance;
-
-  // Update the grand total, balance, and total tax amount fields
-  $('#grandtotal').val(grandTotal.toFixed(2));
-  $('#balance').val(balance.toFixed(2));
-  $('#total_taxamount').val(totalTaxAmount.toFixed(2));
-
-  console.log("Grand total calculated:", grandTotal);
-}
-
-// Event handler for changes in tax values
-$('#item_table').on('change', '.tax', function () {
-  console.log("Tax change detected...");
-  // Calculate row amount, subtotal, and grand total when tax value changes
-  calculateRowAmount($(this).closest('tr'));
-  calculateSubtotal();
-  calculateGrandTotal();
-});
-
-// Execute when the "Add Row" button is clicked
-$('#add-row').click(function () {
-  // Add a new row
-  addNewRow();
-});
-
-
-
-
-
-
-
-</script>
-
-
 -->
-
-
-
 {% endblock %}
