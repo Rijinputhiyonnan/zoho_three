@@ -26325,7 +26325,8 @@ def add_prod(request):     #updation
         order_no = request.POST['ord_no']
         cheque_number = ''
         upi_id = ''
-        payment_method = request.POST['payment_method']
+        payment_method = request.POST.get('payment_method', '')
+
         account_number = ''  # Initialize account_number
         
         if payment_method == 'cash':
@@ -26357,8 +26358,9 @@ def add_prod(request):     #updation
     
 
         
-        inv_date_str = request.POST['inv_date']  
-        due_date_str = request.POST['due_date']  
+        inv_date_str = request.POST.get('inv_date', "")
+        due_date_str = request.POST.get('due_date', "")
+ 
         
         inv_date_str = request.POST.get('inv_date', "")
         due_date_str = request.POST.get('due_date', "")
@@ -26384,10 +26386,16 @@ def add_prod(request):     #updation
                     status="draft"
                 if "Save" in request.POST:
                     status = "approved"
-                shipping_charge = request.POST.get('shipping_charge', "")
-                adjustment_charge = request.POST.get('adjustment_charge', "")
-                paid_amount = request.POST.get('paid_amount', "")
-                balance = request.POST.get('balance', "")
+                # Get the adjustment charge from the request, defaulting to 0 if empty
+                adjustment_charge = request.POST.get('adjustment_charge', 0)
+
+                # Similarly, handle other fields that expect numerical values
+                shipping_charge = request.POST.get('shipping_charge', 0)
+                paid_amount = request.POST.get('paid_amount', 0)
+                balance = request.POST.get('balance', 0)
+
+                # Now you can use these values safely
+
                 reference=request.POST['ord_no']
                 invn = invoice(user=user, customer=custo, invoice_no=invoice_no, terms=terms, order_no=order_no, 
                                 inv_date=inv_date, due_date=due_date, cxnote=cxnote, subtotal=subtotal, 
@@ -26397,6 +26405,9 @@ def add_prod(request):     #updation
                                 pterms=pterms)
                 invn.save()
                 account_number = bank_instance.ac_no if bank_instance else ''
+                avlquantity = request.POST.get('avlquantity', '')
+        
+                #unit_instance = get_object_or_404(Unit, id=avlquantity)
 
                 
                 invoice_payment = InvoicePayment(
@@ -26411,15 +26422,13 @@ def add_prod(request):     #updation
                 
                 invoice_payment.save()
                 
-                avlquantity = request.POST.get('avlquantity', '')
-        
-                unit_instance = get_object_or_404(Unit, id=avlquantity)
+               
                 
                 # Create the AddItem instance with the selected Unit
                 additem = AddItem(
-                    stock=unit_instance.stock,  
+                   # stock=unit_instance.stock,  
                     user=user,
-                    unit=unit_instance,
+                    #unit=unit_instance,
                     sales=sales,
                     purchase=purchase,
                    
@@ -27475,6 +27484,7 @@ def invoice_overview(request, id):
     payment = InvoicePayment.objects.filter(invoice=id)
     bank = Bankcreation.objects.filter(user=user)
     pt = payment_terms.objects.filter(user=user)
+    item=  AddItem.objects.filter(user=user)
     attach = InvoiceAttach.objects.filter(invoice=id)
 
     context = {
@@ -27489,6 +27499,8 @@ def invoice_overview(request, id):
         'pt': pt,
         'attach': attach,
         'id': id,
+        'item': item,
+        
     }
     return render(request, 'invoice_overview.html', context)
 
@@ -27846,8 +27858,8 @@ def itemdata_invoice(request):
 
     try:
         
-        item = AddItem.objects.get(id=id)
-        item_id=item.id
+        item = AddItem.objects.get(Name=id)
+        item_id=item.Name
         rate = item.s_price
         place=company.state
         gst = item.intrastate

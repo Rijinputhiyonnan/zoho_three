@@ -338,9 +338,10 @@
               <div class="d-flex">
                 <select class="custom-select" name="terms" required style="background-color: #43596c; color: white;" id="termadd">
                     <option value=" " selected hidden> Select Payment Term</option>
-                    <option value="0">Due on Receipt</option>
-                    <option value="30">NET 30</option>
-                    <option value="60">NET 60</option>
+                   
+                    
+
+                    
                     {% for term in terms %}
                         <option value="{{term.days}}">{{term.term}}</option>
                     {% endfor %}

@@ -18,43 +18,7 @@
 
 
 <!-- <link rel="stylesheet" href="{% static 'assets/css/style.css' %}"> -->
-<style>
-  /* Style the Select2 dropdown */
-  .select2-container {
-      width: 100%;
-  }
 
-  .select2-container .select2-selection--single {
-      height: 38px;
-  }
-
-  .select2-container--default .select2-selection--single .select2-selection__rendered {
-      line-height: 38px;
-  }
-
-  .select2-container--default .select2-selection--single .select2-selection__arrow {
-      height: 38px;
-  }
-
-  .select2-container--default .select2-selection--single .select2-selection__rendered {
-      color: #555;
-      font-size: 16px;
-  }
-
-  .select2-container--default .select2-selection--single {
-      border: 1px solid #ced4da;
-      border-radius: .25rem;
-  }
-
-  .select2-container--default .select2-selection--single:focus {
-      border-color: #80bdff;
-      outline: 0;
-  }
-
-  .select2-container--default .select2-selection--single .select2-selection__arrow b {
-      border-color: #555 transparent transparent transparent;
-  }
-</style>
 <style>
   .modal {
     z-index: 9999;
@@ -171,93 +135,54 @@
     color: black;
   }
 </style>
-
-
 <style>
-  /* Customize the background color of the entire row */
-  td {
-    background-color: #4daaff;
-    color: white;
+ 
+  
+  /* Customize the width of the Select2 container for the select2 class */
+  .select2-container--default.select2 .select2-selection--single {
+    /* width: 66vh !important;  Adjust the width as needed */
+      height: 5vh !important; /* Adjust the height as needed */
+
+      
+  }
+
+  
+  /* Change the background color of the selected option for the select2 class */
+  .select2-container--default.select2 .select2-selection--single {
+      background-color: #fefcfd !important;
+      color: #5b112f !important;
   }
   
-  /* Customize the background color of the dropdown menu */
-  .select2-container--default .select2-dropdown {
-    background-color: #3b3b3b;
-    color: white;
+
+  
+
+  
+  /* For itemselect class */
+  .select2-container--default.itemselect .select2-selection--single .select2-selection__rendered {
+      color: white !important; /* White text color */
+      text-align: left !important; /* Left alignment */
   }
   
-  /* Customize the background color of the upper portion of the dropdown menu */
-  .select2-container--default .select2-dropdown .select2-search {
-    background-color: #3b3b3b;
-    color: #3b3b3b;
+  .select2-container--default.itemselect .select2-dropdown {
+      background-color: #3b3b3b; /* Dark background color for dropdown */
+      color: white; /* White text color for dropdown */
   }
   
-  /* Customize the background color of the selected option */
-  .form-control.select2.text-right.hsn.border-0,
-  .select2-container--default .select2-selection--single {
-    background-color: #3b3b3b !important;
-    color: #da3d7b !important;
+  /* For customer_selection class */
+  .select2-container--default.customer_selection .select2-selection--single .select2-selection__rendered {
+      color: black !important; /* Black text color */
+      text-align: left !important; /* Left alignment */
   }
   
-  /* Customize the color of the dropdown arrow */
-  .select2-container--default .select2-selection__arrow b {
-    border-color: #3b3b3b;
+  .select2-container--default.customer_selection .select2-dropdown {
+      background-color: white; /* White background color for dropdown */
+      color: black; /* Black text color for dropdown */
   }
-
-
-  /* Customize the text color of the selected option */
-.select2-selection__rendered {
-  color: white !important;
-}
-
-
-
-
+  
 </style>
 
 
 
-<style>
-  /* Customize the background color of the entire row */
-  td {
-    background-color: #4daaff;
-    color: white;
-  }
-  
-  /* Customize the background color of the dropdown menu */
-  .select2-container--default .select2-dropdown {
-    background-color: #3b3b3b;
-    color: white;
-  }
-  
-  /* Customize the background color of the upper portion of the dropdown menu */
-  .select2-container--default .select2-dropdown .select2-search {
-    background-color: #3b3b3b;
-    color: #3b3b3b;
-  }
-  
-  /* Customize the background color of the selected option */
-  .form-control.select2.text-right.hsn.border-0,
-  .select2-container--default .select2-selection--single {
-    background-color: #3b3b3b !important;
-    color: #da3d7b !important;
-  }
-  
-  /* Customize the color of the dropdown arrow */
-  .select2-container--default .select2-selection__arrow b {
-    border-color: #3b3b3b;
-  }
-
-
-  /* Customize the text color of the selected option */
-.select2-selection__rendered {
-  color: white !important;
-}
-
-
-
-
-</style>
 <div class="container-fulid containerprof">
   <div class="card " style="width: 100%;">
     <div class="card-body">
@@ -282,15 +207,16 @@
             <label>Customer Name *</label>
           </div>
           <div class="col-md-6 d-flex">
-           <!-- onselect="toggleDateInput()"-->
+           <!-- onselect="toggleDateInput()"           data-pos="{{cust.placeofsupply}}" id="crt_cust"-->
 
-            <select name="cx_name" id="customer_sel" class="form-control bg-light text-dark  " style="width: 91%;"
+            <select name="cx_name" id="customer_sel" class="form-control bg-light text-dark customer_selection select2 " style="width: 91%;"
               required >
             
+             
               <option value=""  selected>Select Customer</option>
               {% for cust in c %}
-              <option value="{{cust.id}}" data-pos="{{cust.placeofsupply}}" id="crt_cust">{{cust.customerName}}</option>
-              {% endfor %}
+              <option value="{{cust.id}}" data-pos="{{cust.placeofsupply}}"  >{{cust.customerName}}</option>
+              {% endfor %} 
             </select>
 
 
@@ -402,8 +328,8 @@
           </div>
 
           <div class="col-md-6">
-            <input type="text" class="form-control bg-light text-dark" id="prof_name" name="sale_no"
-              value="{{remaining_characters}}" required>
+            <input type="text" class="form-control bg-light text-dark" id="prof_name" name="inv_no"
+            placeholder="{{count}}" required>
             <label id="order_label" style="display: none;"></label>
           </div>
         </div>
@@ -425,7 +351,7 @@
           </div>
 
           <div class="col-md-6">
-            <input type="date" class="form-control bg-light text-dark" id="date1" name="sa_date">
+            <input type="date" class="form-control bg-light text-dark" id="date1" name="inv_date">
           </div>
         </div>
 
@@ -435,7 +361,7 @@
           </div>
 
           <div class="col-md-6">
-            <input type="date" class="form-control bg-light text-dark" id="date2" name="sh_date" readonly required>
+            <input type="date" class="form-control bg-light text-dark" id="date2" name="due_date" readonly required>
           </div>
         </div>
 
@@ -448,7 +374,7 @@
             <div class="d-flex">
               <select class="form-control bg-light text-dark" id="pay_term" name="term" required>
                 <option value="" hidden>Select Payment Term</option>
-                {% for p in pay %}
+                {% for p in payments %}
                 <option value="{{p.id}}">{{p.Terms}}</option>
                 {% endfor %}
               </select>
@@ -464,7 +390,7 @@
 
           <div class="col-md-6">
             <div class="d-flex">
-              <select class="form-control bg-light text-dark my-select" id="pay_method" name="method" required>
+              <select class="form-control bg-light text-dark my-select" id="pay_method" name="payment_method" required>
                 <option value="" hidden>Select Payment Method</option>
                 <option value="cash">Cash</option>
                 <option value="cheque">Cheque</option>
@@ -483,7 +409,7 @@
           </div>
 
           <div class="col-md-6">
-            <input type="text" class="form-control text-black" name="cheque_id" id="cheque_id"
+            <input type="text" class="form-control text-black" name="cheque_number" id="cheque_id"
               placeholder="Enter Cheque Number">
           </div>
         </div>
@@ -504,7 +430,7 @@
           </div>
 
           <div class="col-md-6">
-            <input type="text" class="form-control text-black" name="bnk_id" id="bnk_id" readonly>
+            <input type="text" class="form-control text-black" name="bank_name" id="bnk_id" readonly>
           </div>
         </div>
 
@@ -517,6 +443,7 @@
             <table class="table table-bordered table-responsive" id="item_table" onclick='toggleDateInput()'>
               <thead>
                 <tr>
+                  <th></th>
                   <th>Item<a href="" data-toggle="modal" data-target="#newitem" class="text-capitalize">+ Item</a></th>
                   <th class="text-right">HSN</th>
                   <th class="text-right">Quantity</th>
@@ -529,6 +456,7 @@
               </thead>
               <tbody id="item_table_body">
                 <tr id="row1">
+                  <td class="text-white"> 1 </td>
                   <td>
                  <!-- <select class="form-control border-0 bg-transparent text-white item_select itm itemselect" name="item[]" id="item1">
                       <option value="" selected hidden>Select Item</option>
@@ -540,10 +468,11 @@
                        onchange = "changewithitem(this,`{{i.id}}`)"
                   </select>-->  
 
-                  <select name='item[]' id="item1" class="form-control select2 extra border-0 bg-transparent text-white item_select itm itemselect" style="width: 18vh; font-size: 15px;" onchange="itemfunction('item1')">
-                    <option class="form-control text-center" selected value="{{i.product}}">{{i.product}}</option>
+                  <select name='item[]' id="item1" class="form-control select2 extra border-0 bg-dark text-white item_select itm itemselect"  style="width: 18vh; font-size: 15px; background-color: #555;" onchange="itemfunction('item1')">
+                    <option id="selectitem"  >Select Items </option>
+                    <option class="form-control text-center"  value="{{i.product}}">{{i.product}}</option>
                     {% for i in p %}
-                    <option class="form-control  text-right" value="{{ i.id }}" data-tokens="{{ i.Name }}">
+                    <option class="form-control  text-right" value="{{ i.Name }}" data-tokens="{{ i.Name }}">
                         {{ i.Name }}
                     </option>
                     {% endfor %}
@@ -553,26 +482,35 @@
 
                   <td style="width: 15%;" class='text-right'>
                     <input type='number' id='hsn1'
-                      class=' text-right hsn border-0 form-control bg-transparent text-white' name='hsn[]' readonly>
+                      class=' text-right hsn border-0 form-control bg-white text-dark' name='hsn[]' readonly>
                   </td>
                   <td style="width: 17%;" class='text-right'>
                     <input type='number' id='qty1'
-                      class=' text-right qty form-control border-0 bg-transparent text-white' name='quantity[]'
+                      class=' text-right qty form-control border-0 bg-white text-dark' name='quantity[]'
                       value='0' onchange="qtychange(this.id)">
 
+
+                      <input type="text" id="avl1" style="display: none;">
+                      <div style="display: flex; align-items: center;">
+                        <span class="text-warning" style="font-size: 10px;">Available Stock:</span>
+                        <input style="font-size: 9px; margin-left: 10px;" id="stock_data1" class="stock_data text-warning border-0 form-control bg-transparent text-right" name='avlquantity' readonly>
+                    </div>
+
                   </td>
+
+                 
                   <td style="width: 15%;" class='text-right'><input type='number' id='rate1'
-                      class=' text-right rate form-control border-0  bg-transparent text-white' name='rate[]' value='0'
+                      class=' text-right rate form-control border-0 bg-white text-dark' name='rate[]' value='0'
                       readonly>
                   </td>
                   <td style="width: 10%;" class='text-right text-dark'><input type='number' id='discount1'
-                      class=' text-right discount border-0 bg-transparent text-white form-control' name='desc[]'
+                      class=' text-right discount border-0bg-white text-dark form-control' name='desc[]'
                       value='0'>
                   </td>
                   <td style="width: 22%;" class='text-right '> <select name='tax[]' id='tax1'
-                      class='form-control border-0 bg-transparent text-white text-right border-0 tax'
+                      class='form-control border-0 bg-white text-dark text-right border-0 tax'
                       onselect="toggleDateInput()">
-                      <optgroup class="text-center text-black" label="GST">
+                     <!----> <optgroup class="text-center text-black" label="GST" >
                         <option class="text-black" value="0">0% GST(0%)</option>
                         <option class="text-black" value="3">3.0% GST(3%)</option>
                         <option class="text-black" value="5">5.0% GST(5%)</option>
@@ -596,7 +534,7 @@
                       class=" taxamount border-0 bg-transparent text-white" />
                   </td>
                   <td style="width: 15%;" class='text-right'><input type='number' id='amount1'
-                      class=' text-right form-control amount border-0 bg-transparent text-white' name='amount[]'
+                      class=' text-right form-control amount border-0 bg-white text-dark' name='amount[]'
                       value='0.00' readonly>
                   </td>
                   <td class='text-center'>
@@ -680,7 +618,7 @@
                 <td></td>
                 <td>
                   <input type="number" class="form-control  bg-transparent border-0  text-light" id="adjust" value="0"
-                    name="adjust" style="text-align: right;">
+                    name="adjustment_charge" style="text-align: right;">
                 </td>
               </tr>
               <tr>
@@ -1885,11 +1823,11 @@
         if (reford != x) {
           document.getElementById("order_label").style.display = "block"
           document.getElementById("order_label").style.color = "yellow"
-          document.getElementById("order_label").innerHTML = "Sale Order is not Continuous"
+          document.getElementById("order_label").innerHTML = "Invoice Number is not Continuous"
         } else {
           document.getElementById("order_label").style.display = "block"
           document.getElementById("order_label").style.color = "green"
-          document.getElementById("order_label").innerHTML = "Sale Order is now Continuous"
+          document.getElementById("order_label").innerHTML = "Invoice Number is now Continuous"
         }
       }
     });
@@ -2523,13 +2461,14 @@
 
 
             $(document).ready(function() {
-              $('.customer_selection').select2()
+              $('.customer_selection').select2({tags:true} )
             })
           
 
-
-  $(document).on('change', '#customer_sel', function () {
+            $(document).ready(function() {
+  $('#customer_sel').change( function () {
     var customer = $('#customer_sel').val();
+    console.log(customer, "cu")
     $.ajax({
       type: "GET",
       url: "{% url 'customerdata' %}",
@@ -2537,6 +2476,8 @@
         id: customer
       },
       success: function (response) {
+
+        console.log(response, "response")
         data7 = response.email
         data_gst = response.gstno
         place = response.place
@@ -2590,7 +2531,7 @@
       }
     });
   });
-
+})
 </script>
 <script>
 
@@ -2720,19 +2661,26 @@
 
     $('#add-row').click(function () {
 
-      
-      rowCount++; // Increment row counter
-      console.log()
-      var newRow = `
+      var newRow;
+    do {
+        rowCount++; // Increment row counter
+        newRow = $(`#row${rowCount}`);
+    } while (newRow.length > 0);
+
+    console.log();
+    newRow = `
       <tr id='row${rowCount}'>
+        
+        <td class="text-light">${rowCount}</td>
         <td >
           <div>
       
 
             <select name='item[]' id="item${rowCount}" class="form-control select2 extra border-0 bg-transparent text-white item_select itm itemselect" style="width: 18vh; font-size: 15px;"  onchange="itemfunction('item${rowCount}')">
-              <option class="form-control select2 text-center" selected value="{{i.product}}">{{i.product}}</option>
+              <option id="selectitem"  >Select Items </option>
+              <option class="form-control select2 text-center"  value="{{i.Name}}">{{i.product}}</option>
               {% for i in p %}
-              <option class="form-control select2 text-right" value="{{ i.id }}" data-tokens="{{ i.Name }}">
+              <option class="form-control select2 text-right" value="{{ i.Name }}" data-tokens="{{ i.Name }}">
                   {{ i.Name }}
               </option>
               {% endfor %}
@@ -2742,23 +2690,29 @@
 
       
         <td style="width: 15%;" class='text-right'>
-          <input type='number' id='hsn${rowCount}' class=' text-right hsn form-control border-0 bg-transparent text-white' name='hsn[]' readonly>
+          <input type='number' id='hsn${rowCount}' class=' text-right hsn form-control border-0 bg-white text-dark' name='hsn[]' readonly>
         </td>
         
         <td style="width: 17%;" class='text-right'>
-          <input type='number' id='qty${rowCount}' class='text-right border-0 bg-transparent text-white qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange(this.id)'><br>
+          <input type='number' id='qty${rowCount}' class='text-right border-0 bg-white text-dark qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange(this.id)'><br>
+          <input type="text" id="avl1" style="display: none;">
+          <div style="display: flex; align-items: center;">
+            <span class="text-warning" style="font-size: 10px;">Available Stock:</span>
+            <input style="font-size: 9px; margin-left: 10px;" id='stock_data${rowCount}' class="stock_data text-warning border-0 form-control bg-transparent text-right" name='avlquantity' readonly>
+        </div>
+
         </td>
         
         <td style="width: 15%;" class='text-right'>
-          <input type='number' id='rate${rowCount}' class='text-right border-0 bg-transparent text-white rate form-control' name='rate[]' value='0' readonly>
+          <input type='number' id='rate${rowCount}' class='text-right border-0 bg-white text-dark rate form-control' name='rate[]' value='0' readonly>
         </td>
         
         <td style="width: 10%;" class='text-right'>
-          <input type='number' id='discount${rowCount}' class='text-right border-0 bg-transparent text-white discount form-control' name='desc[]' value='0'>
+          <input type='number' id='discount${rowCount}' class='text-right border-0 bg-white text-dark discount form-control' name='desc[]' value='0'>
         </td>
         
         <td style="width: 22%;" class='text-right'>
-          <select name='tax[]'  id='tax${rowCount}' class='form-control border-0 bg-transparent text-white text-right border-0 tax' onselect="toggleDateInput()">
+          <select name='tax[]'  id='tax${rowCount}' class='form-control border-0 bg-white text-dark text-right border-0 tax' onselect="toggleDateInput()">
             <optgroup class="text-center text-black" label="GST">
                             <option class="text-black" value="0">0% GST(0%)</option>
                             <option class="text-black" value="3">3.0% GST(3%)</option>
@@ -2785,7 +2739,7 @@
         </td>
         
         <td style="width: 15%;" class='text-right'>
-          <input type='number' id='amount${rowCount}' class='text-right border-0 bg-transparent text-white form-control amount' name='amount[]' value='0.00' readonly>
+          <input type='number' id='amount${rowCount}' class='text-right border-0 bg-white text-dark form-control amount' name='amount[]' value='0.00' readonly>
         </td>
         
         <td class='text-center'>
@@ -2808,6 +2762,7 @@
       calculateSubtotal();
       calculateGrandTotal();
       calculateTaxAmount();
+      rowCount--;
     });
     $('#srcofsupply').on('change', function () {
       var row = $(this).closest('tr');
@@ -2925,7 +2880,7 @@
 <script>
  
   $(document).ready(function() {
-$('.select2').select2()
+$('.itemselect').select2()
 
   })
 
@@ -2967,6 +2922,7 @@ console.log(response, "response")
         const oxy_igst = data2
         document.getElementById(`hsn${id}`).value = hsn
         document.getElementById(`rate${id}`).value = data
+        
 
         toggleDateInput(id, oxy_igst, oxy_gst);
 
@@ -2979,7 +2935,34 @@ console.log(response, "response")
         var taxAmount = (rowAmount * tax) / 100;
         $(`#amount${id}`).val(rowAmount.toFixed(2));
         $(`#taxamount${id}`).val(taxAmount.toFixed(2));
+        $(`#stock_data${id}`).val(stock.toFixed(2));
+     
 
+       
+        $(document).on('blur', `#qty${id}`, function () {
+          initialStock = stock
+            var enteredQuantity = parseInt($(`#qty${id}`).val());
+        
+            if (isNaN(initialStock) || isNaN(enteredQuantity)) {
+                console.log("Either initialStock or enteredQuantity is not a number.");
+                return;
+            }
+        
+            if (enteredQuantity > 0) {
+                var updatedStock = initialStock - enteredQuantity;
+                console.log(updatedStock, "updated")
+                $(`#stock_data${id}`).val(updatedStock); // Use .val() instead of .text()
+                if (updatedStock < 0) {
+                  
+                    // If entered quantity is not greater than 0, display a message
+                    alert("Please enter a quantity less than stock.");}
+            }
+        
+            $(`#qty${id}`).val(enteredQuantity);
+        });
+  
+        
+        
         var subtotal = 0;
         item_table_rows = document.getElementById('item_table_body').querySelectorAll('tr')
         for (let i = 1; i <= item_table_rows.length; i++) {
@@ -3055,21 +3038,48 @@ console.log(response, "response")
         document.getElementById("grandtotal").value = grandtotal.toFixed(2);
         document.getElementById("balance").value = balance.toFixed(2);
 
+        const number= extractNumber(data2)
+        console.log(number, "mmm")
+        if (data3 === 'Kerala') {
+          console.log(data3, "data3")
+          //document.getElementById(`tgst${id}`).innerHTML = data1 + ' % GST';
+          
+        
+          document.getElementById(`tax${id}`).value = data1
+        }else {
+          console.log(data3, "else")
+ // document.getElementById(`tigst${id}`).innerHTML = data2 + ' % IGST';
+        
+ const select= document.getElementById(`tax${id}`).children[1].children 
+ for(let i=0; i<select.length; i++){
+  if (select[i].value===number){
+    document.getElementById(`tax${id}`).selectedIndex=i
+    break
 
+  }
 
-        if (data3 == '{{ company.state }}') {
-          document.getElementById(`tgst${id}`).innerHTML = data1 + ' % GST';
-          document.getElementById(`tgst${id}`).value = data1
+ }
+ console.log(select, "slect")
+
         }
-        document.getElementById(`tigst${id}`).innerHTML = data2 + ' % IGST';
-        document.getElementById(`tigst${id}`).value = data2
+      
     
       }
     });
 
 
   }
+  function extractNumber(squareBracketString) {
+    var regex = /\[(\d+[^[\]]*)\]/; // Matches one or more digits inside square brackets
+    var match = regex.exec(squareBracketString); // Searches the input string for a match
 
+    if (match && match[1]) {
+      var extractedNumber = match[1].replace(/%/g, ""); // Removes all occurrences of "%" symbol
+      return extractedNumber; // Returns the captured number inside the square brackets without "%"
+    } else {
+      return null; // Returns null if no match is found
+    }
+  }
 
   function toggleDateInput(rowIndex) {
 
@@ -3087,17 +3097,7 @@ console.log(response, "response")
     var gst = oxy_gst;
     var igst = oxy_igst;
 
-    function extractNumber(squareBracketString) {
-      var regex = /\[(\d+[^[\]]*)\]/; // Matches one or more digits inside square brackets
-      var match = regex.exec(squareBracketString); // Searches the input string for a match
-
-      if (match && match[1]) {
-        var extractedNumber = match[1].replace(/%/g, ""); // Removes all occurrences of "%" symbol
-        return extractedNumber; // Returns the captured number inside the square brackets without "%"
-      } else {
-        return null; // Returns null if no match is found
-      }
-    }
+   
 
     var extractedGST = extractNumber(gst);
     var extractedIGST = extractNumber(igst);

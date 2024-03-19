@@ -11,7 +11,14 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
     integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
     crossorigin="anonymous"></script>
+    <!-- Include jQuery (required by Select2) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <!-- Include Select2 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+    
+    <!-- Include Select2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer></script>
 <style>
     select:focus {
         outline: none !important;
@@ -62,7 +69,50 @@
   color: white !important;
 }
 .custom-color{
-  color: black;
+  color: #555;
+}
+
+/* Customize the background color and text color of the selected option */
+.select2-container--default .select2-selection--single {
+    background-color: #555;
+    color: white;
+}
+
+/* Customize the text color of the selected option when it is focused */
+.select2-container--default.select2-container--focus .select2-selection--single {
+    color: white;
+}
+
+
+
+/* Customize the text color of the selected option */
+.select2-selection__rendered {
+    color: #e2d63a;
+}
+
+/* Customize the background color of the dropdown menu */
+.select2-container--default .select2-dropdown {
+    background-color: #555;
+}
+
+/* Change text color to white when selected */
+.select2-container--default.select2-container--open .select2-selection--single .select2-selection__rendered {
+    color: #ffffff !important;
+}
+
+/* Increase the width of the Select2 container */
+.select2-container--default .select2-selection--single {
+    width: 18vh !important; /* Adjust the width as needed */
+    height: 5vh
+}
+
+/* Move the arrow to the right end */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    right: 35vh; /* Adjust the distance from the right end as needed */
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: white;
 }
 
 </style>
@@ -242,7 +292,7 @@
             >
             <thead>
                 <tr>
-                    <th class="" style="font-weight: bold;color: rgb(245, 154, 36);" colspan="2">Item Details <a href="" data-toggle="modal" data-target="#newitem"><i class="fas fa-plus p-2 rounded"
+                    <th class="" style="font-weight: bold;color: rgb(245, 154, 36); width: 15vh;" colspan="2">Item Details <a href="" data-toggle="modal" data-target="#newitem"><i class="fas fa-plus p-2 rounded"
                                 style="color: white; background-color: rgb(210, 132, 30);"></i></a></th>
                     <th class="text-right" style="font-weight: bold;color: rgb(245, 154, 36);">Quantity Available</th>
                     <th class="text-right" style="font-weight: bold;color: rgb(245, 154, 36);">New Quantity on Hand</th>
@@ -254,16 +304,19 @@
                 <tr id='row1'>
                     <td class="bg-transparent text-white rownum" id="" value=""></td>
                     <td>
-                        <div class='form-group'><select class=' bg-transparent border-0 item_select   text-white itm' name='item[]' id='item1' onchange="selectonchange()" >
+                        <div class='form-group'>
+                          <select class=' bg-transparent border-0 item_select   text-white itm  itemselect2' style=" width: 17vh;" name='item[]' id='item1' onchange="selectonchange()" >
 
                                 <option id="selectitem" hidden >Select Items </option>
                                 {% for i in items %}
-                                <option class="text-dark" value="{{i.Name}}" data-stock="{{i.stock}}" >{{i.Name}}</option>
+                                <option class="text-white" value="{{i.Name}}" data-stock="{{i.stock}}" >{{i.Name}}</option>
                                 {% endfor %}
 
                             </select>
                         </div>
                     </td>
+
+
 
                     
                     <td class='text-right text-dark ' ><input type='number' step="0.01" class='form-control bg-transparent border-1 border-light text-light text-right qty ' value='' name="qtyav[]" id="quant"   onchange="qtychange(this.id); changeqty(this.id);">
@@ -474,7 +527,8 @@ document.addEventListener('DOMContentLoaded', function() {
         newRow.innerHTML = `
             <td class="bg-transparent text-light">${rowNum}</td>
             <td>
-                <div class='form-group'><select class='bg-transparent text-light border-0 item_select${rowNum} inneritm' name='item[]' id='item${rowNum}' onchange='selectonchange2(${rowNum})'>
+                <div class='form-group'>
+                  <select class='bg-transparent text-light border-0 item_select${rowNum} itemselect2 inneritm' name='item[]' id='item${rowNum}' onchange='selectonchange2(${rowNum})'>
                         <option class='text-white'hidden selected>Select Items</option>
                         {% for i in items %}
                         <option class="text-dark" value="{{i.Name}}" data-stock="{{i.stock}}" >{{i.Name}}</option>
@@ -492,6 +546,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         tableBody.appendChild(newRow);
 
+    // Initialize Select2 for the newly added select element
+    $(`.item_select${rowNum}`).select2();
 
         populateSelectsFromJSON();
 
@@ -571,7 +627,7 @@ function updateDiscount(diffInput, rateInput, qtyInput) {
                             >
                             <thead>
                                 <tr>
-                                    <th class="" style="font-weight: bold;color: rgb(245, 154, 36);" colspan="2" >Item Details <a href="" data-toggle="modal" data-target="#newitem"><i class="fas fa-plus p-2 rounded"
+                                    <th class="" style="font-weight: bold;color: rgb(245, 154, 36);  width: 50vh" colspan="2" >Item Details <a href="" data-toggle="modal" data-target="#newitem"><i class="fas fa-plus p-2 rounded"
                                                 style="color: white; background-color: rgb(210, 132, 30);"></i></a></th>
                                     <th class="text-right" style="font-weight: bold;color: rgb(245, 154, 36);">Current Value</th>
                                     <th class="text-right" style="font-weight: bold;color: rgb(245, 154, 36);">Changed Value</th>
@@ -583,7 +639,7 @@ function updateDiscount(diffInput, rateInput, qtyInput) {
                                 <tr id='row2'>
                                     <td class="bg-transparent text-light rownum2"  ></td>
                                     <td>
-                                        <div class='form-group'><select class=' bg-transparent text-light border-0 item_select2 itm2 text-light' name='item2[]' id='' onchange="valuechange()">
+                                        <div class='form-group'><select class=' bg-transparent text-light border-0 item_select2 itm2 text-light itemselect2' name='item2[]' id='alphaid' onchange="valuechange()">
                                                 <option class='text-light' hidden>Select Items</option>
                                                 {% for i in items %}
                                                 <!--  -->
@@ -593,7 +649,7 @@ function updateDiscount(diffInput, rateInput, qtyInput) {
                                         </div>
                                     </td>
                                     <!-- id='rate1' -->
-                                    <td class='text-right'><input type='number'  class='form-control bg-transparent border-1 border-light text-light text-right values' name='cuval[]'
+                                    <td class='text-right'><input type='number'  class='form-control bg-transparent border-1 border-light text-light text-right values' id="omega_value" name='cuval[]'
                                             value=''>
                                     </td>
                                     <!-- id='rate2' -->
@@ -650,7 +706,8 @@ function updateDiscount(diffInput, rateInput, qtyInput) {
         newRow2.innerHTML = `
             <td class="bg-transparent text-white">${rowNum2}</td>
             <td>
-                <div class='form-group'><select class='bg-transparent border-0 item_select2 inneritm2 text-light' name='item2[]' onchange="valuechange2()">
+                <div class='form-group'>
+                  <select class='bg-transparent border-0 item_select2 inneritm2 text-light itemselect2' name='item2[]' id="alphaid${rowNum2}" onchange="valuechange2(${rowNum2})">
                         <option class='text-light' hidden>Select Items</option>
                         {% for i in items %}
                         <!-- data-rate="{{i.rate}}" -->
@@ -659,7 +716,7 @@ function updateDiscount(diffInput, rateInput, qtyInput) {
                     </select>
                 </div>
             </td>
-            <td class='text-right'><input type='number' class='form-control bg-transparent border-1 border-light text-light text-right values' name='cuval[]' value=''></td>
+            <td class='text-right'><input type='number' class='form-control bg-transparent border-1 border-light text-light text-right values' name='cuval[]' value='' id="omega_value${rowNum2}"></td>
             <td class='text-right'><input type='number' class='form-control bg-transparent border-1 border-light text-light text-right rate' name='chval[]' value=''></td>
             <td class='text-right'><input type='text' class='form-control bg-transparent border-1 border-light text-light text-right discount' name='adjval[]' value=''></td>
             <td class='text-center'>
@@ -669,7 +726,11 @@ function updateDiscount(diffInput, rateInput, qtyInput) {
 
         const tableBody2 = document.querySelector('#item_table2 tbody');
         tableBody2.appendChild(newRow2);
-
+        
+ // Select the newly added select element
+ const selectElement = newRow2.querySelector('.itemselect2');
+ // Apply Select2 to the select element
+ $(selectElement).select2();
        
 
         reloadItem();
@@ -1470,23 +1531,29 @@ function selectonchange(){
 }
 
 // value-innerhtml
-function valuechange2(){
-const selectedOption = target.options[target.selectedIndex];
-const stock = selectedOption.getAttribute('data-stock');
-const stockrate = selectedOption.getAttribute('data-rate');
-const valuesInput = row.querySelector('.values');
-valuesInput.value = stock * stockrate;
+function valuechange2(id){
+  const select = document.getElementById(`alphaid${id}`);
+  const selectedOption=select.options[select.selectedIndex];
+  
+  const stock = selectedOption.getAttribute('data-stock');
+  console.log(stock)
+  const stockrate = selectedOption.getAttribute('data-rate');
+  const valuesInput = document.getElementById(`omega_value${id}`)
+  valuesInput.value = stock * stockrate;
+  console.log(stock * stockrate,'change')
+  
 
 }
 
-// value
+// value selectedIndex
 function valuechange(){
-const selectedOption = target.options[target.selectedIndex];
+const select = document.getElementById('alphaid');
+const selectedOption=select.options[select.selectedIndex];
 
 const stock = selectedOption.getAttribute('data-stock');
 console.log(stock)
 const stockrate = selectedOption.getAttribute('data-rate');
-const valuesInput = row.querySelector('.values');
+const valuesInput = document.getElementById('omega_value')
 valuesInput.value = stock * stockrate;
 console.log(stock * stockrate,'change')
 
@@ -1592,6 +1659,11 @@ function reloadReason() {
 
 
 </script>
-
+<script>
+  $(document).ready(function() {
+    $('.itemselect2').select2()
+    
+      })
+</script>
 
 {% endblock %}
