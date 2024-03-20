@@ -178,6 +178,13 @@
       background-color: white; /* White background color for dropdown */
       color: black; /* Black text color for dropdown */
   }
+
+  .igstlabel,
+  .gstlabel {
+      display: none;
+  }
+  
+
   
 </style>
 
@@ -375,7 +382,7 @@
               <select class="form-control bg-light text-dark" id="pay_term" name="term" required>
                 <option value="" hidden>Select Payment Term</option>
                 {% for p in payments %}
-                <option value="{{p.Terms}}">{{p.Terms}}</option>
+                <option value="{{p.id}}">{{p.Terms}}</option>
                 {% endfor %}
               </select>
               <a data-toggle="modal" data-target="#newpayment" class="btn" id="termadd">+</a>
@@ -493,7 +500,7 @@
                       <input type="text" id="avl1" style="display: none;">
                       <div style="display: flex; align-items: center;">
                         <span class="text-warning" style="font-size: 10px;">Available Stock:</span>
-                        <input style="font-size: 9px; margin-left: 10px;" id="stock_data1" class="stock_data text-warning border-0 form-control bg-transparent text-right" name='avlquantity' readonly>
+                        <input style="font-size: 9px; margin-left: 10px;" id="stock_data1" class="stock_data text-warning border-0 form-control bg-transparent text-right" name='avlquantity[]' readonly>
                     </div>
 
                   </td>
@@ -507,10 +514,12 @@
                       class=' text-right discount border-0bg-white text-dark form-control' name='desc[]'
                       value='0'>
                   </td>
-                  <td style="width: 22%;" class='text-right '> <select name='tax[]' id='tax1'
+                  <td style="width: 22%;" class='text-right '>
+                     <select name='tax[]' id='tax1'
                       class='form-control border-0 bg-white text-dark text-right border-0 tax'
                       onselect="toggleDateInput()">
-                     <!----> <optgroup class="text-center text-black" label="GST" >
+                    
+                     <optgroup class="text-center text-black gstlabel" label="GST" id='gstlabel'>
                         <option class="text-black" value="0">0% GST(0%)</option>
                         <option class="text-black" value="3">3.0% GST(3%)</option>
                         <option class="text-black" value="5">5.0% GST(5%)</option>
@@ -518,7 +527,9 @@
                         <option class="text-black" value="18">18.0% GST(18%)</option>
                         <option class="text-black" value="28">28.0% GST(28%)</option>
                       </optgroup>
-                      <optgroup class="text-center text-black" label="IGST">
+                     
+
+                      <optgroup class="text-center text-black igstlabel" label="IGST" id='igstlabel'>
                         <option class="text-black" value="0">0% IGST(0%)</option>
                         <option class="text-black" value="3">3.0% IGST(3%)</option>
                         <option class="text-black" value="5">5.0% IGST(5%)</option>
@@ -1015,7 +1026,7 @@
                     <div class="col-md-6 mt-2">
                       <div class="d-flex">
                         <select class="form-control bg-light text-dark" id="c_terms" name="c_terms" required>
-                          {% for p in pay %}
+                          {% for p in payments %}
                           <option value="{{p.Terms}} {{p.id}}">{{p.Terms}}</option>
                           {% endfor %}
                         </select>
@@ -1322,7 +1333,7 @@
                       <div class="d-flex">
                         <select class="form-control bg-light text-dark" id="item_units" name="item_units" required>
                           <option value="" hidden>Select Unit</option>
-                          {% for u in unit %}
+                          {% for u in units %}
                           <option value="{{u.id}}">{{u.unit}}</option>
                           {% endfor %}
                         </select>
@@ -2255,7 +2266,7 @@
   function reloadUnit() {
 
     $.ajax({
-      url: "{% url 'purchase_unit_dropdown' %}",
+      url: "{% url 'invoice_unit_dropdown' %}",
       type: "GET",
       dataType: "json",
       data: $(this).serialize(),
@@ -2698,7 +2709,7 @@
           <input type="text" id="avl1" style="display: none;">
           <div style="display: flex; align-items: center;">
             <span class="text-warning" style="font-size: 10px;">Available Stock:</span>
-            <input style="font-size: 9px; margin-left: 10px;" id='stock_data${rowCount}' class="stock_data text-warning border-0 form-control bg-transparent text-right" name='avlquantity' readonly>
+            <input style="font-size: 9px; margin-left: 10px;" id='stock_data${rowCount}' class="stock_data text-warning border-0 form-control bg-transparent text-right" name='avlquantity[]' readonly>
         </div>
 
         </td>
@@ -3038,30 +3049,55 @@ console.log(response, "response")
         document.getElementById("grandtotal").value = grandtotal.toFixed(2);
         document.getElementById("balance").value = balance.toFixed(2);
 
-        const number= extractNumber(data2)
-        console.log(number, "mmm")
-        if (data3 === 'Kerala') {
-          console.log(data3, "data3")
-          //document.getElementById(`tgst${id}`).innerHTML = data1 + ' % GST';
-          
+        const number = extractNumber(data1);
+        const number2 = extractNumber(data2);
+        console.log(number, "number one");
+        console.log(number2, "number two");
+
+        const selectElement = document.getElementById(`tax${id}`);
+const gstOptgroup = selectElement.querySelector('.gstlabel');
+const igstOptgroup = selectElement.querySelector('.igstlabel');
+
+
+         
         
-          document.getElementById(`tax${id}`).value = data1
-        }else {
-          console.log(data3, "else")
- // document.getElementById(`tigst${id}`).innerHTML = data2 + ' % IGST';
-        
- const select= document.getElementById(`tax${id}`).children[1].children 
- for(let i=0; i<select.length; i++){
-  if (select[i].value===number){
-    document.getElementById(`tax${id}`).selectedIndex=i
-    break
+        if (data3 === '[KL]-Kerala') {
+          gstOptgroup.style.display = 'inline'; // Hide IGST optgroup
+          igstOptgroup.style.display = 'hidden'; // Display GST optgroup
+            console.log(data3, "data3");
+            const select = document.getElementById(`tax${id}`).children[0].children;
+            console.log(select, "select for GST");
+            
+            for (let i = 0; i < select.length; i++) {
+                if (select[i].value === number) {
+                    document.getElementById(`tax${id}`).selectedIndex = i;
+                    console.log(i, "selected index for GST");
+                    const selectedLabel = select[i].parentNode.label; // Retrieve the label of the parent optgroup
+                    console.log(selectedLabel, "label for GST");
+                    break;
+                }
+            } 
+        } else {
 
-  }
-
- }
- console.log(select, "slect")
-
+          gstOptgroup.style.display = 'hidden'; // hide GST optgroup
+          igstOptgroup.style.display = 'inline'; // Display IGST optgroup
+            console.log(data3, "else");
+            const select = document.getElementById(`tax${id}`).children[1].children;
+            console.log(select, "select for IGST");
+            
+            for (let i = 0; i < select.length; i++) {
+                if (select[i].value === number2) {
+                    console.log(select[i], "selected option for GST");
+                    console.log(number2, "number2");
+                    document.getElementById(`tax${id}`).selectedIndex = i;
+                    console.log(i, "selected index for IGST");
+                    const selectedLabel = select[i].parentNode.label; // Retrieve the label of the parent optgroup
+                    console.log(selectedLabel, "label for IGST");
+                    break;
+                }
+            }
         }
+        
       
     
       }

@@ -227,7 +227,7 @@
   <div class="card radius-15" style="width: 100%;">
     <div class="card-body">
       <div class="card-title">
-        <h2 class="mb-0 text-uppercase text-right"> Edit Invoice</h2>
+        <h2 class="mb-0 text-uppercase text-right"> Edijt Invoice</h2>
         {% for message in messages %}
         <div class="alert alert-success">
           <a class="close" href="#" data-dismiss="alert">x</a>
@@ -237,6 +237,8 @@
       </div>
     </div>
   </div>
+
+
   <div>
 
     <div class="card radius-15 p-5">
@@ -493,6 +495,7 @@
                   <th class="text-center" style="width: 13%; font-size: 10px;">Tax</th>
                   <th class="text-center" style="width: 13%; font-size: 10px;">Amount</th>
                   <th></th>
+
                 </tr>
               </thead>
               <tbody id="item_table_body">
@@ -509,14 +512,7 @@
                         <option class="text-black" value="{{j.id}}">{{ j.Name }} </option>
                         {% endfor %}
                       </select>-->
-                      <select  name='item[]' id="item{{forloop.counter}}" class="form-control select2  extra  itemselect"  style="width: 18vh; font-size: 15px; "   onchange = "changewithitem(this,`{{i.id}}`)">
-                        <option class="form-control select2  text-center " style="padding-bottom: 7vh;  "  selected value="{{i.product}}">{{i.product}}</option>
-                        {% for i in p %}
-                            <option class="form-control select2  text-right  " value="{{ i.Name }}" data-tokens="{{ i.Name }}">
-                                {{ i.Name }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                     
                   </div>
                   </td>
                   <!-- Include jQuery -->

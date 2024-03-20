@@ -459,7 +459,8 @@
                 </tr>
               </thead>
               <tbody id="item_table_body">
-                <tr id="row1">
+                {% for i in est %}
+                <tr id="row{{forloop.counter}}">
                   <td class="text-white">  {{forloop.counter}} </td>
                   <td>
                  <!-- <select class="form-control border-0 bg-transparent text-white item_select itm itemselect" name="item[]" id="item1">
@@ -472,18 +473,26 @@
                        onchange = "changewithitem(this,`{{i.id}}`)"
                   </select>-->  
 
-                  <select name='item[]' id="item1" class="form-control select2 extra border-0 bg-dark text-white item_select itm itemselect"  style="width: 18vh; font-size: 15px; background-color: #555;" onchange="itemfunction('item1')">
+                
+                <!--  <select name='item[]' id="item1" class="form-control select2 extra border-0 bg-dark text-white item_select itm itemselect"  style="width: 18vh; font-size: 15px; background-color: #555;" onchange="itemfunction('item1')">
+                   
+                    <option class="form-control  text-right"  selected value="{{i.product}}" >{{i.product}}  </option>
+                   
                     {% for i in p %}
-                    <option  selected value="{{i.product}}" >{{i.product}}  </option>
-                    <option class="form-control text-center"  value="{{i.product}}">{{i.product}}</option>
-                    
-                    <option class="form-control  text-right" value="{{ i.Name }}" data-tokens="{{ i.Name }}">
+                    <option  value="{{ i.Name }}" data-tokens="{{ i.Name }}">
                         {{ i.Name }}
                     </option>
                     {% endfor %}
-                </select>
+                </select>  -->
                 
-           
+                <select  name='item[]' id="item{{forloop.counter}}" class="form-control select2  extra  itemselect"  style="width: 18vh; font-size: 15px; "   onchange = "changewithitem(this,`{{i.id}}`)">
+                  <option class="form-control select2  text-center " style="padding-bottom: 7vh;  "  selected value="{{i.product}}">{{i.product}}</option>
+                  {% for i in p %}
+                      <option class="form-control select2  text-right  " value="{{ i.Name }}" data-tokens="{{ i.Name }}">
+                          {{ i.Name }}
+                      </option>
+                  {% endfor %}
+              </select>
 
                   <td style="width: 15%;" class='text-right'>
                     <input type='number' id='hsn1'
@@ -492,30 +501,33 @@
                   <td style="width: 17%;" class='text-right'>
                     <input type='number' id='qty1'
                       class=' text-right qty form-control border-0 bg-white text-dark' name='quantity[]'
-                      value='0' onchange="qtychange(this.id)">
+                      value='{{i.quantity}}' onchange="qtychange(this.id)">
 
 
                       <input type="text" id="avl1" style="display: none;">
                       <div style="display: flex; align-items: center;">
                         <span class="text-warning" style="font-size: 10px;">Available Stock:</span>
-                        <input style="font-size: 9px; margin-left: 10px;" id="stock_data1" class="stock_data text-warning border-0 form-control bg-transparent text-right" name='avlquantity' readonly>
-                    </div>
+                        <input style="font-size: 9px; margin-left: 10px;" id="stock_data1" class="stock_data text-warning border-0 form-control bg-transparent text-right" name='avlquantity[]'  value="{{i.inv_stock}}" readonly>
+               
+                      </div>
 
                   </td>
 
                  
                   <td style="width: 15%;" class='text-right'><input type='number' id='rate1'
-                      class=' text-right rate form-control border-0 bg-white text-dark' name='rate[]' value='0'
+                      class=' text-right rate form-control border-0 bg-white text-dark' name='rate[]' value='{{i.rate}}'
                       readonly>
                   </td>
                   <td style="width: 10%;" class='text-right text-dark'><input type='number' id='discount1'
                       class=' text-right discount border-0bg-white text-dark form-control' name='desc[]'
-                      value='0'>
+                      value='{{i.discount}}'>
                   </td>
-                  <td style="width: 22%;" class='text-right '> <select name='tax[]' id='tax1'
+                  <td style="width: 22%;" class='text-right '>
+                     <select name='tax[]' id='tax1'
                       class='form-control border-0 bg-white text-dark text-right border-0 tax'
-                      onselect="toggleDateInput()">
+                      onselect="toggleDateInput()" >
                      <!----> <optgroup class="text-center text-black" label="GST" >
+                      <option class="text-black" value="{{i.tax}}">{{i.tax}}% GST</option>
                         <option class="text-black" value="0">0% GST(0%)</option>
                         <option class="text-black" value="3">3.0% GST(3%)</option>
                         <option class="text-black" value="5">5.0% GST(5%)</option>
@@ -524,6 +536,7 @@
                         <option class="text-black" value="28">28.0% GST(28%)</option>
                       </optgroup>
                       <optgroup class="text-center text-black" label="IGST">
+                        <option class="text-black" value="{{i.tax}}">{{i.tax}}% IGST</option>
                         <option class="text-black" value="0">0% IGST(0%)</option>
                         <option class="text-black" value="3">3.0% IGST(3%)</option>
                         <option class="text-black" value="5">5.0% IGST(5%)</option>
@@ -542,6 +555,7 @@
                       class=' text-right form-control amount border-0 bg-white text-dark' name='amount[]'
                       value='0.00' readonly>
                   </td>
+               
                   <td class='text-center'>
                     <button type='button' id='del_btn1'
                       class='btn  btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row'
@@ -556,6 +570,7 @@
                     </button>
                   </td>
                 </tr>
+                {% endfor %}
               </tbody>
             </table>
             <br>
@@ -677,10 +692,10 @@
         </div>
 
         <div class="row mt-5 mb-3">
+       <!--  <input style="width: 150px;margin-right: 1vh; background-color: chocolate;" type="submit" class="btn mt-2"
+            value="Draft" name="Draft">--> 
           <input style="width: 150px;margin-right: 1vh; background-color: chocolate;" type="submit" class="btn mt-2"
-            value="Draft" name="Draft">
-          <input style="width: 150px;margin-right: 1vh; background-color: chocolate;" type="submit" class="btn mt-2"
-            value="Save" name="Save">
+            value="Edit" name="Draft">
           <input style="width: 150px; background-color: chocolate;" class="btn mt-2" type="reset" value="Cancel">
         </div>
       </form>
@@ -2703,7 +2718,7 @@
           <input type="text" id="avl1" style="display: none;">
           <div style="display: flex; align-items: center;">
             <span class="text-warning" style="font-size: 10px;">Available Stock:</span>
-            <input style="font-size: 9px; margin-left: 10px;" id='stock_data${rowCount}' class="stock_data text-warning border-0 form-control bg-transparent text-right" name='avlquantity' readonly>
+            <input style="font-size: 9px; margin-left: 10px;" id='stock_data${rowCount}' class="stock_data text-warning border-0 form-control bg-transparent text-right" name='avlquantity[]' readonly>
         </div>
 
         </td>

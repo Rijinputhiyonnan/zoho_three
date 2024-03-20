@@ -68,6 +68,7 @@ urlpatterns = [
     path('payment_term_for_estimate/',views.payment_term_for_estimate,name='payment_term_for_estimate'),
     path('invoiceview',views.invoiceview,name='invoiceview'),
     path('addinvoice',views.addinvoice,name='addinvoice'),
+    
     path('itemdata',views.itemdata,name='itemdata'),
     path('add_prod',views.add_prod,name='add_prod'),
     path('detailedview/<int:id>',views.detailedview,name='detailedview'),
@@ -1240,9 +1241,10 @@ urlpatterns = [
     #latest
     
     path('itemdata_invoice',views.itemdata_invoice,name='itemdata_invoice'),
+    path('invoice_unit_dropdown',views.invoice_unit_dropdown,name='invoice_unit_dropdown'),
   
 
-    
+
     
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

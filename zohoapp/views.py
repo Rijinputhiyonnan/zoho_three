@@ -26405,7 +26405,7 @@ def add_prod(request):     #updation
                                 pterms=pterms)
                 invn.save()
                 account_number = bank_instance.ac_no if bank_instance else ''
-                avlquantity = request.POST.get('avlquantity', '')
+                
         
                 #unit_instance = get_object_or_404(Unit, id=avlquantity)
 
@@ -26466,6 +26466,10 @@ def add_prod(request):     #updation
             taxes = [float(x) for x in tax1]
             amount1 = request.POST.getlist('amount[]')
             amounts = [float(x) for x in amount1]
+            avlquantity = request.POST.getlist('avlquantity[]')
+            avlq = [float(x) for x in avlquantity]
+            print(avlq, "avialquanty")
+            
             
             
             for i in range(len(items)):
@@ -26479,7 +26483,8 @@ def add_prod(request):     #updation
                     rate=rates[i],
                     discount=discounts[i],
                     tax=taxes[i],
-                    total=amounts[i]
+                    total=amounts[i],
+                    inv_stock=avlq[i]
                     
                 )
             records.save()
@@ -26749,7 +26754,6 @@ def edited_prod(request, id):
     account_type = set(Sales.objects.values_list('Account_type', flat=True))
     
     
-    
     cur_user = request.user
     user = User.objects.get(id=cur_user.id)
     
@@ -26806,39 +26810,61 @@ def edited_prod(request, id):
             invp.save()
         est_items = invoice_item.objects.filter(inv=estimate)
         est_items.delete()
-        est_items.item = request.POST.getlist('item[]')
-        print(est_items.item )
-        est_items.hsn = request.POST.getlist('hsn[]')
-        est_items.quantity1 = request.POST.getlist('quantity[]')
-        est_items.quantity = [float(x) for x in est_items.quantity1]
-        est_items.rate1 = request.POST.getlist('rate[]')
-        est_items.rate = [float(x) for x in est_items.rate1]
-        est_items.discount1 = request.POST.getlist('discount[]')
-        est_items.discount = [float(x) for x in est_items.discount1]
-        est_items.tax1 = request.POST.getlist('tax[]')
+        item = request.POST.getlist('item[]')
+        print(item )
+        hsn = request.POST.getlist('hsn[]')
+        quantity1 = request.POST.getlist('quantity[]')
+        quantity = [float(x) for x in quantity1]
+        rate1 = request.POST.getlist('rate[]')
+        rate = [float(x) for x in rate1]
+        discount1 = request.POST.getlist('desc[]')
+        discount = [float(x) for x in discount1]
+        tax1 = request.POST.getlist('tax[]')
+        print(tax1, " est_items.tax1")
 
     # Filter out non-numeric characters and convert to float
-        est_items.tax = [float(''.join(filter(str.isdigit, x))) for x in est_items.tax1]
-
-        est_items.amount1 = request.POST.getlist('amount[]')
-        est_items.amount = [float(x) for x in est_items.amount1]    
-        est_items.stock1 = request.POST.getlist('stock[]')
-        est_items.stock = [float(x) for x in est_items.stock1]   
+        tax = [float(''.join(filter(str.isdigit, x))) for x in tax1]
+        amount1 = request.POST.getlist('amount[]')
+        amount = [float(x) for x in amount1]    
+        stock1 = request.POST.getlist('avlquantity[]')
+        stock = [float(x) for x in stock1]   
 
             
-        
+        print(stock, "stlck")
         
        
 
+        for i in range(len(item)):
+                print("Items:", i)
         
+                invoice_item.objects.create(
+                    inv=estimate,
+                    product=item[i],
+                    hsn=hsn[i],
+                    quantity=quantity[i],
+                    rate=rate[i],
+                    discount=discount[i],
+                    tax=tax[i],
+                    total=amount[i],
+                    inv_stock=stock[i]
+                    
+                )
+                
+                print("first finsh")
 
-        if len(est_items.item) == len(est_items.hsn) ==  len(est_items.quantity) == len(est_items.rate) == len(est_items.discount) == len(est_items.tax) == len(est_items.amount)  == len(est_items.stock):
-                mapped = zip(est_items.item,est_items.hsn, est_items.quantity, est_items.rate, est_items.discount, est_items.tax, est_items.amount, est_items.stock)
+        '''if len(item) == len(hsn) ==  len(quantity) == len(rate) == len(discount) == len(tax) == len(amount)  == len(stock):
+                mapped = zip(item, hsn, quantity, rate, discount, tax, amount, stock)
+                print(mapped, "mapped")
                 mapped = list(mapped)
                 for element in mapped:
                     created = invoice_item.objects.create(
                         inv=estimate, product=element[0], hsn=element[1], quantity=element[2], rate=element[3], discount=element[4], tax=element[5], total=element[6], inv_stock=element[7])
+                    
+                    print(created, "created")
+                    created.save()'''
+                    
         return redirect('invoice_overview', id)
+    
             
 
         
@@ -26850,6 +26876,7 @@ def edited_prod(request, id):
         
         'invoice': invoic,
         
+        'invoiceitem': invoiceitem,
         
         'items': items,
         'est': est_items,
@@ -27884,4 +27911,17 @@ def itemdata_invoice(request):
         place_of_supply = customer.objects.get(id=cust).placeofsupply
         return JsonResponse({"status":" not",'mail':mail,'desc':desc,'place':place,'rate':rate,'pos':place_of_supply,'gst':gst,'igst':igst,
                             'stock':stock,'hsn':hsn})
-    
+
+
+
+@login_required(login_url='login')        
+def invoice_unit_dropdown(request):
+
+    user = User.objects.get(id=request.user.id)
+
+    options = {}
+    option_objects = Unit.objects.get(user = user)
+    for option in option_objects:
+        options[option.id] = option.unit
+
+    return JsonResponse(options)
