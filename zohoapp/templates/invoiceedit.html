@@ -375,7 +375,10 @@
           <div class="col-md-6">
             <div class="d-flex">
               <select class="form-control bg-light text-dark" id="pay_term" name="term" required>
-                <option selected value="{{terms.id}}">{{terms.Terms}}</option>
+                <option selected disabled >
+                  
+                  {{ payt.Terms }}
+              </option>
                 {% for p in payments %}
                 {% if p.Terms != invoice.terms.Terms %}
                 <option value="{{p.id}}">{{p.Terms}}</option>
@@ -395,7 +398,7 @@
           <div class="col-md-6">
             <div class="d-flex">
               <select class="form-control bg-light text-dark my-select" id="pay_method" name="payment_method" required>
-                <option value="{{invp.payment_method}}" selected hidden>{{invp.payment_method}}</option>
+                <option value="{{invp.payment_method}}" selected >{{invp.payment_method}}</option>
                 <option value="cash">Cash</option>
                 <option value="cheque">Cheque</option>
                 <option value="upi">UPI</option>

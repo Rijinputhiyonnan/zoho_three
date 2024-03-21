@@ -2038,7 +2038,7 @@
 
 
     $.ajax({
-      url: "{% url 'payment_term_for_sales' %}",
+      url: "{% url 'payment_term_for_invoice' %}",
       type: 'POST',
       headers: { 'X-CSRFToken': '{{ csrf_token }}' },
       data: {

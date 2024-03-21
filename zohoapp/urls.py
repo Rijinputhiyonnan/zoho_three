@@ -1242,8 +1242,9 @@ urlpatterns = [
     
     path('itemdata_invoice',views.itemdata_invoice,name='itemdata_invoice'),
     path('invoice_unit_dropdown',views.invoice_unit_dropdown,name='invoice_unit_dropdown'),
+    path('payment_term_for_invoice',views.payment_term_for_invoice,name="payment_term_for_invoice"),
+    path('new_item_inventory',views.new_item_inventory,name='new_item_inventory'),
   
-
 
     
 ]

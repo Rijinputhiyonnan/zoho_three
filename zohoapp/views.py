@@ -16858,101 +16858,6 @@ def filterby_adjusted(request,id):
 
 
 
-def edit_inventory(request,id):
-    user=request.user
-    company=company_details.objects.get(user=user)
-    items = AddItem.objects.filter(user_id=user.id)
-    adj=Adjustment.objects.get(id=id)
-    print(adj.description,'date')
-    items = AddItem.objects.filter(user_id=user.id)
-    accounts=Chart_of_Account.objects.all()
-    adj_items=ItemAdjustment.objects.filter(adjustment=adj)
-    reason=Reason.objects.all()
-    unit=Unit.objects.all()
-    sales=Sales.objects.all()
-    purchase=Purchase.objects.all()
-    value =[]
-    for adjustment in adj_items:
-        print(adjustment.adjustment_type, 'item type')
-        value=adjustment.adjustment_type
-        val=adjustment.current_value
-        print(val,'val')
-    print(value,'value is ')
-    return render(request,'edit_adjustment.html',{'company':company,'adj':adj,'accounts':accounts,'items':items,'adj_items':adj_items,'value':value,'reason':reason,'units':unit,'sales':sales,'purchase':purchase})
-  
-
-    
-def update_adjustment(request,id):
-    user=request.user
-    user_id=request.user.id
-    user_instance = User.objects.get(id=user_id)
-    if request.method=='POST':
-        adjustment=Adjustment.objects.get(id=id)
-        adjustment.user=user_instance
-        adjustment.type=request.POST.get('type','')
-        adjustment.adjustment_type=request.POST.get('type','')
-        adjustment.reference_number=request.POST['refno']
-        adjustment.date=request.POST['date']
-        account=request.POST['account']
-        account_instance = Chart_of_Account.objects.get(id=account)
-        adjustment.account=account_instance
-        reason=request.POST['reason']
-        reason_instance=Reason.objects.get(reason=reason)
-        adjustment.reason=reason_instance
-        adjustment.description=request.POST['description']
-        company = company_details.objects.get(user=user)
-        adjustment.company=company
-        adjustment.save()
-        itemadjustment = ItemAdjustment.objects.filter(adjustment_id=adjustment.id)
-        itemadjustment.delete()
-        
-        if adjustment.adjustment_type == 'Quantity':
-             item_names = request.POST.getlist('item[]')
-             qty_available = request.POST.getlist('qtyav[]')
-             new_qty_on_hand = request.POST.getlist('newqty[]')
-             qty_adjusted = request.POST.getlist('qtyadj[]')
-
-             if len(item_names) == len(qty_available) == len(new_qty_on_hand) == len(qty_adjusted):
-                for i in range(len(item_names)):
-                    item_instance = AddItem.objects.get(Name=item_names[i])
-                    item_instance.stock += int(float(new_qty_on_hand[i]))
-                    item_instance.save()
-                    items1 = ItemAdjustment.objects.create(
-                        item=item_names[i],
-                        quantity_available=qty_available[i],
-                        new_quantity_on_hand=new_qty_on_hand[i],
-                        adjusted_quantity=qty_adjusted[i],
-                        adjustment_type=adjustment.adjustment_type,
-                        adjustment=adjustment,
-                        user=user_instance,
-                    )
-
-                    items1.save()
-        elif adjustment.adjustment_type == 'Value':
-             items_names = request.POST.getlist('item2[]')
-             current_value = request.POST.getlist('cuval[]')
-             changed_value = request.POST.getlist('chval[]')
-             value_adjusted = request.POST.getlist('adjval[]')
-             if len(items_names) == len(current_value) == len(changed_value) == len(value_adjusted):
-                for j in range(len(items_names)):
-                    items2 = ItemAdjustment.objects.create(
-                        item=items_names[j],
-                        current_value=current_value[j],
-                        changed_value=changed_value[j],
-                        adjusted_value=value_adjusted[j],
-                        adjustment_type=adjustment.adjustment_type,
-                        adjustment=adjustment,
-                        user=user_instance,       
-                    )
-                    items2.save()
-        if 'save_draft' in request.POST:
-            adjustment.status = "Draft"
-
-        elif 'convert_adjusted' in request.POST:
-             adjustment.status = "Adjusted"
-
-        adjustment.save()
-    return redirect("inv_overview",id)
     
     
 #------------------------------reports-Profit and Loss & Profit and Loss (schedule lll)-------Merlin------------------------#
@@ -17254,6 +17159,7 @@ def new_item(request):
         type=request.POST.get('type')
         name=request.POST['name']
         ut=request.POST['unit']
+        hsn=request.POST['hsn']
 
         print('ut',ut)
 
@@ -17275,7 +17181,7 @@ def new_item(request):
         history="Created by " + str(request.user)
         user = User.objects.get(id = request.user.id)
         item=AddItem(type=type,unit=units,sales=sel,purchase=cost,Name=name,p_desc=cost_desc,s_desc=sell_desc,s_price=sell_price,p_price=cost_price,
-                    user=user,creat=history,interstate=inter,intrastate=intra,stock=stock,rate=rate,status_stock=status_stock,invacc=invacc)
+                    user=user,creat=history,interstate=inter,intrastate=intra,stock=stock,rate=rate,status_stock=status_stock,invacc=invacc,hsn=hsn)
 
         item.save()
         return HttpResponse({"message": "success"})
@@ -26214,300 +26120,7 @@ def import_payment_recieved(request):
 
 
 @login_required(login_url='login')
-def add_prod(request):     #updation
-    user = request.user
-    c = customer.objects.filter(user = request.user)
-    company = company_details.objects.get(user=request.user.id)
-    p = AddItem.objects.filter(user = request.user)
-    items = AddItem.objects.filter(user_id=user.id, status_stock__iexact='Active')
-    i = invoice.objects.all()
-    payments = payment_terms.objects.filter(user = request.user)
-    sales = Sales.objects.filter(additem__user=request.user)
-    purchase = Purchase.objects.filter(additem__user=request.user)
-    units = Unit.objects.all()
-    banks = Bankcreation.objects.filter(user = request.user)
-    last_record = invoice.objects.filter(user=request.user.id).last()
-    last_reference = Invoice_Reference.objects.filter(user=request.user.id).last()
-    inv_last1 = invoice.objects.filter(user = request.user)
-    inv_last = 0
-    if inv_last1.exists():
-        inv_last = invoice.objects.filter(user = request.user).last().invoice_no
-    else:
-        inv_last = 1
-        
-    inv_last_str = str(inv_last)
-    last_digit_index = len(inv_last_str)
 
-
-
-    prefix = str(inv_last)[:last_digit_index]
-
-    if inv_last_str[last_digit_index:]:
-        number = int(inv_last_str[last_digit_index:]) + 1
-    else:
-        number = 1
-
-
-
-    number+= 1
-    count = f"{prefix}{number}"
-
-
-    '''if invoice.objects.all().exists():
-        invoice_count = invoice.objects.last().id
-        count = invoice_count
-    else:
-        count = 1'''
-    # invoice_count = invoice.objects.last().id
-    # count=invoice_count+1
-    if not payment_terms.objects.filter(Terms='net 15').exists():
-       payment_terms(Terms='net 15', Days=15).save()
-    if not payment_terms.objects.filter(Terms='due end of month').exists():
-        payment_terms(Terms='due end of month', Days=60).save()
-    elif not payment_terms.objects.filter(Terms='net 30').exists():
-        payment_terms(Terms='net 30', Days=30).save()
-        
-        
-    if last_record ==None:
-        reference = '01'
-        remaining_characters=''
-    else:
-        lastSalesNo = last_record.invoice_no
-        last_two_numbers = int(lastSalesNo[-2:])+1
-        remaining_characters = lastSalesNo[:-2]  
-        if remaining_characters == '':
-            if last_two_numbers < 10:
-                reference = '0'+str(last_two_numbers)
-            else:
-                reference = str(last_two_numbers)
-        else:
-            if last_two_numbers < 10:
-                reference = remaining_characters+'0'+str(last_two_numbers)
-            else:
-                reference = remaining_characters+str(last_two_numbers)
-    if last_reference == None:
-        reford = '01'
-    else:
-        if last_reference.invoice_reference+1 < 10:
-            reford = '0'+ str(last_reference.invoice_reference+1)
-        else:
-            reford = str(last_reference.invoice_reference+1)
-    records=Invoice_Reference(invoice_reference=reford,
-                              user=user
-                              )
-    
-        
-        
-        
-    cur_user = request.user
-    user = User.objects.get(id=cur_user.id)
-    unit = Unit.objects.get(id=cur_user.id)
-    bank_id = ''  
-    bank_instance = None
-
-    
-    if request.method == 'POST':
-        items = request.POST.getlist('item[]')
-                
-        print(items)
-        
-        c = request.POST['cx_name']
-        
-        print(c)
-        cus = customer.objects.get(id=c)
-        print(cus.id)
-        custo = cus
-        invoice_no = request.POST['inv_no']
-        terms = request.POST['term']
-        pterms = payment_terms.objects.get(id=terms)
-        
-        # term=payment_terms.objects.get(id=terms)
-        order_no = request.POST['ord_no']
-        cheque_number = ''
-        upi_id = ''
-        payment_method = request.POST.get('payment_method', '')
-
-        account_number = ''  # Initialize account_number
-        
-        if payment_method == 'cash':
-            pass
-            # Handle cash related operations here
-        elif payment_method == 'cheque':
-            cheque_number = request.POST.get('cheque_number', '')
-            # Handle cheque related operations here
-        elif payment_method == 'upi':
-            upi_id = request.POST.get('upi_id', '')
-            # Handle UPI related operations here
-        elif payment_method == 'bank':
-            bank_id = request.POST.get('bank_name', '')
-            cheque_number = request.POST.get('cheque_number', '')
-            upi_id = request.POST.get('upi_id', '')
-            if bank_id:
-                try:
-                    bank_instance = Bankcreation.objects.get(id=bank_id)
-                    account_number = bank_instance.ac_no
-                except Bankcreation.DoesNotExist:
-                    print(f"Bank with ID {bank_id} does not exist.")
-            else:
-                print("No bank ID provided.")
-        else:
-            pass
-
-        print(f"Bank ID: {bank_id}")
-        print(f"Account Number: {account_number}")
-    
-
-        
-        inv_date_str = request.POST.get('inv_date', "")
-        due_date_str = request.POST.get('due_date', "")
- 
-        
-        inv_date_str = request.POST.get('inv_date', "")
-        due_date_str = request.POST.get('due_date', "")
-
-        inv_date = None
-        due_date = None
-
-        if inv_date_str and due_date_str:
-            try:
-                inv_date = datetime.strptime(inv_date_str, '%Y-%m-%d')
-                due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
-
-                cxnote = request.POST.get('customer_note', "")
-                subtotal = request.POST.get('subtotal', "")
-                igst = request.POST.get('igst', "")
-                cgst = request.POST.get('cgst', "")
-                sgst = request.POST.get('sgst', "")
-                totaltax = request.POST.get('totaltax', "")
-                t_total = request.POST.get('t_total', "")
-                file = request.FILES.get('file', None)
-                tc = request.POST.get('ter_cond', "")
-                if 'Draft' in request.POST:
-                    status="draft"
-                if "Save" in request.POST:
-                    status = "approved"
-                # Get the adjustment charge from the request, defaulting to 0 if empty
-                adjustment_charge = request.POST.get('adjustment_charge', 0)
-
-                # Similarly, handle other fields that expect numerical values
-                shipping_charge = request.POST.get('shipping_charge', 0)
-                paid_amount = request.POST.get('paid_amount', 0)
-                balance = request.POST.get('balance', 0)
-
-                # Now you can use these values safely
-
-                reference=request.POST['ord_no']
-                invn = invoice(user=user, customer=custo, invoice_no=invoice_no, terms=terms, order_no=order_no, 
-                                inv_date=inv_date, due_date=due_date, cxnote=cxnote, subtotal=subtotal, 
-                                igst=igst, cgst=cgst, sgst=sgst, t_tax=totaltax, grandtotal=t_total, 
-                                status=status, terms_condition=tc, file=file, adjustment=adjustment_charge, 
-                                shipping_charge=shipping_charge, paid_amount=paid_amount, balance=balance, reference=reference,
-                                pterms=pterms)
-                invn.save()
-                account_number = bank_instance.ac_no if bank_instance else ''
-                
-        
-                #unit_instance = get_object_or_404(Unit, id=avlquantity)
-
-                
-                invoice_payment = InvoicePayment(
-                                    invoice=invn,
-                                    payment_method=payment_method,
-                                    cheque_number=cheque_number,
-                                    upi_id=upi_id,
-                                    account_number=account_number,
-                                    banking=bank_instance
-                                    
-                                )
-                
-                invoice_payment.save()
-                
-               
-                
-                # Create the AddItem instance with the selected Unit
-                additem = AddItem(
-                   # stock=unit_instance.stock,  
-                    user=user,
-                    #unit=unit_instance,
-                    sales=sales,
-                    purchase=purchase,
-                   
-                )
-                
-                
-                additem.save()
-                print(additem, "maekmo")
-                
-                
-                
-                '''if last_reference == None:
-                    ref = Invoice_Reference(invoice_reference = int(reford),user=user)
-                    ref.save()
-                else:
-                    last_reference.invoice_reference = int(reford)
-                    last_reference.save()'''
-
-                # Additional code for creating invoice items
-
-            except ValueError as e:
-                print(f"Value Error: {e}")
-        
-            
-            
-            items = request.POST.getlist('item[]')
-            hsns = request.POST.getlist('hsn[]')
-            quantity1 = request.POST.getlist('quantity[]')
-            quantities = [float(x) for x in quantity1]
-            rate1 = request.POST.getlist('rate[]')
-            rates = [float(x) for x in rate1]
-            discount1 = request.POST.getlist('desc[]')
-            discounts = [float(x) for x in discount1]
-            tax1 = request.POST.getlist('tax[]')
-            taxes = [float(x) for x in tax1]
-            amount1 = request.POST.getlist('amount[]')
-            amounts = [float(x) for x in amount1]
-            avlquantity = request.POST.getlist('avlquantity[]')
-            avlq = [float(x) for x in avlquantity]
-            print(avlq, "avialquanty")
-            
-            
-            
-            for i in range(len(items)):
-                print("Items:", i)
-        
-                invoice_item.objects.create(
-                    inv=invn,
-                    product=items[i],
-                    hsn=hsns[i],
-                    quantity=quantities[i],
-                    rate=rates[i],
-                    discount=discounts[i],
-                    tax=taxes[i],
-                    total=amounts[i],
-                    inv_stock=avlq[i]
-                    
-                )
-            records.save()
-    
-
-        
-
-        return redirect('invoiceview')
-    context = {
-            'c': c,
-            'p': p,
-            'items': items,
-            "reford":reford,
-            'i': i,
-            'company': company,
-            'sales': sales,
-            'purchase': purchase,
-            'units': units,
-            'count': count,
-            'payments': payments,
-            'banks' : banks
-        }
-    return render(request, 'createinvoice.html', context)
 
   
 @login_required(login_url='login')
@@ -26697,209 +26310,7 @@ def shareInvoiceToEmail(request,id):
             return redirect(invoice_overview, id)
         
 
-@login_required(login_url='login')
-def edited_prod(request, id):
-    print(id)
-    print("Submitted Data - Tax:", request.POST.getlist('tax[]'))
 
-    user = request.user
-    c = customer.objects.filter(user = request.user)
-    p = AddItem.objects.filter(user = request.user)
-    invoiceitem = invoice_item.objects.filter(inv_id=id)
-    invoic = invoice.objects.get(id=id)
-    cust = invoic.customer.placeofsupply
-    cust_id = invoic.customer.id
-    pay = payment_terms.objects.filter(user = request.user)
-    sales = Sales.objects.all()
-    purchase = Purchase.objects.all()
-    invpay = InvoicePayment.objects.filter(invoice_id=id)
-    ip = InvoicePayment.objects.filter(invoice__user=request.user)
-
-
-
-    invp = invpay[0] if invpay else None
-    banks = Bankcreation.objects.all()
-    unit = Unit.objects.all()
-    
-    company = company_details.objects.get(user=request.user.id)
-    comp = company.state
-    
-    
-    
-    
-    user = request.user
-    company = company_details.objects.get(user=user)
-    customers = customer.objects.filter(user_id=user.id)
-    
-    c = customer.objects.all()
-
-    items = AddItem.objects.filter(user = request.user)
-    estimate = invoice.objects.get(id=id)
-    cust = estimate.customer.placeofsupply 
-    cust_id = estimate.customer.id
-    payments=payment_terms.objects.filter(user = request.user)
-    
-    pls= customer.objects.get(customerName=estimate.customer.customerName)
-    
-    est_items = invoice_item.objects.filter(inv=estimate)
-
-    unit=Unit.objects.all()
-    sale=Sales.objects.all()
-    purchase=Purchase.objects.all()
-    accounts = Purchase.objects.all()
-    account_types = set(Purchase.objects.values_list('Account_type', flat=True))
-
-    
-    account = Sales.objects.all()
-    account_type = set(Sales.objects.values_list('Account_type', flat=True))
-    
-    
-    cur_user = request.user
-    user = User.objects.get(id=cur_user.id)
-    
-    c = customer.objects.all()
-
-    if request.method == 'POST':
-       
-        u = request.user.id
-        u2 = User.objects.get(id=u)
-        c = request.POST['cx_name']
-        cus = customer.objects.get(id=c)
-
-        invoic.customer = cus
-        invoic.user = u2
-        invoic.terms = request.POST.get('term', "")
-        invoic.inv_date = request.POST.get('inv_date', "")
-        invoic.due_date = request.POST.get('due_date', "")
-        invoic.cxnote = request.POST.get('customer_note', "")
-        invoic.subtotal = request.POST.get('subtotal', "")
-        invoic.igst = request.POST.get('igst', "")
-        invoic.cgst = request.POST.get('cgst', "")
-        invoic.sgst = request.POST.get('sgst', "")
-        invoic.t_tax = request.POST.get('totaltax', "")
-        invoic.grandtotal = request.POST.get('t_total', "")
-        invoic.paid_amount = request.POST.get('paid_amount', "")
-        
-        invoic.balance = request.POST.get('balance', "")
-
-        old = invoic.file
-        new = request.FILES.get('file')
-        if old and not new:
-            invoic.file = old
-        else:
-            invoic.file = new
-
-        invoic.terms_condition = request.POST.get('ter_cond')
-
-        
-        
-
-        invoic.save()
-        
-        if invp:
-            invp.payment_method = request.POST.get('payment_method', "")
-            if invp.payment_method == 'cash':
-                pass
-            elif invp.payment_method == 'cheque':
-                invp.cheque_number = request.POST.get('cheque_number', '')
-            elif invp.payment_method == 'upi':
-                invp.upi_id = request.POST.get('upi_id', '')
-            else:
-                invp.bank_id = request.POST.get('bank_name', "")
-
-            invp.save()
-        est_items = invoice_item.objects.filter(inv=estimate)
-        est_items.delete()
-        item = request.POST.getlist('item[]')
-        print(item )
-        hsn = request.POST.getlist('hsn[]')
-        quantity1 = request.POST.getlist('quantity[]')
-        quantity = [float(x) for x in quantity1]
-        rate1 = request.POST.getlist('rate[]')
-        rate = [float(x) for x in rate1]
-        discount1 = request.POST.getlist('desc[]')
-        discount = [float(x) for x in discount1]
-        tax1 = request.POST.getlist('tax[]')
-        print(tax1, " est_items.tax1")
-
-    # Filter out non-numeric characters and convert to float
-        tax = [float(''.join(filter(str.isdigit, x))) for x in tax1]
-        amount1 = request.POST.getlist('amount[]')
-        amount = [float(x) for x in amount1]    
-        stock1 = request.POST.getlist('avlquantity[]')
-        stock = [float(x) for x in stock1]   
-
-            
-        print(stock, "stlck")
-        
-       
-
-        for i in range(len(item)):
-                print("Items:", i)
-        
-                invoice_item.objects.create(
-                    inv=estimate,
-                    product=item[i],
-                    hsn=hsn[i],
-                    quantity=quantity[i],
-                    rate=rate[i],
-                    discount=discount[i],
-                    tax=tax[i],
-                    total=amount[i],
-                    inv_stock=stock[i]
-                    
-                )
-                
-                print("first finsh")
-
-        '''if len(item) == len(hsn) ==  len(quantity) == len(rate) == len(discount) == len(tax) == len(amount)  == len(stock):
-                mapped = zip(item, hsn, quantity, rate, discount, tax, amount, stock)
-                print(mapped, "mapped")
-                mapped = list(mapped)
-                for element in mapped:
-                    created = invoice_item.objects.create(
-                        inv=estimate, product=element[0], hsn=element[1], quantity=element[2], rate=element[3], discount=element[4], tax=element[5], total=element[6], inv_stock=element[7])
-                    
-                    print(created, "created")
-                    created.save()'''
-                    
-        return redirect('invoice_overview', id)
-    
-            
-
-        
-    context = {
-        'c': c,
-        'company': company,
-        'i': estimate,
-        'customers': customers,
-        
-        'invoice': invoic,
-        
-        'invoiceitem': invoiceitem,
-        
-        'items': items,
-        'est': est_items,
-        'units':unit,
-        'sales':sale,
-        'purchase':purchase,
-        "account":account,
-        "account_type":account_type,
-        "accounts":accounts,
-        "account_types":account_types,
-        "pls":pls,
-        'payments':payments,
-        'cust':cust,
-        'custo_id':cust_id,
-        
-         'invpay': invpay,
-        'banks': banks,
-        'invp':invp,
-         'ip':ip,
-         'p':p,
-    
-    }
-    return render(request, 'invoiceedit.html', context)
 
 
 from django.http import JsonResponse
@@ -27326,112 +26737,7 @@ def shareInventoryAdjustmentToEmail(request,id):
         
         
 
-def save_adjustment(request):
-    
-    
-     if request.method=='POST':
-         typeof_adjustment=request.POST.get('type','')
-         ref_no=request.POST['refno']
-         date=request.POST['date']
-         account=request.POST['account']
-         
 
-         description = request.POST['description']
-         user_id = request.user.id 
-         account_instance = Chart_of_Account.objects.get(id=account)
-         user_instance = User.objects.get(id=user_id) 
-         reason_name = request.POST['reason']
-        
-            # Use get_or_create to retrieve an existing Reason or create a new
-         reason_instance, created = Reason.objects.get_or_create(reason=reason_name)
-
-         company = company_details.objects.get(user=request.user)
-
-         adjustment = Adjustment.objects.create(
-            user=user_instance,
-            type=typeof_adjustment,
-            adjustment_type=typeof_adjustment,
-            reference_number=ref_no,
-            date=date,
-            account=account_instance,
-            reason=reason_instance,
-            description=description,
-            company=company
-                  
-            
-        )
-         adjustment.save()
-         user = request.user
-         
-         last_reference = Inventoryadjust_Reference.objects.filter(user=request.user.id).last() 
-         if last_reference == None:
-            reford = '01'
-         else:
-            if last_reference.inventory_reference+1 < 10:
-                reford = '0'+ str(last_reference.inventory_reference+1)
-            else:
-                reford = str(last_reference.inventory_reference+1)         
-         if last_reference == None:
-            ref = Inventoryadjust_Reference(inventory_reference = int(reford),user=user)
-            ref.save()
-         else:
-            last_reference.inventory_reference = int(reford)
-            last_reference.save()
-         
-
-         if typeof_adjustment == 'Quantity':
-             item_names = request.POST.getlist('item[]')
-             qty_available = request.POST.getlist('qtyav[]')
-             new_qty_on_hand = request.POST.getlist('newqty[]')
-
-             print(new_qty_on_hand,"new_qty_on_hand is")
-             qty_adjusted = request.POST.getlist('qtyadj[]')
-
-             if len(item_names) == len(qty_available) == len(new_qty_on_hand) == len(qty_adjusted):
-                for i in range(len(item_names)):
-
-                    item_instance = AddItem.objects.get(Name=item_names[i])
-                    item_instance.stock += int(new_qty_on_hand[i])
-                    item_instance.save()
-
-                    items1 = ItemAdjustment.objects.create(
-                        item=item_names[i],
-                        quantity_available=qty_available[i],
-                        new_quantity_on_hand=new_qty_on_hand[i],
-                        adjusted_quantity=qty_adjusted[i],
-                        adjustment_type=typeof_adjustment,
-                        adjustment=adjustment,
-                        user=user_instance,
-                    )
-                    items1.save()
-
-         elif typeof_adjustment == 'Value':
-             items_names = request.POST.getlist('item2[]')
-             current_value = request.POST.getlist('cuval[]')
-             changed_value = request.POST.getlist('chval[]')
-             value_adjusted = request.POST.getlist('adjval[]')
-
-             if len(items_names) == len(current_value) == len(changed_value) == len(value_adjusted):
-                for j in range(len(items_names)):
-                    items2 = ItemAdjustment.objects.create(
-                        item=items_names[j],
-                        current_value=current_value[j],
-                        changed_value=changed_value[j],
-                        adjusted_value=value_adjusted[j],
-                        adjustment_type=typeof_adjustment,
-                        adjustment=adjustment,
-                        user=user_instance,       
-                    )
-                    items2.save()
-
-         if 'save_draft' in request.POST:
-            adjustment.status = "Draft"
-
-         elif 'convert_adjusted' in request.POST:
-             adjustment.status = "Adjusted"
-
-         adjustment.save()   
-     return redirect("inventory_adjustment")
  
  
  
@@ -27439,28 +26745,6 @@ def save_adjustment(request):
  
  
  
-@login_required(login_url='login')
-def new_adjustment(request):   #updation
-    user = request.user
-    accounts=Chart_of_Account.objects.all()
-    company_data = company_details.objects.get(user=request.user)
-    items = AddItem.objects.filter(user_id=user.id)
-    sales=Sales.objects.all()
-    purchase=Purchase.objects.all()
-    unit=Unit.objects.all()
-    reason=Reason.objects.all()
-    last_reference = Inventoryadjust_Reference.objects.filter(user=request.user.id).last()
-         
-    if last_reference == None:
-        reford = '01'
-    else:
-        if last_reference.inventory_reference+1 < 10:
-            reford = '0'+ str(last_reference.inventory_reference+1)
-        else:
-            reford = str(last_reference.inventory_reference+1)
-    
-    
-    return render(request,'new_adjustment.html',{'company': company_data,'accounts':accounts,'items':items,'sales':sales,'purchase':purchase,'units':unit,'reason':reason,'reford':reford})
 
 
 def getdata(request):
@@ -27925,3 +27209,814 @@ def invoice_unit_dropdown(request):
         options[option.id] = option.unit
 
     return JsonResponse(options)
+
+
+
+def payment_term_for_invoice(request):
+    user=User.objects.get(id=request.user.id)
+    
+    if request.method == 'POST':
+        terms = json.loads(request.POST.get('terms', '[]'))
+        days = json.loads(request.POST.get('days', '[]'))
+        pay_term=terms[0]
+        if len(terms) == len(days):
+            for term, day in zip(terms, days):
+                
+                created = payment_terms.objects.get_or_create(Terms=term, Days=day,user=user)
+            payment=payment_terms.objects.filter(user=request.user.id).last()
+            pay_id = payment.id
+            print(pay_id)
+
+            return JsonResponse({"message": "success","pay_term":pay_term,"pay_id":pay_id})
+
+    return JsonResponse({"message": "success",})     
+
+
+
+@login_required(login_url='login')
+def new_item_inventory(request):
+    company = company_details.objects.get(user = request.user)
+    if request.method=='POST':
+        type=request.POST.get('type')
+        name=request.POST['name']
+        ut=request.POST['unit']
+        hsn=request.POST['hsn']
+
+        print('ut',ut)
+
+        inter=request.POST['inter']
+        intra=request.POST['intra']
+        sell_price=request.POST.get('sell_price')
+        sell_acc=request.POST.get('sell_acc')
+        sell_desc=request.POST.get('sell_desc')
+        cost_price=request.POST.get('cost_price')
+        cost_acc=request.POST.get('cost_acc')      
+        cost_desc=request.POST.get('cost_desc')
+        units=Unit.objects.get(unit=ut)
+        sel=Sales.objects.get(id=sell_acc)
+        cost=Purchase.objects.get(id=cost_acc)
+        stock=request.POST.get('openstock')
+        rate=request.POST.get('inventoryaccntperunit')
+        status_stock=request.POST.get('satus',0)
+        invacc=request.POST.get('invacc')
+        history="Created by " + str(request.user)
+        user = User.objects.get(id = request.user.id)
+        item=AddItem(type=type,unit=units,sales=sel,purchase=cost,Name=name,p_desc=cost_desc,s_desc=sell_desc,s_price=sell_price,p_price=cost_price,
+                    user=user,creat=history,interstate=inter,intrastate=intra,stock=stock,rate=rate,status_stock=status_stock,invacc=invacc,hsn=hsn)
+
+        item.save()
+        return HttpResponse({"message": "success"})
+    
+    
+
+def edit_inventory(request,id):
+    user=request.user
+    company=company_details.objects.get(user=user)
+    items = AddItem.objects.filter(user_id=user.id)
+    adj=Adjustment.objects.get(id=id)
+    print(adj.description,'date')
+    items = AddItem.objects.filter(user_id=user.id)
+    accounts=Chart_of_Account.objects.all()
+    adj_items=ItemAdjustment.objects.filter(adjustment=adj)
+    reason=Reason.objects.all()
+    unit=Unit.objects.all()
+    sales=Sales.objects.all()
+    purchase=Purchase.objects.all()
+    value =[]
+    for adjustment in adj_items:
+        print(adjustment.adjustment_type, 'item type')
+        value=adjustment.adjustment_type
+        val=adjustment.current_value
+        print(val,'val')
+    print(value,'value is ')
+    return render(request,'edit_adjustment.html',{'company':company,'adj':adj,'accounts':accounts,'items':items,'adj_items':adj_items,'value':value,'reason':reason,'units':unit,'sales':sales,'purchase':purchase})
+  
+
+    
+def update_adjustment(request,id):
+    user=request.user
+    user_id=request.user.id
+    user_instance = User.objects.get(id=user_id)
+    if request.method=='POST':
+        adjustment=Adjustment.objects.get(id=id)
+        adjustment.user=user_instance
+        adjustment.type=request.POST.get('type','')
+        adjustment.adjustment_type=request.POST.get('type','')
+        adjustment.reference_number=request.POST['refno']
+        adjustment.date=request.POST['date']
+        account=request.POST['account']
+        print(account, "account")
+        account_instance = Chart_of_Account.objects.get(id=account)
+        adjustment.account=account_instance
+        reason=request.POST['reason']
+        reason_instance=Reason.objects.get(reason=reason)
+        adjustment.reason=reason_instance
+        adjustment.description=request.POST['description']
+        company = company_details.objects.get(user=user)
+        adjustment.company=company
+        adjustment.save()
+        itemadjustment = ItemAdjustment.objects.filter(adjustment_id=adjustment.id)
+        itemadjustment.delete()
+        
+        if adjustment.adjustment_type == 'Quantity':
+             print(adjustment.adjustment_type, "adjustment.adjustment_type")
+             item_names = request.POST.getlist('item[]')
+             print(item_names,"item_names top")
+             qty_available = request.POST.getlist('qtyav[]')
+             new_qty_on_hand = request.POST.getlist('newqty[]')
+             qty_adjusted = request.POST.getlist('qtyadj[]')
+
+             if len(item_names) == len(qty_available) == len(new_qty_on_hand) == len(qty_adjusted):
+                for i in range(len(item_names)):
+                    item_instance = AddItem.objects.get(Name=item_names[i])
+                    item_instance.stock += int(float(new_qty_on_hand[i]))
+                    item_instance.save()
+                    items1 = ItemAdjustment.objects.create(
+                        item=item_names[i],
+                        quantity_available=qty_available[i],
+                        new_quantity_on_hand=new_qty_on_hand[i],
+                        adjusted_quantity=qty_adjusted[i],
+                        adjustment_type=adjustment.adjustment_type,
+                        adjustment=adjustment,
+                        user=user_instance,
+                    )
+
+                    items1.save()
+                    
+                    print(items1, "item one")
+        elif adjustment.adjustment_type == 'Value':
+             print(adjustment.adjustment_type, "adjustment.adjustment_type")
+             items_names = request.POST.getlist('item2[]')
+             
+             
+             print(items_names, "items_names")
+             current_value = request.POST.getlist('cuval[]')
+             changed_value = request.POST.getlist('chval[]')
+             value_adjusted = request.POST.getlist('adjval[]')
+             if len(items_names) == len(current_value) == len(changed_value) == len(value_adjusted):
+                for j in range(len(items_names)):
+                    items2 = ItemAdjustment.objects.create(
+                        item=items_names[j],
+                        current_value=current_value[j],
+                        changed_value=changed_value[j],
+                        adjusted_value=value_adjusted[j],
+                        adjustment_type=adjustment.adjustment_type,
+                        adjustment=adjustment,
+                        user=user_instance,       
+                    )
+                    items2.save()
+                    print(items2, "item two")
+        if 'save_draft' in request.POST:
+            adjustment.status = "Draft"
+            
+
+        elif 'convert_adjusted' in request.POST:
+             adjustment.status = "Adjusted"
+
+        adjustment.save()
+    return redirect("inv_overview",id)
+
+
+
+@login_required(login_url='login')
+def new_adjustment(request):   #updation
+    user = request.user
+    accounts=Chart_of_Account.objects.all()
+    company_data = company_details.objects.get(user=request.user)
+    items = AddItem.objects.filter(user_id=user.id)
+    sales=Sales.objects.all()
+    purchase=Purchase.objects.all()
+    unit=Unit.objects.all()
+    reason=Reason.objects.all()
+    last_reference = Inventoryadjust_Reference.objects.filter(user=request.user.id).last()
+         
+    if last_reference == None:
+        reford = '01'
+    else:
+        if last_reference.inventory_reference+1 < 10:
+            reford = '0'+ str(last_reference.inventory_reference+1)
+        else:
+            reford = str(last_reference.inventory_reference+1)
+    
+    
+    return render(request,'new_adjustment.html',{'company': company_data,'accounts':accounts,'items':items,'sales':sales,'purchase':purchase,'units':unit,'reason':reason,'reford':reford})
+
+
+def save_adjustment(request):
+    
+    
+     if request.method=='POST':
+         typeof_adjustment=request.POST.get('type','')
+         ref_no=request.POST['refno']
+         date=request.POST['date']
+         account=request.POST['account']
+         
+
+         description = request.POST['description']
+         user_id = request.user.id 
+         account_instance = Chart_of_Account.objects.get(id=account)
+         user_instance = User.objects.get(id=user_id) 
+         reason_name = request.POST['reason']
+        
+            # Use get_or_create to retrieve an existing Reason or create a new
+         reason_instance, created = Reason.objects.get_or_create(reason=reason_name)
+
+         company = company_details.objects.get(user=request.user)
+
+         adjustment = Adjustment.objects.create(
+            user=user_instance,
+            type=typeof_adjustment,
+            adjustment_type=typeof_adjustment,
+            reference_number=ref_no,
+            date=date,
+            account=account_instance,
+            reason=reason_instance,
+            description=description,
+            company=company
+                  
+            
+        )
+         adjustment.save()
+         user = request.user
+         
+         last_reference = Inventoryadjust_Reference.objects.filter(user=request.user.id).last() 
+         if last_reference == None:
+            reford = '01'
+         else:
+            if last_reference.inventory_reference+1 < 10:
+                reford = '0'+ str(last_reference.inventory_reference+1)
+            else:
+                reford = str(last_reference.inventory_reference+1)         
+         if last_reference == None:
+            ref = Inventoryadjust_Reference(inventory_reference = int(reford),user=user)
+            ref.save()
+         else:
+            last_reference.inventory_reference = int(reford)
+            last_reference.save()
+         
+
+         if typeof_adjustment == 'Quantity':
+             item_names = request.POST.getlist('item[]')
+             qty_available = request.POST.getlist('qtyav[]')
+             new_qty_on_hand = request.POST.getlist('newqty[]')
+
+             print(new_qty_on_hand,"new_qty_on_hand is")
+             qty_adjusted = request.POST.getlist('qtyadj[]')
+
+             if len(item_names) == len(qty_available) == len(new_qty_on_hand) == len(qty_adjusted):
+                for i in range(len(item_names)):
+
+                    item_instance = AddItem.objects.get(Name=item_names[i])
+                    item_instance.stock += int(new_qty_on_hand[i])
+                    item_instance.save()
+
+                    items1 = ItemAdjustment.objects.create(
+                        item=item_names[i],
+                        quantity_available=qty_available[i],
+                        new_quantity_on_hand=new_qty_on_hand[i],
+                        adjusted_quantity=qty_adjusted[i],
+                        adjustment_type=typeof_adjustment,
+                        adjustment=adjustment,
+                        user=user_instance,
+                    )
+                    items1.save()
+
+         elif typeof_adjustment == 'Value':
+             items_names = request.POST.getlist('item2[]')
+             current_value = request.POST.getlist('cuval[]')
+             changed_value = request.POST.getlist('chval[]')
+             value_adjusted = request.POST.getlist('adjval[]')
+
+             if len(items_names) == len(current_value) == len(changed_value) == len(value_adjusted):
+                for j in range(len(items_names)):
+                    items2 = ItemAdjustment.objects.create(
+                        item=items_names[j],
+                        current_value=current_value[j],
+                        changed_value=changed_value[j],
+                        adjusted_value=value_adjusted[j],
+                        adjustment_type=typeof_adjustment,
+                        adjustment=adjustment,
+                        user=user_instance,       
+                    )
+                    items2.save()
+
+         if 'save_draft' in request.POST:
+            adjustment.status = "Draft"
+
+         elif 'convert_adjusted' in request.POST:
+             adjustment.status = "Adjusted"
+
+         adjustment.save()   
+     return redirect("inventory_adjustment")
+ 
+ 
+ 
+@login_required(login_url='login')
+def edited_prod(request, id):
+    print(id)
+    print("Submitted Data - Tax:", request.POST.getlist('tax[]'))
+
+    user = request.user
+    c = customer.objects.filter(user = request.user)
+    p = AddItem.objects.filter(user = request.user)
+    invoiceitem = invoice_item.objects.filter(inv_id=id)
+    invoic = invoice.objects.get(id=id)
+    cust = invoic.customer.placeofsupply
+    cust_id = invoic.customer.id
+    pay = payment_terms.objects.filter(user = request.user)
+    sales = Sales.objects.all()
+    purchase = Purchase.objects.all()
+    invpay = InvoicePayment.objects.filter(invoice_id=id)
+    ip = InvoicePayment.objects.filter(invoice__user=request.user)
+    m = invoic.terms
+    
+    payment = payment_terms.objects.get(id=m)
+    print(m,"invoice terms")
+    print(payment,"invoice payment")
+
+   
+
+
+
+    invp = invpay[0] if invpay else None
+    banks = Bankcreation.objects.all()
+    unit = Unit.objects.all()
+    
+    company = company_details.objects.get(user=request.user.id)
+    comp = company.state
+    
+    
+    
+    
+    user = request.user
+    company = company_details.objects.get(user=user)
+    customers = customer.objects.filter(user_id=user.id)
+    
+    c = customer.objects.all()
+
+    items = AddItem.objects.filter(user = request.user)
+    estimate = invoice.objects.get(id=id)
+    cust = estimate.customer.placeofsupply 
+    cust_id = estimate.customer.id
+    payments=payment_terms.objects.filter(user = request.user)
+    
+    pls= customer.objects.get(customerName=estimate.customer.customerName)
+    
+    est_items = invoice_item.objects.filter(inv=estimate)
+
+    unit=Unit.objects.all()
+    sale=Sales.objects.all()
+    purchase=Purchase.objects.all()
+    accounts = Purchase.objects.all()
+    account_types = set(Purchase.objects.values_list('Account_type', flat=True))
+
+    
+    account = Sales.objects.all()
+    account_type = set(Sales.objects.values_list('Account_type', flat=True))
+    
+    
+    cur_user = request.user
+    user = User.objects.get(id=cur_user.id)
+    
+    c = customer.objects.all()
+
+    if request.method == 'POST':
+       
+        u = request.user.id
+        u2 = User.objects.get(id=u)
+        c = request.POST['cx_name']
+        cus = customer.objects.get(id=c)
+
+        invoic.customer = cus
+        invoic.user = u2
+        invoic.terms = request.POST.get('term', "")
+        invoic.inv_date = request.POST.get('inv_date', "")
+        invoic.due_date = request.POST.get('due_date', "")
+        invoic.cxnote = request.POST.get('customer_note', "")
+        invoic.subtotal = request.POST.get('subtotal', "")
+        invoic.igst = request.POST.get('igst', "")
+        invoic.cgst = request.POST.get('cgst', "")
+        invoic.sgst = request.POST.get('sgst', "")
+        invoic.t_tax = request.POST.get('totaltax', "")
+        invoic.grandtotal = request.POST.get('t_total', "")
+        invoic.paid_amount = request.POST.get('paid_amount', "")
+        
+        invoic.balance = request.POST.get('balance', "")
+
+        old = invoic.file
+        new = request.FILES.get('file')
+        if old and not new:
+            invoic.file = old
+        else:
+            invoic.file = new
+
+        invoic.terms_condition = request.POST.get('ter_cond')
+
+        
+        
+
+        invoic.save()
+        
+        if invp:
+            invp.payment_method = request.POST.get('payment_method', "")
+            if invp.payment_method == 'cash':
+                pass
+            elif invp.payment_method == 'cheque':
+                invp.cheque_number = request.POST.get('cheque_number', '')
+            elif invp.payment_method == 'upi':
+                invp.upi_id = request.POST.get('upi_id', '')
+            else:
+                invp.bank_id = request.POST.get('bank_name', "")
+
+            invp.save()
+        est_items = invoice_item.objects.filter(inv=estimate)
+        est_items.delete()
+        item = request.POST.getlist('item[]')
+        print(item )
+        hsn = request.POST.getlist('hsn[]')
+        quantity1 = request.POST.getlist('quantity[]')
+        quantity = [float(x) for x in quantity1]
+        rate1 = request.POST.getlist('rate[]')
+        rate = [float(x) for x in rate1]
+        discount1 = request.POST.getlist('desc[]')
+        discount = [float(x) for x in discount1]
+        tax1 = request.POST.getlist('tax[]')
+        print(tax1, " est_items.tax1")
+
+    # Filter out non-numeric characters and convert to float
+        tax = [float(''.join(filter(str.isdigit, x))) for x in tax1]
+        amount1 = request.POST.getlist('amount[]')
+        amount = [float(x) for x in amount1]    
+        stock1 = request.POST.getlist('avlquantity[]')
+        stock = [float(x) for x in stock1]   
+
+            
+        print(stock, "stlck")
+        
+       
+
+        for i in range(len(item)):
+                print("Items:", i)
+        
+                invoice_item.objects.create(
+                    inv=estimate,
+                    product=item[i],
+                    hsn=hsn[i],
+                    quantity=quantity[i],
+                    rate=rate[i],
+                    discount=discount[i],
+                    tax=tax[i],
+                    total=amount[i],
+                    inv_stock=stock[i]
+                    
+                )
+                
+                print("first finsh")
+
+        '''if len(item) == len(hsn) ==  len(quantity) == len(rate) == len(discount) == len(tax) == len(amount)  == len(stock):
+                mapped = zip(item, hsn, quantity, rate, discount, tax, amount, stock)
+                print(mapped, "mapped")
+                mapped = list(mapped)
+                for element in mapped:
+                    created = invoice_item.objects.create(
+                        inv=estimate, product=element[0], hsn=element[1], quantity=element[2], rate=element[3], discount=element[4], tax=element[5], total=element[6], inv_stock=element[7])
+                    
+                    print(created, "created")
+                    created.save()'''
+                    
+        return redirect('invoice_overview', id)
+    
+            
+
+        
+    context = {
+        'c': c,
+        'company': company,
+        'i': estimate,
+        'customers': customers,
+        
+        'invoice': invoic,
+        
+        'invoiceitem': invoiceitem,
+        
+        'items': items,
+        'est': est_items,
+        'units':unit,
+        'sales':sale,
+        'purchase':purchase,
+        "account":account,
+        "account_type":account_type,
+        "accounts":accounts,
+        "account_types":account_types,
+        "pls":pls,
+        'payments':payments,
+        'cust':cust,
+        'custo_id':cust_id,
+        
+         'invpay': invpay,
+        'banks': banks,
+        'invp':invp,
+         'ip':ip,
+         'p':p,
+         'payt': payment
+    
+    }
+    return render(request, 'invoiceedit.html', context)
+
+
+
+
+def add_prod(request):     #updation
+    user = request.user
+    c = customer.objects.filter(user = request.user)
+    company = company_details.objects.get(user=request.user.id)
+    p = AddItem.objects.filter(user = request.user)
+    items = AddItem.objects.filter(user_id=user.id, status_stock__iexact='Active')
+    i = invoice.objects.all()
+    payments = payment_terms.objects.filter(user = request.user)
+    sales = Sales.objects.filter(additem__user=request.user)
+    purchase = Purchase.objects.filter(additem__user=request.user)
+    units = Unit.objects.all()
+    banks = Bankcreation.objects.filter(user = request.user)
+    last_record = invoice.objects.filter(user=request.user.id).last()
+    last_reference = Invoice_Reference.objects.filter(user=request.user.id).last()
+    inv_last1 = invoice.objects.filter(user = request.user)
+    inv_last = 0
+    if inv_last1.exists():
+        inv_last = invoice.objects.filter(user = request.user).last().invoice_no
+    else:
+        inv_last = 1
+        
+    inv_last_str = str(inv_last)
+    last_digit_index = len(inv_last_str)
+
+
+
+    prefix = str(inv_last)[:last_digit_index]
+
+    if inv_last_str[last_digit_index:]:
+        number = int(inv_last_str[last_digit_index:]) + 1
+    else:
+        number = 1
+
+
+
+    number+= 1
+    count = f"{prefix}{number}"
+
+
+    '''if invoice.objects.all().exists():
+        invoice_count = invoice.objects.last().id
+        count = invoice_count
+    else:
+        count = 1'''
+    # invoice_count = invoice.objects.last().id
+    # count=invoice_count+1
+    if not payment_terms.objects.filter(Terms='net 15').exists():
+       payment_terms(Terms='net 15', Days=15).save()
+    if not payment_terms.objects.filter(Terms='due end of month').exists():
+        payment_terms(Terms='due end of month', Days=60).save()
+    elif not payment_terms.objects.filter(Terms='net 30').exists():
+        payment_terms(Terms='net 30', Days=30).save()
+        
+        
+    if last_record ==None:
+        reference = '01'
+        remaining_characters=''
+    else:
+        lastSalesNo = last_record.invoice_no
+        last_two_numbers = int(lastSalesNo[-2:])+1
+        remaining_characters = lastSalesNo[:-2]  
+        if remaining_characters == '':
+            if last_two_numbers < 10:
+                reference = '0'+str(last_two_numbers)
+            else:
+                reference = str(last_two_numbers)
+        else:
+            if last_two_numbers < 10:
+                reference = remaining_characters+'0'+str(last_two_numbers)
+            else:
+                reference = remaining_characters+str(last_two_numbers)
+    if last_reference == None:
+        reford = '01'
+    else:
+        if last_reference.invoice_reference+1 < 10:
+            reford = '0'+ str(last_reference.invoice_reference+1)
+        else:
+            reford = str(last_reference.invoice_reference+1)
+    records=Invoice_Reference(invoice_reference=reford,
+                              user=user
+                              )
+    
+        
+        
+        
+    cur_user = request.user
+    user = User.objects.get(id=cur_user.id)
+    unit = Unit.objects.get(id=cur_user.id)
+    bank_id = ''  
+    bank_instance = None
+
+    
+    if request.method == 'POST':
+        items = request.POST.getlist('item[]')
+                
+        print(items)
+        
+        c = request.POST['cx_name']
+        
+        print(c)
+        cus = customer.objects.get(id=c)
+        print(cus.id)
+        custo = cus
+        invoice_no = request.POST['inv_no']
+        terms = request.POST['term']
+        pterms = payment_terms.objects.get(id=terms)
+        
+        # term=payment_terms.objects.get(id=terms)
+        order_no = request.POST['ord_no']
+        cheque_number = ''
+        upi_id = ''
+        payment_method = request.POST.get('payment_method', '')
+
+        account_number = ''  # Initialize account_number
+        
+        if payment_method == 'cash':
+            pass
+            # Handle cash related operations here
+        elif payment_method == 'cheque':
+            cheque_number = request.POST.get('cheque_number', '')
+            # Handle cheque related operations here
+        elif payment_method == 'upi':
+            upi_id = request.POST.get('upi_id', '')
+            # Handle UPI related operations here
+        elif payment_method == 'bank':
+            bank_id = request.POST.get('bank_name', '')
+            cheque_number = request.POST.get('cheque_number', '')
+            upi_id = request.POST.get('upi_id', '')
+            if bank_id:
+                try:
+                    bank_instance = Bankcreation.objects.get(id=bank_id)
+                    account_number = bank_instance.ac_no
+                except Bankcreation.DoesNotExist:
+                    print(f"Bank with ID {bank_id} does not exist.")
+            else:
+                print("No bank ID provided.")
+        else:
+            pass
+
+        print(f"Bank ID: {bank_id}")
+        print(f"Account Number: {account_number}")
+    
+
+        
+        inv_date_str = request.POST.get('inv_date', "")
+        due_date_str = request.POST.get('due_date', "")
+ 
+        
+        inv_date_str = request.POST.get('inv_date', "")
+        due_date_str = request.POST.get('due_date', "")
+
+        inv_date = None
+        due_date = None
+
+        if inv_date_str and due_date_str:
+            try:
+                inv_date = datetime.strptime(inv_date_str, '%Y-%m-%d')
+                due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
+
+                cxnote = request.POST.get('customer_note', "")
+                subtotal = request.POST.get('subtotal', "")
+                igst = request.POST.get('igst', "")
+                cgst = request.POST.get('cgst', "")
+                sgst = request.POST.get('sgst', "")
+                totaltax = request.POST.get('totaltax', "")
+                t_total = request.POST.get('t_total', "")
+                file = request.FILES.get('file', None)
+                tc = request.POST.get('ter_cond', "")
+                if 'Draft' in request.POST:
+                    status="draft"
+                if "Save" in request.POST:
+                    status = "approved"
+                # Get the adjustment charge from the request, defaulting to 0 if empty
+                adjustment_charge = request.POST.get('adjustment_charge', 0)
+
+                # Similarly, handle other fields that expect numerical values
+                shipping_charge = request.POST.get('shipping_charge', 0)
+                paid_amount = request.POST.get('paid_amount', 0)
+                balance = request.POST.get('balance', 0)
+
+                # Now you can use these values safely
+
+                reference=request.POST['ord_no']
+                invn = invoice(user=user, customer=custo, invoice_no=invoice_no, terms=terms, order_no=order_no, 
+                                inv_date=inv_date, due_date=due_date, cxnote=cxnote, subtotal=subtotal, 
+                                igst=igst, cgst=cgst, sgst=sgst, t_tax=totaltax, grandtotal=t_total, 
+                                status=status, terms_condition=tc, file=file, adjustment=adjustment_charge, 
+                                shipping_charge=shipping_charge, paid_amount=paid_amount, balance=balance, reference=reference,
+                                pterms=pterms)
+                invn.save()
+                account_number = bank_instance.ac_no if bank_instance else ''
+                
+        
+                #unit_instance = get_object_or_404(Unit, id=avlquantity)
+
+                
+                invoice_payment = InvoicePayment(
+                                    invoice=invn,
+                                    payment_method=payment_method,
+                                    cheque_number=cheque_number,
+                                    upi_id=upi_id,
+                                    account_number=account_number,
+                                    banking=bank_instance
+                                    
+                                )
+                
+                invoice_payment.save()
+                
+               
+                
+                # Create the AddItem instance with the selected Unit
+                additem = AddItem(
+                   # stock=unit_instance.stock,  
+                    user=user,
+                    #unit=unit_instance,
+                    sales=sales,
+                    purchase=purchase,
+                   
+                )
+                
+                
+                additem.save()
+                print(additem, "maekmo")
+                
+                
+                
+                '''if last_reference == None:
+                    ref = Invoice_Reference(invoice_reference = int(reford),user=user)
+                    ref.save()
+                else:
+                    last_reference.invoice_reference = int(reford)
+                    last_reference.save()'''
+
+                # Additional code for creating invoice items
+
+            except ValueError as e:
+                print(f"Value Error: {e}")
+        
+            
+            
+            items = request.POST.getlist('item[]')
+            hsns = request.POST.getlist('hsn[]')
+            quantity1 = request.POST.getlist('quantity[]')
+            quantities = [float(x) for x in quantity1]
+            rate1 = request.POST.getlist('rate[]')
+            rates = [float(x) for x in rate1]
+            discount1 = request.POST.getlist('desc[]')
+            discounts = [float(x) for x in discount1]
+            tax1 = request.POST.getlist('tax[]')
+            taxes = [float(x) for x in tax1]
+            amount1 = request.POST.getlist('amount[]')
+            amounts = [float(x) for x in amount1]
+            avlquantity = request.POST.getlist('avlquantity[]')
+            avlq = [float(x) for x in avlquantity]
+            print(avlq, "avialquanty")
+            
+            
+            
+            for i in range(len(items)):
+                print("Items:", i)
+        
+                invoice_item.objects.create(
+                    inv=invn,
+                    product=items[i],
+                    hsn=hsns[i],
+                    quantity=quantities[i],
+                    rate=rates[i],
+                    discount=discounts[i],
+                    tax=taxes[i],
+                    total=amounts[i],
+                    inv_stock=avlq[i]
+                    
+                )
+            records.save()
+    
+
+        
+
+        return redirect('invoiceview')
+    context = {
+            'c': c,
+            'p': p,
+            'items': items,
+            "reford":reford,
+            'i': i,
+            'company': company,
+            'sales': sales,
+            'purchase': purchase,
+            'units': units,
+            'count': count,
+            'payments': payments,
+            'banks' : banks
+        }
+    return render(request, 'createinvoice.html', context)
