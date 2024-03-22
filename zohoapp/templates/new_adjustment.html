@@ -319,7 +319,8 @@
 
 
                     
-                    <td class='text-right text-dark ' ><input type='number' step="0.01" class='form-control bg-transparent border-1 border-light text-light text-right qty ' value='' name="qtyav[]" id="quant"   onchange="qtychange(this.id); changeqty(this.id);">
+                    <td class='text-right text-dark ' >
+                      <input type='number' step="0.01" class='form-control bg-transparent border-1 border-light bg-white text-darkt text-right qty ' value='' name="qtyav[]" id="quant"   onchange="qtychange(this.id); changeqty(this.id);">
 
                      <!--<span class="text-warning">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>--> 
                       <span class="stock_warning text-danger"></span>
@@ -447,11 +448,11 @@
                   </script>
                     </td>
                     
-                    <td class='text-right'><input type='number' id='rates' class='form-control bg-transparent border-1 border-light text-light text-right rate' name='newqty[]' value=''>
+                    <td class='text-right'><input type='number' id='rates' class='form-control bg-transparent border-1 border-light bg-white text-dark text-right rate' name='newqty[]' value=''>
                     </td>
                     
                     
-                    <td class='text-right'><input type='text' id='diff' class='form-control bg-transparent border-1 border-light text-light text-right discount' name='qtyadj[]' value=''>
+                    <td class='text-right'><input type='text' id='diff' class='form-control bg-transparent border-1 border-light bg-white text-dark text-right discount' name='qtyadj[]' value=''>
                     </td>
                     
 
@@ -1039,6 +1040,7 @@ function populateSelectsFromJSON() {
                               <option value="">Select Account</option>
                
                                 <option value="" disabled class="btn btn-dark text-white"><b>SALES</b></option>
+                                <option value="{{s.id}}">{{ s.Account_name }}</option>
                                 {% for s in sales %}
                                     <option value="{{s.id}}">{{ s.Account_name }}</option>
                               {% endfor %}

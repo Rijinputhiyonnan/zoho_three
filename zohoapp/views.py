@@ -27384,10 +27384,11 @@ def new_adjustment(request):   #updation
     accounts=Chart_of_Account.objects.all()
     company_data = company_details.objects.get(user=request.user)
     items = AddItem.objects.filter(user_id=user.id)
-    sales=Sales.objects.all()
-    purchase=Purchase.objects.all()
-    unit=Unit.objects.all()
-    reason=Reason.objects.all()
+    sales = Sales.objects.filter(user=request.user).first()
+
+    purchase = Purchase.objects.filter(user=request.user).first()
+    unit=Unit.objects.filter(user=request.user).first()
+    reason=Reason.objects.filter(user=request.user).first()
     last_reference = Inventoryadjust_Reference.objects.filter(user=request.user.id).last()
          
     if last_reference == None:
@@ -27813,7 +27814,7 @@ def add_prod(request):     #updation
         
     cur_user = request.user
     user = User.objects.get(id=cur_user.id)
-    unit = Unit.objects.get(id=cur_user.id)
+    unit = Unit.objects.filter(user=request.user)
     bank_id = ''  
     bank_instance = None
 
