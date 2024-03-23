@@ -27317,9 +27317,10 @@ def update_adjustment(request,id):
         adjustment.save()
         itemadjustment = ItemAdjustment.objects.filter(adjustment_id=adjustment.id)
         itemadjustment.delete()
+        newadj=Adjustment.objects.get(id=id)
         
-        if adjustment.adjustment_type == 'Quantity':
-             print(adjustment.adjustment_type, "adjustment.adjustment_type")
+        if newadj.adjustment_type == 'Quantity':
+             print(newadj.adjustment_type, "adjustment_type quantity")
              item_names = request.POST.getlist('item[]')
              print(item_names,"item_names top")
              qty_available = request.POST.getlist('qtyav[]')
@@ -27336,16 +27337,16 @@ def update_adjustment(request,id):
                         quantity_available=qty_available[i],
                         new_quantity_on_hand=new_qty_on_hand[i],
                         adjusted_quantity=qty_adjusted[i],
-                        adjustment_type=adjustment.adjustment_type,
-                        adjustment=adjustment,
-                        user=user_instance,
+                        adjustment_type=newadj.adjustment_type,
+                        adjustment=newadj,
+                        user=user,
                     )
 
                     items1.save()
                     
                     print(items1, "item one")
-        elif adjustment.adjustment_type == 'Value':
-             print(adjustment.adjustment_type, "adjustment.adjustment_type")
+        elif newadj.adjustment_type == 'Value':
+             print(newadj.adjustment_type, "adjustment.adjustment_type")
              items_names = request.POST.getlist('item2[]')
              
              
@@ -27360,20 +27361,20 @@ def update_adjustment(request,id):
                         current_value=current_value[j],
                         changed_value=changed_value[j],
                         adjusted_value=value_adjusted[j],
-                        adjustment_type=adjustment.adjustment_type,
-                        adjustment=adjustment,
-                        user=user_instance,       
+                        adjustment_type=newadj.adjustment_type,
+                        adjustment=newadj,
+                        user=user,       
                     )
                     items2.save()
                     print(items2, "item two")
         if 'save_draft' in request.POST:
-            adjustment.status = "Draft"
+            newadj.status = "Draft"
             
 
         elif 'convert_adjusted' in request.POST:
-             adjustment.status = "Adjusted"
+             newadj.status = "Adjusted"
 
-        adjustment.save()
+        newadj.save()
     return redirect("inv_overview",id)
 
 

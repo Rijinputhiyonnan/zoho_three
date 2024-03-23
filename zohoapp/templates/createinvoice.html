@@ -1457,12 +1457,12 @@
                         <option value="" hidden>Select Account</option>
 
                         <option value="" disabled class="btn btn-dark text-white"><b>SALES</b></option>
-                        <option value="General Income" >General Income</option>
+                    <!--    <option value="General Income" >General Income</option>
                         <option value="Intrest Income" >Intrest Income</option>
                         <option value="Late fee Income" >Late fee Income</option>
                         <option value="Discount Income" >Discount Income</option>
                         <option value="Other Charges" >Other Charges</option>
-                        <option value="Shipping Charge" >Shipping Charge</option>
+                        <option value="Shipping Charge" >Shipping Charge</option>-->
                         {% for s in sales %}
                         <option value="{{s.id}}">{{ s.Account_name }}</option>
                         {% endfor %}
@@ -1474,13 +1474,13 @@
                     <div class="col-md-4">
                       <select name="cost_acc" class="form-control bg-light text-dark" id="cost_acc">
                         <option value="" hidden>Select Account</option>
-                        <option value="" disabled class="btn btn-dark text-white"><b>PURCHASE</b></option>
-                        <option value="General Income" >General Income</option>
+                        <option value="" disabled class="btn btn-dark text-white"><b>PURCHASE </b></option>
+                       <!-- <option value="General Income" >General Income</option>
                         <option value="Intrest Income" >Intrest Income</option>
                         <option value="Late fee Income" >Late fee Income</option>
                         <option value="Discount Income" >Discount Income</option>
                         <option value="Other Charges" >Other Charges</option>
-                        <option value="Shipping Charge" >Shipping Charge</option>
+                        <option value="Shipping Charge" >Shipping Charge</option>-->
                         {% for p in purchase %}
                         <option value="{{p.id}}">{{ p.Account_name }}</option>
                         {% endfor %}
