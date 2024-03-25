@@ -520,7 +520,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // NEW ROW
 document.addEventListener('DOMContentLoaded', function() {
 
-
+ // Initialize rowNum variable to keep track of row numbers
+ let rowNum = {{ adj_items|length }};
 
 
 
@@ -529,8 +530,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const tableBody = document.querySelector('#item_table tbody');
 
     addRowButton.addEventListener('click', function() {
-        var newRow = document.createElement('tr');
-        rowNum++;
+         // Increment rowNum each time a new row is added
+         rowNum++;
+
+         var newRow = document.createElement('tr');
 
         newRow.innerHTML = `
             <td class="bg-transparent text-light">${rowNum}</td>
@@ -635,7 +638,7 @@ function updateDiscount(diffInput, rateInput, qtyInput) {
                             >
                             <thead>
                                 <tr>
-                                    <th class="" style="font-weight: bold;color: rgb(245, 154, 36);  width: 50vh" colspan="2" >Item Details <a href="" data-toggle="modal" data-target="#newitem"><i class="fas fa-plus p-2 rounded"
+                                    <th class="" style="font-weight: bold;color: rgb(245, 154, 36);  width: 5vh" colspan="2" >Item Details <a href="" data-toggle="modal" data-target="#newitem"><i class="fas fa-plus p-2 rounded"
                                                 style="color: white; background-color: rgb(210, 132, 30);"></i></a></th>
                                     <th class="text-right" style="font-weight: bold;color: rgb(245, 154, 36);">Current Value</th>
                                     <th class="text-right" style="font-weight: bold;color: rgb(245, 154, 36);">Changed Value</th>
@@ -708,10 +711,10 @@ function updateDiscount(diffInput, rateInput, qtyInput) {
 
     addRowButton2.addEventListener('click', function() {
        
-        const newRow2 = document.createElement('tr');
+        
 
         rowNum2++;
-
+        const newRow2 = document.createElement('tr');
         newRow2.innerHTML = `
             <td class="bg-transparent text-white">${rowNum2}</td>
             <td>

@@ -27292,90 +27292,94 @@ def edit_inventory(request,id):
     return render(request,'edit_adjustment.html',{'company':company,'adj':adj,'accounts':accounts,'items':items,'adj_items':adj_items,'value':value,'reason':reason,'units':unit,'sales':sales,'purchase':purchase})
   
 
-    
-def update_adjustment(request,id):
-    user=request.user
-    user_id=request.user.id
-    user_instance = User.objects.get(id=user_id)
-    if request.method=='POST':
-        adjustment=Adjustment.objects.get(id=id)
-        adjustment.user=user_instance
-        adjustment.type=request.POST.get('type','')
-        adjustment.adjustment_type=request.POST.get('type','')
-        adjustment.reference_number=request.POST['refno']
-        adjustment.date=request.POST['date']
-        account=request.POST['account']
-        print(account, "account")
-        account_instance = Chart_of_Account.objects.get(id=account)
-        adjustment.account=account_instance
-        reason=request.POST['reason']
-        reason_instance=Reason.objects.get(reason=reason)
-        adjustment.reason=reason_instance
-        adjustment.description=request.POST['description']
-        company = company_details.objects.get(user=user)
-        adjustment.company=company
-        adjustment.save()
-        itemadjustment = ItemAdjustment.objects.filter(adjustment_id=adjustment.id)
-        itemadjustment.delete()
-        newadj=Adjustment.objects.get(id=id)
-        
-        if newadj.adjustment_type == 'Quantity':
-             print(newadj.adjustment_type, "adjustment_type quantity")
-             item_names = request.POST.getlist('item[]')
-             print(item_names,"item_names top")
-             qty_available = request.POST.getlist('qtyav[]')
-             new_qty_on_hand = request.POST.getlist('newqty[]')
-             qty_adjusted = request.POST.getlist('qtyadj[]')
+from django.http import HttpResponseServerError
+import traceback
+from django.db.models import Q
 
-             if len(item_names) == len(qty_available) == len(new_qty_on_hand) == len(qty_adjusted):
+def update_adjustment(request, id):
+    try:
+        user_instance = request.user
+        adjustment = Adjustment.objects.get(id=id)
+
+        if request.method == 'POST':
+            # Update adjustment details
+            adjustment.user = user_instance
+            adjustment.type = request.POST.get('type', '')
+            adjustment.adjustment_type = request.POST.get('type', '')
+            adjustment.reference_number = request.POST.get('refno', '')
+            adjustment.date = request.POST.get('date', '')
+
+            account_id = request.POST.get('account', '')
+            account_instance = Chart_of_Account.objects.get(id=account_id)
+            adjustment.account = account_instance
+
+            reason = request.POST.get('reason', '')
+            reason_instance = Reason.objects.get(reason=reason)
+            adjustment.reason = reason_instance
+
+            adjustment.description = request.POST.get('description', '')
+
+            company = company_details.objects.get(user=user_instance)
+            adjustment.company = company
+
+            adjustment.save()
+
+            # Process quantity adjustments
+            if adjustment.adjustment_type == 'Quantity':
+                item_names = request.POST.getlist('item[]')
+                qty_available = request.POST.getlist('qtyav[]')
+                new_qty_on_hand = request.POST.getlist('newqty[]')
+                qty_adjusted = request.POST.getlist('qtyadj[]')
+
                 for i in range(len(item_names)):
-                    item_instance = AddItem.objects.get(Name=item_names[i])
+                    item_instance, _ = AddItem.objects.get_or_create(Name=item_names[i])
                     item_instance.stock += int(float(new_qty_on_hand[i]))
                     item_instance.save()
-                    items1 = ItemAdjustment.objects.create(
-                        item=item_names[i],
+
+                    # Update existing ItemAdjustment object or create new one
+                    ItemAdjustment.objects.filter(
+                        adjustment=adjustment,
+                        item=item_instance
+                    ).update(
                         quantity_available=qty_available[i],
                         new_quantity_on_hand=new_qty_on_hand[i],
                         adjusted_quantity=qty_adjusted[i],
-                        adjustment_type=newadj.adjustment_type,
-                        adjustment=newadj,
-                        user=user,
+                        adjustment_type=adjustment.adjustment_type,
+                        user=user_instance,
                     )
 
-                    items1.save()
-                    
-                    print(items1, "item one")
-        elif newadj.adjustment_type == 'Value':
-             print(newadj.adjustment_type, "adjustment.adjustment_type")
-             items_names = request.POST.getlist('item2[]')
-             
-             
-             print(items_names, "items_names")
-             current_value = request.POST.getlist('cuval[]')
-             changed_value = request.POST.getlist('chval[]')
-             value_adjusted = request.POST.getlist('adjval[]')
-             if len(items_names) == len(current_value) == len(changed_value) == len(value_adjusted):
+            # Process value adjustments
+            elif adjustment.adjustment_type == 'Value':
+                items_names = request.POST.getlist('item2[]')
+                current_value = request.POST.getlist('cuval[]')
+                changed_value = request.POST.getlist('chval[]')
+                value_adjusted = request.POST.getlist('adjval[]')
+
                 for j in range(len(items_names)):
-                    items2 = ItemAdjustment.objects.create(
-                        item=items_names[j],
+                    # Update existing ItemAdjustment object or create new one
+                    ItemAdjustment.objects.filter(
+                        adjustment=adjustment,
+                        item=items_names[j]
+                    ).update(
                         current_value=current_value[j],
                         changed_value=changed_value[j],
                         adjusted_value=value_adjusted[j],
-                        adjustment_type=newadj.adjustment_type,
-                        adjustment=newadj,
-                        user=user,       
+                        adjustment_type=adjustment.adjustment_type,
+                        user=user_instance,
                     )
-                    items2.save()
-                    print(items2, "item two")
-        if 'save_draft' in request.POST:
-            newadj.status = "Draft"
-            
 
-        elif 'convert_adjusted' in request.POST:
-             newadj.status = "Adjusted"
+            # Update adjustment status
+            if 'save_draft' in request.POST:
+                adjustment.status = "Draft"
+            elif 'convert_adjusted' in request.POST:
+                adjustment.status = "Adjusted"
 
-        newadj.save()
-    return redirect("inv_overview",id)
+            adjustment.save()
+
+            return redirect("inv_overview", id)
+    except Exception as e:
+        traceback.print_exc()  # Print traceback for debugging
+        return HttpResponseServerError()  # Return an HTTP 500 response for server errors
 
 
 
