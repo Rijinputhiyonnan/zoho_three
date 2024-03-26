@@ -17188,19 +17188,7 @@ def new_item(request):
     
 
 
-  
-@login_required(login_url='login')        
-def new_item_dropdown(request):
-    user = User.objects.get(id=request.user.id) 
-    options = {}
-    option_objects = AddItem.objects.all()
-    for option in option_objects:
-         options[option.id] = {
-            'name': option.Name,
-            'stock': option.stock,  
-            'rate': option.rate,   
-        }
-    return JsonResponse(options, safe=False)
+
 
 # nasneen o m
 
@@ -27386,14 +27374,14 @@ def update_adjustment(request, id):
 @login_required(login_url='login')
 def new_adjustment(request):   #updation
     user = request.user
-    accounts=Chart_of_Account.objects.all()
+    accounts=Chart_of_Account.objects.filter(user=request.user)
     company_data = company_details.objects.get(user=request.user)
     items = AddItem.objects.filter(user_id=user.id)
     sales = Sales.objects.filter(user=request.user).first()
 
     purchase = Purchase.objects.filter(user=request.user).first()
-    unit=Unit.objects.filter(user=request.user).first()
-    reason=Reason.objects.filter(user=request.user).first()
+    unit=Unit.objects.filter(user=request.user)
+    reason=Reason.objects.filter(user=request.user)
     last_reference = Inventoryadjust_Reference.objects.filter(user=request.user.id).last()
          
     if last_reference == None:
@@ -28026,3 +28014,20 @@ def add_prod(request):     #updation
             'banks' : banks
         }
     return render(request, 'createinvoice.html', context)
+
+
+
+
+  
+@login_required(login_url='login')        
+def new_item_dropdown(request):
+    user = User.objects.get(id=request.user.id) 
+    options = {}
+    option_objects = AddItem.objects.filter(user=request.user)
+    for option in option_objects:
+         options[option.id] = {
+            'name': option.Name,
+            'stock': option.stock,  
+            'rate': option.rate,   
+        }
+    return JsonResponse(options, safe=False)
