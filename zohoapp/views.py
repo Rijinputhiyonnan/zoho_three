@@ -16772,23 +16772,7 @@ def inventory_adjustment(request):
 
 
 
-@login_required(login_url='login')
-def newreasons(request):
-    if request.method == 'POST':
-        newreason= request.POST.get('reasonlist')
-        print(newreason,'reason')
-        reasons=Reason(reason=newreason)
-        reasons.save()
-        return JsonResponse({"message": "success"})
 
-
-def newreasonslist(request):
-    print('hello')
-    rson={}
-    reasons=Reason.objects.all()
-    for r in reasons:
-        rson[r.id]= r.reason
-    return JsonResponse(rson)
 
 
              
@@ -28031,3 +28015,48 @@ def new_item_dropdown(request):
             'rate': option.rate,   
         }
     return JsonResponse(options, safe=False)
+
+''' 
+def newreasons(request):
+    if request.method == 'POST':
+        newreason= request.POST.get('reasonlist')
+        print(newreason,'reason')
+        reasons=Reason(reason=newreason)
+        reasons.save()
+        return JsonResponse({"message": "success"})'''
+
+from django.db import IntegrityError
+from django.http import JsonResponse
+
+def newreasons(request):
+    if request.method == 'POST':
+        newreason = request.POST.get('reasonlist')
+        print(newreason, 'reason')
+
+        try:
+            # Check if the reason already exists
+            existing_reason = Reason.objects.filter(reason=newreason).first()
+
+            if existing_reason:
+                # Return a JsonResponse indicating that the reason already exists
+                return JsonResponse({"message": "Reason already exists"})
+
+            # If the reason doesn't exist, save it
+            reasons = Reason(reason=newreason)
+            reasons.save()
+            return JsonResponse({"message": "success"})
+        except IntegrityError:
+            # Handle IntegrityError (e.g., duplicate entry)
+            return JsonResponse({"message": "Error occurred while saving the reason"}, status=500)
+
+
+
+
+def newreasonslist(request):
+    user = User.objects.get(id=request.user.id) 
+    print('hello')
+    rson={}
+    reasons=Reason.objects.filter(user=request.user)
+    for r in reasons:
+        rson[r.id]= r.reason
+    return JsonResponse(rson)

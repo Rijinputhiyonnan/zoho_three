@@ -115,6 +115,14 @@
   color: white;
 }
 
+/* Customize the width of the Select2 container for the select2 class */
+.select2-container--default.select2 .select2-selection--single {
+  /* width: 66vh !important;  Adjust the width as needed */
+    height: 5vh !important; /* Adjust the height as needed */
+
+    
+}
+
 </style>
 
 
@@ -326,7 +334,7 @@
 
                     
                     <td class='text-right text-dark ' >
-                      <input type='number' step="0.01" class='form-control bg-transparent border-1 border-light text-light text-right qty '  name="qtyav[]" id="quant"   onchange="qtychange(this.id); changeqty(this.id);"  value='{{ i.quantity_available }}'>
+                      <input type='number' step="0.01" class='form-control bg-light border-1 border-light text-dark text-right qty '  name="qtyav[]" id="quant"   onchange="qtychange(this.id); changeqty(this.id);"  value='{{ i.quantity_available }}'>
 
                      <!--<span class="text-warning">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>--> 
                       <span class="stock_warning text-danger"></span>
@@ -454,11 +462,11 @@
                   </script>
                     </td>
                     
-                    <td class='text-right'><input type='number' id='rates' class='form-control bg-transparent border-1 border-light text-light text-right rate' name='newqty[]' value='{{ i.new_quantity_on_hand }}'>
+                    <td class='text-right'><input type='number' id='rates' class='form-control bg-light border-1 border-light text-dark text-right rate' name='newqty[]' value='{{ i.new_quantity_on_hand }}'>
                     </td>
                     
                     
-                    <td class='text-right'><input type='text' id='diff' class='form-control bg-transparent border-1 border-light text-light text-right discount' name='qtyadj[]' value='{{ i.adjusted_quantity }}'>
+                    <td class='text-right'><input type='text' id='diff' class='form-control bg-light border-1 border-light text-dark text-right discount' name='qtyadj[]' value='{{ i.adjusted_quantity }}'>
                     </td>
                     
 
@@ -547,9 +555,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     </select>
                 </div>
             </td>
-            <td class='text-right'><input type='number' class='form-control bg-transparent border-1 border-light text-light text-right qty2${rowNum}'  name="qtyav[]"></td>
-            <td class='text-right'><input type='number' id='rates${rowNum}' class='form-control bg-transparent border-1 border-light text-light text-right rate' onchange='quaninp(${rowNum})' name="newqty[]" value=''></td>
-            <td class='text-right'><input type='text' id='diff${rowNum}' class='form-control bg-transparent border-1 border-light text-light text-right discount' name="qtyadj[]" value=''></td>
+            <td class='text-right'><input type='number' class='form-control bg-light border-1 border-light text-light text-dark qty2${rowNum}'  name="qtyav[]"></td>
+            <td class='text-right'><input type='number' id='rates${rowNum}' class='form-control bg-light border-1 border-light text-dark text-right rate' onchange='quaninp(${rowNum})' name="newqty[]" value=''></td>
+            <td class='text-right'><input type='text' id='diff${rowNum}' class='form-control bg-light border-1 border-light text-dark text-right discount' name="qtyadj[]" value=''></td>
             <td class='text-center'>
                 <button type='button' class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row' style='width:30px'><i class='fa fa-times'></i></button>
             </td>
@@ -660,15 +668,15 @@ function updateDiscount(diffInput, rateInput, qtyInput) {
                                         </div>
                                     </td>
                                     <!-- id='rate1' -->
-                                    <td class='text-right'><input type='number'  class='form-control bg-transparent border-1 border-light text-light text-right values' id="omega_value" name='cuval[]'
+                                    <td class='text-right'><input type='number'  class='form-control bg-light border-1 border-light text-dark text-right values' id="omega_value" name='cuval[]'
                                       value="{{ j.current_value }}" >
                                     </td>
                                     <!-- id='rate2' -->
-                                    <td class='text-right'><input type='number'  class='form-control bg-transparent border-1 border-light text-light text-right rate' name='chval[]'
+                                    <td class='text-right'><input type='number'  class='form-control bg-light border-1 border-light text-dark text-right rate' name='chval[]'
                                       value="{{ j.changed_value }}" >
                                     </td>
                                     <!-- id='discount1' -->
-                                    <td class='text-right'><input type='text'  class='form-control bg-transparent border-1 border-light text-light text-right discount' name='adjval[]'
+                                    <td class='text-right'><input type='text'  class='form-control bg-light border-1 border-light text-dark text-right discount' name='adjval[]'
                                       value="{{ j.adjusted_value }}" >
                                     </td>
                                     
@@ -728,9 +736,9 @@ function updateDiscount(diffInput, rateInput, qtyInput) {
                     </select>
                 </div>
             </td>
-            <td class='text-right'><input type='number' class='form-control bg-transparent border-1 border-light text-light text-right values' name='cuval[]' value='' id="omega_value${rowNum2}"></td>
-            <td class='text-right'><input type='number' class='form-control bg-transparent border-1 border-light text-light text-right rate' name='chval[]' value=''></td>
-            <td class='text-right'><input type='text' class='form-control bg-transparent border-1 border-light text-light text-right discount' name='adjval[]' value=''></td>
+            <td class='text-right'><input type='number' class='form-control bg-light border-1 border-light text-dark text-right values' name='cuval[]' value='' id="omega_value${rowNum2}"></td>
+            <td class='text-right'><input type='number' class='form-control bg-light border-1 border-light text-dark text-right rate' name='chval[]' value=''></td>
+            <td class='text-right'><input type='text' class='form-control bg-light border-1 border-light text-dark text-right discount' name='adjval[]' value=''></td>
             <td class='text-center'>
                 <button type='button' class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row' style='width:30px'><i class='fa fa-times'></i></button>
             </td>

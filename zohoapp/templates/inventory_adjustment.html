@@ -64,6 +64,54 @@
   }
   
   
+
+
+
+
+
+
+
+
+
+  .tooltip-container {
+    position: relative;
+}
+
+.tooltip-text {
+    display: none;
+    position: absolute;
+    top: -30px; /* Adjust as needed to position above the icon */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px;
+    border-radius: 3px;
+    white-space: nowrap;
+    transition: opacity 0.3s ease-in-out; /* Smooth transition */
+    z-index: 1; /* Ensure it's above the icon */
+}
+
+.tooltip-trigger {
+    position: relative;
+    cursor: pointer;
+    z-index: 0;
+}
+
+.tooltip-trigger:hover + .tooltip-text {
+    display: block;
+}
+
+/* Animation for the icon */
+.tooltip-trigger i {
+    transition: transform 0.3s ease-in-out;
+}
+
+.tooltip-trigger:hover i {
+    transform: rotate(380deg); /* Adjust as needed for the desired animation */
+}
+
+
 </style>
 
 
@@ -110,7 +158,7 @@
     <div style="height: 600px;overflow-y: scroll;">
 
       <div class="row container-fluid">
-        <div class="col-md-3"><a class="text-white" style="font-size: 2rem;">Inventory Adjustments</a></div>
+        <div class="col-md-3"><a class="text-white" style="font-size: 2rem;">Inventory  Adjustments</a></div>
       </div>
       <br><br><br>
 
@@ -184,9 +232,14 @@
               </a> </td>
               <td> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;" >{{ a.reason }}</a></td>
               <td class="tooltip-container text-center">
-                <span class="tooltip-trigger text-center"><i class="fas fa-comment-alt"></i></span>
-              <span class="tooltip-text text-center"> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;" class="text-dark">{{ a.description }}</a> </span>
-              </td>
+                <span class="tooltip-trigger text-center">
+                    <i class="fas fa-comment-alt"></i>
+                </span>
+                <span class="tooltip-text text-center">
+                    <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;" class="text-light">{{ a.description }}</a>
+                </span>
+            </td>
+            
               
               <td class="text-center"> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;">{{ a.reference_number }}</a> </td>
               <td class="text-center"> <a href="{% url 'inv_overview' a.id %}" style="text-decoration: none;color: white;">{{ a.adjustment_type }}</a> </td>
