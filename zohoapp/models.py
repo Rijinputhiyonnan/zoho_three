@@ -1946,14 +1946,15 @@ class Inventoryadjust_Reference(models.Model):
     
     
         
+
+
 class Reason(models.Model):
-    reason=models.TextField(max_length=255, unique=True)
-    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    reason = models.TextField(max_length=255)
 
     def __str__(self):
         return self.reason
-        
-        
+
 class Adjustment(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     type = models.CharField(max_length=255)

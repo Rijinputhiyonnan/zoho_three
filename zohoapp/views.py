@@ -28029,13 +28029,14 @@ from django.db import IntegrityError
 from django.http import JsonResponse
 
 def newreasons(request):
+    user = request.user 
     if request.method == 'POST':
         newreason = request.POST.get('reasonlist')
         print(newreason, 'reason')
 
         try:
             # Check if the reason already exists
-            existing_reason = Reason.objects.filter(reason=newreason).first()
+            existing_reason = Reason.objects.filter(user=user)
 
             if existing_reason:
                 # Return a JsonResponse indicating that the reason already exists
@@ -28053,10 +28054,7 @@ def newreasons(request):
 
 
 def newreasonslist(request):
-    user = User.objects.get(id=request.user.id) 
-    print('hello')
-    rson={}
-    reasons=Reason.objects.filter(user=request.user)
-    for r in reasons:
-        rson[r.id]= r.reason
-    return JsonResponse(rson)
+    user = request.user
+    reasons = Reason.objects.filter(user=user)
+    reasons_dict = {reason.id: reason.reason for reason in reasons}
+    return JsonResponse(reasons_dict)

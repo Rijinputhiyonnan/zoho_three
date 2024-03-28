@@ -150,7 +150,7 @@
   /* Change the background color of the selected option for the select2 class */
   .select2-container--default.select2 .select2-selection--single {
       background-color: #fefcfd !important;
-      color: #5b112f !important;
+      color: #fefafc !important;
   }
   
 
@@ -2699,7 +2699,7 @@
           <div>
       
 
-            <select name='item[]' id="item${rowCount}" class="form-control select2 extra border-0 bg-transparent text-white item_select itm itemselect" style="width: 18vh; font-size: 15px;"  onchange="itemfunction('item${rowCount}')">
+            <select name='item[]' id="item${rowCount}" class="form-control select2 extra border-0 bg-transparent text-white item_select itm itemselect" style="width: 28vh; font-size: 15px;"  onchange="itemfunction('item${rowCount}')">
               <option id="selectitem"  >Select Items </option>
               <option class="form-control select2 text-center"  value="{{i.Name}}">{{i.product}}</option>
               {% for i in p %}

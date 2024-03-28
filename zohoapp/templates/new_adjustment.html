@@ -50,7 +50,7 @@
 
     /* Handle on hover */
     ::-webkit-scrollbar-thumb:hover {
-        background: #555;
+        background: #f08a9e;
     }
 
     .hide {
@@ -74,7 +74,7 @@
 
 /* Customize the background color and text color of the selected option */
 .select2-container--default .select2-selection--single {
-    background-color: #555;
+    background-color: #ea6c9e;
     color: white;
 }
 
@@ -103,16 +103,24 @@
 /* Increase the width of the Select2 container */
 .select2-container--default .select2-selection--single {
     width: 18vh !important; /* Adjust the width as needed */
-    height: 5vh
+    height: 10vh
 }
 
-/* Move the arrow to the right end */
-.select2-container--default .select2-selection--single .select2-selection__arrow {
-    right: 35vh; /* Adjust the distance from the right end as needed */
-}
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
   color: white;
+}
+
+
+
+
+  
+/* Customize the width of the Select2 container for the select2 class */
+.select2-container--default.select2 .select2-selection--single {
+  /* width: 66vh !important;  Adjust the width as needed */
+    height: 5vh !important; /* Adjust the height as needed */
+
+    
 }
 
 </style>
@@ -305,7 +313,7 @@
                     <td class="bg-transparent text-white rownum" id="" value=""></td>
                     <td>
                         <div class='form-group'>
-                          <select class=' bg-transparent border-0 item_select   text-white itm  itemselect2' style=" width: 17vh;" name='item[]' id='item1' onchange="selectonchange()" >
+                          <select class=' bg-light border-0 item_select   text-dark itm  itemselect2' style=" width: 17vh;" name='item[]' id='item1' onchange="selectonchange()" >
 
                                 <option id="selectitem" hidden >Select Items </option>
                                 {% for i in items %}
@@ -319,8 +327,7 @@
 
 
                     
-                    <td class='text-right text-dark ' >
-                      <input type='number' step="0.01" class='form-control bg-transparent border-1 border-light bg-white text-light text-right qty ' value='' name="qtyav[]" id="quant"   onchange="qtychange(this.id); changeqty(this.id);">
+                    <td class='text-right text-dark ' ><input type='number' step="0.01" class='form-control bg-light border-1 border-light text-dark text-right qty ' value='' name="qtyav[]" id="quant"   onchange="qtychange(this.id); changeqty(this.id);">
 
                      <!--<span class="text-warning">Available Stock : <span id="stock_data1" class="stock_data text-warning"></span></span>--> 
                       <span class="stock_warning text-danger"></span>
@@ -448,11 +455,11 @@
                   </script>
                     </td>
                     
-                    <td class='text-right'><input type='number' id='rates' class='form-control bg-transparent border-1 border-light bg-white text-light text-right rate' name='newqty[]' value=''>
+                    <td class='text-right'><input type='number' id='rates' class='form-control bg-light border-1 border-light text-dark text-right rate' name='newqty[]' value=''>
                     </td>
                     
                     
-                    <td class='text-right'><input type='text' id='diff' class='form-control bg-transparent border-1 border-light bg-white text-light text-right discount' name='qtyadj[]' value=''>
+                    <td class='text-right'><input type='text' id='diff' class='form-control bg-light border-1 border-light text-dark text-right discount' name='qtyadj[]' value=''>
                     </td>
                     
 
@@ -537,9 +544,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     </select>
                 </div>
             </td>
-            <td class='text-right'><input type='number' class='form-control bg-transparent border-1 border-light text-light text-right qty2${rowNum}'  name="qtyav[]"></td>
-            <td class='text-right'><input type='number' id='rates${rowNum}' class='form-control bg-transparent border-1 border-light text-light text-right rate' onchange='quaninp(${rowNum})' name="newqty[]" value=''></td>
-            <td class='text-right'><input type='text' id='diff${rowNum}' class='form-control bg-transparent border-1 border-light text-light text-right discount' name="qtyadj[]" value=''></td>
+            <td class='text-right'><input type='number' class='form-control bg-light border-1 border-light text-dark text-right qty2${rowNum}'  name="qtyav[]"></td>
+            <td class='text-right'><input type='number' id='rates${rowNum}' class='form-control bg-light border-1 border-light text-dark text-right rate' onchange='quaninp(${rowNum})' name="newqty[]" value=''></td>
+            <td class='text-right'><input type='text' id='diff${rowNum}' class='form-control bg-light border-1 border-light text-dark text-right discount' name="qtyadj[]" value=''></td>
             <td class='text-center'>
                 <button type='button' class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row' style='width:30px'><i class='fa fa-times'></i></button>
             </td>
@@ -628,7 +635,7 @@ function updateDiscount(diffInput, rateInput, qtyInput) {
                             >
                             <thead>
                                 <tr>
-                                    <th class="" style="font-weight: bold;color: rgb(245, 154, 36);  width: 50vh" colspan="2" >Item Details <a href="" data-toggle="modal" data-target="#newitem"><i class="fas fa-plus p-2 rounded"
+                                    <th class="" style="font-weight: bold;color: rgb(245, 154, 36);  width: 25vh" colspan="2" >Item Details <a href="" data-toggle="modal" data-target="#newitem"><i class="fas fa-plus p-2 rounded"
                                                 style="color: white; background-color: rgb(210, 132, 30);"></i></a></th>
                                     <th class="text-right" style="font-weight: bold;color: rgb(245, 154, 36);">Current Value</th>
                                     <th class="text-right" style="font-weight: bold;color: rgb(245, 154, 36);">Changed Value</th>
@@ -650,15 +657,15 @@ function updateDiscount(diffInput, rateInput, qtyInput) {
                                         </div>
                                     </td>
                                     <!-- id='rate1' -->
-                                    <td class='text-right'><input type='number'  class='form-control bg-transparent border-1 border-light text-light text-right values' id="omega_value" name='cuval[]'
+                                    <td class='text-right'><input type='number'  class='form-control bg-light border-1 border-light text-dark text-right values' id="omega_value" name='cuval[]'
                                             value=''>
                                     </td>
                                     <!-- id='rate2' -->
-                                    <td class='text-right'><input type='number'  class='form-control bg-transparent border-1 border-light text-light text-right rate' name='chval[]'
+                                    <td class='text-right'><input type='number'  class='form-control bg-light border-1 border-light text-dark text-right rate' name='chval[]'
                                             value=''>
                                     </td>
                                     <!-- id='discount1' -->
-                                    <td class='text-right'><input type='text'  class='form-control bg-transparent border-1 border-light text-light text-right discount' name='adjval[]'
+                                    <td class='text-right'><input type='text'  class='form-control bg-light border-1 border-light text-dark text-right discount' name='adjval[]'
                                             value=''>
                                     </td>
                                     
@@ -717,9 +724,9 @@ function updateDiscount(diffInput, rateInput, qtyInput) {
                     </select>
                 </div>
             </td>
-            <td class='text-right'><input type='number' class='form-control bg-transparent border-1 border-light text-light text-right values' name='cuval[]' value='' id="omega_value${rowNum2}"></td>
-            <td class='text-right'><input type='number' class='form-control bg-transparent border-1 border-light text-light text-right rate' name='chval[]' value=''></td>
-            <td class='text-right'><input type='text' class='form-control bg-transparent border-1 border-light text-light text-right discount' name='adjval[]' value=''></td>
+            <td class='text-right'><input type='number' class='form-control bg-light border-1 border-light text-dark text-right values' name='cuval[]' value='' id="omega_value${rowNum2}"></td>
+            <td class='text-right'><input type='number' class='form-control bg-light border-1 border-light text-dark text-right rate' name='chval[]' value=''></td>
+            <td class='text-right'><input type='text' class='form-control bg-light border-1 border-light text-dark text-right discount' name='adjval[]' value=''></td>
             <td class='text-center'>
                 <button type='button' class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row' style='width:30px'><i class='fa fa-times'></i></button>
             </td>
@@ -1040,7 +1047,6 @@ function populateSelectsFromJSON() {
                               <option value="">Select Account</option>
                
                                 <option value="" disabled class="btn btn-dark text-white"><b>SALES</b></option>
-                                <option value="{{s.id}}">{{ s.Account_name }}</option>
                                 {% for s in sales %}
                                     <option value="{{s.id}}">{{ s.Account_name }}</option>
                               {% endfor %}
@@ -1222,7 +1228,7 @@ function populateSelectsFromJSON() {
   <div class="modal-dialog modal-xl">
     <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
       <div class="modal-header " style="background: rgb(32, 35, 37);">
-          <h3 class="m-3 text-uppercase">New Adjustment</h3>
+          <h3 class="m-3 text-uppercase">New Reason</h3>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
           </button>
