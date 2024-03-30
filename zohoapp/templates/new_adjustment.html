@@ -536,12 +536,17 @@ document.addEventListener('DOMContentLoaded', function() {
             <td class="bg-transparent text-light">${rowNum}</td>
             <td>
                 <div class='form-group'>
-                  <select class='bg-transparent text-light border-0 item_select${rowNum} itemselect2 inneritm' name='item[]' id='item${rowNum}' onchange='selectonchange2(${rowNum})'>
-                        <option class='text-white'hidden selected>Select Items</option>
-                        {% for i in items %}
-                        <option class="text-dark" value="{{i.Name}}" data-stock="{{i.stock}}" >{{i.Name}}</option>
-                        {% endfor %}
-                    </select>
+               
+
+
+                    <select class=' bg-light border-0 item_select   text-dark itm  itemselect2 item_select${rowNum}'  style=" width: 17vh;" name='item[]' id='item${rowNum}' onchange='selectonchange2(${rowNum})' >
+
+                      <option class='text-white' >Select Items</option>
+                      {% for i in items %}
+                      <option class="text-white" value="{{i.Name}}" data-stock="{{i.stock}}" >{{i.Name}}</option>
+                      {% endfor %}
+
+                  </select>
                 </div>
             </td>
             <td class='text-right'><input type='number' class='form-control bg-light border-1 border-light text-dark text-right qty2${rowNum}'  name="qtyav[]"></td>
@@ -715,13 +720,16 @@ function updateDiscount(diffInput, rateInput, qtyInput) {
             <td class="bg-transparent text-white">${rowNum2}</td>
             <td>
                 <div class='form-group'>
-                  <select class='bg-transparent border-0 item_select2 inneritm2 text-light itemselect2' name='item2[]' id="alphaid${rowNum2}" onchange="valuechange2(${rowNum2})">
+                  <select class='bg-transparent border-0 item_select2 inneritm2 text-light itemselect2' name='item2[]' style=" width: 17vh;" id="alphaid${rowNum2}" onchange="valuechange2(${rowNum2})">
                         <option class='text-light' hidden>Select Items</option>
                         {% for i in items %}
                         <!-- data-rate="{{i.rate}}" -->
                         <option  value="{{i.Name}}" data-stock="{{i.stock}}" data-rate="{{i.rate}}" style="color:black!important;">{{i.Name}}</option>
                         {% endfor %}
                     </select>
+                    
+
+        
                 </div>
             </td>
             <td class='text-right'><input type='number' class='form-control bg-light border-1 border-light text-dark text-right values' name='cuval[]' value='' id="omega_value${rowNum2}"></td>

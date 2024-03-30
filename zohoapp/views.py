@@ -27361,11 +27361,11 @@ def new_adjustment(request):   #updation
     accounts=Chart_of_Account.objects.filter(user=request.user)
     company_data = company_details.objects.get(user=request.user)
     items = AddItem.objects.filter(user_id=user.id)
-    sales = Sales.objects.filter(user=request.user).first()
+    sales = Sales.objects.all()
 
-    purchase = Purchase.objects.filter(user=request.user).first()
-    unit=Unit.objects.filter(user=request.user)
-    reason=Reason.objects.filter(user=request.user)
+    purchase = Purchase.objects.all()
+    unit=Unit.objects.filter(user=user)
+    reason=Reason.objects.filter(user=user)
     last_reference = Inventoryadjust_Reference.objects.filter(user=request.user.id).last()
          
     if last_reference == None:
@@ -27712,34 +27712,36 @@ def add_prod(request):     #updation
     items = AddItem.objects.filter(user_id=user.id, status_stock__iexact='Active')
     i = invoice.objects.all()
     payments = payment_terms.objects.filter(user = request.user)
-    sales = Sales.objects.filter(additem__user=request.user)
-    purchase = Purchase.objects.filter(additem__user=request.user)
-    units = Unit.objects.all()
+    sales = Sales.objects.all()
+    purchase = Purchase.objects.all()
+    units = Unit.objects.filter(user=user)
     banks = Bankcreation.objects.filter(user = request.user)
     last_record = invoice.objects.filter(user=request.user.id).last()
     last_reference = Invoice_Reference.objects.filter(user=request.user.id).last()
-    inv_last1 = invoice.objects.filter(user = request.user)
+    inv_last1 = invoice.objects.filter(user=request.user)
     inv_last = 0
+
     if inv_last1.exists():
-        inv_last = invoice.objects.filter(user = request.user).last().invoice_no
+        inv_last = invoice.objects.filter(user=request.user).last().invoice_no
     else:
         inv_last = 1
-        
+
     inv_last_str = str(inv_last)
     last_digit_index = len(inv_last_str)
 
+    # Extract the prefix and numeric portion
+    prefix = inv_last_str[:-1]
+    numeric_portion = inv_last_str[-1:]
 
-
-    prefix = str(inv_last)[:last_digit_index]
-
-    if inv_last_str[last_digit_index:]:
-        number = int(inv_last_str[last_digit_index:]) + 1
+    # Check if numeric portion is numeric
+    if numeric_portion.isdigit():
+        # Increment the numeric portion by 1
+        number = int(numeric_portion) + 1
     else:
+        # Default to 1 if numeric portion is not numeric
         number = 1
 
-
-
-    number+= 1
+    # Concatenate the prefix and the incremented numeric portion
     count = f"{prefix}{number}"
 
 
@@ -28025,36 +28027,23 @@ def newreasons(request):
         reasons.save()
         return JsonResponse({"message": "success"})'''
 
-from django.db import IntegrityError
-from django.http import JsonResponse
 
+@login_required(login_url='login')
 def newreasons(request):
-    user = request.user 
+    user=request.user
     if request.method == 'POST':
-        newreason = request.POST.get('reasonlist')
-        print(newreason, 'reason')
-
-        try:
-            # Check if the reason already exists
-            existing_reason = Reason.objects.filter(user=user)
-
-            if existing_reason:
-                # Return a JsonResponse indicating that the reason already exists
-                return JsonResponse({"message": "Reason already exists"})
-
-            # If the reason doesn't exist, save it
-            reasons = Reason(reason=newreason)
-            reasons.save()
-            return JsonResponse({"message": "success"})
-        except IntegrityError:
-            # Handle IntegrityError (e.g., duplicate entry)
-            return JsonResponse({"message": "Error occurred while saving the reason"}, status=500)
-
-
+        newreason= request.POST.get('reasonlist')
+        print(newreason,'reason')
+        reasons=Reason(reason=newreason, user=user)
+        reasons.save()
+        return JsonResponse({"message": "success"})
 
 
 def newreasonslist(request):
-    user = request.user
-    reasons = Reason.objects.filter(user=user)
-    reasons_dict = {reason.id: reason.reason for reason in reasons}
-    return JsonResponse(reasons_dict)
+    user=request.user
+    print('hello')
+    rson={}
+    reasons=Reason.objects.filter(user=user)
+    for r in reasons:
+        rson[r.id]= r.reason
+    return JsonResponse(rson)
