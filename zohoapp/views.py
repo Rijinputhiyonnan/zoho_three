@@ -28047,3 +28047,113 @@ def newreasonslist(request):
     for r in reasons:
         rson[r.id]= r.reason
     return JsonResponse(rson)
+
+
+
+
+
+def inventory_unit_dropdown_eway(request):
+
+    user = User.objects.get(id=request.user.id)
+    req_user=request.user
+
+    options = {}
+    option_objects = Unit.objects.filter(user=req_user)
+    
+    for option in option_objects:
+        print(option, "option_objects  inventory")
+        options[option.id] = option.unit
+    
+    return JsonResponse(options)
+
+def invoice_unit_dropdown(request):  #updation
+
+    user = User.objects.get(id=request.user.id)
+    req_user=request.user
+
+    options = {}
+    option_objects = Unit.objects.filter(user = req_user)
+    for option in option_objects:
+        options[option.id] = option.unit
+
+    return JsonResponse(options)
+
+
+def invoice_unit_eway(request):
+    user=request.user
+    
+    company = company_details.objects.get(user = request.user)
+
+    if request.method=='POST':
+
+        unit =request.POST.get('unit')
+        
+        u = User.objects.get(id = request.user.id)
+
+        unit = Unit(unit= unit, user=user)
+        unit.save()
+     
+        return JsonResponse({"message": "success"})
+    
+    
+    
+def invoice_modal_item_dropdown(request):
+
+    user = User.objects.get(id=request.user.id)
+    req_user=request.user
+
+    options = {}
+    option_objects = AddItem.objects.filter(user=req_user)
+    for option in option_objects:
+        options[option.id] = option.Name
+    return JsonResponse(options)
+    
+def invoice_modal_item(request):
+    if request.method=='POST':
+        type=request.POST.get('type')
+        name=request.POST['name']
+        ut=request.POST['unit']
+        hsn=request.POST['hsn']
+        inter=request.POST['inter']
+        intra=request.POST['intra']
+        sell_price=request.POST.get('sell_price')
+        sell_acc=request.POST.get('sell_acc')
+        sell_desc=request.POST.get('sell_desc')
+        cost_price=request.POST.get('cost_price')
+        cost_acc=request.POST.get('cost_acc')      
+        cost_desc=request.POST.get('cost_desc')
+        invasset=request.POST.get('invasset')
+        opening_stock=request.POST.get('opening_stock')
+        opening_stock_unit=request.POST.get('opening_stock_unit')
+        active_type=request.POST.get('active_type')
+        units=Unit.objects.get(id=ut)
+        sel=Sales.objects.get(id=sell_acc)
+        cost=Purchase.objects.get(id=cost_acc)
+
+        history="Created by " + str(request.user)
+        user = User.objects.get(id = request.user.id)
+
+        item=AddItem(type=type,hsn=hsn,unit=units,sales=sel,purchase=cost,Name=name,p_desc=cost_desc,s_desc=sell_desc,s_price=sell_price,
+                    p_price=cost_price,user=user,creat=history,interstate=inter,intrastate=intra,invacc=invasset,stock=opening_stock,
+                    rate=opening_stock_unit,satus=active_type,status_stock=active_type)
+
+        item.save()
+        return HttpResponse({"message": "success"})
+    
+    
+    
+def invoice_modal_unit(request):
+    
+    company = company_details.objects.get(user = request.user)
+    user_req=request.user
+
+    if request.method=='POST':
+
+        unit =request.POST.get('unit')
+        
+        u = User.objects.get(id = request.user.id)
+
+        unit = Unit(unit= unit, user=user_req)
+        unit.save()
+
+        return HttpResponse({"message": "success"})

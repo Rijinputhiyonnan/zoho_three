@@ -1333,6 +1333,9 @@
                       <div class="d-flex">
                         <select class="form-control bg-light text-dark" id="item_units" name="item_units" required>
                           <option value="" hidden>Select Unit</option>
+                          <option value="BOX">BOX</option>
+                                <option value="UNIT">UNIT</option>
+                                <option value="LITRE">LITRE</option>
                           {% for u in units %}
                           <option value="{{u.id}}">{{u.unit}}</option>
                           {% endfor %}
@@ -2259,7 +2262,7 @@
     $.ajax({
 
       type: 'POST',
-      url: "{% url 'purchase_unit' %}",
+      url: "{% url 'invoice_modal_unit' %}",
 
       data: {
         unit: $("#unit").val(),
@@ -2374,7 +2377,7 @@
     $.ajax({
 
       type: 'POST',
-      url: "{% url 'purchase_item' %}",
+      url: "{% url 'invoice_modal_item' %}",
 
       data: {
         type: itemtype,
@@ -2408,7 +2411,7 @@
 
   function reloadItem() {
     $.ajax({
-      url: "{% url 'purchase_item_dropdown' %}",
+      url: "{% url 'invoice_modal_item_dropdown' %}",
       type: "GET",
       dataType: "json",
       data: $(this).serialize(),

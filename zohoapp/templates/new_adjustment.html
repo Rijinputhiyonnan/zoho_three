@@ -937,6 +937,9 @@ function populateSelectsFromJSON() {
                             <div class="d-flex">
                               <select class="form-control bg-light text-dark" id="item_units" name="item_units" required>
                                 <option value="" hidden>Select Unit</option>
+                                <option value="BOX">BOX</option>
+                                <option value="UNIT">UNIT</option>
+                                <option value="LITRE">LITRE</option>
                                 {% for u in units %}
                                 <option value="{{u.unit}}">{{u.unit}}</option>
                                 {% endfor %}
@@ -1614,7 +1617,7 @@ $(document).on("click","#unitSave",function(){
             $.ajax({
               
               type : 'POST',
-              url:"{% url 'purchase_unit_eway' %}",
+              url:"{% url 'invoice_unit_eway' %}",
           
               data:{
                   unit : $("#unitval").val(),      
@@ -1633,7 +1636,7 @@ $(document).on("click","#unitSave",function(){
           function reloadUnit() {
           
             $.ajax({
-              url: "{% url 'purchase_unit_dropdown_eway' %}",
+              url: "{% url 'inventory_unit_dropdown_eway' %}",
               type: "GET",
               dataType: "json",
               data: $(this).serialize(),
@@ -1646,6 +1649,8 @@ $(document).on("click","#unitSave",function(){
           
                 $.each(data, function(key, value) {
                     dropdown.append($('<option></option>').attr('value', key).text(value).val(value));
+                    
+                    
                     
                 });
               },

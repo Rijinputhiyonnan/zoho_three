@@ -1238,12 +1238,20 @@ urlpatterns = [
     path('itemdatadebit',views.itemdatadebit,name='itemdatadebit'),
     
     
-    #latest
+    
     
     path('itemdata_invoice',views.itemdata_invoice,name='itemdata_invoice'),
     path('invoice_unit_dropdown',views.invoice_unit_dropdown,name='invoice_unit_dropdown'),
     path('payment_term_for_invoice',views.payment_term_for_invoice,name="payment_term_for_invoice"),
     path('new_item_inventory',views.new_item_inventory,name='new_item_inventory'),
+    
+    #latest 01-04-2024
+    
+    path('inventory_unit_dropdown_eway',views.inventory_unit_dropdown_eway,name='inventory_unit_dropdown_eway'),
+    path('invoice_unit_eway',views.invoice_unit_eway,name='invoice_unit_eway'),
+    path('invoice_modal_item_dropdown',views.invoice_modal_item_dropdown,name='invoice_modal_item_dropdown'),
+    path('invoice_modal_item',views.invoice_modal_item,name='invoice_modal_item'),
+    path('invoice_modal_unit',views.invoice_modal_unit,name='invoice_modal_unit'),
   
 
     
