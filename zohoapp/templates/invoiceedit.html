@@ -1345,7 +1345,7 @@
                       <div class="d-flex">
                         <select class="form-control bg-light text-dark" id="item_units" name="item_units" required>
                           <option value="" hidden>Select Unit</option>
-                          {% for u in unit %}
+                          {% for u in units %}
                           <option value="{{u.id}}">{{u.unit}}</option>
                           {% endfor %}
                         </select>

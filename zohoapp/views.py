@@ -27515,10 +27515,10 @@ def edited_prod(request, id):
    
 
 
-
+    user = request.user
     invp = invpay[0] if invpay else None
     banks = Bankcreation.objects.all()
-    unit = Unit.objects.all()
+    unit = Unit.objects.filter(user=user)
     
     company = company_details.objects.get(user=request.user.id)
     comp = company.state
@@ -27526,7 +27526,7 @@ def edited_prod(request, id):
     
     
     
-    user = request.user
+    
     company = company_details.objects.get(user=user)
     customers = customer.objects.filter(user_id=user.id)
     
@@ -27542,7 +27542,7 @@ def edited_prod(request, id):
     
     est_items = invoice_item.objects.filter(inv=estimate)
 
-    unit=Unit.objects.all()
+    #unit=Unit.objects.all()
     sale=Sales.objects.all()
     purchase=Purchase.objects.all()
     accounts = Purchase.objects.all()
@@ -28103,10 +28103,12 @@ def invoice_modal_item_dropdown(request):
     req_user=request.user
 
     options = {}
-    option_objects = AddItem.objects.filter(user=req_user)
+    option_objects = AddItem.objects.filter(user=req_user.id)
     for option in option_objects:
         options[option.id] = option.Name
     return JsonResponse(options)
+
+    
     
 def invoice_modal_item(request):
     if request.method=='POST':

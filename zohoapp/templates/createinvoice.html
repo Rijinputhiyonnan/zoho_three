@@ -1397,10 +1397,10 @@
                     </div>
                     <div class="col-md-6">
                       <select name="inter" class="form-control bg-light text-dark" id="inter">
-                        <option value="" hidden>Select GST</option>
+                        <option value="" hidden>Select IGST</option>
 
                         <option value="IGST0[0%]">IGST0[0%]</option>
-                        <option value="GST3[3%]">GST3[3%]</option>
+                        <option value="GST3[3%]">IGST3[3%]</option>
                         <option value="IGST5[5%]">IGST5[5%]</option>
                         <option value="IGST12[12%]">IGST12[12%]</option>
                         <option value="IGST18[18%]">IGST18[18%]]</option>
@@ -1844,7 +1844,7 @@
   $(document).ready(function () {
     $("#prof_name").keyup(function () {
       var x = $('#prof_name').val();
-      reford = "{{reference}}"
+      reford = "{{count}}"
       if (reford != '01') {
         if (reford != x) {
           document.getElementById("order_label").style.display = "block"
@@ -2403,7 +2403,7 @@
 
       success: function (response) {
         document.getElementById("modalItem").reset();
-        reloadItem();
+        //reloadItem();
       },
     });
   });
