@@ -2403,7 +2403,7 @@
 
       success: function (response) {
         document.getElementById("modalItem").reset();
-        //reloadItem();
+        reloadItem();
       },
     });
   });
@@ -2425,14 +2425,19 @@
             // If it doesn't exist, create a new option element
             var option = $('<option></option>').attr('value', key).text(value);
             dropdown.append(option);
+            
           }
+         
         });
+        itemfunction();
       },
       error: function (xhr, status, error) {
         console.error(xhr.responseText);
       }
     });
   }
+
+
 
   // account modal
 
@@ -2780,6 +2785,7 @@
       toggleDateInput();
       calculateSubtotal();
       calculateGrandTotal();
+      reloadItem();
     });
     $('#item_table').on('click', '.delete-row', function () {
 
@@ -2912,7 +2918,7 @@ $('.itemselect').select2()
 
 
 
-    // Variable declarations
+    // Variables
     var companyState;
     var oxy_gst;
     var oxy_igst;

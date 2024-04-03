@@ -28098,6 +28098,7 @@ def invoice_unit_eway(request):
     
     
 def invoice_modal_item_dropdown(request):
+    print("fucntion call")
 
     user = User.objects.get(id=request.user.id)
     req_user=request.user
@@ -28106,6 +28107,7 @@ def invoice_modal_item_dropdown(request):
     option_objects = AddItem.objects.filter(user=req_user.id)
     for option in option_objects:
         options[option.id] = option.Name
+        print(option.Name, "name")
     return JsonResponse(options)
 
     
