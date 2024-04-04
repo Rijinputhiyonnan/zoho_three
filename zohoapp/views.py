@@ -28130,7 +28130,7 @@ def invoice_modal_item(request):
         opening_stock=request.POST.get('opening_stock')
         opening_stock_unit=request.POST.get('opening_stock_unit')
         active_type=request.POST.get('active_type')
-        units=Unit.objects.get(id=ut)
+        units=Unit.objects.get(unit=ut)
         sel=Sales.objects.get(id=sell_acc)
         cost=Purchase.objects.get(id=cost_acc)
 
