@@ -2410,6 +2410,7 @@
 
 
   function reloadItem() {
+    console.log("reload item is called")
     $.ajax({
       url: "{% url 'invoice_modal_item_dropdown' %}",
       type: "GET",
@@ -2418,19 +2419,25 @@
       csrfmiddlewaretoken: '{{ csrf_token }}',
 
       success: function (data) {
+        
         var dropdown = $('.itm');
+
         $.each(data, function (key, value) {
           // Check if option with the same value already exists
           if (dropdown.find('option[value="' + key + '"]').length === 0) {
             // If it doesn't exist, create a new option element
             var option = $('<option></option>').attr('value', key).text(value);
             dropdown.append(option);
-            
+           
           }
          
+         
         });
+        itemfunction();
+        console.log(itemfunction(), "itemfunction(itm)")
        
       },
+   
       error: function (xhr, status, error) {
         console.error(xhr.responseText);
       }
@@ -2786,6 +2793,7 @@
       calculateSubtotal();
       calculateGrandTotal();
       reloadItem();
+      
     });
     $('#item_table').on('click', '.delete-row', function () {
 
@@ -2941,6 +2949,9 @@ $('.itemselect').select2()
       },
       success: function (response) {
 console.log(response, "response")
+
+
+
        
         const data = response.rate
         const data1 = response.gst
