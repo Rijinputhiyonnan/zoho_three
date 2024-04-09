@@ -2419,7 +2419,7 @@
       csrfmiddlewaretoken: '{{ csrf_token }}',
 
       success: function (data) {
-        
+
         var dropdown = $('.itm');
 
         $.each(data, function (key, value) {
@@ -2913,23 +2913,28 @@
   });
 
 
+
+
+
+  $(document).ready(function() {
+    $('.itemselect').select2()
+    
+      })
+    
+    
+    
+        // Variables
+        var companyState;
+        var oxy_gst;
+        var oxy_igst;
+    
+
 </script>
 
 
 
 <script>
  
-  $(document).ready(function() {
-$('.itemselect').select2()
-
-  })
-
-
-
-    // Variables
-    var companyState;
-    var oxy_gst;
-    var oxy_igst;
 
  
   function itemfunction(id_str) {
