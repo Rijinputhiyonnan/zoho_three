@@ -1246,8 +1246,6 @@ urlpatterns = [
     path('new_item_inventory',views.new_item_inventory,name='new_item_inventory'),
     
     
-    
-    
     #latest 01-04-2024
     
     path('inventory_unit_dropdown_eway',views.inventory_unit_dropdown_eway,name='inventory_unit_dropdown_eway'),

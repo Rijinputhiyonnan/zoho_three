@@ -18598,7 +18598,7 @@ def getAllAccounts(request):
         return redirect('/')
         
         
-def getinvCustomerDetails(request):
+def (request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         log_details= LoginDetails.objects.get(id=log_id)
